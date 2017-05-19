@@ -1,7 +1,7 @@
 {
   "name": "sqb",
   "description": "Lightweight, multi-dialect SQL query builder for JavaScript",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -20,8 +20,7 @@
     "oracle",
     "framework"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0"
