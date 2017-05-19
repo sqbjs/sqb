@@ -13,7 +13,8 @@ SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 Note: SQB is in alpha state. Use it only for testing purposes only! 
 
 ```js
-const sqb = require('./'),
+const sqb = require('sqb'),
+    /* Shortcuts for more clear coding */
     and = sqb.and,
     or = sqb.or,
     innerJoin = sqb.innerJoin,
@@ -63,7 +64,7 @@ order by c.name, b.release_date desc
 
 Paremeters output
 
-```js
+```
 [ 'WHTE DOG', 2000-01-01T00:00:00.000Z, 2001-01-01T00:00:00.000Z ]
 ```
 
