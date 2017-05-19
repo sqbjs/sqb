@@ -1,14 +1,16 @@
-# sqb
+# SQB
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
+[![Dependencies][dependencies-image]][dependencies-url]
 [![Gitter chat][gitter-image]][gitter-url]
+[![Package Quality][quality-image]][quality-url]
 
-sqb is a lightweight, multi-dialect SQL query builder for JavaScript;
+SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 
-Note: sqb is in alpha state. Use it only for testing purposes only! 
+Note: SQB is in alpha state. Use it only for testing purposes only! 
 
 ## Node Compatibility
 
@@ -27,3 +29,7 @@ Note: sqb is in alpha state. Use it only for testing purposes only!
 [downloads-url]: https://npmjs.org/package/sqb
 [gitter-image]: https://badges.gitter.im/panates/sqb.svg
 [gitter-url]: https://gitter.im/panates/sqb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[dependencies-image]: https://david-dm.org/panates/sqb.svg
+[dependencies-url]:https://david-dm.org/panates/sqb#info=dependencies
+[quality-image]: http://npm.packagequality.com/shield/eonc-rest.png
+[quality-url]: http://packagequality.com/#?package=sqb
