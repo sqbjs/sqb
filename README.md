@@ -46,6 +46,19 @@ let sql =
             ])
         )
         .orderBy("c.name", "b.release_date desc");
+
+let result = sql.build({
+    dialect: "generic",
+    prettyPrint: true,
+    namedParams: false,
+    params: {
+        name: 'WHTE DOG',
+        release_date: [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2001, 0, 1, 0, 0, 0, 0)]
+    }
+});
+console.log(result.sql);
+console.log(result.params);
+
 ```
 
 SQL output
