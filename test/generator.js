@@ -1,8 +1,24 @@
-
 const assert = require('assert'),
     sqb = require('../');
 
 describe('Generator', function () {
+
+    it('should configure', function (done) {
+        let generator = sqb.generator({
+            dialect: 'oracledb',
+            prettyPrint: 1,
+            namedParams: 1,
+            params: {
+                a: 1
+            }
+        });
+        assert.equal(generator.dialect, 'oracle');
+        assert.equal(generator.prettyPrint, true);
+        assert.equal(generator.namedParams, true);
+        assert.deepEqual(generator._inputParams, {a: 1});
+        done();
+    });
+
 
     describe('Generate "select/from" part', function () {
 
@@ -38,6 +54,17 @@ describe('Generator', function () {
             let statement = sqb.select(sqb.column('field1 f1')).from('schema1.table1 t1');
             let result = statement.build();
             assert.equal(result.sql, 'select field1 f1 from schema1.table1 t1');
+            done();
+        });
+
+        it('should validate table name', function (done) {
+            let ok;
+            try {
+                sqb.select().from('table1"');
+            } catch (e) {
+                ok = true;
+            }
+            assert.ok(ok);
             done();
         });
 
@@ -127,6 +154,14 @@ describe('Generator', function () {
             let statement = sqb.select().from('table1').join(sqb.join(sqb.raw('"hello"')));
             let result = statement.build();
             assert.equal(result.sql, 'select * from table1 inner join "hello"');
+            done();
+        });
+
+        it('should generate join/on', function (done) {
+            let statement = sqb.select().from('table1')
+                .join(sqb.innerJoin('join1').on(sqb.and('ID',1)));
+            let result = statement.build();
+            assert.equal(result.sql, 'select * from table1 inner join join1 on ID = 1');
             done();
         });
 
@@ -253,6 +288,17 @@ describe('Generator', function () {
                 let statement = sqb.select().from('table1').where(sqb.and('ID', [1, 2, 3]));
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID in (1,2,3)");
+
+                statement = sqb.select().from('table1').where(sqb.and('ID', '!=', [1, 2, 3]));
+                result = statement.build();
+                assert.equal(result.sql, "select * from table1 where ID not in (1,2,3)");
+                done();
+            });
+
+            it('should generate null', function (done) {
+                let statement = sqb.select().from('table1').where(sqb.and('ID', null));
+                let result = statement.build();
+                assert.equal(result.sql, "select * from table1 where ID = null");
                 done();
             });
 
