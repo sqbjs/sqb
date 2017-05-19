@@ -113,10 +113,24 @@ describe('Generator', function () {
             done();
         });
 
-        it('should generate raw', function (done) {
+        it('should generate raw in select', function (done) {
             let statement = sqb.select(sqb.raw('"hello"')).from('table1');
             let result = statement.build();
             assert.equal(result.sql, 'select "hello" from table1');
+            done();
+        });
+
+        it('should generate raw in "from"', function (done) {
+            let statement = sqb.select().from(sqb.raw('"hello"'));
+            let result = statement.build();
+            assert.equal(result.sql, 'select * from "hello"');
+            done();
+        });
+
+        it('should generate raw in "join"', function (done) {
+            let statement = sqb.select().from('table1').join(sqb.join(sqb.raw('"hello"')));
+            let result = statement.build();
+            assert.equal(result.sql, 'select * from table1 inner join "hello"');
             done();
         });
 
@@ -221,14 +235,14 @@ describe('Generator', function () {
             });
 
             it('should generate date', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', new Date(2017,0,1,10,30,15)));
+                let statement = sqb.select().from('table1').where(sqb.and('ID', new Date(2017, 0, 1, 10, 30, 15)));
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = '2017-01-01 10:30:15'");
                 done();
             });
 
             it('should generate array', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', [1,2,3]));
+                let statement = sqb.select().from('table1').where(sqb.and('ID', [1, 2, 3]));
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID in (1,2,3)");
                 done();
@@ -243,8 +257,13 @@ describe('Generator', function () {
 
             it('should generate parameter', function (done) {
                 let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
-                let result = statement.build();
+                let result = statement.build({
+                    params: {
+                        ID: 1
+                    }
+                });
                 assert.equal(result.sql, "select * from table1 where ID = :ID");
+                assert.equal(result.params.ID, 1);
                 done();
             });
         });
@@ -259,17 +278,81 @@ describe('Generator', function () {
             });
         });
 
+        describe('Sub-selects', function () {
+
+            it('should generate sub-select in "from" part', function (done) {
+                let statement = sqb.select().from(sqb.select().from('table1').alias('t1'));
+                let result = statement.build();
+                assert.equal(result.sql, "select * from (select * from table1) t1");
+                done();
+            });
+
+            it('should generate sub-select in "select" part', function (done) {
+                let statement = sqb.select(sqb.select('ID').from('table2').alias('t1')).from('table1');
+                let result = statement.build();
+                assert.equal(result.sql, "select (select ID from table2) t1 from table1");
+                done();
+            });
+
+            it('should generate sub-select in "join" part', function (done) {
+                let statement = sqb.select().from('table1').join(sqb.innerJoin(sqb.select().from('table1').alias('t1')));
+                let result = statement.build();
+                assert.equal(result.sql, "select * from table1 inner join (select * from table1) t1");
+                done();
+            });
+
+            it('should generate sub-select in "where" part', function (done) {
+                let statement = sqb.select().from('table1').where(sqb.and(sqb.select('ID').from('table1').alias('t1'), 1));
+                let result = statement.build();
+                assert.equal(result.sql, "select * from table1 where (select ID from table1) = 1");
+                done();
+            });
+
+        });
     });
 
 
-    describe('Should generate pretty sql', function () {
+    describe('Generator configuration', function () {
 
-        it('test 1', function (done) {
+        it('Should pretty print - test1', function (done) {
             let statement = sqb.select('field1').from('table1').join(sqb.join('table2'));
             let result = statement.build({
                 prettyPrint: true
             });
             assert.equal(result.sql, 'select field1 from table1\n  inner join table2');
+            done();
+        });
+
+        it('Should pretty print - test2', function (done) {
+            let statement = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6').from('table1').join(sqb.join('table2'));
+            let result = statement.build({
+                prettyPrint: true
+            });
+            assert.equal(result.sql, 'select field1, field2, field3, field4, field5, field6\nfrom table1\n  inner join table2');
+            done();
+        });
+
+        it('Should pretty print - test3', function (done) {
+            let statement = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6').from('table1').where(
+                sqb.and('field1', 'abcdefgh1234567890'),
+                sqb.and('field2', 'abcdefgh1234567890'),
+                sqb.and('field3', 'abcdefgh1234567890')
+            ).orderBy('ID');
+            let result = statement.build({
+                prettyPrint: true
+            });
+            assert.equal(result.sql, "select field1, field2, field3, field4, field5, field6\nfrom table1" +
+                "\nwhere field1 = 'abcdefgh1234567890' and field2 = 'abcdefgh1234567890'\n    and field3 = 'abcdefgh1234567890'" +
+                "\norder by ID");
+            done();
+        });
+
+        it('Should generate indexed params', function (done) {
+            let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
+            let result = statement.build({
+                namedParams: false
+            });
+            assert.equal(result.sql, "select * from table1 where ID = ?");
             done();
         });
 
