@@ -1,7 +1,3 @@
-/*
- * Tests for mounting capabilities (extended from connect)
- * Original file ([connect]/test/mounting.js)
- */
 
 const assert = require('assert'),
     sqb = require('../');
@@ -69,6 +65,17 @@ describe('Select statement', function () {
         assert.equal(obj._where.length, 1);
         assert.ok(obj._where.item(0) instanceof sqb.Condition);
         assert.equal(obj._where.item(0).field, 'ID');
+        done();
+    });
+
+    it('should validate objects in "where"', function (done) {
+        let ok;
+        try {
+            sqb.select().where(1)
+        } catch (e) {
+            ok = true;
+        }
+        assert.ok(ok);
         done();
     });
 

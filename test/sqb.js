@@ -1,7 +1,3 @@
-/*
- * Tests for mounting capabilities (extended from connect)
- * Original file ([connect]/test/mounting.js)
- */
 
 const assert = require('assert'),
     sqb = require('../');

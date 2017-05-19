@@ -1,7 +1,3 @@
-/*
- * Tests for mounting capabilities (extended from connect)
- * Original file ([connect]/test/mounting.js)
- */
 
 const assert = require('assert'),
     sqb = require('../');
@@ -216,6 +212,18 @@ describe('Generator', function () {
                 assert.equal(result.sql, 'select * from table1 where ID is null');
                 done();
             });
+
+            it('should generate sub group', function (done) {
+                let statement = sqb.select().from('table1').where(sqb.and('ID', 'is', null),
+                    sqb.and([
+                        sqb.or('ID2', 1), sqb.or('ID2', 2)
+                    ])
+                );
+                let result = statement.build();
+                assert.equal(result.sql, 'select * from table1 where ID is null and (ID2 = 1 or ID2 = 2)');
+                done();
+            });
+
         });
 
         describe('Generate values', function () {
