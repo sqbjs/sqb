@@ -1,0 +1,42 @@
+{
+  "name": "sqb",
+  "description": "Lightweight, multi-dialect SQL query builder for JavaScript",
+  "version": "0.0.1",
+  "author": "Panates Ltd.",
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>"
+  ],
+  "license": "MIT",
+  "repository": "panates/sqb",
+  "main": "lib/sqb.js",
+  "keywords": [
+    "javascript",
+    "sql",
+    "query",
+    "builder",
+    "dialect",
+    "multi-dialect",
+    "database",
+    "oracle",
+    "framework"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "istanbul": "^0.4.5",
+    "mocha": "^3.2.0"
+  },
+  "engines": {
+    "node": ">= 6.0"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "lib/"
+  ],
+  "scripts": {
+    "test": "mocha --require test/support/env --reporter spec --bail --check-leaks test/",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require test/support/env --reporter dot --check-leaks test/",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require test/support/env --reporter spec --check-leaks test/"
+  }
+}
