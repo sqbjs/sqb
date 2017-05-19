@@ -12,6 +12,61 @@ SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 
 Note: SQB is in alpha state. Use it only for testing purposes only! 
 
+```js
+const sqb = require('./'),
+    and = sqb.and,
+    or = sqb.or,
+    innerJoin = sqb.innerJoin,
+    select = sqb.select,
+    raw = sqb.raw;
+
+let sql =
+    select(
+        'b.ID as book_id', 'b.name book_name', 'c.name category_name',
+        select(raw('count(*)')).from('articles a')
+            .where(and('a.book_id', '=', raw("b.id"))).alias('article_count')
+    )
+        .from('BOOKS b')
+        .join(
+            innerJoin('category c')
+                .on(and('c.id', '=', raw('b.category_id')), and('c.kind', 'science'))
+        )
+        .where(
+            and('name', 'like', /name/),
+            and([
+                or('release_date', 'between', /release_date/),
+                or('release_date', 'between', new Date(2015, 0, 1, 0, 0, 0, 0), new Date(2016, 0, 1, 0, 0, 0, 0)),
+            ]),
+            and([
+                or('c.name', '=', 'novel'),
+                or('c.name', '=', 'horror'),
+                or('c.name', '=', 'child'),
+                or(select('name').from('category').where(and('id', 5)))
+            ])
+        )
+        .orderBy("c.name", "b.release_date desc");
+```
+
+SQL output
+
+```sql
+select b.ID book_id, b.name book_name, c.name category_name, 
+    (select count(*) from articles a where a.book_id = b.id) article_count
+from BOOKS b
+  inner join category c on c.id = b.category_id and c.kind = 'science'
+where name like ? and (release_date between ? and ?
+        or release_date between '2015-01-01' and '2016-01-01')
+    and (c.name = 'novel' or c.name = 'horror' or c.name = 'child'
+        or (select name from category where id = 5) = null)
+order by c.name, b.release_date desc
+```
+
+Paremeters output
+
+```js
+[ 'WHTE DOG', 2000-01-01T00:00:00.000Z, 2001-01-01T00:00:00.000Z ]
+```
+
 ## Node Compatibility
 
   - node `>= 6.x`;
