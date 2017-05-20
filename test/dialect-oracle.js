@@ -32,5 +32,32 @@ describe('Oracle dialect', function () {
             done();
         });
 
+        it('should serialize "limit"', function (done) {
+            let statement = sqb.select().from('table1').limit(10);
+            let result = statement.build({
+                dialect: 'oracle'
+            });
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  row$number <= 10");
+            done();
+        });
+
+        it('should serialize "limit/offset"', function (done) {
+            let statement = sqb.select().from('table1').offset(5).limit(10);
+            let result = statement.build({
+                dialect: 'oracle'
+            });
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  and row$number >= 5 and row$number <= 10");
+            done();
+        });
+
+        it('should serialize "offset"', function (done) {
+            let statement = sqb.select().from('table1').offset(5);
+            let result = statement.build({
+                dialect: 'oracle'
+            });
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  and row$number >= 5");
+            done();
+        });
+
     });
 });

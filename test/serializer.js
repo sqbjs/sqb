@@ -20,6 +20,18 @@ describe('Serializer', function () {
     });
 
 
+    it('should check arguments in .build()', function (done) {
+        let ok;
+        try {
+            let serializer = sqb.serializer();
+            serializer.build(1);
+        } catch (e) {
+            ok = true;
+        }
+        assert.ok(ok);
+        done();
+    });
+
     it('Should pretty print - test1', function (done) {
         let statement = sqb.select('field1').from('table1').join(sqb.join('table2'));
         let result = statement.build({
