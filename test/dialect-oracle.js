@@ -1,7 +1,7 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('SelectSerializer', function () {
+describe('Oracle dialect', function () {
 
     describe('Serialize "select/from" part', function () {
 

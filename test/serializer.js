@@ -1,7 +1,7 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('SelectSerializer', function () {
+describe('Serializer', function () {
 
     it('should configure', function (done) {
         let serializer = sqb.serializer({
@@ -15,7 +15,7 @@ describe('SelectSerializer', function () {
         assert.equal(serializer.dialect, 'oracle');
         assert.equal(serializer.prettyPrint, true);
         assert.equal(serializer.namedParams, true);
-        assert.deepEqual(serializer._inputValues, {a: 1});
+        assert.deepEqual(serializer._inputValues, {A: 1});
         done();
     });
 
