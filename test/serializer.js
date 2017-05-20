@@ -1,10 +1,10 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('Generator', function () {
+describe('SelectSerializer', function () {
 
     it('should configure', function (done) {
-        let generator = sqb.generator({
+        let serializer = sqb.serializer({
             dialect: 'oracledb',
             prettyPrint: 1,
             namedParams: 1,
@@ -12,10 +12,10 @@ describe('Generator', function () {
                 a: 1
             }
         });
-        assert.equal(generator.dialect, 'oracle');
-        assert.equal(generator.prettyPrint, true);
-        assert.equal(generator.namedParams, true);
-        assert.deepEqual(generator._inputParams, {a: 1});
+        assert.equal(serializer.dialect, 'oracle');
+        assert.equal(serializer.prettyPrint, true);
+        assert.equal(serializer.namedParams, true);
+        assert.deepEqual(serializer._inputValues, {a: 1});
         done();
     });
 
@@ -53,7 +53,7 @@ describe('Generator', function () {
         done();
     });
 
-    it('Should generate indexed params', function (done) {
+    it('Should serialize indexed params', function (done) {
         let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
         let result = statement.build({
             namedParams: false

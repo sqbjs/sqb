@@ -1,11 +1,11 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('Generator', function () {
+describe('SelectSerializer', function () {
 
-    describe('Generate "select/from" part', function () {
+    describe('Serialize "select/from" part', function () {
 
-        it('should generate dual', function (done) {
+        it('should serialize dual', function (done) {
             let statement = sqb.select().from();
             let result = statement.build({
                 dialect: 'oracle'
@@ -23,7 +23,7 @@ describe('Generator', function () {
             done();
         });
 
-        it('should generate date', function (done) {
+        it('should serialize date', function (done) {
             let statement = sqb.select().from('table1').where(sqb.and('ID', new Date(2017, 0, 1, 10, 30, 15)));
             let result = statement.build({
                 dialect: 'oracle'
