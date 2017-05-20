@@ -3,7 +3,7 @@ const assert = require('assert'),
 
 describe('Oracle dialect', function () {
 
-    describe('Serialize "select/from" part', function () {
+    describe('Serialize "select" statements', function () {
 
         it('should serialize dual', function (done) {
             let statement = sqb.select().from();
@@ -37,7 +37,7 @@ describe('Oracle dialect', function () {
             let result = statement.build({
                 dialect: 'oracle'
             });
-            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  row$number <= 10");
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where row$number <= 10");
             done();
         });
 
@@ -46,7 +46,7 @@ describe('Oracle dialect', function () {
             let result = statement.build({
                 dialect: 'oracle'
             });
-            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  and row$number >= 5 and row$number <= 10");
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where row$number >= 5 and row$number <= 10");
             done();
         });
 
@@ -55,7 +55,17 @@ describe('Oracle dialect', function () {
             let result = statement.build({
                 dialect: 'oracle'
             });
-            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where  and row$number >= 5");
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where row$number >= 5");
+            done();
+        });
+
+        it('should serialize "limit/offset" pretty print ', function (done) {
+            let statement = sqb.select().from('table1').offset(5).limit(10);
+            let result = statement.build({
+                dialect: 'oracle',
+                prettyPrint: true
+            });
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (\n  select * from table1\n) t)\nwhere row$number >= 5 and row$number <= 10");
             done();
         });
 

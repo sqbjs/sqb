@@ -33,6 +33,16 @@ describe('Serialize insert statements', function () {
         done();
     });
 
+    it('should serialize array params', function (done) {
+        let statement = sqb.insert(/id/, /name/).into('table1').values([1, 'aaa']);
+        let result = statement.build({
+            namedParams: false
+        });
+        assert.equal(result.sql, "insert into table1 (id, name) values (?, ?)");
+        assert.deepEqual(result.params, [1, 'aaa']);
+        done();
+    });
+
     it('should serialize params in configuration (build.params)  ', function (done) {
         let statement = sqb.insert(/id/, /name/).into('table1');
         let result = statement.build({
