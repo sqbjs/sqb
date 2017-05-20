@@ -9,7 +9,7 @@ describe('Serialize insert statements', function () {
         let result = statement.build();
         assert.equal(result.sql, "insert into table1 (id, name) values (1, 'aaa')");
 
-        statement = sqb.insert().columns('id', 'name').into('table1').values({id: 1, name: 'aaa'});
+        statement = sqb.insert().columns('id', 'name').columns().columns(undefined).into('table1').values({id: 1, name: 'aaa'});
         result = statement.build();
         assert.equal(result.sql, "insert into table1 (id, name) values (1, 'aaa')");
         done();
@@ -34,12 +34,12 @@ describe('Serialize insert statements', function () {
     });
 
     it('should serialize array params', function (done) {
-        let statement = sqb.insert(/id/, /name/).into('table1').values([1, 'aaa']);
+        let statement = sqb.insert(/id/, /name/, /address/).into('table1').values([1, 'aaa']);
         let result = statement.build({
             namedParams: false
         });
-        assert.equal(result.sql, "insert into table1 (id, name) values (?, ?)");
-        assert.deepEqual(result.params, [1, 'aaa']);
+        assert.equal(result.sql, "insert into table1 (id, name, address) values (?, ?, ?)");
+        assert.deepEqual(result.params, [1, 'aaa', null]);
         done();
     });
 

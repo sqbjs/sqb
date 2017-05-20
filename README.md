@@ -12,6 +12,10 @@ SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 
 Note: SQB is in alpha state. Use it only for testing purposes only! 
 
+## Getting started
+
+Codding pattern in SQB is very similar to standard sql language.
+
 ```js
 const sqb = require('sqb'),
     /* Shortcuts for more clear coding */
@@ -52,7 +56,7 @@ let result = sql.build({
     prettyPrint: true,
     namedParams: false,
     params: {
-        name: 'WHTE DOG',
+        name: 'WIHTE DOG',
         release_date: [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2001, 0, 1, 0, 0, 0, 0)]
     }
 });
@@ -78,7 +82,46 @@ order by c.name, b.release_date desc
 Paremeters output
 
 ```
-[ 'WHTE DOG', 2000-01-01T00:00:00.000Z, 2001-01-01T00:00:00.000Z ]
+[ 'WIHTE DOG', 2000-01-01T00:00:00.000Z, 2001-01-01T00:00:00.000Z ]
+```
+
+## Insert statements
+
+SQB supports both Array and Object argument to pass values into Insert statements.
+
+```js
+let result = sqb.insert('id', 'name', 'address').into('BOOKS')
+    .values([1, 'Hello SQB', 'The Earth']);
+```
+or
+```js
+let result = sqb.insert('id', 'name', 'address').into('BOOKS')
+    .values({
+      id:-1, 
+      name: 'Hello SQB', 
+      address:'The Earth'
+    });
+```
+result.sql output will be 
+```sql
+insert into BOOKS (id, name, address) values (1, 'Hello SQB', 'The Earth')
+```
+
+## Serialising with parameters
+
+SQB can generate parameter placeholders except serializing values. To do this, just place field names in RegExp pattern.
+
+```js
+let result = sqb.insert(/id/, /name/, /address/).into('BOOKS')
+    .values([1, 'Hello SQB', 'The Earth']);
+```
+result.sql output will be
+```sql
+insert into books (id, name, address) values (?, ?, ?)
+```
+result.params output will be
+```
+[ 1, 'Hello SQB', 'The Earth' ]
 ```
 
 ## Node Compatibility
