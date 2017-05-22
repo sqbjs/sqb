@@ -7,15 +7,11 @@ describe('Serializer', function () {
         let serializer = sqb.serializer({
             dialect: 'oracledb',
             prettyPrint: 1,
-            namedParams: 1,
-            params: {
-                a: 1
-            }
+            namedParams: 1
         });
         assert.equal(serializer.dialect, 'oracle');
         assert.equal(serializer.prettyPrint, true);
         assert.equal(serializer.namedParams, true);
-        assert.deepEqual(serializer._inputValues, {A: 1});
         done();
     });
 
@@ -69,8 +65,9 @@ describe('Serializer', function () {
         let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
         let result = statement.build({
             namedParams: false
-        });
+        }, {id: 5});
         assert.equal(result.sql, "select * from table1 where ID = ?");
+        assert.deepEqual(result.params, [5]);
         done();
     });
 
