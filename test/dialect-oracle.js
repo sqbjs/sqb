@@ -7,9 +7,7 @@ describe('Oracle dialect', function () {
 
         it('should serialize dual', function (done) {
             let statement = sqb.select().from();
-            let result = statement.build({
-                dialect: 'oracle'
-            });
+            let result = statement.build('oracle');
             assert.equal(result.sql, 'select * from dual');
             done();
         });

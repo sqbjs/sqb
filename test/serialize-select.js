@@ -363,27 +363,26 @@ describe('Serialize select statements', function () {
             });
 
             it('should serialize parameter for "between"', function (done) {
-                let statement = sqb.select().from('table1').where(
+                let serializer = sqb.serializer(),
+                    statement = sqb.select().from('table1').where(
                     sqb.and('adate', 'between', /adate/),
                     sqb.and('bdate', 'between', /bdate/)
                 );
                 let d1 = new Date(), d2 = new Date(),
-                    result = statement.build({
-                        params: {
-                            adate: [d1, d2],
-                            bdate: d1,
-                        }
-                    });
-                assert.equal(result.sql, "select * from table1 where adate between :adate1 and :adate2 and bdate between :bdate1 and :bdate2");
-                assert.deepEqual(result.params.adate1, d1);
-                assert.deepEqual(result.params.adate2, d2);
-                assert.deepEqual(result.params.bdate1, d1);
-                assert.deepEqual(result.params.bdate2, null);
+                    result = serializer.build(statement,{
+                            ADATE: [d1, d2],
+                            BDATE: d1,
+                        });
+                assert.equal(result.sql, "select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2");
+                assert.deepEqual(result.params.ADATE1, d1);
+                assert.deepEqual(result.params.ADATE2, d2);
+                assert.deepEqual(result.params.BDATE1, d1);
+                assert.deepEqual(result.params.BDATE2, null);
                 result = statement.build({
                     namedParams: false,
                     params: {
-                        adate: [d1, d2],
-                        bdate: d1,
+                        ADATE: [d1, d2],
+                        BDATE: d1,
                     }
                 });
                 assert.equal(result.sql, "select * from table1 where adate between ? and ? and bdate between ? and ?");
@@ -391,7 +390,22 @@ describe('Serialize select statements', function () {
                 done();
             });
 
+            it('should validate build{params} argument', function (done) {
+                let ok;
+                try {
+                    let serializer = sqb.serializer();
+                    sqb.select();
+                    serializer.build(undefined, 123);
+                } catch (e) {
+                    ok = true;
+                }
+                assert.ok(ok);
+                done();
+            });
+
         });
+
+
 
         describe('Serialize "order by" part', function () {
 
