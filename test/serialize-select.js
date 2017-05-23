@@ -6,7 +6,7 @@ describe('Serialize select statements', function () {
     describe('Serialize "select/from" part', function () {
 
         it('should serialize * for when no columns given', function (done) {
-            let statement = sqb.select().from('table1');
+            let statement = sqb.select().columns().from('table1').join();
             let result = statement.build();
             assert.equal(result.sql, 'select * from table1');
             done();

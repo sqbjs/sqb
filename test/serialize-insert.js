@@ -4,7 +4,7 @@ const assert = require('assert'),
 describe('Serialize insert statements', function () {
 
     it('should serialize formal insert statement with Object values', function (done) {
-        let statement = sqb.insert('id', 'name').into('table1').values({id: 1, name: 'aaa'});
+        let statement = sqb.insert('id', 'name').into().into('table1').values().values({id: 1, name: 'aaa'});
         let result = statement.build();
         assert.equal(result.sql, "insert into table1 (id, name) values (1, 'aaa')");
 
@@ -15,9 +15,9 @@ describe('Serialize insert statements', function () {
     });
 
     it('should serialize formal insert statement with Array values', function (done) {
-        let statement = sqb.insert('id', 'name').into('table1').values([1, 'aaa']);
+        let statement = sqb.insert('id', 'name', 'address').into('table1').values([1, 'aaa']);
         let result = statement.build();
-        assert.equal(result.sql, "insert into table1 (id, name) values (1, 'aaa')");
+        assert.equal(result.sql, "insert into table1 (id, name, address) values (1, 'aaa', null)");
         done();
     });
 

@@ -64,6 +64,28 @@ describe('Select statement', function () {
         done();
     });
 
+    it('should validate arguments in "condition"', function (done) {
+        let ok;
+        try {
+            sqb.select().where(sqb.and())
+        } catch (e) {
+            ok = true;
+        }
+        assert.ok(ok);
+        done();
+    });
+
+    it('should validate operator in "condition"', function (done) {
+        let ok;
+        try {
+            sqb.select().where(sqb.and('id', '-', 1))
+        } catch (e) {
+            ok = true;
+        }
+        assert.ok(ok);
+        done();
+    });
+
     it('should validate arguments in "joing"', function (done) {
         let ok;
         try {
