@@ -34,7 +34,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize select/from - test 3', function (done) {
-            let statement = sqb.select(sqb.column('field1 f1')).from('schema1.table1 t1');
+            let statement = sqb.select('field1 f1').from('schema1.table1 t1');
             let result = statement.build();
             assert.equal(result.sql, 'select field1 f1 from schema1.table1 t1');
             done();
@@ -67,9 +67,9 @@ describe('Serialize select statements', function () {
                 .from('table1')
                 .where(sqb.and('ID', 1), sqb.and('name', 'value of the field should be too long'),
                     sqb.and('ID', 1), sqb.and('ID', 12345678))
-                .groupBy('field1', 'field2');
+                .groupBy('field1', 'field2', sqb.raw('field3'));
             let result = statement.build({prettyPrint: true});
-            assert.equal(result.sql, "select * from table1\nwhere ID = 1 and name = 'value of the field should be too long' and ID = 1\n    and ID = 12345678\ngroup by field1, field2");
+            assert.equal(result.sql, "select * from table1\nwhere ID = 1 and name = 'value of the field should be too long' and ID = 1\n    and ID = 12345678\ngroup by field1, field2, field3");
             done();
         });
 
@@ -79,7 +79,7 @@ describe('Serialize select statements', function () {
     describe('serialize "join" part', function () {
 
         it('should serialize join', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.join('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 inner join join1');
@@ -87,7 +87,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize innerJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.innerJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 inner join join1');
@@ -95,7 +95,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize leftJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.leftJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 left join join1');
@@ -103,7 +103,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize leftOuterJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.leftOuterJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 left outer join join1');
@@ -111,7 +111,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize rightJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.rightJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 right join join1');
@@ -119,7 +119,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize rightOuterJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.rightOuterJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 right outer join join1');
@@ -127,7 +127,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize outerJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.outerJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 outer join join1');
@@ -135,7 +135,7 @@ describe('Serialize select statements', function () {
         });
 
         it('should serialize fullOuterJoin', function (done) {
-            let statement = sqb.select(sqb.column('field1')).from('table1')
+            let statement = sqb.select('field1').from('table1')
                 .join(sqb.fullOuterJoin('join1'));
             let result = statement.build();
             assert.equal(result.sql, 'select field1 from table1 full outer join join1');
@@ -418,13 +418,12 @@ describe('Serialize select statements', function () {
         });
 
 
-
         describe('Serialize "order by" part', function () {
 
             it('should serialize order by', function (done) {
-                let statement = sqb.select().from('table1').orderBy('field1', 'field2 descending');
+                let statement = sqb.select().from('table1').orderBy('field1', 'field2 descending', sqb.raw('field3'), sqb.raw(''));
                 let result = statement.build();
-                assert.equal(result.sql, "select * from table1 order by field1, field2 desc");
+                assert.equal(result.sql, "select * from table1 order by field1, field2 desc, field3");
                 done();
             });
 

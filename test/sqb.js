@@ -19,13 +19,6 @@ describe('Initialize sql objects', function () {
         done();
     });
 
-    it('should initialize "column"', function (done) {
-        let obj = sqb.column('id');
-        assert.equal(obj.type, 'column');
-        assert.ok(obj instanceof sqb.Column);
-        done();
-    });
-
     it('should validate arguments in "join"', function (done) {
         let ok;
         try {

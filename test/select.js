@@ -5,7 +5,7 @@ const assert = require('assert'),
 describe('Select statement', function () {
 
     it('should "type" member must be "select"', function (done) {
-        let obj = sqb.select();
+        let obj = sqb.select().where().groupBy().orderBy();
         assert.equal(obj.type, 'select');
         assert.equal(obj.isSelect, true);
         done();
@@ -23,22 +23,7 @@ describe('Select statement', function () {
         assert.equal(obj._columns[2].alias, 'c3');
         done();
     });
-
-    it('should define columns with sqb.Column', function (done) {
-        let obj = sqb.select(sqb.column('table1.field1 f1'),
-            sqb.column('field2 as f2'), sqb.column('table3.field3'));
-        assert.equal(obj._columns.length, 3);
-        console.log(obj._columns[0]);
-        assert.equal(obj._columns[0].table, 'table1');
-        assert.equal(obj._columns[0].field, 'field1');
-        assert.equal(obj._columns[0].alias, 'f1');
-        assert.equal(obj._columns[1].field, 'field2');
-        assert.equal(obj._columns[1].alias, 'f2');
-        assert.equal(obj._columns[2].table, 'table3');
-        assert.equal(obj._columns[2].field, 'field3');
-        done();
-    });
-
+    
     it('should define table in "from"', function (done) {
         let obj = sqb.select().from('table1', 'table2');
         assert.equal(obj._tables.length, 2);
@@ -68,10 +53,21 @@ describe('Select statement', function () {
         done();
     });
 
-    it('should validate objects in "where"', function (done) {
+    it('should validate arguments in "where"', function (done) {
         let ok;
         try {
             sqb.select().where(1)
+        } catch (e) {
+            ok = true;
+        }
+        assert.ok(ok);
+        done();
+    });
+
+    it('should validate arguments in "joing"', function (done) {
+        let ok;
+        try {
+            sqb.select().join(1)
         } catch (e) {
             ok = true;
         }
