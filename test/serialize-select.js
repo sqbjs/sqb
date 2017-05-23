@@ -62,6 +62,18 @@ describe('Serialize select statements', function () {
             done();
         });
 
+        it('should pretty print', function (done) {
+            let statement = sqb.select()
+                .from('table1')
+                .where(sqb.and('ID', 1), sqb.and('name', 'value of the field should be too long'),
+                    sqb.and('ID', 1), sqb.and('ID', 12345678))
+                .groupBy('field1', 'field2');
+            let result = statement.build({prettyPrint: true});
+            assert.equal(result.sql, "select * from table1\nwhere ID = 1 and name = 'value of the field should be too long' and ID = 1\n    and ID = 12345678\ngroup by field1, field2");
+            done();
+        });
+
+
     });
 
     describe('serialize "join" part', function () {
