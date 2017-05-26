@@ -79,7 +79,7 @@ describe('Serialize insert statements', function () {
 
     it('should serialize insert/select statement', function (done) {
         let statement = sqb.insert('ID', 'NAME').into('table1').values(
-            sqb.select('id', 'name').from('table2').where(sqb.and('id', '>', 5))
+            sqb.select('id', 'name').from('table2').where(['id', '>', 5])
         );
         let result = statement.build();
         assert.equal(result.sql, "insert into table1 (ID, NAME) select id, name from table2 where id > 5");

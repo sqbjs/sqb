@@ -94,40 +94,6 @@ describe('Initialize sql objects', function () {
         done();
     });
 
-    it('should initialize "or"', function (done) {
-        let obj = sqb.or('field', '=', 1);
-        assert.ok(obj instanceof sqb.Condition);
-        assert.equal(obj.logicalOperator, 'or');
-        assert.equal(obj.type, 'condition');
-        assert.equal(obj.field, 'field');
-        assert.equal(obj.operator, '=');
-        assert.equal(obj.value, 1);
-
-        obj = sqb.and('field', 1);
-        assert.equal(obj.field, 'field');
-        assert.equal(obj.operator, '=');
-        assert.equal(obj.value, 1);
-        done();
-    });
-
-    it('should initialize "and"', function (done) {
-
-        let obj = sqb.and('field', '=', 1);
-        assert.ok(obj instanceof sqb.Condition);
-        assert.equal(obj.logicalOperator, 'and');
-        assert.equal(obj.type, 'condition');
-        assert.equal(obj.field, 'field');
-        assert.equal(obj.operator, '=');
-        assert.equal(obj.value, 1);
-
-        obj = sqb.and('field', 1);
-        assert.equal(obj.field, 'field');
-        assert.equal(obj.operator, '=');
-        assert.equal(obj.value, 1);
-
-        done();
-    });
-
     describe('Select statement', function () {
 
         it('should "type" member must be "select"', function (done) {
@@ -172,7 +138,7 @@ describe('Initialize sql objects', function () {
         });
 
         it('should define "where"', function (done) {
-            let obj = sqb.select().where(sqb.and('ID', 1));
+            let obj = sqb.select().where(['ID', 1]);
             assert.equal(obj._where.length, 1);
             assert.ok(obj._where.item(0) instanceof sqb.Condition);
             assert.equal(obj._where.item(0).field, 'ID');

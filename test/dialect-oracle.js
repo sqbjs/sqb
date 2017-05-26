@@ -13,7 +13,7 @@ describe('Oracle dialect', function () {
         });
 
         it('should replace "=" to "is" when value is null', function (done) {
-            let statement = sqb.select().from().where(sqb.and('ID',null));
+            let statement = sqb.select().from().where(['ID', null]);
             let result = statement.build({
                 dialect: 'oracle'
             });
@@ -22,7 +22,7 @@ describe('Oracle dialect', function () {
         });
 
         it('should serialize date', function (done) {
-            let statement = sqb.select().from('table1').where(sqb.and('ID', new Date(2017, 0, 1, 10, 30, 15)));
+            let statement = sqb.select().from('table1').where(['ID', new Date(2017, 0, 1, 10, 30, 15)]);
             let result = statement.build({
                 dialect: 'oracle'
             });

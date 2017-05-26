@@ -48,9 +48,9 @@ describe('Serializer', function () {
 
     it('Should pretty print - test3', function (done) {
         let statement = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6').from('table1').where(
-            sqb.and('field1', 'abcdefgh1234567890'),
-            sqb.and('field2', 'abcdefgh1234567890'),
-            sqb.and('field3', 'abcdefgh1234567890')
+            ['field1', 'abcdefgh1234567890'],
+            ['field2', 'abcdefgh1234567890'],
+            ['field3', 'abcdefgh1234567890']
         ).orderBy('ID');
         let result = statement.build({
             prettyPrint: true
@@ -62,7 +62,7 @@ describe('Serializer', function () {
     });
 
     it('Should serialize indexed params', function (done) {
-        let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
+        let statement = sqb.select().from('table1').where(['ID', /ID/]);
         let result = statement.build({
             namedParams: false
         }, {id: 5});

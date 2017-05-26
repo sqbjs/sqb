@@ -65,8 +65,8 @@ describe('Serialize select statements', function () {
         it('should pretty print', function (done) {
             let statement = sqb.select()
                 .from('table1')
-                .where(sqb.and('ID', 1), sqb.and('name', 'value of the field should be too long'),
-                    sqb.and('ID', 1), sqb.and('ID', 12345678))
+                .where(['ID', 1], ['name', 'value of the field should be too long'],
+                    ['ID', 1], ['ID', 12345678])
                 .groupBy('field1', 'field2', sqb.raw('field3'));
             let result = statement.build({prettyPrint: true});
             assert.equal(result.sql, "select * from table1\nwhere ID = 1 and name = 'value of the field should be too long' and ID = 1\n    and ID = 12345678\ngroup by field1, field2, field3");
@@ -179,7 +179,7 @@ describe('Serialize select statements', function () {
 
         it('should serialize join/on', function (done) {
             let statement = sqb.select().from('table1')
-                .join(sqb.innerJoin('join1').on(sqb.and('ID', 1)));
+                .join(sqb.innerJoin('join1').on(['ID', 1]));
             let result = statement.build();
             assert.equal(result.sql, 'select * from table1 inner join join1 on ID = 1');
             done();
@@ -192,105 +192,101 @@ describe('Serialize select statements', function () {
         describe('Serialize comparison operators', function () {
 
             it('should serialize "=" operator for field/value pair', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', 1));
+                let statement = sqb.select().from('table1').where(['ID', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID = 1');
                 done();
             });
 
             it('should serialize "=" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '=', 1));
+                let statement = sqb.select().from('table1').where(['ID', '=', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID = 1');
                 done();
             });
 
             it('should serialize ">" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '>', 1));
+                let statement = sqb.select().from('table1').where(['ID', '>', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID > 1');
                 done();
             });
 
             it('should serialize ">=" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '>=', 1));
+                let statement = sqb.select().from('table1').where(['ID', '>=', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID >= 1');
                 done();
             });
 
             it('should serialize "!>" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '!>', 1));
+                let statement = sqb.select().from('table1').where(['ID', '!>', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID !> 1');
                 done();
             });
 
             it('should serialize "<" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '<', 1));
+                let statement = sqb.select().from('table1').where(['ID', '<', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID < 1');
                 done();
             });
 
             it('should serialize "<=" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '<=', 1));
+                let statement = sqb.select().from('table1').where(['ID', '<=', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID <= 1');
                 done();
             });
 
             it('should serialize "!<" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '!<', 1));
+                let statement = sqb.select().from('table1').where(['ID', '!<', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID !< 1');
                 done();
             });
 
             it('should serialize "!=" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '!=', 1));
+                let statement = sqb.select().from('table1').where(['ID', '!=', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID != 1');
                 done();
             });
 
             it('should serialize "<>" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', '<>', 1));
+                let statement = sqb.select().from('table1').where(['ID', '<>', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID <> 1');
                 done();
             });
 
             it('should serialize "is" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', 'is', null));
+                let statement = sqb.select().from('table1').where(['ID', 'is', null]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID is null');
                 done();
             });
 
             it('should serialize "like" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('NAME', 'like', "%abc%"));
+                let statement = sqb.select().from('table1').where(['NAME', 'like', "%abc%"]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where NAME like '%abc%'");
                 done();
             });
 
             it('should serialize "between" operator', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('id', 'between', 1, 4));
+                let statement = sqb.select().from('table1').where(['id', 'between', [1, 4]]);
                 let result = statement.build();
-                assert.equal(result.sql, "select * from table1 where id between 1 and 4");
-
-                statement = sqb.select().from('table1').where(sqb.and('id', 'between', [1, 4]));
-                result = statement.build();
                 assert.equal(result.sql, "select * from table1 where id between 1 and 4");
                 done();
             });
 
             it('should serialize sub group', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', 'is', null),
-                    sqb.and([
-                        sqb.or('ID2', 1), sqb.or('ID2', 2)
-                    ])
+                let statement = sqb.select().from('table1').where(['ID', 'is', null],
+                    [
+                        ['ID2', 1], 'or', ['ID2', 2]
+                    ]
                 );
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where ID is null and (ID2 = 1 or ID2 = 2)');
@@ -298,14 +294,14 @@ describe('Serialize select statements', function () {
             });
 
             it('should serialize raw in "where"', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and([sqb.raw('ID=1')]));
+                let statement = sqb.select().from('table1').where([[sqb.raw('ID=1')]]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where (ID=1)');
                 done();
             });
 
             it('should handle reserved words', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and("select", 1));
+                let statement = sqb.select().from('table1').where(["select", 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where "select" = 1');
                 done();
@@ -317,53 +313,53 @@ describe('Serialize select statements', function () {
         describe('Serialize values', function () {
 
             it('should serialize string', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', 'abcd'));
+                let statement = sqb.select().from('table1').where(['ID', 'abcd']);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = 'abcd'");
                 done();
             });
 
             it('should serialize number', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', 123));
+                let statement = sqb.select().from('table1').where(['ID', 123]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = 123");
                 done();
             });
 
             it('should serialize date', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', new Date(2017, 0, 1, 10, 30, 15)));
+                let statement = sqb.select().from('table1').where(['ID', new Date(2017, 0, 1, 10, 30, 15)]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = '2017-01-01 10:30:15'");
                 done();
             });
 
             it('should serialize array', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', [1, 2, 3]));
+                let statement = sqb.select().from('table1').where(['ID', [1, 2, 3]]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID in (1,2,3)");
 
-                statement = sqb.select().from('table1').where(sqb.and('ID', '!=', [1, 2, 3]));
+                statement = sqb.select().from('table1').where(['ID', '!=', [1, 2, 3]]);
                 result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID not in (1,2,3)");
                 done();
             });
 
             it('should serialize null', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', null));
+                let statement = sqb.select().from('table1').where(['ID', null]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = null");
                 done();
             });
 
             it('should serialize raw', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', sqb.raw('current_date')));
+                let statement = sqb.select().from('table1').where(['ID', sqb.raw('current_date')]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where ID = current_date");
                 done();
             });
 
             it('should serialize parameter', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and('ID', /ID/));
+                let statement = sqb.select().from('table1').where(['ID', /ID/]);
                 let result = statement.build({
                     params: {
                         ID: 1
@@ -377,14 +373,14 @@ describe('Serialize select statements', function () {
             it('should serialize parameter for "between"', function (done) {
                 let serializer = sqb.serializer(),
                     statement = sqb.select().from('table1').where(
-                    sqb.and('adate', 'between', /adate/),
-                    sqb.and('bdate', 'between', /bdate/)
-                );
+                        ['adate', 'between', /adate/],
+                        ['bdate', 'between', /bdate/]
+                    );
                 let d1 = new Date(), d2 = new Date(),
-                    result = serializer.build(statement,{
-                            ADATE: [d1, d2],
-                            BDATE: d1,
-                        });
+                    result = serializer.build(statement, {
+                        ADATE: [d1, d2],
+                        BDATE: d1,
+                    });
                 assert.equal(result.sql, "select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2");
                 assert.deepEqual(result.params.ADATE1, d1);
                 assert.deepEqual(result.params.ADATE2, d2);
@@ -468,7 +464,7 @@ describe('Serialize select statements', function () {
             });
 
             it('should serialize sub-select in "where" part', function (done) {
-                let statement = sqb.select().from('table1').where(sqb.and(sqb.select('ID').from('table1').alias('t1'), 1));
+                let statement = sqb.select().from('table1').where([sqb.select('ID').from('table1').alias('t1'), 1]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where (select ID from table1) = 1");
                 done();
@@ -477,4 +473,5 @@ describe('Serialize select statements', function () {
         });
     });
 
-});
+})
+;

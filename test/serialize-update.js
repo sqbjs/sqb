@@ -8,7 +8,7 @@ describe('Serialize update statements', function () {
         let statement = sqb.update('table1').set({
             name: 'name',
             address: 'earth'
-        }).where(and('id', 1));
+        }).where(['id', 1]);
         let result = statement.build();
         assert.equal(result.sql, "update table1 set NAME = 'name', ADDRESS = 'earth' where id = 1");
         done();
@@ -18,7 +18,7 @@ describe('Serialize update statements', function () {
         let statement = sqb.update('table1').set({
             name: /name/,
             address: /earth/
-        }).where(and('id', /id/));
+        }).where(['id', /id/]);
         let result = statement.build(undefined,
             {
                 id: 1,
@@ -33,14 +33,15 @@ describe('Serialize update statements', function () {
         let statement = sqb.update(sqb.raw('table1')).set({
             name: 'name',
             address: 'earth'
-        }).where(and('id', 1));
+        }).where(['id', 1]);
+
         let result = statement.build();
         assert.equal(result.sql, "update table1 set NAME = 'name', ADDRESS = 'earth' where id = 1");
         done();
     });
 
     it('should use Raw in values', function (done) {
-        let statement = sqb.update('table1').set(sqb.raw("NAME = 'name', ADDRESS = 'earth'")).where(and('id', 1));
+        let statement = sqb.update('table1').set(sqb.raw("NAME = 'name', ADDRESS = 'earth'")).where(['id', 1]);
         let result = statement.build();
         assert.equal(result.sql, "update table1 set NAME = 'name', ADDRESS = 'earth' where id = 1");
         done();
@@ -62,7 +63,7 @@ describe('Serialize update statements', function () {
         let statement = sqb.update('table1').set({
             name: 'name',
             address: 'earth'
-        }).where(and('id', 1));
+        }).where(['id', 1]);
         let result = statement.build({
             prettyPrint: true
         });
