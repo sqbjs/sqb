@@ -20,18 +20,14 @@ class Column extends SqlObject {
     constructor(fieldName) {
         super();
         this.type = 'column';
-        let m = fieldName.match(/^(?:(\w+)(?:\.))?(\w+) ?(?:as)? ?(\w+)?$/);
+        const m = fieldName.match(/^(?:(\w+)(?:\.))?(\w+) ?(?:as)? ?(\w+)?$/);
         if (!m)
             throw new Error('Invalid definition "' + fieldName + '" for column');
         this.table = m[1];
         this.field = m[2];
         this.alias = m[3];
     }
-
-    get isColumn() {
-        return true;
-    }
-
+    
 }
 
 module.exports = Column;

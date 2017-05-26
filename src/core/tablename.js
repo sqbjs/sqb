@@ -19,7 +19,7 @@ class TableName extends SqlObject {
 
     constructor(table) {
         super();
-        let m = table.match(/^(?:(\w+)(?:\.))?([\w$]+) ?(?:as)? ?(\w+)?$/);
+        const m = table.match(/^(?:(\w+)(?:\.))?([\w$]+) ?(?:as)? ?(\w+)?$/);
         if (!m)
             throw new Error(`Invalid table definition "${table}"`);
         this.type = 'table';

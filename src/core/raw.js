@@ -24,7 +24,7 @@ class Raw extends SqlObject {
     }
 
     get isRaw() {
-        return true;
+        return this.type === 'raw';
     }
 
 }

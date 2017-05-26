@@ -19,7 +19,6 @@ class StringBuilder {
     cr() {
         this._lines.push(this.line);
         this.line = '';
-        this._indentstr = '';
         this._needIndent = true;
         return this;
     }
@@ -27,7 +26,6 @@ class StringBuilder {
     crlf() {
         this._lines.push(this.line);
         this.line = '';
-        this._indentstr = '';
         this._needIndent = false;
         return this;
     }
@@ -39,7 +37,7 @@ class StringBuilder {
                 this.append(input[i]);
         } else {
             if (input.indexOf('\n') >= 0) {
-                let arr = input.split('\n');
+                const arr = input.split('\n');
                 for (let i = 0; i < arr.length; i++) {
                     if (i > 0) this.cr();
                     this.append(arr[i]);

@@ -12,7 +12,6 @@ const SqlObject = require('./abstract');
 const Table = require('./tablename');
 const Column = require('./column');
 const Join = require('./join');
-const Condition = require('./condition');
 const ConditionGroup = require('./conditiongroup');
 const Order = require('./order');
 
@@ -36,7 +35,7 @@ class Select extends SqlObject {
     }
 
     get isSelect() {
-        return true;
+        return this.type === 'select';
     }
 
     /**
@@ -106,8 +105,8 @@ class Select extends SqlObject {
      */
     columns(columns) {
         if (!columns) return this;
-        let self = this;
-        for (let arg of arguments) {
+        const self = this;
+        for (const arg of arguments) {
             if (Array.isArray(arg)) {
                 arg.forEach(function (item) {
                     self.columns(item);
@@ -125,7 +124,7 @@ class Select extends SqlObject {
      */
     from(table) {
         if (!table) return this;
-        for (let arg of arguments)
+        for (const arg of arguments)
             this._tables.push(arg.isSelect || arg.isRaw ? arg : new Table(String(arg)));
         return this;
     }
@@ -137,7 +136,7 @@ class Select extends SqlObject {
      */
     join(joins) {
         if (!joins) return this;
-        for (let arg of arguments) {
+        for (const arg of arguments) {
             if (arg instanceof Join)
                 this._joins.push(arg);
             else
@@ -166,7 +165,7 @@ class Select extends SqlObject {
      */
     groupBy(fields) {
         if (!fields) return this;
-        for (let arg of arguments)
+        for (const arg of arguments)
             this._groupby.push(arg.isRaw ? arg : new Column(String(arg)));
         return this;
     }
@@ -179,7 +178,7 @@ class Select extends SqlObject {
      */
     orderBy(fields) {
         if (!fields) return this;
-        for (let arg of arguments)
+        for (const arg of arguments)
             this._orderby.push(arg.isRaw ? arg : new Order(String(arg)));
         return this;
     }

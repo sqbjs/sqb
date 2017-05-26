@@ -10,8 +10,6 @@
 
 const SqlObject = require('./abstract');
 const Condition = require('./condition');
-const isPlainObject = require('../helpers/helpers').isPlainObject;
-
 
 /**
  * @class
@@ -22,6 +20,7 @@ class ConditionGroup extends SqlObject {
 
     constructor(...src) {
         super();
+        this.type = 'conditiongroup';
         this._items = [];
         this.logicalOperator = 'and';
         if (arguments.length > 0)
@@ -29,19 +28,19 @@ class ConditionGroup extends SqlObject {
     }
 
     add(arr) {
-        let self = this,
-            logop = this.logicalOperator;
-        for (let arg of arguments) {
+        const self = this;
+        let logop = this.logicalOperator;
+        for (const arg of arguments) {
 
             // Process array argument
             if (Array.isArray(arg) && arg.length) {
                 // if First item is array, it is a group
                 if (Array.isArray(arg[0])) {
-                    let c = Reflect.construct(ConditionGroup, arg);
+                    const c = Reflect.construct(ConditionGroup, arg);
                     c.logicalOperator = logop;
                     self._items.push(c);
                 } else if (typeof arg[0] === 'string' || arg[0].type === 'select' || arg[0].type === 'raw') {
-                    let c = Reflect.construct(Condition, arg);
+                    const c = Reflect.construct(Condition, arg);
                     c.logicalOperator = logop;
                     self._items.push(c);
                 } else throw new TypeError('Invalid argument');
@@ -58,10 +57,6 @@ class ConditionGroup extends SqlObject {
 
     item(index) {
         return this._items[index];
-    }
-
-    get isConditionGroup() {
-        return true;
     }
 
 }

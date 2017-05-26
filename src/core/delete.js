@@ -30,7 +30,7 @@ class Delete extends SqlObject {
 
     /**
      *
-     * @return {Select}
+     * @return {Delete}
      * @public
      */
     clearFrom() {

@@ -51,7 +51,7 @@ class Update extends SqlObject {
             this._values = values;
         else if (typeof values === 'object') {
             // We build a new map of upper keys for case insensitivity
-            let out = {};
+            const out = {};
             Object.getOwnPropertyNames(values).forEach(
                 function (key) {
                     out[key.toUpperCase()] = values[key];

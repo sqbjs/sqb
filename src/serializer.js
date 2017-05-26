@@ -37,7 +37,7 @@ class Serializer {
     /**
      * Serializes input object to string representation
      *
-     * @param {SqlObject} obj
+     * @param {Select|Insert|Update|Delete} obj
      * @param {Array|Object} [values]
      * @return {{sql: string, params: Array|Object}}
      * @public
@@ -50,7 +50,7 @@ class Serializer {
                 this._executeParams = values;
             else if (typeof values === 'object') {
                 // We build a new map with upper keys for case insensitivity
-                let obj = {};
+                const obj = {};
                 Object.getOwnPropertyNames(values).forEach(
                     function (key) {
                         obj[key.toUpperCase()] = values[key];
@@ -97,37 +97,38 @@ class Serializer {
      * @protected
      */
     _serializeSelect(obj) {
-        let sb = new StringBuilder(this.prettyPrint ? 180 : 0), s;
+        const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+        let s;
 
         sb.append('select');
 
         s = this._serializeColumnNames(obj._columns);
         sb.append(s ? ' ' + s : ' *');
 
-        if (s = this._serializeTablesNames(obj._tables)) {
+        if ((s = this._serializeTablesNames(obj._tables))) {
             sb.append((this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + s);
         }
 
-        if (s = this._serializeJoins(obj._joins)) {
+        if ((s = this._serializeJoins(obj._joins))) {
             sb.indent = 2;
             sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + s);
             if (this.prettyPrint)
                 sb.cr();
         }
 
-        if (s = this._serializeWhere(obj._where)) {
+        if ((s = this._serializeWhere(obj._where))) {
             sb.indent = 0;
             sb.append((this.prettyPrint && (sb.line.length > 40 || sb.lines > 1 || s.indexOf('\n') > 0) ?
                     (sb.line ? '\n' : '') : (sb.line ? ' ' : '')) + s);
             if (this.prettyPrint) sb.cr();
         }
 
-        if (s = this._serializeGroupBy(obj._groupby)) {
+        if ((s = this._serializeGroupBy(obj._groupby))) {
             sb.indent = 0;
             sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'group by ' + s);
         }
 
-        if (s = this._serializeOrderBy(obj._orderby)) {
+        if ((s = this._serializeOrderBy(obj._orderby))) {
             sb.indent = 0;
             sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'order by ' + s);
         }
@@ -143,7 +144,7 @@ class Serializer {
      * @protected
      */
     _serializeInsert(obj) {
-        let sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+        const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
 
         sb.append('insert into ');
 
@@ -154,7 +155,7 @@ class Serializer {
 
         sb.append('(' + this._serializeColumnNames(obj._columns) + ') ');
 
-        let objValues = obj._values || {};
+        const objValues = obj._values || {};
 
         if (objValues) {
             if (objValues.isRaw)
@@ -166,20 +167,21 @@ class Serializer {
 
             } else {
                 sb.append('values (');
-                let self = this,
-                    executeParams = this._executeParams,
-                    prmidx = 0;
+                const self = this,
+                    executeParams = this._executeParams;
+                let prmidx = 0;
 
                 // Iterate over columns
                 obj._columns.forEach(function (col, idx) {
 
-                    let field = col.field.toUpperCase(),
+                    const field = col.field.toUpperCase(),
                         val = objValues[field],
                         prefix = (idx < obj._columns.length - 1 ? ', ' : '');
 
                     // If value in statement is RegExp, we serialize it as an out parameter
                     if (val instanceof RegExp) {
-                        let prm = val.source.toUpperCase(), x;
+                        const prm = val.source.toUpperCase();
+                        let x;
 
                         if (Array.isArray(executeParams))
                             x = prmidx < executeParams.length ? executeParams[prmidx++] : null;
@@ -214,7 +216,7 @@ class Serializer {
     _serializeUpdate(obj) {
         assert.ok(!!obj._values, 'values required for Update statement');
 
-        let self = this,
+        const self = this,
             prettyPrint = self.prettyPrint,
             sb = new StringBuilder(prettyPrint ? 180 : 0);
 
@@ -236,10 +238,10 @@ class Serializer {
             sb.append(' ' + self._serializeRaw(obj._values));
         } else {
             // Iterate over update values
-            let values = obj._values;
+            const values = obj._values;
             Object.getOwnPropertyNames(values).forEach(
                 function (key, idx) {
-                    let s = self._serializeUpdateValue(key, values[key]);
+                    const s = self._serializeUpdateValue(key, values[key]);
                     if (s)
                         sb.append((idx > 0 ? ', ' : (prettyPrint ? '' : ' ')) + s);
                 }
@@ -249,7 +251,7 @@ class Serializer {
         // Serialize conditions
         sb.indent = 2;
         let s;
-        if (s = this._serializeWhere(obj._where)) {
+        if ((s = this._serializeWhere(obj._where))) {
             sb.indent = 0;
             sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ? (sb.line ? '\n' : '') :
                     (sb.line ? ' ' : '')) + s);
@@ -267,7 +269,7 @@ class Serializer {
      * @protected
      */
     _serializeDelete(obj) {
-        let self = this,
+        const self = this,
             prettyPrint = self.prettyPrint,
             sb = new StringBuilder(prettyPrint ? 180 : 0);
 
@@ -283,7 +285,7 @@ class Serializer {
         // Serialize conditions
         sb.indent = 2;
         let s;
-        if (s = this._serializeWhere(obj._where)) {
+        if ((s = this._serializeWhere(obj._where))) {
             sb.indent = 0;
             sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ? (sb.line ? '\n' : '') :
                     (sb.line ? ' ' : '')) + s);
@@ -293,6 +295,7 @@ class Serializer {
         return sb.toString();
     }
 
+    //noinspection JSMethodCanBeStatic
     /**
      * Serialize Raw object
      *
@@ -300,6 +303,7 @@ class Serializer {
      * @return {string}
      * @protected
      */
+    // eslint-disable-next-line
     _serializeRaw(raw) {
         return raw.text;
     }
@@ -312,9 +316,10 @@ class Serializer {
      * @protected
      */
     _serializeColumnNames(columns) {
-        if (!(columns && columns.length)) return;
+        if (!(columns && columns.length)) return '';
 
-        let sb = new StringBuilder(this.prettyPrint ? undefined : 0), col, s;
+        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+        let col, s;
         sb.indent += 4;
 
         for (let i = 0; i < columns.length; i++) {
@@ -339,6 +344,7 @@ class Serializer {
         return sb.toString();
     }
 
+    //noinspection JSMethodCanBeStatic
     /**
      * Serializes single column name
      *
@@ -378,6 +384,7 @@ class Serializer {
         return str ? 'from' + str : '';
     }
 
+    //noinspection JSMethodCanBeStatic
     /**
      * Serializes single table name
      *
@@ -392,7 +399,7 @@ class Serializer {
     }
 
     _serializeWhere(group) {
-        let s = this._serializeConditionGroup(group);
+        const s = this._serializeConditionGroup(group);
         if (s)
             return 'where ' + s;
         return '';
@@ -407,15 +414,16 @@ class Serializer {
      */
     _serializeConditionGroup(group) {
         if (!group) return '';
-        let sb = new StringBuilder(this.prettyPrint ? undefined : 0), s;
+        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+        let s;
         sb.indent += 4;
         for (let i = 0; i < group.length; i++) {
-            let item = group.item(i);
+            const item = group.item(i);
 
             if (item.isRaw)
                 s = this._serializeRaw(item);
 
-            else if (item.isConditionGroup) {
+            else if (item.type === 'conditiongroup') {
                 s = this._serializeConditionGroup(item);
                 if (s) s = '(' + s + ')';
             } else
@@ -444,12 +452,12 @@ class Serializer {
             str = '(' + this._serializeSelect(item.field) + ') ';
         else str = this._isReserved(item.field) ? '"' + item.field + '" ' : item.field + ' ';
 
+        const outParams = this._outParams;
         let operator = item.operator.toLowerCase(),
-            outParams = this._outParams,
             s;
 
         if (item.param) {
-            let prm = item.param.toUpperCase(),
+            const prm = item.param.toUpperCase(),
                 inputprm = this._executeParams ? this._executeParams[prm] : null,
                 inputIsArray = Array.isArray(inputprm);
             if (operator === 'between') {
@@ -513,6 +521,7 @@ class Serializer {
         return this._serializeStringValue(String(val))
     }
 
+    //noinspection JSMethodCanBeStatic
     /**
      * Serializes string value
      *
@@ -532,13 +541,13 @@ class Serializer {
      * @protected
      */
     _serializeDateValue(date) {
-        let d = date.getDate(),
+        const d = date.getDate(),
             m = date.getMonth() + 1,
             y = date.getFullYear(),
             h = date.getHours(),
             n = date.getMinutes(),
-            s = date.getSeconds(),
-            str = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+            s = date.getSeconds();
+        let str = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
         if (h || n || s)
             str += ' ' + (h <= 9 ? '0' + h : h) + ':' +
                 (n <= 9 ? '0' + n : n) + ':' +
@@ -569,10 +578,10 @@ class Serializer {
      * @protected
      */
     _serializeJoins(joins) {
-        if (!joins) return;
-        let sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+        if (!joins) return '';
+        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
         for (let i = 0; i < joins.length; i++) {
-            let s = this._serializeJoin(joins[i]);
+            const s = this._serializeJoin(joins[i]);
             if (s) {
                 sb.append(s);
                 if (this.prettyPrint)
@@ -591,7 +600,7 @@ class Serializer {
      * @protected
      */
     _serializeJoin(join) {
-        let sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
         sb.indent = 4;
         let s;
         switch (join.joinType) {
@@ -658,7 +667,8 @@ class Serializer {
      * @protected
      */
     _serializeOrderBy(columns) {
-        let sb = new StringBuilder(this.prettyPrint ? undefined : 0), o;
+        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+        let o;
         sb.indent = 4;
         for (let i = 0; i < columns.length; i++) {
             o = columns[i];
@@ -686,7 +696,7 @@ class Serializer {
     _serializeUpdateValue(key, value) {
         let s;
         if (value instanceof RegExp) {
-            let x = this._executeParams ? this._executeParams[key] : null;
+            const x = this._executeParams ? this._executeParams[key] : null;
             if (this.namedParams) {
                 s = ':' + key;
                 this._outParams[key] = x;

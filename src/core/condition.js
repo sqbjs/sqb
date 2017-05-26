@@ -24,7 +24,7 @@ class Condition extends SqlObject {
         assert.ok(field && (typeof field === 'string' || field.type === 'select' || field.type === 'raw'),
             'Invalid "field" argument for Condition constructor');
         if (typeof field === 'string') {
-            let m = field.match(/^([a-z]\w*)\.?([a-z]\w*)?$/i);
+            const m = field.match(/^([a-z]\w*)\.?([a-z]\w*)?$/i);
             assert.ok(!!m,
                 'Invalid "field" argument for Condition constructor');
         }
@@ -42,10 +42,6 @@ class Condition extends SqlObject {
                 this.value = Array.isArray(value) ? value : [value, value];
             }
         }
-    }
-
-    get isCondition() {
-        return true;
     }
 
     get field() {

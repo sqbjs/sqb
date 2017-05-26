@@ -19,6 +19,7 @@ const createSerializer = require('../serializer-factory');
 class SqlObject {
 
     constructor() {
+        this.type = undefined;
     }
 
     build(config, params) {

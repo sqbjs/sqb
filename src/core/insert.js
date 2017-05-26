@@ -33,7 +33,7 @@ class Insert extends SqlObject {
      */
     columns(columns) {
         if (!columns) return this;
-        for (let arg of arguments)
+        for (const arg of arguments)
             this._columns.push(new Column(arg));
         return this;
     }
@@ -57,10 +57,11 @@ class Insert extends SqlObject {
     values(values) {
         if (!values)
             this._values = undefined;
-        else if (values.isRaw || values.isSelect)
+        else if (values.isRaw || values.type === 'select')
             this._values = values;
         else if (Array.isArray(values)) {
-            let out = {}, i = 0;
+            const out = {};
+            let i = 0;
             this._columns.forEach(function (key) {
                 out[key.field.toUpperCase()] = values.length >= i ? values[i] : null;
                 i++;
@@ -68,7 +69,7 @@ class Insert extends SqlObject {
             this._values = out;
         } else if (typeof values === 'object') {
             // We build a new map of upper keys for case insensitivity
-            let out = {};
+            const out = {};
             Object.getOwnPropertyNames(values).forEach(
                 function (key) {
                     out[key.toUpperCase()] = values[key];

@@ -21,8 +21,8 @@ class OracleSerializer extends Serializer {
      * @override
      */
     _serializeSelect(obj) {
-        let sql = super._serializeSelect(obj),
-            prettyPrint = this.prettyPrint,
+        let sql = super._serializeSelect(obj);
+        const prettyPrint = this.prettyPrint,
             limit = obj._limit,
             offset = obj._offset;
         if (limit || offset) {
@@ -43,8 +43,7 @@ class OracleSerializer extends Serializer {
      * @override
      */
     _serializeTablesNames(tables) {
-        let s = super._serializeTablesNames(tables);
-        return s || 'from dual';
+        return super._serializeTablesNames(tables) || 'from dual';
     }
 
     /**
@@ -64,7 +63,7 @@ class OracleSerializer extends Serializer {
      * @override
      */
     _serializeDateValue(date) {
-        let s = super._serializeDateValue(date);
+        const s = super._serializeDateValue(date);
         return s.length <= 12 ?
             'to_date(' + s + ", 'yyyy-mm-dd')" :
             'to_date(' + s + ", 'yyyy-mm-dd hh24:mi:ss')"

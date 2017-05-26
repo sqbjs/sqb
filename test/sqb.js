@@ -106,7 +106,7 @@ describe('Initialize sql objects', function () {
         it('should define columns with string', function (done) {
             let obj = sqb.select('col1', 'col2 c2', 'tbl.col3 c3');
             assert.equal(obj._columns.length, 3);
-            assert.equal(obj._columns[0].isColumn, true);
+            assert.equal(obj._columns[0].type === 'column', true);
             assert.equal(obj._columns[0].field, 'col1');
             assert.equal(obj._columns[1].field, 'col2');
             assert.equal(obj._columns[1].alias, 'c2');
