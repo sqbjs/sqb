@@ -28,7 +28,7 @@ class Serializer {
     constructor(config) {
         this.dialect = config.dialect;
         this.prettyPrint = !!config.prettyPrint;
-        this.namedParams = config.namedParams === undefined || !!config.namedParams;
+        this.namedParams = !!config.namedParams;
         this.reservedWords = ['select', 'from', 'with', 'where',
             'join', 'inner', 'outer', 'full', 'and', 'or', 'not', 'between', 'null', 'like',
             'order', 'by', 'group', 'count', 'sum', 'average'];

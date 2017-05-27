@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "repository": "panates/sqb",
-  "main": "src/sqb.js",
+  "main": "src/index.js",
   "keywords": [
     "javascript",
     "sql",
@@ -22,7 +22,7 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "babel-eslint": "^6.1.2",
+    "babel-eslint": "^7.2.3",
     "eslint": "^3.19.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2"

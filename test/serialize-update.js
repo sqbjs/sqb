@@ -1,3 +1,4 @@
+/* eslint-disable */
 const assert = require('assert'),
     sqb = require('../'),
     and = sqb.and;
@@ -25,7 +26,7 @@ describe('Serialize update statements', function () {
                 name: 'name',
                 address: 'earth'
             });
-        assert.equal(result.sql, "update table1 set NAME = :NAME, ADDRESS = :ADDRESS where id = :ID");
+        assert.equal(result.sql, "update table1 set NAME = ?, ADDRESS = ? where id = ?");
         done();
     });
 

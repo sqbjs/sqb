@@ -1,3 +1,4 @@
+/* eslint-disable */
 const assert = require('assert'),
     sqb = require('../');
 
@@ -365,8 +366,8 @@ describe('Serialize select statements', function () {
                         ID: 1
                     }
                 });
-                assert.equal(result.sql, "select * from table1 where ID = :ID");
-                assert.equal(result.params.ID, 1);
+                assert.equal(result.sql, "select * from table1 where ID = ?");
+                assert.equal(result.params[0], 1);
                 done();
             });
 
@@ -381,20 +382,20 @@ describe('Serialize select statements', function () {
                         ADATE: [d1, d2],
                         BDATE: d1,
                     });
-                assert.equal(result.sql, "select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2");
-                assert.deepEqual(result.params.ADATE1, d1);
-                assert.deepEqual(result.params.ADATE2, d2);
-                assert.deepEqual(result.params.BDATE1, d1);
-                assert.deepEqual(result.params.BDATE2, null);
+                assert.equal(result.sql, "select * from table1 where adate between ? and ? and bdate between ? and ?");
+                assert.deepEqual(result.params, [d1, d2, d2, null]);
                 result = statement.build({
-                    namedParams: false,
+                    namedParams: true,
                     params: {
                         ADATE: [d1, d2],
                         BDATE: d1,
                     }
                 });
-                assert.equal(result.sql, "select * from table1 where adate between ? and ? and bdate between ? and ?");
-                assert.deepEqual(result.params, [d1, d2, d2, null]);
+                assert.equal(result.sql, "select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2");
+                assert.deepEqual(result.params.ADATE1, d1);
+                assert.deepEqual(result.params.ADATE2, d2);
+                assert.deepEqual(result.params.BDATE1, d1);
+                assert.deepEqual(result.params.BDATE2, null);
                 done();
             });
 

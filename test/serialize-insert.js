@@ -1,3 +1,4 @@
+/* eslint-disable */
 const assert = require('assert'),
     sqb = require('../');
 
@@ -33,28 +34,26 @@ describe('Serialize insert statements', function () {
 
     it('should serialize params in "values"', function (done) {
         let statement = sqb.insert('id', 'name').into('table1').values({id: /id/, name: /name/});
-        let result = statement.build(undefined, {id: 1, name: 'aaa'});
-        assert.equal(result.sql, "insert into table1 (id, name) values (:ID, :NAME)");
-        assert.deepEqual(result.params, {ID: 1, NAME: 'aaa'});
-        done();
-    });
-
-    it('should serialize indexed params', function (done) {
-        let statement = sqb.insert('id', 'name').into('table1').values({id: /id/, name: /name/});
-        let result = statement.build({
-            namedParams: false,
-            params: {ID: 1, NAME: 'aaa'}
-        });
+        let result = statement.build({}, {id: 1, name: 'aaa'});
         assert.equal(result.sql, "insert into table1 (id, name) values (?, ?)");
         assert.deepEqual(result.params, [1, 'aaa']);
         done();
     });
 
+    it('should serialize named params', function (done) {
+        let statement = sqb.insert('id', 'name').into('table1').values({id: /id/, name: /name/});
+        let result = statement.build({
+            namedParams: true,
+            params: {ID: 1, NAME: 'aaa'}
+        });
+        assert.equal(result.sql, "insert into table1 (id, name) values (:ID, :NAME)");
+        assert.deepEqual(result.params, {ID: 1, NAME: 'aaa'});
+        done();
+    });
+
     it('should serialize array params', function (done) {
         let statement = sqb.insert('id', 'name', 'address').into('table1').values([/id/, 'name', /address/]);
-        let result = statement.build({
-            namedParams: false
-        }, [1, 'earth']);
+        let result = statement.build({}, [1, 'earth']);
         assert.equal(result.sql, "insert into table1 (id, name, address) values (?, 'name', ?)");
         assert.deepEqual(result.params, [1, 'earth']);
         done();
@@ -65,8 +64,8 @@ describe('Serialize insert statements', function () {
         let result = statement.build({
             params: {id: 1, name: 'aaa'}
         });
-        assert.equal(result.sql, "insert into table1 (id, name) values (:ID, :NAME)");
-        assert.deepEqual(result.params, {ID: 1, NAME: 'aaa'});
+        assert.equal(result.sql, "insert into table1 (id, name) values (?, ?)");
+        assert.deepEqual(result.params, [1, 'aaa']);
         done();
     });
 
