@@ -28,6 +28,7 @@ module.exports = new SqlBuilder();
 
 Object.assign(module.exports, {
 
+    SqlBuilder,
     SqlObject,
     Select,
     Insert,

@@ -34,7 +34,7 @@ class Statement extends SqlObject {
 
     build(config, params) {
         if (config instanceof Serializer) {
-            config.build(this, (config ? config.params : undefined) || params);
+            return config.build(this, params);
         } else
             return Serializer.create(config).build(this, (config ? config.params : undefined) || params);
     }
