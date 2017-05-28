@@ -1,4 +1,4 @@
-/* SQB.js
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -37,7 +37,7 @@ class Serializer {
     /**
      * Serializes input object to string representation
      *
-     * @param {Select|Insert|Update|Delete} obj
+     * @param {Statement} obj
      * @param {Array|Object} [values]
      * @return {{sql: string, params: Array|Object}}
      * @public
@@ -62,15 +62,15 @@ class Serializer {
                 throw new TypeError('Invalid argument');
         }
 
-        if (obj.type === 'select')
+        if (obj.type === 'select') { //noinspection JSCheckFunctionSignatures
             sql = this._serializeSelect(obj);
-        else if (obj.type === 'insert')
+        } else if (obj.type === 'insert') { //noinspection JSCheckFunctionSignatures
             sql = this._serializeInsert(obj);
-        else if (obj.type === 'update')
+        } else if (obj.type === 'update') { //noinspection JSCheckFunctionSignatures
             sql = this._serializeUpdate(obj);
-        else if (obj.type === 'delete')
+        } else if (obj.type === 'delete') { //noinspection JSCheckFunctionSignatures
             sql = this._serializeDelete(obj);
-        else throw new TypeError('Invalid argument');
+        } else throw new TypeError('Invalid argument');
 
         return {
             sql,
@@ -708,7 +708,30 @@ class Serializer {
             s = this._serializeValue(value);
         return (key + ' = ' + s);
     }
-
 }
+
+Serializer.register = function (dialect, serializerProto) {
+    const items = this._registry = this._registry || {};
+    items[dialect] = serializerProto;
+};
+
+Serializer.get = function (dialect) {
+    return this._registry ? this._registry[dialect] : undefined;
+};
+
+Serializer.create = function (config) {
+    if (config instanceof Serializer)
+        return config;
+
+    config = typeof config === 'string' ? {dialect: config} : typeof config === 'object' ? config : {};
+
+    if (!config.dialect || config.dialect === 'generic')
+        return new Serializer(config);
+
+    const clazz = this.get(config.dialect);
+    if (clazz)
+        return new clazz(config);
+    else throw new Error(`Dialect "${config.dialect}" is not registered`);
+};
 
 module.exports = Serializer;

@@ -1,4 +1,4 @@
-/* SQB.js
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -7,8 +7,7 @@
  */
 
 /* Internal module dependencies. */
-
-const SqlObject = require('./abstract');
+const Statement = require('./statement');
 const Table = require('./tablename');
 const Column = require('./column');
 
@@ -18,12 +17,14 @@ const Column = require('./column');
  * @public
  */
 
-class Insert extends SqlObject {
+class Insert extends Statement {
 
-    constructor() {
-        super();
+    constructor(dbpool, ...columns) {
+        super(dbpool);
         this.type = 'insert';
         this._columns = [];
+        if (columns.length)
+            this.columns(...columns);
     }
 
     /**

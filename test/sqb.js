@@ -4,6 +4,18 @@ const assert = require('assert'),
 
 describe('Initialize sql objects', function () {
 
+    it('should create serializer', function (done) {
+        let obj = sqb.serializer();
+        assert.ok(obj instanceof sqb.Serializer);
+        done();
+    });
+
+    it('should create pool', function (done) {
+        let obj = sqb.pool('test');
+        assert.ok(obj instanceof sqb.DbPool);
+        done();
+    });
+
     it('should initialize "raw"', function (done) {
         let obj = sqb.raw('test');
         assert.ok(obj instanceof sqb.Raw);

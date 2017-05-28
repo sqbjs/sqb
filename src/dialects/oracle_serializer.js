@@ -1,4 +1,4 @@
-/* SQB.js
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -7,8 +7,7 @@
  */
 
 /* Internal module dependencies. */
-
-const Serializer = require('../../serializer');
+const Serializer = require('../serializer');
 
 class OracleSerializer extends Serializer {
 
@@ -17,6 +16,7 @@ class OracleSerializer extends Serializer {
         this.dialect = 'oracle';
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @override
      */
@@ -39,6 +39,7 @@ class OracleSerializer extends Serializer {
         return sql;
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @override
      */
@@ -46,6 +47,7 @@ class OracleSerializer extends Serializer {
         return super._serializeTablesNames(tables) || 'from dual';
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @override
      */
@@ -59,6 +61,7 @@ class OracleSerializer extends Serializer {
         return s;
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @override
      */
@@ -69,5 +72,7 @@ class OracleSerializer extends Serializer {
             'to_date(' + s + ", 'yyyy-mm-dd hh24:mi:ss')"
     }
 }
+
+Serializer.register('oracle', OracleSerializer);
 
 module.exports = OracleSerializer;

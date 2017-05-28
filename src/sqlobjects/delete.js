@@ -1,4 +1,4 @@
-/* SQB.js
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -7,8 +7,7 @@
  */
 
 /* Internal module dependencies. */
-
-const SqlObject = require('./abstract');
+const Statement = require('./statement');
 const Table = require('./tablename');
 const ConditionGroup = require('./conditiongroup');
 
@@ -18,10 +17,10 @@ const ConditionGroup = require('./conditiongroup');
  * @public
  */
 
-class Delete extends SqlObject {
+class Delete extends Statement {
 
-    constructor(table) {
-        super();
+    constructor(dbpool, table) {
+        super(dbpool);
         this.type = 'delete';
         this.clearFrom();
         this.clearWhere();

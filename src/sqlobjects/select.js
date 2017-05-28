@@ -1,4 +1,4 @@
-/* SQB.js
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -8,6 +8,7 @@
 
 /* Internal module dependencies. */
 
+const Statement = require('./statement');
 const SqlObject = require('./abstract');
 const Table = require('./tablename');
 const Column = require('./column');
@@ -21,10 +22,10 @@ const Order = require('./order');
  * @public
  */
 
-class Select extends SqlObject {
+class Select extends Statement {
 
-    constructor() {
-        super();
+    constructor(dbpool, ...columns) {
+        super(dbpool);
         this.type = 'select';
         this.clearColumns();
         this.clearFrom();
@@ -32,6 +33,8 @@ class Select extends SqlObject {
         this.clearOrderBy();
         this.clearWhere();
         this.clearGroupBy();
+        if (columns.length)
+            this.columns(...columns);
     }
 
     get isSelect() {

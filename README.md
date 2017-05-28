@@ -5,8 +5,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![Dependencies][dependencies-image]][dependencies-url]
-[![Gitter chat][gitter-image]][gitter-url]
-[![Package Quality][quality-image]][quality-url]
+[![DevDependencies][devdependencies-image]][devdependencies-url]
 
 SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 
@@ -147,7 +146,9 @@ result.params output will be
 [downloads-url]: https://npmjs.org/package/sqb
 [gitter-image]: https://badges.gitter.im/panates/sqb.svg
 [gitter-url]: https://gitter.im/panates/sqb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[dependencies-image]: https://david-dm.org/panates/sqb.svg
-[dependencies-url]:https://david-dm.org/panates/sqb#info=dependencies
-[quality-image]: http://npm.packagequality.com/shield/eonc-rest.png
+[dependencies-image]: https://david-dm.org/panates/sqb/status.svg
+[dependencies-url]:https://david-dm.org/panates/sqb
+[devdependencies-image]: https://david-dm.org/panates/sqb/dev-status.svg
+[devdependencies-url]:https://david-dm.org/panates/sqb?type=dev
+[quality-image]: http://npm.packagequality.com/shield/sqb.png
 [quality-url]: http://packagequality.com/#?package=sqb
