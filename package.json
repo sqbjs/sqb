@@ -21,7 +21,6 @@
     "framework"
   ],
   "dependencies": {
-    "sqb-connect": "^0.0.5",
     "debug": "^2.6.8"
   },
   "devDependencies": {
@@ -30,7 +29,9 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "sqb-connect": "^0.0.5"
+  },
   "engines": {
     "node": ">= 6.0"
   },
