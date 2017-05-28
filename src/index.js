@@ -49,7 +49,9 @@ Object.assign(module.exports, {
     pool: function (config) {
         return DbPool.create(config);
     }
-
 });
+
+DbPool._sqb = module.exports;
+
 
 

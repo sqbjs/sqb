@@ -30,7 +30,7 @@
     "mocha": "^3.4.2"
   },
   "peerDependencies": {
-    "sqb-connect": "^0.0.8"
+    "sqb-connect": "^0.0.9"
   },
   "engines": {
     "node": ">= 6.0"
