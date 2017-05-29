@@ -3,11 +3,14 @@
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
  For details and documentation:
- https://panates.github.io/sqb-connect/
+ https://panates.github.io/sqb/
  */
 
 /* Internal module dependencies. */
-const SqlBuilder = require('./sqlbuilder');
+const sqlObjects = require('./sqlobjects');
+
+/* External module dependencies. */
+const {EventEmitter} = require('events');
 
 
 /**
@@ -15,7 +18,7 @@ const SqlBuilder = require('./sqlbuilder');
  * @public
  */
 
-class DbPool extends SqlBuilder{
+class DbPool extends EventEmitter {
 
     constructor(config) {
         super();
@@ -26,6 +29,8 @@ class DbPool extends SqlBuilder{
         pool.increment = pool.increment || 1;
         pool.timeout = pool.timeout || 60;
         Object.defineProperty(this, 'config', {value: Object.freeze(config), writable: false, configurable: false});
+        Object.assign(this, sqlObjects);
+
     }
 
     //noinspection JSUnusedGlobalSymbols
@@ -57,14 +62,12 @@ class DbPool extends SqlBuilder{
         });
 
         if (callback) {
-
             promise = promise.then(connection => {
-
-                function done(commit) {
+                function close(commit) {
                     if (commit) {
                         connection.commit(err => {
                             if (err)
-                                done(false);
+                                close(false);
                             else
                                 connection.release();
                         });
@@ -78,10 +81,14 @@ class DbPool extends SqlBuilder{
                 }
 
                 try {
-                    callback(connection, done);
+                    const out = callback(connection, close);
+                    if (out instanceof Promise)
+                        out.catch(() => {
+                            close(false);
+                        });
+                    return out;
                 } catch (e) {
-                    done(false);
-                    throw e;
+                    close(false);
                 }
             });
         }

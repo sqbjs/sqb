@@ -28,7 +28,7 @@ class Statement extends SqlObject {
         this.connection = undefined;
     }
 
-    dbpool() {
+    get dbpool() {
         return typeof this.builder.connect === 'function' ? this.builder : undefined;
     }
 
@@ -37,6 +37,11 @@ class Statement extends SqlObject {
             return config.build(this, params);
         } else
             return Serializer.create(config).build(this, (config ? config.params : undefined) || params);
+    }
+
+    identify(value) {
+        this._identity = value;
+        return this;
     }
 
     //noinspection JSUnusedGlobalSymbols

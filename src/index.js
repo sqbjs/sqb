@@ -7,7 +7,6 @@
  */
 
 /* Internal module dependencies. */
-const SqlBuilder = require('./sqlbuilder');
 const SqlObject = require('./sqlobjects/abstract');
 const Select = require('./sqlobjects/select');
 const Insert = require('./sqlobjects/insert');
@@ -22,14 +21,13 @@ const Serializer = require('./serializer');
 const DbPool = require('./pool');
 const Connection = require('./connection');
 
+const sqlObjects = require('./sqlobjects');
+
 /* Register built-in serializers */
 require('./dialects/oracle_serializer');
 
-module.exports = new SqlBuilder();
+Object.assign(sqlObjects, {
 
-Object.assign(module.exports, {
-
-    SqlBuilder,
     Serializer,
     DbPool,
     Connection,
@@ -53,6 +51,4 @@ Object.assign(module.exports, {
     }
 });
 
-
-
-
+module.exports = sqlObjects;

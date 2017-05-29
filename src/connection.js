@@ -3,7 +3,7 @@
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
  For details and documentation:
- https://panates.github.io/sqb-connect/
+ https://panates.github.io/sqb/
  */
 
 /* External module dependencies. */
@@ -19,7 +19,7 @@ class Connection extends EventEmitter {
 
     constructor(dbpool) {
         super();
-        Object.defineProperty(this, 'pool', {value: dbpool, writable: false, configurable: false});
+        Object.defineProperty(this, 'dbpool', {value: dbpool, writable: false, configurable: false});
         this._refcount = 0;
         if (process.env.DEBUG)
             debug('Created (' + this.sessionId + ')');
@@ -70,27 +70,26 @@ class Connection extends EventEmitter {
     }
 
     select(...args) {
-        console.log(this.pool.select);
-        const statement = this.pool.select(...args);
+        const statement = this.dbpool.select(...args);
         statement.connection = this;
         return statement;
     }
 
     insert(...args) {
-        const statement = this.pool.insert(...args);
+        const statement = this.dbpool.insert(...args);
         statement.connection = this;
         return statement;
     }
 
     update(...args) {
-        const statement = this.pool.update(...args);
+        const statement = this.dbpool.update(...args);
         statement.connection = this;
         return statement;
     }
 
     //noinspection ReservedWordAsName
     delete(...args) {
-        const statement = this.pool.delete(...args);
+        const statement = this.dbpool.delete(...args);
         statement.connection = this;
         return statement;
     }
@@ -107,14 +106,13 @@ class Connection extends EventEmitter {
         }
 
         const self = this,
-            serializer = this.pool.serializer;
+            serializer = this.dbpool.serializer;
         let sql, prms;
 
         if (typeof statement === 'object' && typeof statement.build === 'function') {
             if (params)
                 statement.params(params);
             const o = statement.build(serializer);
-            console.log(o);
             sql = o.sql;
             prms = o.params;
             options = options || statement._options;
@@ -131,6 +129,13 @@ class Connection extends EventEmitter {
         options.resultSet = options.resultSet !== undefined ? options.resultSet : false;
         options.objectRows = options.objectRows !== undefined ? options.objectRows : false;
         options.showSql = options.showSql !== undefined ? options.showSql : false;
+
+        this.dbpool.emit('execute', {
+            sql,
+            params: prms,
+            options,
+            identity: statement ? statement._identity : undefined
+        });
 
         if (callback) {
             this._execute(sql, prms, options, function (err, result) {

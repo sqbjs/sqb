@@ -30,6 +30,12 @@ describe('Initialize sql objects', function () {
         done();
     });
 
+    it('should set identidy of statements', function (done) {
+        let obj = sqb.select('id').identify('123');
+        assert.equal(obj._identity, 123);
+        done();
+    });
+
     it('should validate arguments in "join"', function (done) {
         let ok;
         try {
