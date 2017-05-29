@@ -10,7 +10,7 @@
 
 const Statement = require('./statement');
 const SqlObject = require('./abstract');
-const Table = require('./tablename');
+const TableName = require('./tablename');
 const Column = require('./column');
 const Join = require('./join');
 const ConditionGroup = require('./conditiongroup');
@@ -128,7 +128,7 @@ class Select extends Statement {
     from(table) {
         if (!table) return this;
         for (const arg of arguments)
-            this._tables.push(arg.isSelect || arg.isRaw ? arg : new Table(String(arg)));
+            this._tables.push(arg.isSelect || arg.isRaw ? arg : new TableName(String(arg)));
         return this;
     }
 

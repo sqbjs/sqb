@@ -25,6 +25,7 @@ class Connection extends EventEmitter {
             debug('Created (' + this.sessionId + ')');
     }
 
+    //noinspection JSUnusedGlobalSymbols
     get closed() {
         return true;
     }
@@ -32,6 +33,7 @@ class Connection extends EventEmitter {
     get sessionId() {
     }
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @protected
      */

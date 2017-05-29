@@ -637,7 +637,7 @@ class Serializer {
             if (join.table.isRaw)
                 sb.append(' ' + this._serializeRaw(join.table));
             else
-                sb.append(' ' + join.table)
+                sb.append(' ' + this._serializeTableName(join.table))
         }
 
 

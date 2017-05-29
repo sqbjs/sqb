@@ -10,6 +10,7 @@
 
 const SqlObject = require('./abstract');
 const ConditionGroup = require('./conditiongroup');
+const TableName = require('./tablename');
 
 /**
  * @class
@@ -26,7 +27,7 @@ class Join extends SqlObject {
             throw new TypeError('Invalid argument (table) for join');
         this.type = 'join';
         this.joinType = joinType;
-        this.table = table;
+        this.table = table.isSelect || table.isRaw ? table : new TableName(String(table));
         this.conditions = new ConditionGroup();
     }
 

@@ -45,13 +45,17 @@ class Statement extends SqlObject {
     }
 
     //noinspection JSUnusedGlobalSymbols
-    then(callback) {
+    then(options, callback) {
+        if (typeof options === 'function') {
+            callback = options;
+            options = undefined;
+        }
         if (this.connection)
-            return this.connection.execute(this).then(callback);
+            return this.connection.execute(this, undefined, options).then(callback);
         else {
             const dbpool = this.dbpool;
             assert.ok(dbpool, 'This statement is not executable');
-            return dbpool.connect(conn => conn.execute(this)).then(callback);
+            return dbpool.connect(conn => conn.execute(this, undefined, options)).then(callback);
         }
     }
 

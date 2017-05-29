@@ -34,7 +34,7 @@ class OracleSerializer extends Serializer {
                 ') t)' + (obj._alias ? ' ' + obj._alias : '') +
                 (prettyPrint ? '\nwhere' : ' where') +
                 (offset ? ' row$number >= ' + offset : '') +
-                (limit ? (offset ? ' and' : '') + ' row$number <= ' + limit : '');
+                (limit ? (offset ? ' and' : '') + ' row$number <= ' + (limit + (offset || 0)) : '');
         }
         return sql;
     }

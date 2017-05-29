@@ -1,3 +1,4 @@
+/* eslint-disable */
 const assert = require('assert'),
     sqb = require('../');
 
@@ -151,7 +152,7 @@ describe('Initialize sql objects', function () {
             let obj = sqb.select().join(sqb.join('table1'));
             assert.equal(obj._joins.length, 1);
             assert.ok(obj._joins[0] instanceof sqb.Join);
-            assert.equal(obj._joins[0].table, 'table1');
+            assert.equal(obj._joins[0].table.table, 'table1');
             done();
         });
 

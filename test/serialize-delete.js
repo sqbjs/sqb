@@ -1,3 +1,4 @@
+/* eslint-disable */
 const assert = require('assert'),
     sqb = require('../');
 

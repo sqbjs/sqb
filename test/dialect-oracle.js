@@ -45,7 +45,7 @@ describe('Oracle dialect', function () {
             let result = statement.build({
                 dialect: 'oracle'
             });
-            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where row$number >= 5 and row$number <= 10");
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (select * from table1) t) where row$number >= 5 and row$number <= 15");
             done();
         });
 
@@ -64,7 +64,7 @@ describe('Oracle dialect', function () {
                 dialect: 'oracle',
                 prettyPrint: true
             });
-            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (\n  select * from table1\n) t)\nwhere row$number >= 5 and row$number <= 10");
+            assert.equal(result.sql, "select * from (select rownum row$number, t.* from (\n  select * from table1\n) t)\nwhere row$number >= 5 and row$number <= 15");
             done();
         });
 
