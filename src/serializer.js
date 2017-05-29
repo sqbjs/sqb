@@ -7,7 +7,6 @@
  */
 
 /* Internal module dependencies. */
-
 const StringBuilder = require('./helpers/stringbuilder');
 
 /* External module dependencies. */

@@ -19,7 +19,8 @@ const Join = require('./sqlobjects/join');
 const Condition = require('./sqlobjects/condition');
 const ConditionGroup = require('./sqlobjects/conditiongroup');
 const Serializer = require('./serializer');
-const {DbPool} = require('sqb-connect');
+const DbPool = require('./pool');
+const Connection = require('./connection');
 
 /* Register built-in serializers */
 require('./dialects/oracle_serializer');
@@ -29,6 +30,9 @@ module.exports = new SqlBuilder();
 Object.assign(module.exports, {
 
     SqlBuilder,
+    Serializer,
+    DbPool,
+    Connection,
     SqlObject,
     Select,
     Insert,
@@ -39,8 +43,6 @@ Object.assign(module.exports, {
     Join,
     Condition,
     ConditionGroup,
-    Serializer,
-    DbPool,
 
     serializer: function (config) {
         return Serializer.create(config);
@@ -51,7 +53,6 @@ Object.assign(module.exports, {
     }
 });
 
-DbPool._sqb = module.exports;
 
 
 
