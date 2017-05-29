@@ -17,7 +17,6 @@
     "dialect",
     "multi-dialect",
     "database",
-    "oracle",
     "framework"
   ],
   "dependencies": {

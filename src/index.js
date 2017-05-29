@@ -23,9 +23,6 @@ const Connection = require('./connection');
 
 const sqlObjects = require('./sqlobjects');
 
-/* Register built-in serializers */
-require('./dialects/oracle_serializer');
-
 Object.assign(sqlObjects, {
 
     Serializer,

@@ -13,15 +13,16 @@ Note: SQB is in alpha state. Use it only for testing purposes only!
 
 
 ```js
+require('sqb-serializer-oracle'); /* Loads Oracle serialization plug-in */
 const sqb = require('sqb'),
     /* Shortcuts for more clear coding */
     innerJoin = sqb.innerJoin,
     select = sqb.select,
     raw = sqb.raw,
     serializer = sqb.serializer({
-      dialect:'oracle',
-      prettyPrint: true,
-      namedParams: false
+      dialect:'oracle',   // Use Oracle serializer
+      prettyPrint: true,  // Pretty sql output
+      namedParams: false  // Serialize named params (:prm) except (?)
     });
 
 let statement =

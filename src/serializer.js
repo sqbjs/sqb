@@ -414,22 +414,27 @@ class Serializer {
     _serializeConditionGroup(group) {
         if (!group) return '';
         const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        let s;
+        let s, logop = 'and';
         sb.indent += 4;
         for (let i = 0; i < group.length; i++) {
             const item = group.item(i);
 
-            if (item.isRaw)
+            if (item.isRaw) {
+                logop = item.logicalOperator || logop;
                 s = this._serializeRaw(item);
+            }
 
             else if (item.type === 'conditiongroup') {
+                logop = item.logicalOperator;
                 s = this._serializeConditionGroup(item);
                 if (s) s = '(' + s + ')';
-            } else
+            } else {
+                logop = item.logicalOperator;
                 s = this._serializeCondition(item);
+            }
 
             if (s)
-                sb.append((sb.line ? ' ' + item.logicalOperator + ' ' : '') + s);
+                sb.append((sb.line ? ' ' + logop + ' ' : '') + s);
         }
         return sb.toString();
     }

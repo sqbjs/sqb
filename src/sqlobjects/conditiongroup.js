@@ -46,6 +46,9 @@ class ConditionGroup extends SqlObject {
                 } else throw new TypeError('Invalid argument');
             } else if (arg === 'and' || arg === 'or') {
                 logop = arg;
+            } else if (arg.type === 'raw') {
+                arg.logicalOperator = logop;
+                self._items.push(arg);
             } else
                 throw new TypeError('Invalid argument');
         }
