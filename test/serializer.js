@@ -77,5 +77,5 @@ describe('Serializer', function () {
         assert.ok(obj === obj2);
         done();
     });
-    
+
 });

@@ -28,9 +28,6 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2"
   },
-  "peerDependencies": {
-    "sqb-connect": "^0.0.11"
-  },
   "engines": {
     "node": ">= 6.0"
   },
