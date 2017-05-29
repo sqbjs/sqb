@@ -53,7 +53,7 @@ describe('Connect', function () {
 
         it('should create connection', function (done) {
 
-            db.connect(async (conn, close) => {
+            db.connect((conn, close) => {
                 done();
             }).catch(err => {
                 done(new Error(err));
@@ -63,7 +63,7 @@ describe('Connect', function () {
 
         it('should create connection', function (done) {
 
-            db.connect(async (conn, close) => {
+            db.connect((conn, close) => {
                 done();
             }).catch(err => {
                 done(new Error(err));
@@ -76,7 +76,7 @@ describe('Connect', function () {
 
         it('should execute sql', function (done) {
 
-            db.connect(async (conn, close) => {
+            db.connect((conn, close) => {
                 conn.execute('select * from test', [], {
                     autoCommit: true,
                     extendedMetaData: true,
