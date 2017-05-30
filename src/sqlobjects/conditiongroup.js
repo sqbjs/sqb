@@ -27,11 +27,17 @@ class ConditionGroup extends SqlObject {
             this.add(...src);
     }
 
-    add(arr) {
+    add() {
+        if (!arguments.length) return this;
         const self = this;
         let logop = this.logicalOperator;
-        for (const arg of arguments) {
 
+        if (typeof arguments[0] === 'string') {
+            self._items.push(new Condition(...arguments));
+            return this;
+        }
+
+        for (const arg of arguments) {
             // Process array argument
             if (Array.isArray(arg) && arg.length) {
                 // if First item is array, it is a group

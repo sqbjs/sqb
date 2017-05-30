@@ -219,7 +219,7 @@ describe('Initialize sql objects', function () {
         });
 
         it('should define "alias"', function (done) {
-            let obj = sqb.select().alias('t1');
+            let obj = sqb.select().as('t1');
             assert.equal(obj._alias, 't1');
             done();
         });

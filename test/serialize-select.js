@@ -188,6 +188,38 @@ describe('Serialize select statements', function () {
 
     });
 
+    describe('serialize "case" expressions', function () {
+
+        it('should serialize single condition in "when"', function (done) {
+            let statement = sqb.select(
+                sqb.case().when('col1', 5).then(1).else(100)
+            ).from('table1');
+            let result = statement.build();
+            assert.equal(result.sql, 'select case when col1 = 5 then 1 else 100 end from table1');
+            done();
+        });
+
+        it('should serialize group of conditions in "when"', function (done) {
+            let statement = sqb.select(
+                sqb.case().when(['col1', 5], 'or', ['col2', 4]).then(1).else(100)
+            ).from('table1');
+            let result = statement.build();
+            assert.equal(result.sql, 'select case when col1 = 5 or col2 = 4 then 1 else 100 end from table1');
+            done();
+        });
+
+        it('should serialize alias', function (done) {
+            let statement = sqb.select(
+                sqb.case().when('col1', 5).then(1).else(100).as('col1')
+            ).from('table1');
+            let result = statement.build();
+            assert.equal(result.sql, 'select case when col1 = 5 then 1 else 100 end col1 from table1');
+            done();
+        });
+
+    });
+
+
     describe('Serialize "where" part', function () {
 
         describe('Serialize comparison operators', function () {
@@ -295,14 +327,14 @@ describe('Serialize select statements', function () {
             });
 
             it('should serialize raw in "where"', function (done) {
-                let statement = sqb.select().from('table1').where([[sqb.raw('ID=1')]]);
+                let statement = sqb.select().from('table1').where([[sqb.raw('ID')]]);
                 let result = statement.build();
-                assert.equal(result.sql, 'select * from table1 where (ID=1)');
+                assert.equal(result.sql, 'select * from table1 where (ID = null)');
                 done();
             });
 
-            it('should handle reserved words', function (done) {
-                let statement = sqb.select().from('table1').where(["select", 1]);
+            it('should use double quotes for reserved words', function (done) {
+                let statement = sqb.select().from('table1').where(['select', 1]);
                 let result = statement.build();
                 assert.equal(result.sql, 'select * from table1 where "select" = 1');
                 done();
@@ -441,7 +473,7 @@ describe('Serialize select statements', function () {
         describe('Sub-selects', function () {
 
             it('should serialize sub-select in "columns" part', function (done) {
-                let statement = sqb.select(sqb.select('ID').from('table2').alias('t1')).from('table1');
+                let statement = sqb.select(sqb.select('ID').from('table2').as('t1')).from('table1');
                 let result = statement.build();
                 assert.equal(result.sql, "select (select ID from table2) t1 from table1");
                 statement = sqb.select(sqb.select('ID').from('table2')).from('table1');
@@ -451,21 +483,21 @@ describe('Serialize select statements', function () {
             });
 
             it('should serialize sub-select in "from" part', function (done) {
-                let statement = sqb.select().from(sqb.select().from('table1').alias('t1'));
+                let statement = sqb.select().from(sqb.select().from('table1').as('t1'));
                 let result = statement.build();
                 assert.equal(result.sql, "select * from (select * from table1) t1");
                 done();
             });
 
             it('should serialize sub-select in "join" part', function (done) {
-                let statement = sqb.select().from('table1').join(sqb.innerJoin(sqb.select().from('table1').alias('t1')));
+                let statement = sqb.select().from('table1').join(sqb.innerJoin(sqb.select().from('table1').as('t1')));
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 inner join (select * from table1) t1");
                 done();
             });
 
-            it('should serialize sub-select in "where" part', function (done) {
-                let statement = sqb.select().from('table1').where([sqb.select('ID').from('table1').alias('t1'), 1]);
+            it('should serialize sub-select in "where" expression', function (done) {
+                let statement = sqb.select().from('table1').where([sqb.select('ID').from('table1').as('t1'), 1]);
                 let result = statement.build();
                 assert.equal(result.sql, "select * from table1 where (select ID from table1) = 1");
                 done();

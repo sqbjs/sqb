@@ -17,6 +17,7 @@ const Column = require('./sqlobjects/column');
 const Join = require('./sqlobjects/join');
 const Condition = require('./sqlobjects/condition');
 const ConditionGroup = require('./sqlobjects/conditiongroup');
+const Case = require('./sqlobjects/case');
 const Serializer = require('./serializer');
 const DbPool = require('./pool');
 const Connection = require('./connection');
@@ -38,6 +39,7 @@ Object.assign(sqlObjects, {
     Join,
     Condition,
     ConditionGroup,
+    Case,
 
     serializer: function (config) {
         return Serializer.create(config);

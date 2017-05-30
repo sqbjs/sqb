@@ -14,6 +14,7 @@ const Delete = require('./sqlobjects/delete');
 
 const Raw = require('./sqlobjects/raw');
 const Join = require('./sqlobjects/join');
+const Case = require('./sqlobjects/case');
 
 
 module.exports = {
@@ -82,4 +83,10 @@ module.exports = {
     fullOuterJoin (table) {
         return new Join(Join.Type.fullOuterJoin, table);
     },
+
+    //noinspection JSMethodCanBeStatic,JSUnusedGlobalSymbols
+    case () {
+        return new Case();
+    }
+
 };

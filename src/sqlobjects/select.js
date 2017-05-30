@@ -192,7 +192,7 @@ class Select extends Statement {
      * @return {Select}
      * @public
      */
-    alias(alias) {
+    as(alias) {
         this._alias = alias;
         return this;
     }
