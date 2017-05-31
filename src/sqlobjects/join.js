@@ -7,7 +7,6 @@
  */
 
 /* Internal module dependencies. */
-
 const SqlObject = require('./abstract');
 const ConditionGroup = require('./conditiongroup');
 const TableName = require('./tablename');
@@ -16,25 +15,26 @@ const TableName = require('./tablename');
  * @class
  * @public
  */
-
 class Join extends SqlObject {
 
-    constructor(joinType, table) {
-        super();
-        if (joinType < 0 || joinType > 6)
-            throw new TypeError('Invalid argument (joinType) for join');
-        if (!(typeof table === 'string' || table.isSelect || table.isRaw))
-            throw new TypeError('Invalid argument (table) for join');
-        this.type = 'join';
-        this.joinType = joinType;
-        this.table = table.isSelect || table.isRaw ? table : new TableName(String(table));
-        this.conditions = new ConditionGroup();
-    }
+  constructor(joinType, table) {
+    super();
+    if (joinType < 0 || joinType > 6)
+      throw new TypeError('Invalid argument (joinType) for join');
+    if (!(typeof table === 'string' || table.isSelect || table.isRaw))
+      throw new TypeError('Invalid argument (table) for join');
+    this.type = 'join';
+    this.joinType = joinType;
+    this.table = table.isSelect || table.isRaw ?
+        table :
+        new TableName(String(table));
+    this.conditions = new ConditionGroup();
+  }
 
-    on(conditions) {
-        this.conditions.add.apply(this.conditions, arguments);
-        return this;
-    }
+  on(conditions) {
+    this.conditions.add.apply(this.conditions, arguments);
+    return this;
+  }
 
 }
 
@@ -61,6 +61,5 @@ Join.Type.outerJoin = /** @type {!Join.Type} */ (5);
 
 /** @export */
 Join.Type.fullOuterJoin = /** @type {!Join.Type} */ (6);
-
 
 module.exports = Join;

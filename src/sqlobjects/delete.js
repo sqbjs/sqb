@@ -11,65 +11,61 @@ const Statement = require('./statement');
 const Table = require('./tablename');
 const ConditionGroup = require('./conditiongroup');
 
-
 /**
  * @class
  * @public
  */
-
 class Delete extends Statement {
 
-    constructor(dbpool, table) {
-        super(dbpool);
-        this.type = 'delete';
-        this.clearFrom();
-        this.clearWhere();
-        this.from(table);
-    }
+  constructor(dbpool, table) {
+    super(dbpool);
+    this.type = 'delete';
+    this.clearFrom();
+    this.clearWhere();
+    this.from(table);
+  }
 
-    /**
-     *
-     * @return {Delete}
-     * @public
-     */
-    clearFrom() {
-        this._tables = [];
-        return this;
-    }
+  /**
+   *
+   * @return {Delete}
+   * @public
+   */
+  clearFrom() {
+    this._tables = [];
+    return this;
+  }
 
-    /**
-     *
-     * @return {Delete}
-     * @public
-     */
-    clearWhere() {
-        this._where = new ConditionGroup();
-        return this;
-    }
+  /**
+   *
+   * @return {Delete}
+   * @public
+   */
+  clearWhere() {
+    this._where = new ConditionGroup();
+    return this;
+  }
 
-    /**
-     *
-     * @param {string|Raw} table..
-     * @return {Delete}
-     */
-    from(table) {
-        if (table)
-            this._table = table.isRaw ? table : new Table(String(table));
-        return this;
-    }
+  /**
+   *
+   * @param {string|Raw} table..
+   * @return {Delete}
+   */
+  from(table) {
+    if (table)
+      this._table = table.isRaw ? table : new Table(String(table));
+    return this;
+  }
 
-    /**
-     *
-     * @param {Condition} conditions..
-     * @return {Delete}
-     * @public
-     */
-    where(conditions) {
-        if (!conditions) return this;
-        this._where.add.apply(this._where, arguments);
-        return this;
-    }
-
+  /**
+   *
+   * @param {...Condition} condition
+   * @return {Delete}
+   * @public
+   */
+  where(...condition) {
+    this._where.add(...condition);
+    return this;
+  }
 
 }
 

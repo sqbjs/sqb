@@ -13,7 +13,6 @@ const Serializer = require('../serializer');
 /* External module dependencies. */
 const assert = require('assert');
 
-
 /**
  * @class
  * @public
@@ -21,53 +20,58 @@ const assert = require('assert');
 
 class Statement extends SqlObject {
 
-    //noinspection SpellCheckingInspection
-    constructor(builder) {
-        super();
-        this.builder = builder;
-        this.connection = undefined;
-    }
+  //noinspection SpellCheckingInspection
+  constructor(builder) {
+    super();
+    this.builder = builder;
+    this.connection = undefined;
+  }
 
-    get dbpool() {
-        return typeof this.builder.connect === 'function' ? this.builder : undefined;
-    }
+  get dbpool() {
+    return typeof this.builder.connect === 'function' ?
+        this.builder :
+        undefined;
+  }
 
-    build(config, params) {
-        if (config instanceof Serializer) {
-            return config.build(this, params);
-        } else
-            return Serializer.create(config).build(this, (config ? config.params : undefined) || params);
-    }
+  build(config, params) {
+    if (config instanceof Serializer) {
+      return config.build(this, params);
+    } else
+      return Serializer.create(config).
+          build(this, (config ? config.params : undefined) || params);
+  }
 
-    identify(value) {
-        this._identity = value;
-        return this;
-    }
+  identify(value) {
+    this._identity = value;
+    return this;
+  }
 
-    //noinspection JSUnusedGlobalSymbols
-    then(options, callback) {
-        if (typeof options === 'function') {
-            callback = options;
-            options = undefined;
-        }
-        if (this.connection)
-            return this.connection.execute(this, undefined, options).then(callback);
-        else {
-            const dbpool = this.dbpool;
-            assert.ok(dbpool, 'This statement is not executable');
-            return dbpool.connect(conn => conn.execute(this, undefined, options)).then(callback);
-        }
+  //noinspection JSUnusedGlobalSymbols
+  then(options, callback) {
+    if (typeof options === 'function') {
+      callback = options;
+      options = undefined;
     }
+    if (this.connection)
+      return this.connection.execute(this, undefined, options).then(callback);
+    else {
+      const dbpool = this.dbpool;
+      assert.ok(dbpool, 'This statement is not executable');
+      return dbpool.connect((conn) => conn.execute(this, undefined, options)).
+          then(callback);
+    }
+  }
 
-    execute(params, options, callback) {
-        if (this.connection)
-            return this.connection.execute(this, params, options, callback);
-        else {
-            const dbpool = this.dbpool;
-            assert.ok(dbpool, 'This statement is not executable');
-            return dbpool.connect(conn => conn.execute(this, params, options, callback));
-        }
+  execute(params, options, callback) {
+    if (this.connection)
+      return this.connection.execute(this, params, options, callback);
+    else {
+      const dbpool = this.dbpool;
+      assert.ok(dbpool, 'This statement is not executable');
+      return dbpool.connect(
+          (conn) => conn.execute(this, params, options, callback));
     }
+  }
 
 }
 

@@ -14,20 +14,18 @@ const SqlObject = require('./abstract');
  * @class
  * @public
  */
-
 class Column extends SqlObject {
 
-    constructor(fieldName) {
-        super();
-        this.type = 'column';
-        const m = fieldName.match(/^(?:(\w+)(?:\.))?(\w+) ?(?:as)? ?(\w+)?$/);
-        if (!m)
-            throw new Error('Invalid definition "' + fieldName + '" for column');
-        this.table = m[1];
-        this.field = m[2];
-        this.alias = m[3];
-    }
-    
+  constructor(fieldName) {
+    super();
+    this.type = 'column';
+    const m = fieldName.match(/^(?:(\w+)(?:\.))?(\w+) ?(?:as)? ?(\w+)?$/);
+    if (!m)
+      throw new Error('Invalid definition "' + fieldName + '" for column');
+    this.table = m[1];
+    this.field = m[2];
+    this.alias = m[3];
+  }
 }
 
 module.exports = Column;

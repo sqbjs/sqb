@@ -7,7 +7,6 @@
  */
 
 /* Internal module dependencies. */
-
 const SqlObject = require('./abstract');
 
 /**
@@ -17,19 +16,20 @@ const SqlObject = require('./abstract');
 
 class Order extends SqlObject {
 
-    constructor(value) {
-        super();
-        this.type = 'order';
-        const m = value.match(/^(?:(\w+)(?:\.))?(\w+) ?(asc|desc|ascending|descending)?$/i);
-        if (m) {
-            this.table = m[1];
-            this.field = m[2];
-            if (m[3])
-                this.descending = ['desc', 'descending'].indexOf(m[3].toLowerCase()) >= 0;
-        } else
-            throw new Error(`Invalid order by definition "${value}"`);
-    }
-
+  constructor(value) {
+    super();
+    this.type = 'order';
+    const m = value.match(
+        /^(?:(\w+)(?:\.))?(\w+) ?(asc|desc|ascending|descending)?$/i);
+    if (m) {
+      this.table = m[1];
+      this.field = m[2];
+      if (m[3])
+        this.descending = ['desc', 'descending'].indexOf(m[3].toLowerCase()) >=
+            0;
+    } else
+      throw new Error(`Invalid order by definition "${value}"`);
+  }
 }
 
 module.exports = Order;

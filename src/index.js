@@ -26,28 +26,28 @@ const sqlObjects = require('./sqlobjects');
 
 Object.assign(sqlObjects, {
 
-    Serializer,
-    DbPool,
-    Connection,
-    SqlObject,
-    Select,
-    Insert,
-    Update,
-    Delete,
-    Raw,
-    Column,
-    Join,
-    Condition,
-    ConditionGroup,
-    Case,
+  Serializer,
+  DbPool,
+  Connection,
+  SqlObject,
+  Select,
+  Insert,
+  Update,
+  Delete,
+  Raw,
+  Column,
+  Join,
+  Condition,
+  ConditionGroup,
+  Case,
 
-    serializer: function (config) {
-        return Serializer.create(config);
-    },
+  serializer: function(config) {
+    return Serializer.create(config);
+  },
 
-    pool: function (config) {
-        return DbPool.create(config);
-    }
+  pool: function(config) {
+    return DbPool.create(config);
+  },
 });
 
 module.exports = sqlObjects;

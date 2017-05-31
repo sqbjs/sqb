@@ -17,15 +17,15 @@ const SqlObject = require('./abstract');
 
 class Raw extends SqlObject {
 
-    constructor(str) {
-        super();
-        this.type = 'raw';
-        this.text = str;
-    }
+  constructor(str) {
+    super();
+    this.type = 'raw';
+    this.text = str;
+  }
 
-    get isRaw() {
-        return this.type === 'raw';
-    }
+  get isRaw() {
+    return this.type === 'raw';
+  }
 
 }
 

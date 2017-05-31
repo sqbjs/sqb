@@ -12,12 +12,10 @@ const StringBuilder = require('./helpers/stringbuilder');
 /* External module dependencies. */
 const assert = require('assert');
 
-
 /* helper functions */
 function isNumeric(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+  return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
 
 /**
  * @class
@@ -25,726 +23,762 @@ function isNumeric(n) {
  */
 class Serializer {
 
-    constructor(config) {
-        this.dialect = config.dialect;
-        this.prettyPrint = !!config.prettyPrint;
-        this.namedParams = !!config.namedParams;
-        this.reservedWords = ['select', 'from', 'with', 'where',
-            'join', 'inner', 'outer', 'full', 'and', 'or', 'not', 'between', 'null', 'like',
-            'order', 'by', 'group', 'count', 'sum', 'average'];
+  constructor(config) {
+    this.dialect = config.dialect;
+    this.prettyPrint = !!config.prettyPrint;
+    this.namedParams = !!config.namedParams;
+    this.reservedWords = [
+      'select',
+      'from',
+      'with',
+      'where',
+      'join',
+      'inner',
+      'outer',
+      'full',
+      'and',
+      'or',
+      'not',
+      'between',
+      'null',
+      'like',
+      'order',
+      'by',
+      'group',
+      'count',
+      'sum',
+      'average'];
 
-        this.objSerializers = {
-            conditiongroup: this._serializeConditionGroup,
-            condition: this._serializeCondition,
-            raw: this._serializeRaw,
-            select: this._serializeSelect,
-            insert: this._serializeInsert,
-            update: this._serializeUpdate,
-            delete: this._serializeDelete,
-            table: this._serializeTableName,
-            column: this._serializeFieldName,
-            case: this._serializeCase
-        }
+    this.objSerializers = {
+      conditiongroup: this._serializeConditionGroup,
+      condition: this._serializeCondition,
+      raw: this._serializeRaw,
+      select: this._serializeSelect,
+      insert: this._serializeInsert,
+      update: this._serializeUpdate,
+      delete: this._serializeDelete,
+      table: this._serializeTableName,
+      column: this._serializeFieldName,
+      case: this._serializeCase,
+    };
+  }
+
+  /**
+   * Serializes input object to string representation
+   *
+   * @param {Statement} obj
+   * @param {Array|Object} [values]
+   * @return {{sql: string, params: (Object|Array) }}
+   * @public
+   */
+  build(obj, values) {
+    this._outParams = this.namedParams ? {} : [];
+    if (values) {
+      if (Array.isArray(values))
+        this._executeParams = values;
+      else if (typeof values === 'object') {
+        // We build a new map with upper keys for case insensitivity
+        const obj = {};
+        Object.getOwnPropertyNames(values).forEach(
+            function(key) {
+              obj[key.toUpperCase()] = values[key];
+            },
+        );
+        this._executeParams = obj;
+      } else
+        throw new TypeError('Invalid argument');
+    }
+    assert.ok(['select', 'insert', 'update', 'delete'].includes(obj.type),
+        'Invalid argument');
+    return {
+      sql: this._serializeSqlObject(obj),
+      params: this._outParams,
+    };
+  }
+
+  /**
+   * Checks if word is reserved
+   *
+   * @param {string} word
+   * @return {boolean}
+   * @protected
+   */
+  _isReserved(word) {
+    return word && this.reservedWords.indexOf(String(word).toLowerCase()) >= 0;
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serialize Select statement
+   *
+   * @param {Select} obj Select statement object
+   * @return {String}
+   * @protected
+   */
+  _serializeSelect(obj) {
+    const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+    let s;
+
+    sb.append('select');
+
+    s = this._serializeColumns(obj._columns);
+    sb.append(s ? ' ' + s : ' *');
+
+    if ((s = this._serializeTablesNames(obj._tables))) {
+      sb.append(
+          (this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + 'from' + s);
     }
 
-    /**
-     * Serializes input object to string representation
-     *
-     * @param {Statement} obj
-     * @param {Array|Object} [values]
-     * @return {{sql: string, params: Array|Object}}
-     * @public
-     */
-    build(obj, values) {
-        this._outParams = this.namedParams ? {} : [];
-        if (values) {
-            if (Array.isArray(values))
-                this._executeParams = values;
-            else if (typeof values === 'object') {
-                // We build a new map with upper keys for case insensitivity
-                const obj = {};
-                Object.getOwnPropertyNames(values).forEach(
-                    function (key) {
-                        obj[key.toUpperCase()] = values[key];
-                    }
-                );
-                this._executeParams = obj;
-            }
-            else
-                throw new TypeError('Invalid argument');
-        }
-        assert.ok(['select', 'insert', 'update', 'delete'].includes(obj.type),
-            'Invalid argument');
-        return {
-            sql: this._serializeSqlObject(obj),
-            params: this._outParams
-        }
+    if ((s = this._serializeJoins(obj._joins))) {
+      sb.indent = 2;
+      sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + s);
+      if (this.prettyPrint)
+        sb.cr();
     }
 
-    /**
-     * Checks if word is reserved
-     *
-     * @param {string} word
-     * @return {boolean}
-     * @protected
-     */
-    _isReserved(word) {
-        return word && this.reservedWords.indexOf(String(word).toLowerCase()) >= 0;
+    if ((s = this._serializeWhere(obj._where))) {
+      sb.indent = 0;
+      sb.append((this.prettyPrint &&
+          (sb.line.length > 40 || sb.lines > 1 || s.indexOf('\n') > 0) ?
+              (sb.line ? '\n' : '') : (sb.line ? ' ' : '')) + s);
+      if (this.prettyPrint) sb.cr();
     }
 
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serialize Select statement
-     *
-     * @param {Select} obj Select statement object
-     * @return {String}
-     * @protected
-     */
-    _serializeSelect(obj) {
-        const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
-        let s;
-
-        sb.append('select');
-
-        s = this._serializeColumns(obj._columns);
-        sb.append(s ? ' ' + s : ' *');
-
-        if ((s = this._serializeTablesNames(obj._tables))) {
-            sb.append((this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + 'from' + s);
-        }
-
-        if ((s = this._serializeJoins(obj._joins))) {
-            sb.indent = 2;
-            sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + s);
-            if (this.prettyPrint)
-                sb.cr();
-        }
-
-        if ((s = this._serializeWhere(obj._where))) {
-            sb.indent = 0;
-            sb.append((this.prettyPrint && (sb.line.length > 40 || sb.lines > 1 || s.indexOf('\n') > 0) ?
-                    (sb.line ? '\n' : '') : (sb.line ? ' ' : '')) + s);
-            if (this.prettyPrint) sb.cr();
-        }
-
-        if ((s = this._serializeGroupBy(obj._groupby))) {
-            sb.indent = 0;
-            sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'group by ' + s);
-        }
-
-        if ((s = this._serializeOrderBy(obj._orderby))) {
-            sb.indent = 0;
-            sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'order by ' + s);
-        }
-
-        return sb.toString();
+    if ((s = this._serializeGroupBy(obj._groupby))) {
+      sb.indent = 0;
+      sb.append(
+          (this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'group by ' + s);
     }
 
-    /**
-     * Serialize Insert statement
-     *
-     * @param {Insert} obj Select statement object
-     * @return {string}
-     * @protected
-     */
-    _serializeInsert(obj) {
-        assert.ok(['raw', 'table'].includes(obj._table.type), 'Invalid argument. Only Raw or TableName allowed in "insert(?)"');
-
-        const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
-        sb.append('insert into ');
-        // table name
-        sb.append(this._serializeSqlObject(obj._table));
-        // columns
-        sb.append(' (' + this._serializeColumns(obj._columns) + ') ');
-        // values
-        const objValues = obj._values || {};
-
-        if (objValues) {
-
-            if (['raw', 'select'].includes(objValues.type)) {
-                const s = this._serializeSqlObject(objValues);
-                if (s) {
-                    if (this.prettyPrint && objValues.type === 'select') sb.crlf();
-                    sb.append(s);
-                }
-            } else {
-                sb.append('values (');
-                const self = this;
-                self._prmIdx = 0;
-
-                // Iterate over columns
-                obj._columns.forEach(function (col, idx) {
-                    const field = col.field.toUpperCase(),
-                        val = objValues[field];
-                    const s = self._serializeValue(val);
-                    if (s)
-                        sb.append(s + (idx < obj._columns.length - 1 ? ', ' : ''))
-                });
-                sb.append(')');
-            }
-        }
-        return sb.toString();
+    if ((s = this._serializeOrderBy(obj._orderby))) {
+      sb.indent = 0;
+      sb.append(
+          (this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'order by ' + s);
     }
 
-    /**
-     * Serialize Update statement
-     *
-     * @param {Update} obj Update statement object
-     * @return {string}
-     * @protected
-     */
-    _serializeUpdate(obj) {
-        assert.ok(['raw', 'table'].includes(obj._table.type), 'Invalid argument. Only Raw or TableName allowed in "update(?)"');
-        assert.ok(!!obj._values, 'values required for Update statement');
+    return sb.toString();
+  }
 
-        const self = this,
-            prettyPrint = self.prettyPrint,
-            sb = new StringBuilder(prettyPrint ? 180 : 0);
+  /**
+   * Serialize Insert statement
+   *
+   * @param {Insert} obj Select statement object
+   * @return {string}
+   * @protected
+   */
+  _serializeInsert(obj) {
+    assert.ok(['raw', 'table'].includes(obj._table.type),
+        'Invalid argument. Only Raw or TableName allowed in "insert(?)"');
 
-        sb.indent = 4;
+    const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+    sb.append('insert into ');
+    // table name
+    sb.append(this._serializeSqlObject(obj._table));
+    // columns
+    sb.append(' (' + this._serializeColumns(obj._columns) + ') ');
+    // values
+    const objValues = obj._values || {};
 
-        sb.append('update ');
-        sb.append(this._serializeSqlObject(obj._table));
-        sb.append(' set');
-        if (prettyPrint)
-            sb.cr();
-
-        // Serialize update values
-        if (obj._values.isRaw) {
-            sb.append(' ' + self._serializeRaw(obj._values));
-        } else {
-            // Iterate over update values
-            const values = obj._values;
-            Object.getOwnPropertyNames(values).forEach(
-                function (key, idx) {
-                    const s = self._serializeUpdateValue(key, values[key]);
-                    if (s)
-                        sb.append((idx > 0 ? ', ' : (prettyPrint ? '' : ' ')) + s);
-                }
-            );
+    if (objValues) {
+      if (['raw', 'select'].includes(objValues.type)) {
+        const s = this._serializeSqlObject(objValues);
+        if (s) {
+          if (this.prettyPrint && objValues.type === 'select') sb.crlf();
+          sb.append(s);
         }
+      } else {
+        sb.append('values (');
+        const self = this;
+        self._prmIdx = 0;
 
-        // Serialize conditions
-        sb.indent = 2;
-        let s;
-        if ((s = this._serializeWhere(obj._where))) {
-            sb.indent = 0;
-            sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ? (sb.line ? '\n' : '') :
-                    (sb.line ? ' ' : '')) + s);
-            if (prettyPrint) sb.cr();
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Serialize Delete statement
-     *
-     * @param {Delete} obj Delete statement object
-     * @return {string}
-     * @protected
-     */
-    _serializeDelete(obj) {
-        assert.ok(['raw', 'table'].includes(obj._table.type), 'Invalid argument. Only Raw or TableName allowed in "delete(?)"');
-        const self = this,
-            prettyPrint = self.prettyPrint,
-            sb = new StringBuilder(prettyPrint ? 180 : 0);
-        sb.indent = 4;
-        sb.append('delete from ');
-        sb.append(this._serializeSqlObject(obj._table));
-
-        // Serialize conditions
-        sb.indent = 2;
-        let s;
-        if ((s = this._serializeWhere(obj._where))) {
-            sb.indent = 0;
-            sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ? (sb.line ? '\n' : '') :
-                    (sb.line ? ' ' : '')) + s);
-            if (prettyPrint) sb.cr();
-        }
-
-        return sb.toString();
-    }
-
-    //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-    /**
-     * Serialize Raw object
-     *
-     * @param {Raw} raw
-     * @return {string}
-     * @protected
-     */
-    // eslint-disable-next-line
-    _serializeRaw(raw) {
-        return raw ? raw.text || '' : '';
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes array of column names comes after 'Select'
-     *
-     * @param {Array<Column>} columns
-     * @return {string}
-     * @protected
-     */
-    _serializeColumns(columns) {
-        if (!(columns && columns.length)) return '';
-        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        sb.indent += 4;
-        columns.forEach(col => {
-            const s = this._serializeColumn(col);
-            if (s) {
-                if (sb.line) sb.append(', ', true);
-                sb.append(s);
-            }
+        // Iterate over columns
+        obj._columns.forEach(function(col, idx) {
+          const field = col.field.toUpperCase();
+          const val = objValues[field];
+          const s = self._serializeValue(val);
+          if (s)
+            sb.append(s + (idx < obj._columns.length - 1 ? ', ' : ''));
         });
-        return sb.toString();
+        sb.append(')');
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Serialize Update statement
+   *
+   * @param {Update} obj Update statement object
+   * @return {string}
+   * @protected
+   */
+  _serializeUpdate(obj) {
+    assert.ok(['raw', 'table'].includes(obj._table.type),
+        'Invalid argument. Only Raw or TableName allowed in "update(?)"');
+    assert.ok(!!obj._values, 'values required for Update statement');
+
+    const self = this;
+    const prettyPrint = self.prettyPrint;
+    const sb = new StringBuilder(prettyPrint ? 180 : 0);
+
+    sb.indent = 4;
+
+    sb.append('update ');
+    sb.append(this._serializeSqlObject(obj._table));
+    sb.append(' set');
+    if (prettyPrint)
+      sb.cr();
+
+    // Serialize update values
+    if (obj._values.isRaw) {
+      sb.append(' ' + self._serializeRaw(obj._values));
+    } else {
+      // Iterate over update values
+      const values = obj._values;
+      Object.getOwnPropertyNames(values).forEach(
+          function(key, idx) {
+            const s = self._serializeUpdateValue(key, values[key]);
+            if (s)
+              sb.append((idx > 0 ? ', ' : (prettyPrint ? '' : ' ')) + s);
+          },
+      );
     }
 
-    /**
-     * Serializes array of column names comes after 'Select'
-     *
-     * @param {Column} column
-     * @return {string}
-     * @protected
-     */
-    _serializeColumn(column) {
-        if (!column) return '';
-        assert.ok(['column', 'raw', 'case', 'select'].includes(column.type), 'Invalid object for serializing column');
-        const s = this._serializeSqlObject(column);
-        //noinspection JSUnresolvedVariable
-        return column.type === 'select' ? '(' + s + ')' + (column._alias ? ' ' + column._alias : '') : s;
+    // Serialize conditions
+    sb.indent = 2;
+    let s;
+    if ((s = this._serializeWhere(obj._where))) {
+      sb.indent = 0;
+      sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ?
+              (sb.line ? '\n' : '') :
+              (sb.line ? ' ' : '')) + s);
+      if (prettyPrint) sb.cr();
     }
 
-    //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-    /**
-     * Serializes single column name
-     *
-     * @param field
-     * @return {string}
-     * @protected
-     */
-    _serializeFieldName(field) {
-        return (field.table ? field.table + '.' : '') + field.field + (field.alias ? ' ' + field.alias : '');
+    return sb.toString();
+  }
+
+  /**
+   * Serialize Delete statement
+   *
+   * @param {Delete} obj Delete statement object
+   * @return {string}
+   * @protected
+   */
+  _serializeDelete(obj) {
+    assert.ok(['raw', 'table'].includes(obj._table.type),
+        'Invalid argument. Only Raw or TableName allowed in "delete(?)"');
+    const self = this;
+    const prettyPrint = self.prettyPrint;
+    const sb = new StringBuilder(prettyPrint ? 180 : 0);
+    sb.indent = 4;
+    sb.append('delete from ');
+    sb.append(this._serializeSqlObject(obj._table));
+
+    // Serialize conditions
+    sb.indent = 2;
+    let s;
+    if ((s = this._serializeWhere(obj._where))) {
+      sb.indent = 0;
+      sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ?
+              (sb.line ? '\n' : '') :
+              (sb.line ? ' ' : '')) + s);
+      if (prettyPrint) sb.cr();
     }
 
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes tables names comes after 'From'
-     *
-     * @param {Array<SqlObject>} tables
-     * @return {string}
-     * @protected
-     */
-    _serializeTablesNames(tables) {
-        if (!(tables && tables.length)) return '';
-        let str = '';
-        tables.forEach(item => {
-            let ss;
-            assert.ok(['raw', 'select', 'table'].includes(item.type),
-                'Invalid object used as Table Name');
-            if ((ss = this._serializeSqlObject(item))) {
-                if (item.type === 'select') { //noinspection JSUnresolvedVariable
-                    ss = '(' + ss + ')' + (item._alias ? ' ' + item._alias : '');
-                }
-                str += (str ? ', ' : ' ') + ss;
-            }
-        });
-        return str;
-    }
+    return sb.toString();
+  }
 
-    //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
-    /**
-     * Serializes single table name
-     *
-     * @param {TableName} table
-     * @return {string}
-     * @protected
-     */
-    _serializeTableName(table) {
-        return (table.schema ? table.schema + '.' : '') +
-            table.table +
-            (table.alias ? ' ' + table.alias : '')
-    }
+  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
+  /**
+   * Serialize Raw object
+   *
+   * @param {Raw} raw
+   * @return {string}
+   * @protected
+   */
+  // eslint-disable-next-line
+  _serializeRaw(raw) {
+    return raw ? raw.text || '' : '';
+  }
 
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes single table name
-     *
-     * @param {ConditionGroup} group
-     * @return {string}
-     * @protected
-     */
-    _serializeWhere(group) {
-        const s = this._serializeConditionGroup(group);
-        return s ? 'where ' + s : '';
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes condition group
-     *
-     * @param {ConditionGroup} group
-     * @return {string}
-     * @protected
-     */
-    _serializeConditionGroup(group) {
-        if (!group) return '';
-        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        let s, logop = 'and';
-        sb.indent += 4;
-        for (let i = 0; i < group.length; i++) {
-            const item = group.item(i);
-            assert.ok(['raw', 'conditiongroup', 'condition'].includes(item.type),
-                'Invalid object used as Condition');
-            logop = item.logicalOperator || logop;
-            if ((s = this._serializeSqlObject(item))) {
-                if (item.type === 'conditiongroup') s = '(' + s + ')';
-                sb.append((sb.line ? ' ' + logop + ' ' : '') + s);
-            }
-        }
-        return sb.toString();
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes condition
-     *
-     * @param {Condition} item
-     * @return {string}
-     * @protected
-     */
-    _serializeCondition(item) {
-        let str;
-        if (['raw', 'select'].includes(item.field.type)) {
-            str = (str = this._serializeSqlObject(item.field)) && item.field.type === 'select' ?
-                '(' + str + ')' : str;
-        } else
-            str = this._isReserved(item.field) ? '"' + item.field + '"' : item.field;
-
-        const outParams = this._outParams;
-        let operator = item.operator.toLowerCase(),
-            s;
-
-        if (item.param) {
-            const prm = item.param.toUpperCase(),
-                inputprm = this._executeParams ? this._executeParams[prm] : null,
-                inputIsArray = Array.isArray(inputprm);
-            if (operator === 'between') {
-                if (this.namedParams) {
-                    s = ':' + prm + '1 and :' + prm + '2';
-                    outParams[prm + '1'] = inputIsArray ? inputprm[0] : inputprm;
-                    outParams[prm + '2'] = inputIsArray ? inputprm[1] : null;
-                } else {
-                    s = '? and ?';
-                    outParams.push(inputIsArray ? inputprm[0] : inputprm);
-                    outParams.push(inputIsArray ? inputprm[1] : null);
-                }
-            } else {
-                if (this.namedParams) {
-                    s = ':' + prm;
-                    outParams[prm] = inputprm;
-                } else {
-                    s = '?';
-                    outParams.push(inputprm);
-                }
-            }
-        } else {
-            if (operator === 'between') {
-                s = this._serializeValue(item.value[0]) + ' and ' +
-                    this._serializeValue(item.value[1]);
-            } else if (operator === 'like')
-                s = this._serializeValue(String(item.value));
-            else
-                s = this._serializeValue(item.value);
-            if (s.startsWith('(')) {
-                if (operator === '=') operator = 'in';
-                else if (operator === '!=') operator = 'not in'
-            }
-        }
-
-        if (s)
-            str += ' ' + operator + ' ' + s;
-        return str;
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes any value
-     *
-     * @param {*} val
-     * @return {string}
-     * @protected
-     */
-    _serializeValue(val) {
-        if (val === null || val === undefined)
-            return 'null';
-
-        if (val instanceof RegExp) {
-            const prm = val.source.toUpperCase(),
-                executeParams = this._executeParams;
-            let x;
-
-            if (Array.isArray(executeParams))
-                x = this._prmIdx < executeParams.length ? executeParams[this._prmIdx++] : null;
-
-            else if (typeof executeParams === 'object')
-                x = executeParams[prm] || null;
-
-            if (this.namedParams) {
-                this._outParams[prm] = x;
-                return ':' + prm;
-            } else {
-                this._outParams.push(x);
-                return '?';
-            }
-        }
-        if (val.isRaw)
-            return this._serializeRaw(val);
-        if (typeof val === 'string')
-            return this._serializeStringValue(val);
-        if (isNumeric(val))
-            return String(val);
-        if (val instanceof Date)
-            return this._serializeDateValue(val);
-        if (Array.isArray(val))
-            return this._serializeArrayValue(val);
-        return this._serializeStringValue(String(val))
-    }
-
-    //noinspection JSMethodCanBeStatic, JSUnusedLocalSymbols
-    /**
-     * Serializes string value
-     *
-     * @param {string} val
-     * @return {string}
-     * @protected
-     */
-    _serializeStringValue(val) {
-        return "'" + (val || '').replace("'", "''") + "'"
-    }
-
-    //noinspection JSMethodCanBeStatic, JSUnusedLocalSymbols
-    /**
-     * Serializes Date value
-     *
-     * @param {Date} date
-     * @return {string}
-     * @protected
-     */
-    _serializeDateValue(date) {
-        const d = date.getDate(),
-            m = date.getMonth() + 1,
-            y = date.getFullYear(),
-            h = date.getHours(),
-            n = date.getMinutes(),
-            s = date.getSeconds();
-        let str = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
-        if (h || n || s)
-            str += ' ' + (h <= 9 ? '0' + h : h) + ':' +
-                (n <= 9 ? '0' + n : n) + ':' +
-                (s <= 9 ? '0' + s : s);
-        return "'" + str + "'";
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes Array value
-     *
-     * @param {Array} arr
-     * @return {string}
-     * @protected
-     */
-    _serializeArrayValue(arr) {
-        let str = '';
-        for (let i = 0; i < arr.length; i++) {
-            str += (str ? ',' : '') + this._serializeValue(arr[i]);
-        }
-        return str ? '(' + str + ')' : '';
-    }
-
-    /**
-     * Serializes array of Joins
-     *
-     * @param {Array<Join>} joins
-     * @return {string}
-     * @protected
-     */
-    _serializeJoins(joins) {
-        if (!joins) return '';
-        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        for (let i = 0; i < joins.length; i++) {
-            const s = this._serializeJoin(joins[i]);
-            if (s) {
-                sb.append(s);
-                if (this.prettyPrint)
-                    sb.crlf();
-                else sb.append(i < joins.length - 1 ? ' ' : '');
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Serializes single Join
-     *
-     * @param {Join} join
-     * @return {string}
-     * @protected
-     */
-    _serializeJoin(join) {
-        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        sb.indent = 4;
-        let s;
-        switch (join.joinType) {
-            case 1:
-                s = 'left join';
-                break;
-            case 2:
-                s = 'left outer join';
-                break;
-            case 3:
-                s = 'right join';
-                break;
-            case 4:
-                s = 'right outer join';
-                break;
-            case 5:
-                s = 'outer join';
-                break;
-            case 6:
-                s = 'full outer join';
-                break;
-            default:
-                s = 'inner join';
-                break;
-        }
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes array of column names comes after 'Select'
+   *
+   * @param {Array<Column>} columns
+   * @return {string}
+   * @protected
+   */
+  _serializeColumns(columns) {
+    if (!(columns && columns.length)) return '';
+    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    sb.indent += 4;
+    columns.forEach((col) => {
+      const s = this._serializeColumn(col);
+      if (s) {
+        if (sb.line) sb.append(', ', true);
         sb.append(s);
+      }
+    });
+    return sb.toString();
+  }
 
+  /**
+   * Serializes array of column names comes after 'Select'
+   *
+   * @param {Column} column
+   * @return {string}
+   * @protected
+   */
+  _serializeColumn(column) {
+    if (!column) return '';
+    assert.ok(['column', 'raw', 'case', 'select'].includes(column.type),
+        'Invalid object for serializing column');
+    const s = this._serializeSqlObject(column);
+    //noinspection JSUnresolvedVariable
+    return column.type === 'select' ?
+        '(' + s + ')' + (column._alias ? ' ' + column._alias : '') :
+        s;
+  }
 
-        assert.ok(['raw', 'select', 'table'].includes(join.table.type),
-            'Invalid object used as Table Name');
-        if ((s = this._serializeSqlObject(join.table))) {
-            if (join.table.type === 'select') {
-                s = '(' + s + ')' + (join.table._alias ? ' ' + join.table._alias : '');
-            }
-            sb.append(' ' + s);
+  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
+  /**
+   * Serializes single column name
+   *
+   * @param {Column} field
+   * @return {string}
+   * @protected
+   */
+  _serializeFieldName(field) {
+    return (field.table ? field.table + '.' : '') + field.field +
+        (field.alias ? ' ' + field.alias : '');
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes tables names comes after 'From'
+   *
+   * @param {Array<SqlObject>} tables
+   * @return {string}
+   * @protected
+   */
+  _serializeTablesNames(tables) {
+    if (!(tables && tables.length)) return '';
+    let str = '';
+    tables.forEach((item) => {
+      let ss;
+      assert.ok(['raw', 'select', 'table'].includes(item.type),
+          'Invalid object used as Table Name');
+      if ((ss = this._serializeSqlObject(item))) {
+        if (item.type === 'select') { //noinspection JSUnresolvedVariable
+          ss = '(' + ss + ')' + (item._alias ? ' ' + item._alias : '');
         }
+        str += (str ? ', ' : ' ') + ss;
+      }
+    });
+    return str;
+  }
 
-        s = this._serializeConditionGroup(join.conditions);
+  //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
+  /**
+   * Serializes single table name
+   *
+   * @param {TableName} table
+   * @return {string}
+   * @protected
+   */
+  _serializeTableName(table) {
+    return (table.schema ? table.schema + '.' : '') +
+        table.table +
+        (table.alias ? ' ' + table.alias : '');
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes single table name
+   *
+   * @param {ConditionGroup} group
+   * @return {string}
+   * @protected
+   */
+  _serializeWhere(group) {
+    const s = this._serializeConditionGroup(group);
+    return s ? 'where ' + s : '';
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes condition group
+   *
+   * @param {ConditionGroup} group
+   * @return {string}
+   * @protected
+   */
+  _serializeConditionGroup(group) {
+    if (!group) return '';
+    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    let s;
+    let logop = 'and';
+    sb.indent += 4;
+    for (let i = 0; i < group.length; i++) {
+      const item = group.item(i);
+      assert.ok(['raw', 'conditiongroup', 'condition'].includes(item.type),
+          'Invalid object used as Condition');
+      logop = item.logicalOperator || logop;
+      if ((s = this._serializeSqlObject(item))) {
+        if (item.type === 'conditiongroup') s = '(' + s + ')';
+        sb.append((sb.line ? ' ' + logop + ' ' : '') + s);
+      }
+    }
+    return sb.toString();
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes condition
+   *
+   * @param {Condition} item
+   * @return {string}
+   * @protected
+   */
+  _serializeCondition(item) {
+    let str;
+    if (['raw', 'select'].includes(item.field.type)) {
+      str = (str = this._serializeSqlObject(item.field)) &&
+      item.field.type === 'select' ?
+          '(' + str + ')' : str;
+    } else
+      str = this._isReserved(item.field) ? '"' + item.field + '"' : item.field;
+
+    const outParams = this._outParams;
+    let operator = item.operator.toLowerCase();
+    let s;
+
+    if (item.param) {
+      const prm = item.param.toUpperCase();
+      const inputprm = this._executeParams ? this._executeParams[prm] : null;
+      const inputIsArray = Array.isArray(inputprm);
+      if (operator === 'between') {
+        if (this.namedParams) {
+          s = ':' + prm + '1 and :' + prm + '2';
+          outParams[prm + '1'] = inputIsArray ? inputprm[0] : inputprm;
+          outParams[prm + '2'] = inputIsArray ? inputprm[1] : null;
+        } else {
+          s = '? and ?';
+          outParams.push(inputIsArray ? inputprm[0] : inputprm);
+          outParams.push(inputIsArray ? inputprm[1] : null);
+        }
+      } else {
+        if (this.namedParams) {
+          s = ':' + prm;
+          outParams[prm] = inputprm;
+        } else {
+          s = '?';
+          outParams.push(inputprm);
+        }
+      }
+    } else {
+      if (operator === 'between') {
+        s = this._serializeValue(item.value[0]) + ' and ' +
+            this._serializeValue(item.value[1]);
+      } else if (operator === 'like')
+        s = this._serializeValue(String(item.value));
+      else
+        s = this._serializeValue(item.value);
+      if (s.startsWith('(')) {
+        if (operator === '=') operator = 'in';
+        else if (operator === '!=') operator = 'not in';
+      }
+    }
+
+    if (s)
+      str += ' ' + operator + ' ' + s;
+    return str;
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes any value
+   *
+   * @param {*} val
+   * @return {string}
+   * @protected
+   */
+  _serializeValue(val) {
+    if (val === null || val === undefined)
+      return 'null';
+
+    if (val instanceof RegExp) {
+      const prm = val.source.toUpperCase();
+      const executeParams = this._executeParams;
+      let x;
+
+      if (Array.isArray(executeParams))
+        x = this._prmIdx < executeParams.length ?
+            executeParams[this._prmIdx++] :
+            null;
+
+      else if (typeof executeParams === 'object')
+        x = executeParams[prm] || null;
+
+      if (this.namedParams) {
+        this._outParams[prm] = x;
+        return ':' + prm;
+      } else {
+        this._outParams.push(x);
+        return '?';
+      }
+    }
+    if (val.isRaw)
+      return this._serializeRaw(val);
+    if (typeof val === 'string')
+      return this._serializeStringValue(val);
+    if (isNumeric(val))
+      return String(val);
+    if (val instanceof Date)
+      return this._serializeDateValue(val);
+    if (Array.isArray(val))
+      return this._serializeArrayValue(val);
+    return this._serializeStringValue(String(val));
+  }
+
+  //noinspection JSMethodCanBeStatic, JSUnusedLocalSymbols
+  /**
+   * Serializes string value
+   *
+   * @param {string} val
+   * @return {string}
+   * @protected
+   */
+  _serializeStringValue(val) {
+    return '\'' + (val || '').replace('\'', '\'\'') + '\'';
+  }
+
+  //noinspection JSMethodCanBeStatic, JSUnusedLocalSymbols
+  /**
+   * Serializes Date value
+   *
+   * @param {Date} date
+   * @return {string}
+   * @protected
+   */
+  _serializeDateValue(date) {
+    const d = date.getDate();
+    const m = date.getMonth() + 1;
+    const y = date.getFullYear();
+    const h = date.getHours();
+    const n = date.getMinutes();
+    const s = date.getSeconds();
+    let str = y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+    if (h || n || s)
+      str += ' ' + (h <= 9 ? '0' + h : h) + ':' +
+          (n <= 9 ? '0' + n : n) + ':' +
+          (s <= 9 ? '0' + s : s);
+    return '\'' + str + '\'';
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes Array value
+   *
+   * @param {Array} arr
+   * @return {string}
+   * @protected
+   */
+  _serializeArrayValue(arr) {
+    let str = '';
+    for (let i = 0; i < arr.length; i++) {
+      str += (str ? ',' : '') + this._serializeValue(arr[i]);
+    }
+    return str ? '(' + str + ')' : '';
+  }
+
+  /**
+   * Serializes array of Joins
+   *
+   * @param {Array<Join>} joins
+   * @return {string}
+   * @protected
+   */
+  _serializeJoins(joins) {
+    if (!joins) return '';
+    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    for (let i = 0; i < joins.length; i++) {
+      const s = this._serializeJoin(joins[i]);
+      if (s) {
+        sb.append(s);
+        if (this.prettyPrint)
+          sb.crlf();
+        else sb.append(i < joins.length - 1 ? ' ' : '');
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Serializes single Join
+   *
+   * @param {Join} join
+   * @return {string}
+   * @protected
+   */
+  _serializeJoin(join) {
+    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    sb.indent = 4;
+    let s;
+    switch (join.joinType) {
+      case 1:
+        s = 'left join';
+        break;
+      case 2:
+        s = 'left outer join';
+        break;
+      case 3:
+        s = 'right join';
+        break;
+      case 4:
+        s = 'right outer join';
+        break;
+      case 5:
+        s = 'outer join';
+        break;
+      case 6:
+        s = 'full outer join';
+        break;
+      default:
+        s = 'inner join';
+        break;
+    }
+    sb.append(s);
+
+    assert.ok(['raw', 'select', 'table'].includes(join.table.type),
+        'Invalid object used as Table Name');
+    if ((s = this._serializeSqlObject(join.table))) {
+      if (join.table.type === 'select') {
+        s = '(' + s + ')' + (join.table._alias ? ' ' + join.table._alias : '');
+      }
+      sb.append(' ' + s);
+    }
+
+    s = this._serializeConditionGroup(join.conditions);
+    if (s)
+      sb.append(' on ' + s);
+    return sb.toString();
+  }
+
+  /**
+   * Serializes array of 'group by' columns
+   *
+   * @param {Array<Column>} columns
+   * @return {string}
+   * @protected
+   */
+  _serializeGroupBy(columns) {
+    return this._serializeColumns(columns);
+  }
+
+  /**
+   * Serializes array of 'order by' columns
+   *
+   * @param {Array<Order>} columns
+   * @return {string}
+   * @protected
+   */
+  _serializeOrderBy(columns) {
+    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    let o;
+    sb.indent = 4;
+    for (let i = 0; i < columns.length; i++) {
+      o = columns[i];
+      let s;
+      if (o.isRaw)
+        s = this._serializeRaw(o);
+      else s = (o.table ? o.table + '.' : '') + o.field +
+          (o.descending ? ' desc' : '');
+
+      if (s) {
+        if (i) sb.append(', ');
+        sb.append(s);
+      }
+    }
+    return sb.toString();
+  }
+
+  /**
+   * Serializes single value for Update statement
+   *
+   * @param {string} key
+   * @param {*} value
+   * @return {string}
+   * @protected
+   */
+  _serializeUpdateValue(key, value) {
+    let s;
+    if (value instanceof RegExp) {
+      const x = this._executeParams ? this._executeParams[key] : null;
+      if (this.namedParams) {
+        s = ':' + key;
+        this._outParams[key] = x;
+      } else {
+        s = '?';
+        this._outParams.push(x);
+      }
+    } else
+      s = this._serializeValue(value);
+    return (key + ' = ' + s);
+  }
+
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes Case expression
+   *
+   * @param {Case} obj
+   * @return {string}
+   * @protected
+   */
+  _serializeCase(obj) {
+    if (obj._expressions.length) {
+      const self = this;
+      const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+      sb.indent = 4;
+      sb.append('case');
+
+      obj._expressions.forEach((item) => {
+        assert.ok(['conditiongroup', 'condition', 'raw'].includes(
+            item.condition.type),
+            'Invalid object used in "case" expression');
+        const s = self._serializeSqlObject(item.condition);
         if (s)
-            sb.append(' on ' + s);
-        return sb.toString();
+          sb.append(
+              ' when ' + s + ' then ' + (self._serializeValue(item.value)) ||
+              'null');
+      });
+
+      if (obj._elseValue !== undefined) {
+        const s = self._serializeValue(obj._elseValue);
+        if (s)
+          sb.append(' else ' + s);
+      }
+      sb.append(' end' + (obj._alias ? ' ' + obj._alias : ''));
+      return sb.toString();
     }
+  }
 
-    /**
-     * Serializes array of 'group by' columns
-     *
-     * @param {Array<Column>} columns
-     * @return {string}
-     * @protected
-     */
-    _serializeGroupBy(columns) {
-        return this._serializeColumns(columns);
+  //noinspection JSUnusedLocalSymbols
+  /**
+   * Serializes Case expression
+   *
+   * @param {SqlObject} obj
+   * @return {string}
+   * @protected
+   */
+  _serializeSqlObject(obj) {
+    if (obj) {
+      const fn = this.objSerializers[obj.type];
+      return fn ? fn.call(this, obj) : '';
     }
-
-    /**
-     * Serializes array of 'order by' columns
-     *
-     * @param {Array<Order>} columns
-     * @return {string}
-     * @protected
-     */
-    _serializeOrderBy(columns) {
-        const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-        let o;
-        sb.indent = 4;
-        for (let i = 0; i < columns.length; i++) {
-            o = columns[i];
-            let s;
-            if (o.isRaw)
-                s = this._serializeRaw(o);
-            else s = (o.table ? o.table + '.' : '') + o.field + (o.descending ? ' desc' : '');
-
-            if (s) {
-                if (i) sb.append(', ');
-                sb.append(s);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Serializes single value for Update statement
-     *
-     * @param {string} key
-     * @param {*} value
-     * @return {string}
-     * @protected
-     */
-    _serializeUpdateValue(key, value) {
-        let s;
-        if (value instanceof RegExp) {
-            const x = this._executeParams ? this._executeParams[key] : null;
-            if (this.namedParams) {
-                s = ':' + key;
-                this._outParams[key] = x;
-            } else {
-                s = '?';
-                this._outParams.push(x);
-            }
-        } else
-            s = this._serializeValue(value);
-        return (key + ' = ' + s);
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes Case expression
-     *
-     * @param {Case} obj
-     * @return {string}
-     * @protected
-     */
-    _serializeCase(obj) {
-        if (obj._expressions.length) {
-            const self = this,
-                sb = new StringBuilder(this.prettyPrint ? undefined : 0);
-            sb.indent = 4;
-            sb.append('case');
-
-            obj._expressions.forEach((item) => {
-                assert.ok(['conditiongroup', 'condition', 'raw'].includes(item.condition.type),
-                    'Invalid object used in "case" expression');
-                const s = self._serializeSqlObject(item.condition);
-                if (s)
-                    sb.append(' when ' + s + ' then ' + (self._serializeValue(item.value)) || 'null');
-            });
-
-            if (obj._elseValue !== undefined) {
-                const s = self._serializeValue(obj._elseValue);
-                if (s)
-                    sb.append(' else ' + s);
-            }
-            sb.append(' end' + (obj._alias ? ' ' + obj._alias : ''));
-            return sb.toString();
-        }
-    }
-
-    //noinspection JSUnusedLocalSymbols
-    /**
-     * Serializes Case expression
-     *
-     * @param {SqlObject} obj
-     * @return {string}
-     * @protected
-     */
-    _serializeSqlObject(obj) {
-        if (obj) {
-            const fn = this.objSerializers[obj.type];
-            return fn ? fn.call(this, obj) : '';
-        }
-    }
+  }
 }
 
 /**
@@ -755,9 +789,9 @@ class Serializer {
  * @static
  * @public
  */
-Serializer.register = function (dialect, serializerProto) {
-    const items = this._registry = this._registry || {};
-    items[dialect] = serializerProto;
+Serializer.register = function(dialect, serializerProto) {
+  const items = this._registry = this._registry || {};
+  items[dialect] = serializerProto;
 };
 
 /**
@@ -768,35 +802,38 @@ Serializer.register = function (dialect, serializerProto) {
  * @static
  * @public
  */
-Serializer.get = function (dialect) {
-    return this._registry ? this._registry[dialect] : undefined;
+Serializer.get = function(dialect) {
+  return this._registry ? this._registry[dialect] : undefined;
 };
 
 /**
  * Creates serializer for given dialect/config
  *
  * @param {String|Object} config
- * @return Serializer
+ * @return {Serializer}
  * @static
  * @public
  */
-Serializer.create = function (config) {
-    if (config instanceof Serializer) {
-        //noinspection JSValidateTypes
-        return config;
-    }
+Serializer.create = function(config) {
+  if (config instanceof Serializer) {
+    //noinspection JSValidateTypes
+    return config;
+  }
 
-    config = typeof config === 'string' ? {dialect: config} : typeof config === 'object' ? config : {};
+  config = typeof config === 'string' ?
+      {dialect: config} :
+      typeof config === 'object' ?
+          config :
+          {};
 
-    if (!config.dialect || config.dialect === 'generic')
-        return new Serializer(config);
+  if (!config.dialect || config.dialect === 'generic')
+    return new Serializer(config);
 
-    const clazz = this.get(config.dialect);
-    if (clazz) {
-        //noinspection JSValidateTypes
-        return new clazz(config);
-    }
-    else throw new Error(`Dialect "${config.dialect}" is not registered`);
+  const Clazz = this.get(config.dialect);
+  if (Clazz) {
+    //noinspection JSValidateTypes
+    return new Clazz(config);
+  } else throw new Error(`Dialect "${config.dialect}" is not registered`);
 };
 
 module.exports = Serializer;

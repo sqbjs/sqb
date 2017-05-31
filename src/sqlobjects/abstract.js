@@ -10,12 +10,11 @@
  * @class
  * @public
  */
-
 class SqlObject {
 
-    constructor() {
-        this.type = undefined;
-    }
+  constructor() {
+    this.type = undefined;
+  }
 
 }
 
