@@ -47,7 +47,7 @@ Object.assign(sqlObjects, {
 
   pool: function(config) {
     return DbPool.create(config);
-  },
+  }
 });
 
 module.exports = sqlObjects;

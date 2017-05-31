@@ -34,7 +34,7 @@ class Case extends SqlObject {
   then(value) {
     this._expressions.push({
       condition: this._condition,
-      value,
+      value
     });
     return this;
   }

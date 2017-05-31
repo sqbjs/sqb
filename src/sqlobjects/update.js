@@ -54,7 +54,7 @@ class Update extends Statement {
       Object.getOwnPropertyNames(values).forEach(
           function(key) {
             out[key.toUpperCase()] = values[key];
-          },
+          }
       );
       this._values = out;
     } else throw new TypeError('Invalid argument');

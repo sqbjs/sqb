@@ -27,6 +27,7 @@
     "no-trailing-spaces": 0,
     "spaced-comment": 0,
     "max-len": 0,
-    "require-jsdoc": 0
+    "require-jsdoc": 0,
+    "comma-dangle": 0
   }
 }

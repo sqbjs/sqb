@@ -59,7 +59,7 @@ class Serializer {
       delete: this._serializeDelete,
       table: this._serializeTableName,
       column: this._serializeFieldName,
-      case: this._serializeCase,
+      case: this._serializeCase
     };
   }
 
@@ -82,7 +82,7 @@ class Serializer {
         Object.getOwnPropertyNames(values).forEach(
             function(key) {
               obj[key.toUpperCase()] = values[key];
-            },
+            }
         );
         this._executeParams = obj;
       } else
@@ -92,7 +92,7 @@ class Serializer {
         'Invalid argument');
     return {
       sql: this._serializeSqlObject(obj),
-      params: this._outParams,
+      params: this._outParams
     };
   }
 
@@ -240,7 +240,7 @@ class Serializer {
             const s = self._serializeUpdateValue(key, values[key]);
             if (s)
               sb.append((idx > 0 ? ', ' : (prettyPrint ? '' : ' ')) + s);
-          },
+          }
       );
     }
 

@@ -37,8 +37,9 @@ class Statement extends SqlObject {
     if (config instanceof Serializer) {
       return config.build(this, params);
     } else
-      return Serializer.create(config).
-          build(this, (config ? config.params : undefined) || params);
+      return Serializer
+          .create(config)
+          .build(this, (config ? config.params : undefined) || params);
   }
 
   identify(value) {
@@ -57,8 +58,8 @@ class Statement extends SqlObject {
     else {
       const dbpool = this.dbpool;
       assert.ok(dbpool, 'This statement is not executable');
-      return dbpool.connect((conn) => conn.execute(this, undefined, options)).
-          then(callback);
+      return dbpool.connect((conn) => conn.execute(this, undefined, options))
+                   .then(callback);
     }
   }
 

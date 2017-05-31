@@ -73,7 +73,7 @@ class Insert extends Statement {
       Object.getOwnPropertyNames(values).forEach(
           function(key) {
             out[key.toUpperCase()] = values[key];
-          },
+          }
       );
       this._values = out;
     }
