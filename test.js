@@ -5,6 +5,7 @@ const sqb = require('./'),
     select = sqb.select,
     raw = sqb.raw;
 
+
 let statement, result,
     serializer = sqb.serializer({
       //dialect: 'oracle',
