@@ -73,6 +73,7 @@ class Serializer {
    */
   build(obj, values) {
     this._outParams = this.namedParams ? {} : [];
+    values = values || obj._params;
     if (values) {
       if (Array.isArray(values))
         this._executeParams = values;

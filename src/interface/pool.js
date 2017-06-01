@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const sqlObjects = require('./sqlobjects');
+const sqlObjects = require('../sqlobjects');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');

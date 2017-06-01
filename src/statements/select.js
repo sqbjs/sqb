@@ -8,8 +8,8 @@
 
 /* Internal module dependencies. */
 
-const Statement = require('../sqlobjects/statement');
-const SqlObject = require('../interface/sql-object');
+const Statement = require('../interface/statement');
+const SqlObject = require('../interface/sqlobject');
 const TableName = require('../sqlobjects/tablename');
 const Column = require('../sqlobjects/column');
 const Join = require('../sqlobjects/join');

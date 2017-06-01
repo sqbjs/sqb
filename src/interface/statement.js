@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const SqlObject = require('../interface/sql-object');
+const SqlObject = require('./sqlobject');
 const Serializer = require('../serializer');
 
 /* External module dependencies. */
@@ -37,13 +37,18 @@ class Statement extends SqlObject {
     if (config instanceof Serializer) {
       return config.build(this, params);
     } else
-      return Serializer
-          .create(config)
-          .build(this, (config ? config.params : undefined) || params);
+      return Serializer.create(config)
+          .build(this, params);
   }
 
   identify(value) {
     this._identity = value;
+    return this;
+  }
+
+  params(obj) {
+    assert.ok(!obj || typeof obj === 'object', 'Ivalid argument');
+    this._params = obj;
     return this;
   }
 
@@ -59,7 +64,7 @@ class Statement extends SqlObject {
       const dbpool = this.dbpool;
       assert.ok(dbpool, 'This statement is not executable');
       return dbpool.connect((conn) => conn.execute(this, undefined, options))
-                   .then(callback);
+          .then(callback);
     }
   }
 

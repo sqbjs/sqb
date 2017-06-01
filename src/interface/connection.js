@@ -114,9 +114,7 @@ class Connection extends EventEmitter {
 
     if (typeof statement === 'object' &&
         typeof statement.build === 'function') {
-      if (params)
-        statement.params(params);
-      const o = statement.build(serializer);
+      const o = statement.build(serializer, params);
       sql = o.sql;
       prms = o.params;
       //noinspection JSUnresolvedVariable
@@ -127,29 +125,24 @@ class Connection extends EventEmitter {
     }
 
     options = options || {};
-    options.autoCommit = options.autoCommit !== undefined ?
-        options.autoCommit :
-        false;
-    options.extendedMetaData = options.extendedMetaData !== undefined ?
-        options.extendedMetaData :
-        false;
-    options.prefetchRows = options.prefetchRows !== undefined ?
-        options.prefetchRows :
-        100;
+    options.autoCommit =
+        options.autoCommit !== undefined ? options.autoCommit : false;
+    options.extendedMetaData = options.extendedMetaData !==
+    undefined ? options.extendedMetaData : false;
+    options.prefetchRows =
+        options.prefetchRows !== undefined ? options.prefetchRows : 100;
     options.maxRows = options.maxRows !== undefined ? options.maxRows : 100;
-    options.resultSet = options.resultSet !== undefined ?
-        options.resultSet :
-        false;
-    options.objectRows = options.objectRows !== undefined ?
-        options.objectRows :
-        false;
+    options.resultSet =
+        options.resultSet !== undefined ? options.resultSet : false;
+    options.objectRows =
+        options.objectRows !== undefined ? options.objectRows : false;
     options.showSql = options.showSql !== undefined ? options.showSql : false;
 
     this.dbpool.emit('execute', {
       sql,
       params: prms,
       options,
-      identity: statement ? statement._identity : undefined,
+      identity: statement ? statement._identity : undefined
     });
 
     if (callback) {
