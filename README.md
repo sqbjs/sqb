@@ -4,8 +4,10 @@
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
+
 [![Dependencies][dependencies-image]][dependencies-url]
 [![DevDependencies][devdependencies-image]][devdependencies-url]
+[![Package Quality][quality-image]][quality-url]
 
 SQB is a lightweight, multi-dialect SQL query builder for JavaScript;
 

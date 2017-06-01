@@ -7,9 +7,9 @@
  */
 
 /* Internal module dependencies. */
-const Statement = require('./statement');
-const Table = require('./tablename');
-const Column = require('./column');
+const Statement = require('../sqlobjects/statement');
+const Table = require('../sqlobjects/tablename');
+const Column = require('../sqlobjects/column');
 
 /**
  * @class

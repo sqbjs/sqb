@@ -8,13 +8,13 @@
 
 /* Internal module dependencies. */
 
-const Statement = require('./statement');
-const SqlObject = require('./abstract');
-const TableName = require('./tablename');
-const Column = require('./column');
-const Join = require('./join');
-const ConditionGroup = require('./conditiongroup');
-const Order = require('./order');
+const Statement = require('../sqlobjects/statement');
+const SqlObject = require('../interface/sql-object');
+const TableName = require('../sqlobjects/tablename');
+const Column = require('../sqlobjects/column');
+const Join = require('../sqlobjects/join');
+const ConditionGroup = require('../sqlobjects/conditiongroup');
+const Order = require('../sqlobjects/order');
 
 /**
  * @class

@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const SqlObject = require('./abstract');
+const SqlObject = require('../interface/sql-object');
 const ConditionGroup = require('./conditiongroup');
 const TableName = require('./tablename');
 

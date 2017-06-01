@@ -7,11 +7,11 @@
  */
 
 /* Internal module dependencies. */
-const SqlObject = require('./sqlobjects/abstract');
-const Select = require('./sqlobjects/select');
-const Insert = require('./sqlobjects/insert');
-const Update = require('./sqlobjects/update');
-const Delete = require('./sqlobjects/delete');
+const SqlObject = require('./interface/sql-object');
+const Select = require('./statements/select');
+const Insert = require('./statements/insert');
+const Update = require('./statements/update');
+const Delete = require('./statements/delete');
 const Raw = require('./sqlobjects/raw');
 const Column = require('./sqlobjects/column');
 const Join = require('./sqlobjects/join');
