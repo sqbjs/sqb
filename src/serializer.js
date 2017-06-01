@@ -28,26 +28,9 @@ class Serializer {
     this.prettyPrint = !!config.prettyPrint;
     this.namedParams = !!config.namedParams;
     this.reservedWords = [
-      'select',
-      'from',
-      'with',
-      'where',
-      'join',
-      'inner',
-      'outer',
-      'full',
-      'and',
-      'or',
-      'not',
-      'between',
-      'null',
-      'like',
-      'order',
-      'by',
-      'group',
-      'count',
-      'sum',
-      'average'];
+      'select', 'from', 'with', 'where', 'join', 'inner', 'outer', 'full',
+      'and', 'or', 'not', 'between', 'null', 'like', 'order', 'by', 'group',
+      'count', 'sum', 'average'];
 
     this.objSerializers = {
       conditiongroup: this._serializeConditionGroup,
@@ -73,10 +56,11 @@ class Serializer {
    */
   build(obj, values) {
     this._outParams = this.namedParams ? {} : [];
+    this._outParamsCache = {};
     values = values || obj._params;
     if (values) {
       if (Array.isArray(values))
-        this._executeParams = values;
+        this._inputParams = values;
       else if (typeof values === 'object') {
         // We build a new map with upper keys for case insensitivity
         const obj = {};
@@ -85,7 +69,7 @@ class Serializer {
               obj[key.toUpperCase()] = values[key];
             }
         );
-        this._executeParams = obj;
+        this._inputParams = obj;
       } else
         throw new TypeError('Invalid argument');
     }
@@ -458,7 +442,7 @@ class Serializer {
 
     if (item.param) {
       const prm = item.param.toUpperCase();
-      const inputprm = this._executeParams ? this._executeParams[prm] : null;
+      const inputprm = this._inputParams ? this._inputParams[prm] : null;
       const inputIsArray = Array.isArray(inputprm);
       if (operator === 'between') {
         if (this.namedParams) {
@@ -512,16 +496,18 @@ class Serializer {
 
     if (val instanceof RegExp) {
       const prm = val.source.toUpperCase();
-      const executeParams = this._executeParams;
-      let x;
+      const inputParams = this._inputParams;
+      let x = this._outParamsCache[prm];
 
-      if (Array.isArray(executeParams))
-        x = this._prmIdx < executeParams.length ?
-            executeParams[this._prmIdx++] :
-            null;
-
-      else if (typeof executeParams === 'object')
-        x = executeParams[prm] || null;
+      if (x === undefined) {
+        if (Array.isArray(inputParams)) {
+          x = this._prmIdx < inputParams.length ?
+              inputParams[this._prmIdx++] :
+              null;
+        } else if (typeof inputParams === 'object')
+          x = inputParams[prm] || null;
+        this._outParamsCache[prm] = x;
+      }
 
       if (this.namedParams) {
         this._outParams[prm] = x;
@@ -717,7 +703,7 @@ class Serializer {
   _serializeUpdateValue(key, value) {
     let s;
     if (value instanceof RegExp) {
-      const x = this._executeParams ? this._executeParams[key] : null;
+      const x = this._inputParams ? this._inputParams[key] : null;
       if (this.namedParams) {
         s = ':' + key;
         this._outParams[key] = x;
