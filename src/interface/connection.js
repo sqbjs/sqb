@@ -22,8 +22,6 @@ class Connection extends EventEmitter {
     Object.defineProperty(this, 'dbpool',
         {value: dbpool, writable: false, configurable: false});
     this._refcount = 0;
-    if (process.env.DEBUG)
-      debug('Created (' + this.sessionId + ')');
   }
 
   //noinspection JSUnusedGlobalSymbols
@@ -34,7 +32,7 @@ class Connection extends EventEmitter {
   acquire() {
     this._refcount++;
     if (process.env.DEBUG)
-      debug('[%s] acquire | refCount = %s', this.sessionId, this._refcount);
+      debug('[%s] acquired | refCount: %s', this.sessionId, this._refcount);
   }
 
   /**
@@ -44,13 +42,12 @@ class Connection extends EventEmitter {
     this._refcount--;
     if (!this._refcount) {
       if (process.env.DEBUG)
-        debug('[%s] close', this.sessionId);
+        debug('[%s] closed', this.sessionId);
       //noinspection JSUnresolvedFunction
       this.emit('close', this);
       this._close();
     } else if (process.env.DEBUG)
-      debug('[%s] release | refCount = %s', this.sessionId, this._refcount);
-      debug('[%s] release | refCount = %s', this.sessionId, this._refcount);
+      debug('[%s] released | refCount: %s', this.sessionId, this._refcount);
   }
 
   select(...args) {
@@ -176,7 +173,8 @@ class Connection extends EventEmitter {
    * @public
    * @abstract
    */
-  commit() {}
+  commit() {
+  }
 
   //noinspection JSUnusedGlobalSymbols
   /**
@@ -184,7 +182,8 @@ class Connection extends EventEmitter {
    * @public
    * @abstract
    */
-  rollback() {}
+  rollback() {
+  }
 
   //noinspection JSUnusedGlobalSymbols
   /**
@@ -201,7 +200,8 @@ class Connection extends EventEmitter {
    * @public
    * @abstract
    */
-  get sessionId() {}
+  get sessionId() {
+  }
 
   //noinspection JSUnusedGlobalSymbols
   /**
@@ -218,14 +218,16 @@ class Connection extends EventEmitter {
    * @protected
    * @abstract
    */
-  _close() {}
+  _close() {
+  }
 
   /**
    *
    * @protected
    * @abstract
    */
-  _execute() {}
+  _execute() {
+  }
 
 }
 

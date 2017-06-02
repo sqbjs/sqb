@@ -74,7 +74,7 @@ describe('Connect', function() {
 
     it('should execute sql', function(done) {
 
-      db.connect((conn, close) => {
+      db.connect((conn) => {
         conn.execute('select * from test', [], {
           autoCommit: true,
           extendedMetaData: true,
@@ -84,10 +84,10 @@ describe('Connect', function() {
           showSql: false
         }).then(result => {
           assert.deepEqual(result.rows, [[1, 'a'], [2, 'b']]);
-          close();
+          conn.close();
           done();
         }).catch(err => {
-          close();
+          conn.close();
           done(new Error(err));
         });
 

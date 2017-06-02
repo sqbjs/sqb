@@ -63,10 +63,10 @@ class DbPool extends EventEmitter {
       self._getConnection((error, connection) => {
         if (error) {
           if (process.env.DEBUG)
-            debug('connect | Fail: ' + error.message);
+            debug('connect failed: ' + error.message);
           reject(error);
         } else {
-          debug('connect | Success');
+          debug('[%s] connected', connection.sessionId);
           connection.acquire();
           resolve(connection);
         }
