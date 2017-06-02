@@ -28,8 +28,11 @@ class Serializer {
     this.prettyPrint = !!config.prettyPrint;
     this.namedParams = !!config.namedParams;
     this.reservedWords = [
-      'select', 'from', 'with', 'where', 'join', 'inner', 'outer', 'full',
-      'and', 'or', 'not', 'between', 'null', 'like', 'order', 'by', 'group',
+      'schema', 'table', 'field', 'index',
+      'select', 'insert', 'update', 'delete', 'merge', 'join', 'inner', 'outer',
+      'left', 'right', 'full',
+      'with', 'from', 'where', 'order', 'by', 'group', 'having',
+      'and', 'or', 'not', 'between', 'null', 'like',
       'count', 'sum', 'average'];
 
     this.objSerializers = {
@@ -89,7 +92,7 @@ class Serializer {
    * @protected
    */
   _isReserved(word) {
-    return word && this.reservedWords.indexOf(String(word).toLowerCase()) >= 0;
+    return word && this.reservedWords.includes(String(word).toLowerCase());
   }
 
   //noinspection JSUnusedLocalSymbols
@@ -323,7 +326,9 @@ class Serializer {
     const s = this._serializeSqlObject(column);
     //noinspection JSUnresolvedVariable
     return column.type === 'select' ?
-        '(' + s + ')' + (column._alias ? ' ' + column._alias : '') :
+        '(' + s + ')' + (column._alias ?
+            ' ' + (this._isReserved(column._alias) ? '"' + column._alias +
+                '"' : column._alias) : '') :
         s;
   }
 
@@ -337,7 +342,9 @@ class Serializer {
    */
   _serializeFieldName(field) {
     return (field.table ? field.table + '.' : '') + field.field +
-        (field.alias ? ' ' + field.alias : '');
+        (field.alias ? ' ' +
+            (this._isReserved(field.alias) ? '"' + field.alias +
+                '"' : field.alias) : '');
   }
 
   //noinspection JSUnusedLocalSymbols
@@ -439,12 +446,17 @@ class Serializer {
     const outParams = this._outParams;
     let operator = item.operator.toLowerCase();
     let s;
-
+    let prm;
+    let inputprm;
+    let inputIsArray;
     if (item.param) {
-      const prm = item.param.toUpperCase();
-      const inputprm = this._inputParams ? this._inputParams[prm] : null;
-      const inputIsArray = Array.isArray(inputprm);
-      if (operator === 'between') {
+      prm = item.param.toUpperCase();
+      inputprm = this._inputParams ? this._inputParams[prm] : null;
+      inputIsArray = Array.isArray(inputprm);
+    }
+
+    if (operator === 'between') {
+      if (prm) {
         if (this.namedParams) {
           s = ':' + prm + '1 and :' + prm + '2';
           outParams[prm + '1'] = inputIsArray ? inputprm[0] : inputprm;
@@ -455,25 +467,32 @@ class Serializer {
           outParams.push(inputIsArray ? inputprm[1] : null);
         }
       } else {
-        if (this.namedParams) {
-          s = ':' + prm;
-          outParams[prm] = inputprm;
-        } else {
-          s = '?';
-          outParams.push(inputprm);
-        }
-      }
-    } else {
-      if (operator === 'between') {
         s = this._serializeValue(item.value[0]) + ' and ' +
             this._serializeValue(item.value[1]);
-      } else if (operator === 'like')
-        s = this._serializeValue(String(item.value));
-      else
-        s = this._serializeValue(item.value);
+      }
+
+    } else if (operator === 'like' && !prm && Array.isArray(item.value) &&
+        (s = item.value.join()) && ((s.includes('%')) || s.includes('?'))) {
+      s = '(';
+      item.value.forEach((v, i) => {
+        s += (i > 0 ? ' or ' : '') + str + ' like ' +
+            this._serializeValue(String(v));
+      });
+      return s + ')';
+
+    } else if (prm) {
+      if (this.namedParams) {
+        s = ':' + prm;
+        outParams[prm] = inputprm;
+      } else {
+        s = '?';
+        outParams.push(inputprm);
+      }
+    } else {
+      s = this._serializeValue(item.value);
       if (s.startsWith('(')) {
-        if (operator === '=') operator = 'in';
-        else if (operator === '!=') operator = 'not in';
+        if (['!=', '<>', ' not like'].includes(operator)) operator = 'not in';
+        else operator = 'in';
       }
     }
 

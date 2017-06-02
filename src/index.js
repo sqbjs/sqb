@@ -21,14 +21,16 @@ const Case = require('./sqlobjects/case');
 const Serializer = require('./serializer');
 const DbPool = require('./interface/pool');
 const Connection = require('./interface/connection');
+const MetaData = require('./interface/metadata');
 
-const sqlObjects = require('./sqlobjects');
+const sqlObjects = require('./interface/sqlobjects');
 
 Object.assign(sqlObjects, {
 
   Serializer,
   DbPool,
   Connection,
+  MetaData,
   SqlObject,
   Select,
   Insert,

@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const sqlObjects = require('../sqlobjects');
+const sqlObjects = require('./sqlobjects');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');
@@ -45,6 +45,10 @@ class DbPool extends EventEmitter {
   //noinspection JSUnusedGlobalSymbols
   get schema() {
     return this.config.schema;
+  }
+
+  meta() {
+    throw new Error(`Metadata support not implemented in dialect (${this.dialect})`);
   }
 
   //noinspection JSUnusedGlobalSymbols

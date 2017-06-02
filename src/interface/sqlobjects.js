@@ -7,14 +7,14 @@
  */
 
 /* Internal module dependencies. */
-const Select = require('./statements/select');
-const Insert = require('./statements/insert');
-const Update = require('./statements/update');
-const Delete = require('./statements/delete');
+const Select = require('../statements/select');
+const Insert = require('../statements/insert');
+const Update = require('../statements/update');
+const Delete = require('../statements/delete');
 
-const Raw = require('./sqlobjects/raw');
-const Join = require('./sqlobjects/join');
-const Case = require('./sqlobjects/case');
+const Raw = require('../sqlobjects/raw');
+const Join = require('../sqlobjects/join');
+const Case = require('../sqlobjects/case');
 
 module.exports = {
 
@@ -86,6 +86,6 @@ module.exports = {
   //noinspection JSMethodCanBeStatic,JSUnusedGlobalSymbols
   case() {
     return new Case();
-  },
+  }
 
 };
