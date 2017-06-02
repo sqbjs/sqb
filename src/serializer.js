@@ -78,8 +78,10 @@ class Serializer {
     }
     assert.ok(['select', 'insert', 'update', 'delete'].includes(obj.type),
         'Invalid argument');
+    const comments = (obj._identity ? '/* #Identity:' + obj._identity +
+        ' */\n' : '');
     return {
-      sql: this._serializeSqlObject(obj),
+      sql: comments + this._serializeSqlObject(obj),
       params: this._outParams
     };
   }
@@ -114,7 +116,7 @@ class Serializer {
 
     if ((s = this._serializeTablesNames(obj._tables))) {
       sb.append(
-          (this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + 'from' + s);
+          (this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + 'from ' + s);
     }
 
     if ((s = this._serializeJoins(obj._joins))) {
@@ -366,7 +368,7 @@ class Serializer {
         if (item.type === 'select') { //noinspection JSUnresolvedVariable
           ss = '(' + ss + ')' + (item._alias ? ' ' + item._alias : '');
         }
-        str += (str ? ', ' : ' ') + ss;
+        str += (str ? ', ' : '') + ss;
       }
     });
     return str;

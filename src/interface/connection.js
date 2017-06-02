@@ -138,12 +138,13 @@ class Connection extends EventEmitter {
       undefined ? options.extendedMetaData : false;
       options.prefetchRows =
           options.prefetchRows !== undefined ? options.prefetchRows : 100;
-      options.maxRows = options.maxRows !== undefined ? options.maxRows : 100;
+      options.maxRows = statement._limit ? statement._limit : 100;
       options.resultSet =
           options.resultSet !== undefined ? options.resultSet : false;
       options.objectRows =
           options.objectRows !== undefined ? options.objectRows : false;
       options.showSql = options.showSql !== undefined ? options.showSql : false;
+
       out.options = options;
       return out;
     }
