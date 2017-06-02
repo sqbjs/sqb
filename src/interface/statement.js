@@ -67,8 +67,9 @@ class Statement extends SqlObject {
     else {
       const dbpool = this.dbpool;
       assert.ok(dbpool, 'This statement is not executable');
-      return dbpool.connect(
-          (conn) => conn.execute(this, params, options, callback));
+      options = options || {};
+      options.autoClose = true;
+      return dbpool.connect((conn) => conn.execute(this, params, options, callback));
     }
   }
 

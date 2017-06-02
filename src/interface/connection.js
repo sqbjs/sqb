@@ -27,49 +27,30 @@ class Connection extends EventEmitter {
   }
 
   //noinspection JSUnusedGlobalSymbols
-  get closed() {
-    return true;
-  }
-
-  get sessionId() {
-  }
-
-  //noinspection JSUnusedGlobalSymbols
   /**
-   * @protected
+   *
+   * @public
    */
   acquire() {
     this._refcount++;
     if (process.env.DEBUG)
-      debug('(%s) acquire refcount = %s', this.sessionId, this._refcount);
-    //noinspection JSUnresolvedFunction
-    this.emit('acquire');
+      debug('[%s] acquire | refCount = %s', this.sessionId, this._refcount);
   }
 
   /**
-   * @protected
+   * @public
    */
-  release() {
-    this._refcount--;
-    if (process.env.DEBUG)
-      debug('(%s) release refcount = %s', this.sessionId, this._refcount);
-    //noinspection JSUnresolvedFunction
-    this.emit('release');
-    if (!this._refcount)
-      this.close();
-  }
-
   close() {
-    if (!this._refcount)
+    this._refcount--;
+    if (!this._refcount) {
+      if (process.env.DEBUG)
+        debug('[%s] close', this.sessionId);
+      //noinspection JSUnresolvedFunction
+      this.emit('close', this);
       this._close();
-  }
-
-  commit() {
-
-  }
-
-  rollback() {
-
+    } else if (process.env.DEBUG)
+      debug('[%s] release | refCount = %s', this.sessionId, this._refcount);
+      debug('[%s] release | refCount = %s', this.sessionId, this._refcount);
   }
 
   select(...args) {
@@ -152,13 +133,14 @@ class Connection extends EventEmitter {
     if (callback) {
       try {
         const o = prepare();
-        this.dbpool.emit('execute', o);
-        this._execute(o.sql, o.params, o.options, function(err, result) {
-          try {
-            callback(err, result);
-          } finally {
-            self.release();
-          }
+        self.dbpool.emit('execute', o);
+        if (process.env.DEBUG)
+          debug('[%s] execute | %o', self.sessionId, o);
+        self.acquire(); // Increase reference to prevent un expected close
+        self._execute(o.sql, o.params, o.options, function(err, result) {
+          self.close(); // Release reference
+          if (options.autoClose) self.close();
+          callback(err, result);
         });
       } catch (e) {
         callback(e);
@@ -168,7 +150,13 @@ class Connection extends EventEmitter {
       return new Promise(function(resolve, reject) {
         try {
           const o = prepare();
+          self.dbpool.emit('execute', o);
+          if (process.env.DEBUG)
+            debug('[%s] execute | %o', self.sessionId, o);
+          self.acquire(); // Increase reference to prevent un expected close
           self._execute(o.sql, o.params, o.options, function(err, result) {
+            self.close(); // Release reference
+            if (options.autoClose) self.close();
             if (err)
               reject(err);
             else resolve(result);
@@ -182,18 +170,62 @@ class Connection extends EventEmitter {
 
   /* Abstract members */
 
-  _close() {
-    if (process.env.DEBUG)
-      debug('(%s) close', this.sessionId);
-    //noinspection JSUnresolvedFunction
-    this.emit('close', this);
+  //noinspection JSUnusedGlobalSymbols
+  /**
+   *
+   * @public
+   * @abstract
+   */
+  commit() {}
+
+  //noinspection JSUnusedGlobalSymbols
+  /**
+   *
+   * @public
+   * @abstract
+   */
+  rollback() {}
+
+  //noinspection JSUnusedGlobalSymbols
+  /**
+   *
+   * @public
+   * @abstract
+   */
+  get closed() {
+    return true;
   }
 
-  _execute(...args) {
-    if (process.env.DEBUG)
-      debug('(%s) execute: %o', this.sessionId,
-          Array.prototype.slice.call(args));
+  /**
+   *
+   * @public
+   * @abstract
+   */
+  get sessionId() {}
+
+  //noinspection JSUnusedGlobalSymbols
+  /**
+   *
+   * @public
+   * @abstract
+   */
+  meta() {
+    throw new Error(`Metadata support not implemented in dialect (${this.dialect})`);
   }
+
+  /**
+   *
+   * @protected
+   * @abstract
+   */
+  _close() {}
+
+  /**
+   *
+   * @protected
+   * @abstract
+   */
+  _execute() {}
 
 }
 

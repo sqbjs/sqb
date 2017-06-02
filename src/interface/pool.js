@@ -11,6 +11,7 @@ const sqlObjects = require('./sqlobjects');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');
+const debug = require('debug')('sqb:DbPool');
 
 /**
  * @class
@@ -52,49 +53,31 @@ class DbPool extends EventEmitter {
   }
 
   //noinspection JSUnusedGlobalSymbols
-  connect(callback) {
+  connect(resolveCallbak, rejectCallback) {
+    if (process.env.DEBUG)
+      debug('connect | Creating new connection..');
+
     const self = this;
+
     let promise = new Promise((resolve, reject) => {
       self._getConnection((error, connection) => {
-        if (error)
+        if (error) {
+          if (process.env.DEBUG)
+            debug('connect | Fail: ' + error.message);
           reject(error);
-        else
+        } else {
+          debug('connect | Success');
+          connection.acquire();
           resolve(connection);
+        }
       });
     });
 
-    if (callback) {
-      promise = promise.then((connection) => {
-        function close(commit) {
-          if (commit) {
-            connection.commit((err) => {
-              if (err)
-                close(false);
-              else
-                connection.release();
-            });
-          } else {
-            connection.rollback((err) => {
-              if (err) { //noinspection JSUnresolvedFunction
-                process.emitWarning(err);
-              }
-              connection.release();
-            });
-          }
-        }
+    if (resolveCallbak)
+      promise = promise.then((connection) => resolveCallbak(connection));
 
-        try {
-          const out = callback(connection, close);
-          if (out instanceof Promise)
-            out.catch(() => {
-              close(false);
-            });
-          return out;
-        } catch (e) {
-          close(false);
-        }
-      });
-    }
+    if (rejectCallback)
+      promise = promise.catch(err => rejectCallback);
 
     return promise;
   }
