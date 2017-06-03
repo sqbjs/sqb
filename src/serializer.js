@@ -180,7 +180,7 @@ class Serializer {
         self._prmIdx = 0;
 
         // Iterate over columns
-        obj._columns.forEach(function(col, idx) {
+        obj._columns.forEach((col, idx) => {
           const field = col.field.toUpperCase();
           const val = objValues[field];
           const s = self._serializeValue(val);
@@ -302,13 +302,13 @@ class Serializer {
     if (!(columns && columns.length)) return '';
     const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
     sb.indent += 4;
-    columns.forEach((col) => {
+    for (const col of columns) {
       const s = this._serializeColumn(col);
       if (s) {
         if (sb.line) sb.append(', ', true);
         sb.append(s);
       }
-    });
+    }
     return sb.toString();
   }
 
@@ -358,7 +358,7 @@ class Serializer {
   _serializeTablesNames(tables) {
     if (!(tables && tables.length)) return '';
     let str = '';
-    tables.forEach((item) => {
+    for (const item of tables) {
       let ss;
       assert.ok(['raw', 'select', 'table'].includes(item.type),
           'Invalid object used as Table Name');
@@ -368,7 +368,7 @@ class Serializer {
         }
         str += (str ? ', ' : '') + ss;
       }
-    });
+    }
     return str;
   }
 
@@ -750,7 +750,7 @@ class Serializer {
       sb.indent = 4;
       sb.append('case');
 
-      obj._expressions.forEach((item) => {
+      for (const item of obj._expressions) {
         assert.ok(['conditiongroup', 'condition', 'raw'].includes(
             item.condition.type),
             'Invalid object used in "case" expression');
@@ -759,7 +759,7 @@ class Serializer {
           sb.append(
               ' when ' + s + ' then ' + (self._serializeValue(item.value)) ||
               'null');
-      });
+      }
 
       if (obj._elseValue !== undefined) {
         const s = self._serializeValue(obj._elseValue);

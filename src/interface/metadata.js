@@ -53,13 +53,14 @@ class MetaDataSelect {
     this.meta = meta;
   }
 
+  //noinspection JSUnusedGlobalSymbols
   schemas(...fields) {
     const listFields = [];
-    fields.forEach(field => {
+    for (let field of fields) {
       field = String(field).toLowerCase();
       if (SchemaFields.includes(field) && !listFields.includes(field))
         listFields.push(field);
-    });
+    }
     const subst = this.meta._getStatement({
       type: 'list_schemas',
       fields: listFields
@@ -67,13 +68,14 @@ class MetaDataSelect {
     return this.meta.dbobj.select().from(subst);
   }
 
+  //noinspection JSUnusedGlobalSymbols
   tables(...fields) {
     const listFields = [];
-    fields.forEach(field => {
+    for (let field of fields) {
       field = String(field).toLowerCase();
       if (TableFields.includes(field) && !listFields.includes(field))
         listFields.push(field);
-    });
+    }
     const subst = this.meta._getStatement({
       type: 'list_tables',
       fields: listFields
@@ -83,11 +85,11 @@ class MetaDataSelect {
 
   columns(...fields) {
     const listFields = [];
-    fields.forEach(field => {
+    for (let field of fields) {
       field = String(field).toLowerCase();
       if (ColumnFields.includes(field) && !listFields.includes(field))
         listFields.push(field);
-    });
+    }
     const subst = this.meta._getStatement({
       type: 'list_columns',
       fields: listFields
@@ -95,13 +97,14 @@ class MetaDataSelect {
     return this.meta.dbobj.select().from(subst);
   }
 
+  //noinspection JSUnusedGlobalSymbols
   primaryKeys(...fields) {
     const listFields = [];
-    fields.forEach(field => {
+    for (let field of fields) {
       field = String(field).toLowerCase();
       if (PrimaryKeyFields.includes(field) && !listFields.includes(field))
         listFields.push(field);
-    });
+    }
     const subst = this.meta._getStatement({
       type: 'list_primary_keys',
       fields: listFields
@@ -109,13 +112,14 @@ class MetaDataSelect {
     return this.meta.dbobj.select().from(subst);
   }
 
+  //noinspection JSUnusedGlobalSymbols
   foreignKeys(...fields) {
     const listFields = [];
-    fields.forEach(field => {
+    for (let field of fields) {
       field = String(field).toLowerCase();
       if (ForeignKeyFields.includes(field) && !listFields.includes(field))
         listFields.push(field);
-    });
+    }
     const subst = this.meta._getStatement({
       type: 'list_foreign_keys',
       fields: listFields

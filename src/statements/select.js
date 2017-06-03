@@ -109,9 +109,9 @@ class Select extends Statement {
     const self = this;
     for (const arg of column) {
       if (Array.isArray(arg)) {
-        arg.forEach(function(item) {
+        for (const item of arg) {
           self.columns(item);
-        });
+        }
       } else if (arg)
         this._columns.push(arg instanceof SqlObject ? arg : new Column(arg));
     }

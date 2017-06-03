@@ -62,22 +62,22 @@ class Insert extends Statement {
     else if (Array.isArray(values)) {
       const out = {};
       let i = 0;
-      this._columns.forEach(function(key) {
+      for (const key of this._columns) {
         out[key.field.toUpperCase()] = values.length >= i ? values[i] : null;
         i++;
-      });
+      }
       this._values = out;
+
     } else if (typeof values === 'object') {
       // We build a new map of upper keys for case insensitivity
       const out = {};
-      Object.getOwnPropertyNames(values).forEach(
-          function(key) {
+      Object.getOwnPropertyNames(values).forEach(key => {
             out[key.toUpperCase()] = values[key];
           }
       );
       this._values = out;
-    }
-    else throw new TypeError('Invalid argument');
+
+    } else throw new TypeError('Invalid argument');
     return this;
   }
 
