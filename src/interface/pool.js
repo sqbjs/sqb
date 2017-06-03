@@ -48,10 +48,6 @@ class DbPool extends EventEmitter {
     return this.config.schema;
   }
 
-  meta() {
-    throw new Error(`Metadata support not implemented in dialect (${this.dialect})`);
-  }
-
   //noinspection JSUnusedGlobalSymbols
   connect(resolveCallbak, rejectCallback) {
     if (process.env.DEBUG)
@@ -82,7 +78,17 @@ class DbPool extends EventEmitter {
     return promise;
   }
 
+  //noinspection JSUnusedGlobalSymbols
+  testConnection(callback) {
+    return this.select('1').then(callback);
+  }
+
   /* Abstract members */
+
+  //noinspection JSUnusedGlobalSymbols
+  meta() {
+    throw new Error(`Metadata support not implemented in dialect (${this.dialect})`);
+  }
 
   //noinspection JSMethodCanBeStatic,JSUnusedLocalSymbols
   /**
