@@ -27,11 +27,8 @@ class Select extends Statement {
     super(dbpool);
     this.type = 'select';
     this.clearColumns();
-    this.clearFrom();
     this.clearJoin();
-    this.clearOrderBy();
     this.clearWhere();
-    this.clearGroupBy();
     if (columns.length)
       this.columns(...columns);
   }
@@ -124,6 +121,7 @@ class Select extends Statement {
    * @return {Select}
    */
   from(...table) {
+    this.clearFrom();
     for (const arg of table) {
       if (arg)
         this._tables.push(
@@ -166,6 +164,7 @@ class Select extends Statement {
    * @public
    */
   groupBy(...field) {
+    this.clearGroupBy();
     for (const arg of field) {
       if (arg)
         this._groupby.push(arg.isRaw ? arg : new Column(String(arg)));
@@ -180,6 +179,7 @@ class Select extends Statement {
    * @public
    */
   orderBy(...field) {
+    this.clearOrderBy();
     for (const arg of field) {
       if (arg)
         this._orderby.push(arg.isRaw ? arg : new Order(String(arg)));

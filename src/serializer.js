@@ -692,6 +692,7 @@ class Serializer {
    * @protected
    */
   _serializeOrderBy(columns) {
+    if (!(columns && columns.length)) return '';
     const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
     let o;
     sb.indent = 4;
