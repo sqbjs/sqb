@@ -40,7 +40,7 @@ describe('Connect', function() {
 
     it('should execute statement', function(done) {
 
-      db.select('ID', 'ADI').from('ULKE').identify('aaaaa').then(result => {
+      db.select('ID', 'ADI').from('ULKE').action('aaaaa').then(result => {
         assert.deepEqual(result.rows, [[1, 'a'], [2, 'b']]);
         done();
       }).catch(err => {

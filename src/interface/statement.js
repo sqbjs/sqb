@@ -41,8 +41,18 @@ class Statement extends SqlObject {
           .build(this, params);
   }
 
-  identify(value) {
-    this._identity = value;
+  action(value) {
+    this._action = value;
+    return this;
+  }
+
+  clientId(value) {
+    this._clientId = value;
+    return this;
+  }
+
+  module(value) {
+    this._module = value;
     return this;
   }
 

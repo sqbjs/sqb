@@ -78,10 +78,8 @@ class Serializer {
     }
     assert.ok(['select', 'insert', 'update', 'delete'].includes(obj.type),
         'Invalid argument');
-    const comments = (obj._identity ? '/* #Identity:' + obj._identity +
-        ' */\n' : '');
     return {
-      sql: comments + this._serializeSqlObject(obj),
+      sql: this._serializeSqlObject(obj),
       params: this._outParams
     };
   }

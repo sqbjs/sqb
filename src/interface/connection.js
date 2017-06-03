@@ -93,7 +93,9 @@ class Connection extends EventEmitter {
         sql: undefined,
         params: undefined,
         options: undefined,
-        identity: statement ? statement._identity : undefined
+        action: statement ? statement._action : undefined,
+        clientId: statement ? statement._clientId : undefined,
+        module: statement ? statement._module : undefined
       };
 
       if (typeof statement === 'object' &&
@@ -110,6 +112,9 @@ class Connection extends EventEmitter {
       }
 
       options = options || {};
+      options.action = statement._action;
+      options.clientId = statement._clientId || self._clientId;
+      options.module = statement._module || self._module;
       options.autoCommit =
           options.autoCommit !== undefined ? options.autoCommit : false;
       options.extendedMetaData = options.extendedMetaData !==
