@@ -9,6 +9,7 @@
 /* Internal module dependencies. */
 const SqlObject = require('./sqlobject');
 const Serializer = require('../serializer');
+const Promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
 const assert = require('assert');
@@ -68,7 +69,14 @@ class Statement extends SqlObject {
       callback = options;
       options = undefined;
     }
-    return this.execute(this._params, options).then(callback);
+    const self = this;
+
+    function doExecute(cb) {
+      return self.execute(self._params, options, cb);
+    }
+
+    const promise = Promisify.fromCallback(doExecute);
+    return callback ? promise.then(callback) : promise;
   }
 
   execute(options, callback) {
@@ -79,7 +87,7 @@ class Statement extends SqlObject {
       assert.ok(dbpool, 'This statement is not executable');
       options = options || {};
       options.autoClose = true;
-      return dbpool.connect((conn) => conn.execute(this, this._params, options, callback));
+      return dbpool.connect((err, conn) => conn.execute(this, this._params, options, callback));
     }
   }
 
