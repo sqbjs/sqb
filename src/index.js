@@ -22,7 +22,7 @@ const Serializer = require('./serializer');
 const DbPool = require('./interface/pool');
 const Connection = require('./interface/connection');
 const MetaData = require('./interface/metadata');
-const RowSet = require('./interface/rowset');
+const ResultSet = require('./interface/resultset');
 
 const sqlObjects = require('./interface/sqbexport');
 const Promisify = require('./helpers/promisify');
@@ -34,7 +34,7 @@ Object.assign(sqlObjects, {
   DbPool,
   Connection,
   MetaData,
-  RowSet,
+  ResultSet,
 
   SqlObject,
   Select,

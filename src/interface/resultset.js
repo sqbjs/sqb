@@ -6,19 +6,12 @@
  https://panates.github.io/sqb/
  */
 
-
-/* Internal module dependencies. */
-const promisify = require('../helpers/promisify');
-
-/* External module dependencies. */
-const debug = require('debug')('sqb:RowSet');
-
 /**
  * @class
  * @public
  */
 
-class RowSet {
+class ResultSet {
 
   constructor(connection) {
     this._connection = connection;
@@ -39,4 +32,4 @@ class RowSet {
 
 }
 
-module.exports = RowSet;
+module.exports = ResultSet;
