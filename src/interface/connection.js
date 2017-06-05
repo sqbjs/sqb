@@ -6,6 +6,9 @@
  https://panates.github.io/sqb/
  */
 
+/* Internal module dependencies. */
+const Promisify = require('../helpers/promisify');
+
 /* External module dependencies. */
 const {EventEmitter} = require('events');
 const debug = require('debug')('sqb:Connection');
@@ -132,42 +135,27 @@ class Connection extends EventEmitter {
       return out;
     }
 
-    if (callback) {
+    function doExecute(cb) {
+      self.acquire(); // Increase reference to prevent un expected close
       try {
         const o = prepare();
         self.dbpool.emit('execute', o);
         if (process.env.DEBUG)
           debug('[%s] execute | %o', self.sessionId, o);
-        self.acquire(); // Increase reference to prevent un expected close
         self._execute(o.sql, o.params, o.options, function(err, result) {
           self.close(); // Release reference
           if (options.autoClose) self.close();
-          callback(err, result);
+          cb(err, result);
         });
       } catch (e) {
-        callback(e);
+        self.release();
+        cb(e);
       }
-      return this;
-    } else {
-      return new Promise(function(resolve, reject) {
-        try {
-          const o = prepare();
-          self.dbpool.emit('execute', o);
-          if (process.env.DEBUG)
-            debug('[%s] execute | %o', self.sessionId, o);
-          self.acquire(); // Increase reference to prevent un expected close
-          self._execute(o.sql, o.params, o.options, function(err, result) {
-            self.close(); // Release reference
-            if (options.autoClose) self.close();
-            if (err)
-              reject(err);
-            else resolve(result);
-          });
-        } catch (e) {
-          reject(e);
-        }
-      });
     }
+
+    if (callback)
+      doExecute(callback);
+    else return Promisify.fromCallback(doExecute);
   }
 
   /* Abstract members */

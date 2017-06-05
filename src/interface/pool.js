@@ -7,7 +7,8 @@
  */
 
 /* Internal module dependencies. */
-const sqlObjects = require('./sqlobjects');
+const sqlObjects = require('./sqbexport');
+const Promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');
@@ -49,33 +50,30 @@ class DbPool extends EventEmitter {
   }
 
   //noinspection JSUnusedGlobalSymbols
-  connect(resolveCallbak, rejectCallback) {
+  connect(callback) {
     if (process.env.DEBUG)
       debug('connect | Creating new connection..');
 
     const self = this;
 
-    let promise = new Promise((resolve, reject) => {
+    function doConnect(cb) {
       self._getConnection((error, connection) => {
-        if (error) {
-          if (process.env.DEBUG)
+        if (process.env.DEBUG) {
+          if (error)
             debug('connect failed: ' + error.message);
-          reject(error);
-        } else {
-          debug('[%s] connected', connection.sessionId);
-          connection.acquire();
-          resolve(connection);
+          else
+            debug('[%s] connected', connection.sessionId);
         }
+        if (connection)
+          connection.acquire();
+        cb(error, connection);
       });
-    });
+    }
 
-    if (resolveCallbak)
-      promise = promise.then((connection) => resolveCallbak(connection));
+    if (callback)
+      doConnect(callback);
+    else return Promisify.fromCallback(doConnect);
 
-    if (rejectCallback)
-      promise = promise.catch(err => rejectCallback);
-
-    return promise;
   }
 
   //noinspection JSUnusedGlobalSymbols
@@ -111,6 +109,11 @@ DbPool.get = function(dialect) {
   return this._registry ? this._registry[dialect] : undefined;
 };
 
+/**
+ * Creates a new database pool
+ * @param {Object} config
+ * @return {DbPool}
+ */
 DbPool.create = function(config) {
   if (config instanceof DbPool)
     return config;

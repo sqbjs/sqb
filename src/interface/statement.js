@@ -71,15 +71,15 @@ class Statement extends SqlObject {
     return this.execute(this._params, options).then(callback);
   }
 
-  execute(params, options, callback) {
+  execute(options, callback) {
     if (this.connection)
-      return this.connection.execute(this, params, options, callback);
+      return this.connection.execute(this, this._params, options, callback);
     else {
       const dbpool = this.dbpool;
       assert.ok(dbpool, 'This statement is not executable');
       options = options || {};
       options.autoClose = true;
-      return dbpool.connect((conn) => conn.execute(this, params, options, callback));
+      return dbpool.connect((conn) => conn.execute(this, this._params, options, callback));
     }
   }
 

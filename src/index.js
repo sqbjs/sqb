@@ -22,15 +22,20 @@ const Serializer = require('./serializer');
 const DbPool = require('./interface/pool');
 const Connection = require('./interface/connection');
 const MetaData = require('./interface/metadata');
+const RowSet = require('./interface/rowset');
 
-const sqlObjects = require('./interface/sqlobjects');
+const sqlObjects = require('./interface/sqbexport');
+const Promisify = require('./helpers/promisify');
 
+//noinspection JSUnusedGlobalSymbols
 Object.assign(sqlObjects, {
 
   Serializer,
   DbPool,
   Connection,
   MetaData,
+  RowSet,
+
   SqlObject,
   Select,
   Insert,
@@ -43,13 +48,32 @@ Object.assign(sqlObjects, {
   ConditionGroup,
   Case,
 
+  /**
+   * Creates a new serializer
+   * @param {Object} config
+   * @return {Serializer}
+   */
   serializer: function(config) {
     return Serializer.create(config);
   },
 
+  /**
+   * Creates a new database pool
+   * @param {Object} config
+   * @return {DbPool}
+   */
   pool: function(config) {
     return DbPool.create(config);
+  },
+
+  /**
+   * Assigns a custom Promise library
+   * @param {constructor} value
+   */
+  set promiseClass(value) {
+    Promisify.Promise = value;
   }
+
 });
 
 module.exports = sqlObjects;
