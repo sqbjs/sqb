@@ -74,7 +74,7 @@ describe('Connect', function() {
 
     it('should execute sql', function(done) {
 
-      db.connect((conn) => {
+      db.connect().then(conn => {
         conn.execute('select * from test', [], {
           autoCommit: true,
           extendedMetaData: true,
