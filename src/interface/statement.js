@@ -71,11 +71,9 @@ class Statement extends SqlObject {
     }
     const self = this;
 
-    function doExecute(cb) {
-      return self.execute(self._params, options, cb);
-    }
-
-    const promise = Promisify.fromCallback(doExecute);
+    const promise = Promisify.fromCallback(cb => {
+      self.execute(options, cb);
+    });
     return callback ? promise.then(callback) : promise;
   }
 
@@ -87,7 +85,13 @@ class Statement extends SqlObject {
       assert.ok(dbpool, 'This statement is not executable');
       options = options || {};
       options.autoClose = true;
-      return dbpool.connect((err, conn) => conn.execute(this, this._params, options, callback));
+      dbpool.connect((err, conn) => {
+        try {
+          conn.execute(this, this._params, options, callback);
+        } catch (e) {
+          callback(e);
+        }
+      });
     }
   }
 

@@ -10,11 +10,15 @@ const Promisify = {
 
   fromCallback: function(resolver) {
     return new Promisify.Promise((resolve, reject) => {
-      resolver((error, value) => {
-        if (error)
-          reject(error);
-        else resolve(value);
-      });
+      try {
+        resolver((error, value) => {
+          if (error)
+            reject(error);
+          else resolve(value);
+        });
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 

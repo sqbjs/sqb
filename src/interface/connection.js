@@ -79,6 +79,7 @@ class Connection extends EventEmitter {
   }
 
   execute(statement, params, options, callback) {
+
     const self = this;
 
     function prepare() {
@@ -142,9 +143,10 @@ class Connection extends EventEmitter {
         self.dbpool.emit('execute', o);
         if (process.env.DEBUG)
           debug('[%s] execute | %o', self.sessionId, o);
-        self._execute(o.sql, o.params, o.options, function(err, result) {
+        self._execute(o.sql, o.params, o.options, (err, result) => {
           self.close(); // Release reference
           if (options.autoClose) self.close();
+          console.log('adfadsfds');
           cb(err, result);
         });
       } catch (e) {
