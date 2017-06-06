@@ -78,68 +78,74 @@ class Connection extends EventEmitter {
     return statement;
   }
 
+  prepare(statement, params, options) {
+    const self = this;
+    const serializer = self.dbpool.serializer;
+    const out = {
+      sql: undefined,
+      params: undefined,
+      options: undefined,
+      action: statement ? statement._action : undefined,
+      clientId: statement ? statement._clientId : undefined,
+      module: statement ? statement._module : undefined
+    };
+
+    if (typeof statement === 'object' &&
+        typeof statement.build === 'function') {
+      const o = serializer.build(statement, params);
+      out.sql = o.sql;
+      out.params = o.params;
+
+      //noinspection JSUnresolvedVariable
+      options = options || statement._options;
+    } else {
+      out.sql = statement;
+      out.params = params;
+    }
+
+    options = options || {};
+    options.action = statement._action;
+    options.clientId = statement._clientId || self._clientId;
+    options.module = statement._module || self._module;
+    options.autoCommit =
+        options.autoCommit !== undefined ? options.autoCommit : false;
+    options.resultSet =
+        options.resultSet !== undefined ? options.resultSet : false;
+    if (options.resultSet) {
+      options.extendedMetaData = true;
+      options.objectRows = false;
+      options.prefetchRows =
+          options.prefetchRows !== undefined ? options.prefetchRows : 100;
+    } else {
+      options.maxRows =
+          Math.min(options.maxRows || 100, statement._limit || 100);
+      options.extendedMetaData = options.extendedMetaData !== undefined ?
+          options.extendedMetaData : false;
+      options.objectRows =
+          options.objectRows !== undefined ? options.objectRows : false;
+    }
+    options.debug = options.debug !== undefined ? options.debug : false;
+    out.options = options;
+
+    return out;
+  }
+
   execute(statement, params, options, callback) {
 
     const self = this;
-
-    function prepare() {
-      if (typeof params === 'function') {
-        callback = params;
-        params = undefined;
-        options = undefined;
-      } else if (typeof options === 'function') {
-        callback = options;
-        options = undefined;
-      }
-
-      const serializer = self.dbpool.serializer;
-      const out = {
-        sql: undefined,
-        params: undefined,
-        options: undefined,
-        action: statement ? statement._action : undefined,
-        clientId: statement ? statement._clientId : undefined,
-        module: statement ? statement._module : undefined
-      };
-
-      if (typeof statement === 'object' &&
-          typeof statement.build === 'function') {
-        const o = serializer.build(statement, params);
-        out.sql = o.sql;
-        out.params = o.params;
-
-        //noinspection JSUnresolvedVariable
-        options = options || statement._options;
-      } else {
-        out.sql = statement;
-        out.params = params;
-      }
-
-      options = options || {};
-      options.action = statement._action;
-      options.clientId = statement._clientId || self._clientId;
-      options.module = statement._module || self._module;
-      options.autoCommit =
-          options.autoCommit !== undefined ? options.autoCommit : false;
-      options.extendedMetaData = options.extendedMetaData !==
-      undefined ? options.extendedMetaData : false;
-      options.prefetchRows =
-          options.prefetchRows !== undefined ? options.prefetchRows : 100;
-      options.maxRows = statement._limit ? statement._limit : 100;
-      options.resultSet =
-          options.resultSet !== undefined ? options.resultSet : false;
-      options.objectRows =
-          options.objectRows !== undefined ? options.objectRows : false;
-      options.showSql = options.showSql !== undefined ? options.showSql : false;
-
-      out.options = options;
-      return out;
+    if (typeof params === 'function') {
+      callback = params;
+      params = undefined;
+      options = undefined;
+    } else if (typeof options === 'function') {
+      callback = options;
+      options = undefined;
     }
 
     function doExecute(cb) {
       self.acquire(); // Increase reference to prevent un expected close
       try {
-        const o = prepare();
+        const o = self.prepare(statement, params, options);
         self.dbpool.emit('execute', o);
         if (process.env.DEBUG)
           debug('[%s] execute | %o', self.sessionId, o);

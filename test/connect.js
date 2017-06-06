@@ -81,7 +81,7 @@ describe('Connect', function() {
           prefetchRows: 1,
           resultSet: false,
           objectRows: false,
-          showSql: false
+          debug: false
         }).then(result => {
           assert.deepEqual(result.rows, [[1, 'a'], [2, 'b']]);
           conn.close();

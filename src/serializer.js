@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const StringBuilder = require('./helpers/stringbuilder');
+const StringBuilder = require('./helpers/clausebuilder');
 
 /* External module dependencies. */
 const assert = require('assert');
@@ -141,49 +141,47 @@ class Serializer {
    * @protected
    */
   _serializeSelect(obj) {
-    const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+    const self = this;
+    const sb = new StringBuilder(self.prettyPrint ? 180 : 0);
     let s;
 
     sb.append('select');
 
-    s = this._serializeColumns(obj._columns, {section: 'select.columns'});
-    sb.append(s ? ' ' + s : ' *');
+    s = self._serializeColumns(obj._columns, {section: 'select.columns'});
+    sb.append(s ? s : '*');
 
-    s = this._serializeTablesNames(obj._tables, {section: 'select.from'});
+    s = self._serializeTablesNames(obj._tables, {section: 'select.from'});
     if (s) {
-      sb.append(
-          (this.prettyPrint && sb.line.length > 40 ? '\n' : ' ') + 'from ' + s);
+      sb.append('from ' + s, {
+        newLine: self.prettyPrint && sb.line.length > 40
+      });
     }
 
-    s = this._serializeJoins(obj._joins, {section: 'select.joins'});
+    s = self._serializeJoins(obj._joins, {section: 'select.joins'});
     if (s) {
       sb.indent = 2;
-      sb.append((this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + s);
-      if (this.prettyPrint)
+      sb.append(s, {newLine: self.prettyPrint});
+      sb.indent = 0;
+      if (self.prettyPrint)
         sb.cr();
     }
 
-    s = this._serializeWhere(obj._where, {section: 'select.where'});
+    s = self._serializeWhere(obj._where, {section: 'select.where'});
     if (s) {
-      sb.indent = 0;
-      sb.append((this.prettyPrint &&
-          (sb.line.length > 40 || sb.lines > 1 || s.indexOf('\n') > 0) ?
-              (sb.line ? '\n' : '') : (sb.line ? ' ' : '')) + s);
-      if (this.prettyPrint) sb.cr();
+      sb.append(s, {
+        newLine: (sb.line.length > 40 || sb.lines > 1 || s.includes('\n'))
+      });
+      if (self.prettyPrint) sb.cr();
     }
 
-    s = this._serializeGroupBy(obj._groupby, {section: 'select.groupby'});
+    s = self._serializeGroupBy(obj._groupby, {section: 'select.groupby'});
     if (s) {
-      sb.indent = 0;
-      sb.append(
-          (this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'group by ' + s);
+      sb.append('group by ' + s, {newLine: self.prettyPrint});
     }
 
-    s = this._serializeOrderBy(obj._orderby, {section: 'select.orderby'});
+    s = self._serializeOrderBy(obj._orderby, {section: 'select.orderby'});
     if (s) {
-      sb.indent = 0;
-      sb.append(
-          (this.prettyPrint ? (sb.line ? '\n' : '') : ' ') + 'order by ' + s);
+      sb.append('order by ' + s, {newLine: self.prettyPrint});
     }
 
     return sb.toString();
@@ -200,28 +198,28 @@ class Serializer {
     assert.ok(['raw', 'table'].includes(obj._table.type),
         'Invalid argument. Only Raw or TableName allowed in "insert(?)"');
 
-    const sb = new StringBuilder(this.prettyPrint ? 180 : 0);
+    const self = this;
+    const sb = new StringBuilder(self.prettyPrint ? 180 : 0);
 
-    sb.append('insert into ');
+    sb.append('insert into');
     // table name
-    sb.append(this._serializeSqlObject(obj._table, {section: 'insert.table'}));
+    sb.append(self._serializeSqlObject(obj._table, {section: 'insert.table'}));
     // columns
-    sb.append(' (' +
-        this._serializeColumns(obj._columns, {section: 'insert.columns'}) +
-        ') ');
+    sb.append('(' +
+        self._serializeColumns(obj._columns, {section: 'insert.columns'}) +
+        ')');
     // values
     const objValues = obj._values || {};
 
     if (objValues) {
       if (['raw', 'select'].includes(objValues.type)) {
-        const s = this._serializeSqlObject(objValues, {section: 'insert.values'});
+        const s = self._serializeSqlObject(objValues, {section: 'insert.values'});
         if (s) {
-          if (this.prettyPrint && objValues.type === 'select') sb.crlf();
+          if (self.prettyPrint && objValues.type === 'select') sb.crlf();
           sb.append(s);
         }
       } else {
         sb.append('values (');
-        const self = this;
         self._prmIdx = 0;
 
         // Iterate over columns
@@ -235,9 +233,9 @@ class Serializer {
           iinf.index = idx;
           const s = self._serializeValue(val, iinf);
           if (s)
-            sb.append(s + (idx < obj._columns.length - 1 ? ', ' : ''));
+            sb.append((idx ? ', ' : '') + s, {spacing: false});
         });
-        sb.append(')');
+        sb.append(')', {spacing: false});
       }
     }
     return sb.toString();
@@ -261,16 +259,15 @@ class Serializer {
 
     sb.indent = 4;
 
-    sb.append('update ');
-    sb.append(this._serializeSqlObject(obj._table, {section: 'update.table'}));
-    sb.append(' set');
+    sb.append('update');
+    sb.append(self._serializeSqlObject(obj._table, {section: 'update.table'}));
+    sb.append('set');
     if (prettyPrint)
       sb.cr();
 
     // Serialize update values
     if (obj._values.isRaw) {
-      sb.append(' ' +
-          self._serializeRaw(obj._values, {section: 'update.values'}));
+      sb.append(self._serializeRaw(obj._values, {section: 'update.values'}));
     } else {
       // Iterate over update values
       const values = obj._values;
@@ -283,7 +280,7 @@ class Serializer {
             iinf.index = idx;
             const s = self._serializeUpdateValue(key, values[key], iinf);
             if (s)
-              sb.append((idx > 0 ? ', ' : (prettyPrint ? '' : ' ')) + s);
+              sb.append((idx ? ', ' : '') + s, {spacing: !idx});
           }
       );
     }
@@ -293,9 +290,7 @@ class Serializer {
     let s;
     if ((s = this._serializeWhere(obj._where, {section: 'update.where'}))) {
       sb.indent = 0;
-      sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ?
-              (sb.line ? '\n' : '') :
-              (sb.line ? ' ' : '')) + s);
+      sb.append(s, {newLine: self.prettyPrint});
       if (prettyPrint) sb.cr();
     }
 
@@ -316,17 +311,15 @@ class Serializer {
     const prettyPrint = self.prettyPrint;
     const sb = new StringBuilder(prettyPrint ? 180 : 0);
     sb.indent = 4;
-    sb.append('delete from ');
-    sb.append(this._serializeSqlObject(obj._table, {section: 'delete.table'}));
+    sb.append('delete from');
+    sb.append(self._serializeSqlObject(obj._table, {section: 'delete.table'}));
 
     // Serialize conditions
     sb.indent = 2;
     let s;
-    if ((s = this._serializeWhere(obj._where, {section: 'delete.where'}))) {
+    if ((s = self._serializeWhere(obj._where, {section: 'delete.where'}))) {
       sb.indent = 0;
-      sb.append((prettyPrint && (sb.line.length > 40 || sb.lines > 1) ?
-              (sb.line ? '\n' : '') :
-              (sb.line ? ' ' : '')) + s);
+      sb.append(s, (sb.line.length > 40 || sb.lines > 1 || s.includes('\n')));
       if (prettyPrint) sb.cr();
     }
 
@@ -360,15 +353,16 @@ class Serializer {
     if (!(columns && columns.length)) return '';
     const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
     sb.indent += 4;
+    let k = 0;
     const iinf = {section: inf.section, index: 0};
-    for (const col of columns) {
+    columns.forEach((col, idx) => {
       const s = this._serializeColumn(col, iinf);
       if (s) {
-        if (sb.line) sb.append(', ', true);
-        sb.append(s);
+        sb.append((k > 0 ? ', ' : '') + s, {spacing: false});
+        k++;
       }
       iinf.index++;
-    }
+    });
     return sb.toString();
   }
 
@@ -478,19 +472,23 @@ class Serializer {
    */
   _serializeConditionGroup(group, inf) {
     if (!group) return '';
-    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    const self = this;
+    const sb = new StringBuilder(self.prettyPrint ? undefined : 0);
     sb.indent += 4;
     let s;
     let logop = 'and';
+    let k = 0;
     const iinf = {section: 'conditiongroup', index: 0};
     for (let i = 0; i < group.length; i++) {
       const item = group.item(i);
       assert.ok(['raw', 'conditiongroup', 'condition'].includes(item.type),
           'Invalid object used as Condition');
+
       logop = item.logicalOperator || logop;
-      if ((s = this._serializeSqlObject(item, iinf))) {
+      if ((s = self._serializeSqlObject(item, iinf))) {
         if (item.type === 'conditiongroup') s = '(' + s + ')';
-        sb.append((sb.line ? ' ' + logop + ' ' : '') + s);
+        sb.append((k ? logop + ' ' : '') + s);
+        k++;
       }
       iinf.index++;
     }
@@ -687,16 +685,13 @@ class Serializer {
    */
   _serializeJoins(joins, inf) {
     if (!joins) return '';
-    const sb = new StringBuilder(this.prettyPrint ? undefined : 0);
+    const self = this;
+    const sb = new StringBuilder(self.prettyPrint ? undefined : 0);
     const iinf = {section: 'joins', index: 0};
     for (let i = 0; i < joins.length; i++) {
-      const s = this._serializeJoin(joins[i], iinf);
-      if (s) {
-        sb.append(s);
-        if (this.prettyPrint)
-          sb.crlf();
-        else sb.append(i < joins.length - 1 ? ' ' : '');
-      }
+      const s = self._serializeJoin(joins[i], iinf);
+      if (s)
+        sb.append(s, {newLine: self.prettyPrint});
       iinf.index++;
     }
     return sb.toString();
@@ -746,12 +741,12 @@ class Serializer {
       if (join.table.type === 'select') {
         s = '(' + s + ')' + (join.table._alias ? ' ' + join.table._alias : '');
       }
-      sb.append(' ' + s);
+      sb.append(s);
     }
 
     s = this._serializeConditionGroup(join.conditions, {section: 'join.on'});
     if (s)
-      sb.append(' on ' + s);
+      sb.append('on ' + s);
     return sb.toString();
   }
 
@@ -792,8 +787,7 @@ class Serializer {
           (o.descending ? ' desc' : '');
 
       if (s) {
-        if (i) sb.append(', ');
-        sb.append(s);
+        sb.append((i ? ', ' : '') + s, {spacing: false});
       }
       iinf.index++;
     }
@@ -849,7 +843,7 @@ class Serializer {
         const s = self._serializeSqlObject(item.condition, iinf);
         if (s)
           sb.append(
-              ' when ' + s + ' then ' +
+              'when ' + s + ' then ' +
               (self._serializeValue(item.value, iinf)) ||
               'null');
         iinf.index++;
@@ -859,9 +853,9 @@ class Serializer {
       if (obj._elseValue !== undefined) {
         const s = self._serializeValue(obj._elseValue, iinf);
         if (s)
-          sb.append(' else ' + s);
+          sb.append('else ' + s);
       }
-      sb.append(' end' + (obj._alias ? ' ' + obj._alias : ''));
+      sb.append('end' + (obj._alias ? ' ' + obj._alias : ''));
       return sb.toString();
     }
   }

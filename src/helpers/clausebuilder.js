@@ -6,7 +6,7 @@
  https://panates.github.io/sqb/
  */
 
-class StringBuilder {
+class ClauseBuilder {
 
   constructor(lineWidth) {
     this._lines = [];
@@ -30,34 +30,41 @@ class StringBuilder {
     return this;
   }
 
-  append(input, curLine) {
+  append(input, options) {
     if (!input) return;
+    const self = this;
+    const newLine = options && options.newLine;
+    const spacing = !options || options.spacing === undefined ||
+        options.spacing;
     if (Array.isArray(input)) {
-      for (let i = 0; i < input.length; i++)
-        this.append(input[i]);
+      for (const item of input)
+        self.append(item, options);
     } else {
-      if (input.indexOf('\n') >= 0) {
+      if (input.includes('\n')) {
         const arr = input.split('\n');
-        for (let i = 0; i < arr.length; i++) {
-          if (i > 0) this.cr();
-          this.append(arr[i]);
-        }
+        arr.forEach((item, idx) => {
+          if (idx > 0) self.cr();
+          self.append(item, options);
+        });
       } else {
-        if (!curLine && this.line && this.lineWidth &&
-            this.line.length + input.length > this.lineWidth) {
-          if (this.lines) this.cr();
-          if (input.startsWith(' '))
-            input = input.substring(1);
+        let space = spacing && self.line ? ' ' : '';
+        if (self.line && (newLine ||
+            (self.lineWidth &&
+            (self.line.length + input.length > self.lineWidth)))) {
+          this.cr();
+          space = '';
         }
-        if (this._needIndent) {
-          for (let i = 0; i < this.indent; i++)
-            this.line += ' ';
-          this._needIndent = false;
+        if (self._needIndent) {
+          if (!self.line)
+            for (let i = 0; i < self.indent; i++)
+              self.line += ' ';
+          self._needIndent = false;
         }
-        this.line += input;
+
+        self.line += space + input;
       }
     }
-    return this;
+    return self;
   }
 
   get lines() {
@@ -74,4 +81,4 @@ class StringBuilder {
 
 }
 
-module.exports = StringBuilder;
+module.exports = ClauseBuilder;

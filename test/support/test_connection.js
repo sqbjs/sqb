@@ -54,7 +54,7 @@ class TestConnection extends Connection {
         } else {
             out.rows = [[1, 'a'], [2, 'b']];
             out.metaData = [{name: 'ID'}, {name: 'NAME'}];
-            if (options.showSql) {
+            if (options.debug) {
                 out.sql = sql;
                 out.params = params;
                 out.options = options;
