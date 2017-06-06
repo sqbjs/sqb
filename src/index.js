@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const SqlObject = require('./interface/sqlobject');
+const SqlObject = require('./sqlobjects/sqlobject');
 const Select = require('./statements/select');
 const Insert = require('./statements/insert');
 const Update = require('./statements/update');
@@ -19,13 +19,15 @@ const Condition = require('./sqlobjects/condition');
 const ConditionGroup = require('./sqlobjects/conditiongroup');
 const Case = require('./sqlobjects/case');
 const Serializer = require('./serializer');
-const DbPool = require('./interface/pool');
-const Connection = require('./interface/connection');
-const MetaData = require('./interface/metadata');
-const ResultSet = require('./interface/resultset');
+const DbPool = require('./connect/pool');
+const Connection = require('./connect/connection');
+const MetaData = require('./connect/metadata');
+const ResultSet = require('./connect/resultset');
+const {ResultCache} = require('./connect/resultcache');
 
-const sqlObjects = require('./interface/sqbexport');
+const sqlObjects = require('./helpers/sqbexport');
 const Promisify = require('./helpers/promisify');
+const StringBuilder = require('./helpers/clausebuilder');
 
 //noinspection JSUnusedGlobalSymbols
 Object.assign(sqlObjects, {
@@ -35,6 +37,8 @@ Object.assign(sqlObjects, {
   Connection,
   MetaData,
   ResultSet,
+  ResultCache,
+  StringBuilder,
 
   SqlObject,
   Select,
@@ -71,7 +75,7 @@ Object.assign(sqlObjects, {
    * @param {constructor} value
    */
   set promiseClass(value) {
-    Promisify.Promise = value;
+    Promisify.Promise = value || Promise;
   }
 
 });

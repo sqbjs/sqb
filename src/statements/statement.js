@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const SqlObject = require('./sqlobject');
+const SqlObject = require('../sqlobjects/sqlobject');
 const Serializer = require('../serializer');
 const Promisify = require('../helpers/promisify');
 

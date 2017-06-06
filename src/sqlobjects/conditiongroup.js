@@ -8,7 +8,7 @@
 
 /* Internal module dependencies. */
 
-const SqlObject = require('../interface/sqlobject');
+const SqlObject = require('./sqlobject');
 const Condition = require('./condition');
 
 /**

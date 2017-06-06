@@ -1,4 +1,4 @@
-/* SQB-connect
+/* SQB
  ------------------------
  (c) 2017-present Panates
  SQB may be freely distributed under the MIT license.
@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const sqlObjects = require('./sqbexport');
+const sqlObjects = require('../helpers/sqbexport');
 const Promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
