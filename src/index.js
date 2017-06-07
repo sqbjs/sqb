@@ -27,7 +27,7 @@ const {ResultCache} = require('./connect/resultcache');
 
 const sqlObjects = require('./helpers/sqbexport');
 const Promisify = require('./helpers/promisify');
-const StringBuilder = require('./helpers/clausebuilder');
+const paragraphOut = require('./helpers/paragraphout');
 
 //noinspection JSUnusedGlobalSymbols
 Object.assign(sqlObjects, {
@@ -38,7 +38,7 @@ Object.assign(sqlObjects, {
   MetaData,
   ResultSet,
   ResultCache,
-  StringBuilder,
+  paragraphOut,
 
   SqlObject,
   Select,

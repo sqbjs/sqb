@@ -70,7 +70,10 @@ describe('Serialize select statements', function() {
               ['ID', 1], ['ID', 12345678])
           .groupBy('field1', 'field2', sqb.raw('field3'));
       let result = statement.build({prettyPrint: true});
-      assert.equal(result.sql, 'select * from table1\nwhere ID = 1 and name = \'value of the field should be too long\' and ID = 1\n    and ID = 12345678\ngroup by field1, field2, field3');
+      assert.equal(result.sql, "select * from table1\n"+
+          "where ID = 1 and name = 'value of the field should be too long' and\n"+
+          "  ID = 1 and ID = 12345678\n" +
+          "group by field1, field2, field3");
       done();
     });
 
