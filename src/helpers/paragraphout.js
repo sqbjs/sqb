@@ -33,7 +33,7 @@ function paragraphOut(input, options) {
       i++;
       chr = input.charAt(i);
     }
-    if (k && !['('].includes(pchr) && ![')'].includes(chr))
+    if (k && !['(', ' '].includes(pchr) && ![')'].includes(chr))
       out += ' ';
 
     switch (chr) {

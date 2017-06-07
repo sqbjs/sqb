@@ -209,7 +209,7 @@ class Serializer {
         ')';
 
     // values
-    const objValues = obj._values || {};
+    const objValues = obj._values;
 
     if (objValues) {
       if (['raw', 'select'].includes(objValues.type)) {
@@ -867,7 +867,7 @@ class Serializer {
     if (obj) {
       if (['select', 'insert', 'update', 'delete'].includes(obj.type)) {
         if (this.statement) {
-          const subSerializer = Serializer.create(this.config);
+          const subSerializer = Serializer.create(this);
           subSerializer.statement = obj;
           const fn = subSerializer.objSerializers[obj.type];
           return fn ? fn.call(subSerializer, obj, inf) : '';

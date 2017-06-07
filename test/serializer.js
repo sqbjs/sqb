@@ -85,4 +85,21 @@ describe('Serializer', function() {
     done();
   });
 
+  it('Should register serializer class', function(done) {
+    sqb.Serializer.register('test', sqb.Serializer);
+    done();
+  });
+
+  it('Should get serializer class', function(done) {
+    let clazz = sqb.Serializer.get('test');
+    assert.equal(clazz, sqb.Serializer);
+    done();
+  });
+
+  it('Should create serializer', function(done) {
+    let serializer = sqb.Serializer.create('test');
+    assert.ok(serializer);
+    done();
+  });
+
 });

@@ -95,6 +95,15 @@ describe('Serialize insert statements', function() {
     done();
   });
 
+  it('should use raw in values', function(done) {
+    let statement = sqb.insert('ID', 'NAME').into('table1').values(
+        sqb.raw('values (1,2)')
+    );
+    let result = statement.build();
+    assert.equal(result.sql, 'insert into table1 (ID, NAME) values (1,2)');
+    done();
+  });
+
   it('should check arguments in .values()', function(done) {
     let ok;
     try {

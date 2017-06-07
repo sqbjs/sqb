@@ -21,9 +21,12 @@ describe('Serialize select statements', function() {
     });
 
     it('should serialize select/from - test 1', function(done) {
-      let statement = sqb.select('field1').from('table1');
+      let statement = sqb.select('field1', 'field2', 'field3',
+          'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
+          'field10').from('table1');
       let result = statement.build();
-      assert.equal(result.sql, 'select field1 from table1');
+      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, '+
+          'field6, field7, field8, field9, field10 from table1');
       done();
     });
 
@@ -35,9 +38,10 @@ describe('Serialize select statements', function() {
     });
 
     it('should serialize select/from - test 3', function(done) {
-      let statement = sqb.select('field1 f1').from('schema1.table1 t1');
+      let statement = sqb.select('field1 f1', 'field2', sqb.raw('\nfield3'))
+          .from('schema1.table1 t1', sqb.raw('\ntable2'));
       let result = statement.build();
-      assert.equal(result.sql, 'select field1 f1 from schema1.table1 t1');
+      assert.equal(result.sql, 'select field1 f1, field2, field3 from schema1.table1 t1, table2');
       done();
     });
 
@@ -70,10 +74,10 @@ describe('Serialize select statements', function() {
               ['ID', 1], ['ID', 12345678])
           .groupBy('field1', 'field2', sqb.raw('field3'));
       let result = statement.build({prettyPrint: true});
-      assert.equal(result.sql, "select * from table1\n"+
-          "where ID = 1 and name = 'value of the field should be too long' and\n"+
-          "  ID = 1 and ID = 12345678\n" +
-          "group by field1, field2, field3");
+      assert.equal(result.sql, 'select * from table1\n' +
+          'where ID = 1 and name = \'value of the field should be too long\' and\n' +
+          '  ID = 1 and ID = 12345678\n' +
+          'group by field1, field2, field3');
       done();
     });
 
@@ -416,13 +420,17 @@ describe('Serialize select statements', function() {
             statement = sqb.select().from('table1').where(
                 ['adate', 'between', /adate/],
                 ['bdate', 'between', /bdate/]
-            ).params({
-              ADATE: [d1, d2],
-              BDATE: d1
-            });
-        let result = serializer.build(statement);
+            );
+        let result = serializer.build(statement, {
+          ADATE: [d1, d2],
+          BDATE: d1
+        });
         assert.equal(result.sql, 'select * from table1 where adate between ? and ? and bdate between ? and ?');
         assert.deepEqual(result.params, [d1, d2, d2, null]);
+        statement.params({
+          ADATE: [d1, d2],
+          BDATE: d1
+        });
         result = statement.build({namedParams: true});
         assert.equal(result.sql, 'select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2');
         assert.deepEqual(result.params.ADATE1, d1);
@@ -433,15 +441,19 @@ describe('Serialize select statements', function() {
       });
 
       it('should validate build{params} argument', function(done) {
-        let ok;
+        let serializer = sqb.serializer();
+        let ok = 0;
         try {
-          let serializer = sqb.serializer();
-          sqb.select();
           serializer.build(undefined, 123);
         } catch (e) {
-          ok = true;
+          ok++;
         }
-        assert.ok(ok);
+        try {
+          serializer.build(sqb.select(), 123);
+        } catch (e) {
+          ok++;
+        }
+        assert.equal(ok, 2);
         done();
       });
 
