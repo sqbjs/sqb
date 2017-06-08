@@ -53,16 +53,17 @@
 
 ## <a name="sqbnamespac-methods"></a>2.2 Methods
 
-### <a name="sqbnamespac-methods-serializer"></a>2.2.1 serializer()
+### <a name="sqbnamespac-methods-serializer"></a>2.2.1 .serializer()
 Creates and initializes new Serializer class for desired dialect.
 
-**Usage**
+*Note: No dialects included in SQB package by default. Before using any dialect, be sure you have loaded its serialization plugin.*
 
-`serializer(String dialect)`
+#### Variations
+
+`sqb.serializer(String dialect)`
 
 *dialect:* Name of the sql dialect to use when serializing.
  
-*Note: No dialects included in SQB package by default. Before using any dialect, be sure you have loaded its serialization plugin.*
 
 **Example**
 ```js
@@ -71,7 +72,9 @@ const sqb = require('sqb');
 const sr = sqb.serializer('oracle');
 ```
 
-`serializer(Object config)`
+`sqb.serializer(Object config)`
+
+*config:* Object with configuration parameters
 
 **Example**
 ```js
