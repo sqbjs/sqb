@@ -151,11 +151,11 @@ class Connection extends EventEmitter {
           debug('[%s] execute | %o', self.sessionId, o);
         self._execute(o.sql, o.params, o.options, (err, result) => {
           self.close(); // Release reference
-          if (options.autoClose) self.close();
+          if (options && options.autoClose) self.close();
           cb(err, result);
         });
       } catch (e) {
-        self.release();
+        self.close();
         cb(e);
       }
     }

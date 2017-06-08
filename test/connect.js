@@ -70,7 +70,7 @@ describe('Connect', function() {
     });
   });
 
-  describe('DbPool', function() {
+  describe('Connection', function() {
 
     it('should execute sql', function(done) {
 
@@ -93,6 +93,64 @@ describe('Connect', function() {
 
       }).catch(err => {
         close();
+        done(new Error(err));
+      });
+
+    });
+
+    it('should execute select statement', function(done) {
+
+      db.connect().then(conn => {
+        conn.select().then(result => {
+          done();
+        }).catch(err => {
+          conn.close();
+          done(new Error(err));
+        });
+
+      }).catch(err => {
+        close();
+        done(new Error(err));
+      });
+
+    });
+
+    it('should execute insert statement', function(done) {
+
+      db.connect().then(conn => {
+
+        return conn.insert('a').into('table1').values({a: 1})
+            .then(result => {
+              done();
+            });
+
+      }).catch(err => {
+        done(new Error(err));
+      });
+
+    });
+
+    it('should execute update statement', function(done) {
+
+      db.connect().then(conn => {
+        return conn.update('table2').set({a: 1}).then(result => {
+          done();
+        });
+
+      }).catch(err => {
+        done(new Error(err));
+      });
+
+    });
+
+    it('should execute delete statement', function(done) {
+
+      db.connect().then(conn => {
+        return conn.delete('table1').then(result => {
+          done();
+        });
+
+      }).catch(err => {
         done(new Error(err));
       });
 

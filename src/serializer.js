@@ -198,8 +198,9 @@ class Serializer {
    * @protected
    */
   _serializeInsert(obj) {
-    assert.ok(['raw', 'table'].includes(obj._table.type),
+    assert.ok(obj && obj._table && ['raw', 'table'].includes(obj._table.type),
         'Invalid argument. Only Raw or TableName allowed in "insert(?)"');
+    assert.ok(!!obj._values, 'values required for Insert statement');
 
     const self = this;
     let out = 'insert into ' +
@@ -248,9 +249,10 @@ class Serializer {
    * @protected
    */
   _serializeUpdate(obj) {
-    assert.ok(['raw', 'table'].includes(obj._table.type),
+    assert.ok(obj && obj._table && ['raw', 'table'].includes(obj._table.type),
         'Invalid argument. Only Raw or TableName allowed in "update(?)"');
     assert.ok(!!obj._values, 'values required for Update statement');
+
 
     const self = this;
     let out = 'update ' +
@@ -293,7 +295,7 @@ class Serializer {
    * @protected
    */
   _serializeDelete(obj) {
-    assert.ok(['raw', 'table'].includes(obj._table.type),
+    assert.ok(obj && obj._table && ['raw', 'table'].includes(obj._table.type),
         'Invalid argument. Only Raw or TableName allowed in "delete(?)"');
     const self = this;
     let out = 'delete from ' +
