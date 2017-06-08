@@ -1,4 +1,5 @@
-1. [Introduction](#Introduction)
+1. [Introduction](#introduction)
+    * [Installation](#installation)
 1. [Serializing SQL statements](#serializing)
     * Defining SQL statements
         * *Select* statement
