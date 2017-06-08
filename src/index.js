@@ -38,7 +38,6 @@ Object.assign(sqlObjects, {
   MetaData,
   ResultSet,
   ResultCache,
-  paragraphOut,
 
   SqlObject,
   Select,
@@ -60,6 +59,8 @@ Object.assign(sqlObjects, {
   serializer: function(config) {
     return Serializer.create(config);
   },
+
+  paragraphOut,
 
   /**
    * Creates a new database pool

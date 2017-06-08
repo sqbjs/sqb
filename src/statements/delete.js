@@ -15,7 +15,7 @@ const ConditionGroup = require('../sqlobjects/conditiongroup');
  * @class
  * @public
  */
-class Delete extends Statement {
+class DeleteStatement extends Statement {
 
   constructor(dbpool, table) {
     super(dbpool);
@@ -27,7 +27,7 @@ class Delete extends Statement {
 
   /**
    *
-   * @return {Delete}
+   * @return {DeleteStatement}
    * @public
    */
   clearFrom() {
@@ -37,7 +37,7 @@ class Delete extends Statement {
 
   /**
    *
-   * @return {Delete}
+   * @return {DeleteStatement}
    * @public
    */
   clearWhere() {
@@ -48,7 +48,7 @@ class Delete extends Statement {
   /**
    *
    * @param {string|Raw} table..
-   * @return {Delete}
+   * @return {DeleteStatement}
    */
   from(table) {
     if (table)
@@ -59,7 +59,7 @@ class Delete extends Statement {
   /**
    *
    * @param {...Condition} condition
-   * @return {Delete}
+   * @return {DeleteStatement}
    * @public
    */
   where(...condition) {
@@ -69,4 +69,4 @@ class Delete extends Statement {
 
 }
 
-module.exports = Delete;
+module.exports = DeleteStatement;

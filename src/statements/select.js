@@ -21,7 +21,7 @@ const Order = require('../sqlobjects/order');
  * @public
  */
 
-class Select extends Statement {
+class SelectStatement extends Statement {
 
   constructor(dbpool, ...columns) {
     super(dbpool);
@@ -39,7 +39,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearColumns() {
@@ -49,7 +49,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearFrom() {
@@ -59,7 +59,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearJoin() {
@@ -69,7 +69,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearGroupBy() {
@@ -79,7 +79,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearOrderBy() {
@@ -89,7 +89,7 @@ class Select extends Statement {
 
   /**
    *
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   clearWhere() {
@@ -100,7 +100,7 @@ class Select extends Statement {
   /**
    *
    * @param {...string|Raw} column
-   * @return {Select}
+   * @return {SelectStatement}
    */
   columns(...column) {
     const self = this;
@@ -118,7 +118,7 @@ class Select extends Statement {
   /**
    *
    * @param {...string|Raw} table
-   * @return {Select}
+   * @return {SelectStatement}
    */
   from(...table) {
     this.clearFrom();
@@ -133,7 +133,7 @@ class Select extends Statement {
   /**
    *
    * @param {...Join} join
-   * @return {Select}
+   * @return {SelectStatement}
    */
   join(...join) {
     for (const arg of join) {
@@ -149,7 +149,7 @@ class Select extends Statement {
   /**
    *
    * @param {*} conditions...
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   where(...conditions) {
@@ -160,7 +160,7 @@ class Select extends Statement {
   /**
    *
    * @param {...Raw|String} field
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   groupBy(...field) {
@@ -175,7 +175,7 @@ class Select extends Statement {
   /**
    *
    * @param {...Raw|String} field
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   orderBy(...field) {
@@ -190,7 +190,7 @@ class Select extends Statement {
   /**
    *
    * @param {string} alias
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   as(alias) {
@@ -201,7 +201,7 @@ class Select extends Statement {
   /**
    *
    * @param {int} limit
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   limit(limit) {
@@ -212,7 +212,7 @@ class Select extends Statement {
   /**
    *
    * @param {int} offset
-   * @return {Select}
+   * @return {SelectStatement}
    * @public
    */
   offset(offset) {
@@ -222,4 +222,4 @@ class Select extends Statement {
 
 }
 
-module.exports = Select;
+module.exports = SelectStatement;

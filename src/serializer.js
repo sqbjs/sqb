@@ -137,7 +137,7 @@ class Serializer {
   /**
    * Serialize Select statement
    *
-   * @param {Select} obj Select statement object
+   * @param {SelectStatement} obj Select statement object
    * @return {String}
    * @protected
    */
@@ -193,7 +193,7 @@ class Serializer {
   /**
    * Serialize Insert statement
    *
-   * @param {Insert} obj Select statement object
+   * @param {InsertStatement} obj Insert statement object
    * @return {string}
    * @protected
    */
@@ -242,9 +242,9 @@ class Serializer {
   }
 
   /**
-   * Serialize Update statement
+   * Serialize UpdateStatement statement
    *
-   * @param {Update} obj Update statement object
+   * @param {UpdateStatement} obj Update statement object
    * @return {string}
    * @protected
    */
@@ -290,7 +290,7 @@ class Serializer {
   /**
    * Serialize Delete statement
    *
-   * @param {Delete} obj Delete statement object
+   * @param {DeleteStatement} obj Delete statement object
    * @return {string}
    * @protected
    */
