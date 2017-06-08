@@ -77,10 +77,8 @@ Object.assign(sqbexport, {
     promisify.Promise = value || Promise;
   },
 
-  Helpers: {
-    flattenText,
-    promisify
-  }
+  flattenText,
+  promisify
 
 });
 
