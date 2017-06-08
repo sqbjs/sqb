@@ -9,7 +9,7 @@
 /* Internal module dependencies. */
 const SqlObject = require('../sqlobjects/sqlobject');
 const Serializer = require('../serializer');
-const Promisify = require('../helpers/promisify');
+const promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
 const assert = require('assert');
@@ -71,7 +71,7 @@ class Statement extends SqlObject {
     }
     const self = this;
 
-    const promise = Promisify.fromCallback(cb => {
+    const promise = promisify(cb => {
       self.execute(options, cb);
     });
     return callback ? promise.then(callback) : promise;

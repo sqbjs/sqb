@@ -6,24 +6,20 @@
  https://panates.github.io/sqb/
  */
 
-const Promisify = {
+function promisify(resolver) {
+  return new promisify.Promise((resolve, reject) => {
+    try {
+      resolver((error, value) => {
+        if (error)
+          reject(error);
+        else resolve(value);
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
 
-  fromCallback: function(resolver) {
-    return new Promisify.Promise((resolve, reject) => {
-      try {
-        resolver((error, value) => {
-          if (error)
-            reject(error);
-          else resolve(value);
-        });
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
+promisify.Promise = Promise;
 
-};
-
-Promisify.Promise = Promise;
-
-module.exports = Promisify;
+module.exports = promisify;

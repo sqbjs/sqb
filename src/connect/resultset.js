@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const Promisify = require('../helpers/promisify');
+const promisify = require('../helpers/promisify');
 const {SimpleResultCache} = require('./resultcache');
 
 /* External module dependencies. */
@@ -44,7 +44,7 @@ class ResultSet {
     return !!this._eof;
   }
 
-  get rowNum() {
+  get row() {
     return this._rownum || 0;
   }
 
@@ -83,7 +83,7 @@ class ResultSet {
    * @public
    */
   first(callback) {
-    assert(this.bidirectional, 'Moving cursor backward supported in bidirectional mode only');
+    assert(this.bidirectional, 'Moving backward supported in bidirectional mode only');
     const self = this;
 
     function doFirst(cb) {
@@ -93,7 +93,7 @@ class ResultSet {
 
     if (callback)
       doFirst(callback);
-    else return Promisify.fromCallback(doFirst);
+    else return promisify(doFirst);
   }
 
   next(nRows, callback) {
@@ -102,54 +102,81 @@ class ResultSet {
       callback = nRows;
       nRows = undefined;
     }
-    nRows = nRows === undefined ? 1 : nRows;
-    return this.fetch(this._rownum + nRows, undefined, callback);
+    return this._fetch(this._rownum || 1, (nRows || 1), nRows > 0, callback);
   }
 
   prior(nRows, callback) {
-
+    assert(this.bidirectional, 'Moving backward supported in bidirectional mode only. Enable bidirectional or caching');
     if (typeof nRows === 'function') {
       callback = nRows;
       nRows = undefined;
     }
-    nRows = nRows === undefined ? 1 : nRows;
-    return this.fetch(this._rownum - nRows, undefined, callback);
+    return this._fetch(this._rownum || 1, -(nRows || 1), nRows > 0, callback);
   }
 
   fetch(numStart, numRows, callback) {
+    return this._fetch(numStart, numRows || 1, true, callback);
+  }
+
+  /**
+   *
+   * @param {int} numStart
+   * @param {int} numRows
+   * @param {boolean} arrayResult
+   * @param {Function} callback
+   * @return {Promise|undefined}
+   * @private
+   */
+  _fetch(numStart, numRows, arrayResult, callback) {
     assert(numStart > 0, 'Invalid argument');
 
-    if (typeof numRows === 'function') {
-      callback = numRows;
-      numRows = numStart;
-      numStart = 1;
-    }
     const self = this;
-    const arrayResult = numRows !== undefined;
-    numRows = numRows || 1;
+    let fetchedRows = 0;
+    let first;
+    let last;
+    if (numRows >= 0) {
+      first = numStart;
+      last = numStart + numRows - 1;
+    } else {
+      first = numStart + numRows;
+      last = first - numRows - 1;
+    }
+
+    function more() {
+      if (numRows > 0 && self.eof) return;
+      /* If move direction is forward */
+      if (numRows > 0) {
+        /* If there is no more rows, we exit */
+        if (self.eof) return;
+        first += fetchedRows;
+        last += fetchedRows;
+      } else {
+        first = Math.max(first - fetchedRows, 0);
+        last = Math.max(last - fetchedRows, 0);
+        /* If we reached to first column we exit; */
+        if (last <= 0) return;
+      }
+      if (callback)
+        setImmediate(() => doFetch(callback)); // !We use setImmediate to prevent recursive calls in js stack
+      else return promisify(doFetch);
+    }
 
     function doFetch(cb) {
-      self._fetchRows(numStart, numRows, (err, rows) => {
+      self._fetchRows(first, last - first + 1, (err, rows) => {
         if (err)
           cb(err);
         else {
-          if (arrayResult) {
-            cb(undefined, rows);
-            self._rownum =
-                Math.min(self._fetchedRows, numStart - 1) + rows.length;
-          } else {
+          fetchedRows = rows.length;
+          if (!arrayResult)
             rows = (rows.length ? rows[0] : undefined);
-            self._rownum =
-                Math.min(self._fetchedRows, numStart - 1) + (rows ? 1 : 0);
-            cb(undefined, rows);
-          }
+          self._rownum =
+              numRows > 0 ? first + fetchedRows : first - fetchedRows;
+          cb(undefined, rows, more);
         }
       });
     }
 
-    if (callback)
-      doFetch(callback);
-    else return Promisify.fromCallback(doFetch);
+    return more();
   }
 
   /*
@@ -224,7 +251,6 @@ class ResultSet {
 
     const fetchedRows = self._fetchedRows;
     const rowsToReadCache = Math.min(numRows, fetchedRows - rowStart + 1);
-
     if (rowsToReadCache > 0 && self._cache) {
       self._fetchCachedRows(rowStart, rowsToReadCache, (err, rows) => {
         if (err) {

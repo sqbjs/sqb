@@ -8,10 +8,10 @@
 
 /* Internal module dependencies. */
 const SqlObject = require('./sqlobjects/sqlobject');
-const Select = require('./statements/select');
-const Insert = require('./statements/insert');
-const Update = require('./statements/update');
-const Delete = require('./statements/delete');
+const SelectStatement = require('./statements/select');
+const InsertStatement = require('./statements/insert');
+const UpdateStatement = require('./statements/update');
+const DeleteStatement = require('./statements/delete');
 const Raw = require('./sqlobjects/raw');
 const Column = require('./sqlobjects/column');
 const Join = require('./sqlobjects/join');
@@ -25,12 +25,12 @@ const MetaData = require('./connect/metadata');
 const ResultSet = require('./connect/resultset');
 const {ResultCache} = require('./connect/resultcache');
 
-const sqlObjects = require('./helpers/sqbexport');
-const Promisify = require('./helpers/promisify');
-const paragraphOut = require('./helpers/paragraphout');
+const sqbexport = require('./helpers/sqbexport');
+const promisify = require('./helpers/promisify');
+const flattenText = require('./helpers/flattentext');
 
 //noinspection JSUnusedGlobalSymbols
-Object.assign(sqlObjects, {
+Object.assign(sqbexport, {
 
   Serializer,
   DbPool,
@@ -40,10 +40,10 @@ Object.assign(sqlObjects, {
   ResultCache,
 
   SqlObject,
-  Select,
-  Insert,
-  Update,
-  Delete,
+  SelectStatement,
+  InsertStatement,
+  UpdateStatement,
+  DeleteStatement,
   Raw,
   Column,
   Join,
@@ -60,8 +60,6 @@ Object.assign(sqlObjects, {
     return Serializer.create(config);
   },
 
-  paragraphOut,
-
   /**
    * Creates a new database pool
    * @param {Object} config
@@ -76,9 +74,14 @@ Object.assign(sqlObjects, {
    * @param {constructor} value
    */
   set promiseClass(value) {
-    Promisify.Promise = value || Promise;
+    promisify.Promise = value || Promise;
+  },
+
+  Helpers: {
+    flattenText,
+    promisify
   }
 
 });
 
-module.exports = sqlObjects;
+module.exports = sqbexport;

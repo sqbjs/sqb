@@ -6,7 +6,7 @@
  https://panates.github.io/sqb/
  */
 
-function paragraphOut(input, options) {
+function flattenText(input, options) {
   options = options || {};
   options.indent = options.indent || 2;
   let out = '';
@@ -68,4 +68,4 @@ function paragraphOut(input, options) {
   return out;
 }
 
-module.exports = paragraphOut;
+module.exports = flattenText;

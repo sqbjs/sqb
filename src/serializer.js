@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const paragraphOut = require('./helpers/paragraphout');
+const paragraphOut = require('./helpers/flattentext');
 
 /* External module dependencies. */
 const assert = require('assert');

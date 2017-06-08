@@ -7,7 +7,7 @@
  */
 
 /* Internal module dependencies. */
-const Promisify = require('../helpers/promisify');
+const promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');
@@ -162,7 +162,7 @@ class Connection extends EventEmitter {
 
     if (callback)
       doExecute(callback);
-    else return Promisify.fromCallback(doExecute);
+    else return promisify(doExecute);
   }
 
   /* Abstract members */

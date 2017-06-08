@@ -8,7 +8,7 @@
 
 /* Internal module dependencies. */
 const sqlObjects = require('../helpers/sqbexport');
-const Promisify = require('../helpers/promisify');
+const promisify = require('../helpers/promisify');
 
 /* External module dependencies. */
 const {EventEmitter} = require('events');
@@ -72,7 +72,7 @@ class DbPool extends EventEmitter {
 
     if (callback)
       doConnect(callback);
-    else return Promisify.fromCallback(doConnect);
+    else return promisify(doConnect);
 
   }
 
