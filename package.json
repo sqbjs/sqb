@@ -20,7 +20,9 @@
     "framework"
   ],
   "dependencies": {
-    "debug": "^2.6.8"
+    "debug": "^2.6.8",
+    "putil-flattentext": "^1.0.0",
+    "putil-promisify": "^1.0.2"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
