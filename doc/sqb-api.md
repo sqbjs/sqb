@@ -50,14 +50,23 @@
             * Methods
         * [DbPool class](#sqb-DbPool)
             :small_blue_diamond: constructor
+            
             :small_orange_diamond: dialect
-            :small_orange_diamond: config                
+            
+            :small_orange_diamond: config
+                            
             :small_red_triangle: connect()
+            
             :small_red_triangle: testConnection()
+            
             :small_red_triangle: meta()
+            
             :small_red_triangle_down: register()
+            
             :small_red_triangle_down: get()
+            
             :small_red_triangle_down: create()
+            
         * Connection class
             * Properties
             * Methods
