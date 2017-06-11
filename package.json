@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "debug": "^2.6.8",
-    "putil-flattentext": "^1.0.0",
+    "putil-flattentext": "^1.0.1",
     "putil-promisify": "^1.0.3"
   },
   "devDependencies": {
