@@ -45,6 +45,17 @@ describe('Serialize select statements', function() {
       done();
     });
 
+    it('should serialize select/from - test 4', function(done) {
+      let statement = sqb.select(['field1', 'field2', 'field3',
+        'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
+        'field10','']).from('table1', '').join(null).groupBy('').orderBy('');
+      let result = statement.build();
+      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, '+
+          'field6, field7, field8, field9, field10 from table1');
+      done();
+    });
+
+
     it('should validate field name', function(done) {
       let ok;
       try {
@@ -146,6 +157,18 @@ describe('Serialize select statements', function() {
           .join(sqb.fullOuterJoin('join1'));
       let result = statement.build();
       assert.equal(result.sql, 'select field1 from table1 full outer join join1');
+      done();
+    });
+
+    it('should serialize wrong Join', function(done) {
+      let ok;
+      try {
+        sqb.select('field1').from('table1')
+            .join(1);
+      } catch (e) {
+        ok = true;
+      }
+      assert.ok(ok);
       done();
     });
 
@@ -518,6 +541,33 @@ describe('Serialize select statements', function() {
             .where([sqb.select('ID').from('table1').as('t1'), 1]);
         let result = statement.build();
         assert.equal(result.sql, 'select * from table1 where (select ID from table1) = 1');
+        done();
+      });
+
+      it('should assign limit ', function(done) {
+        let statement = sqb.select()
+            .from('table1')
+            .where([sqb.select('ID').from('table1').as('t1'), 1]).limit(5);
+        assert.equal(statement._limit, 5);
+        done();
+      });
+
+      it('should assign offset ', function(done) {
+        let statement = sqb.select()
+            .from('table1')
+            .where([sqb.select('ID').from('table1').as('t1'), 1]).offset(5);
+        assert.equal(statement._offset, 5);
+        done();
+      });
+
+      it('should assign on Fetch Row', function(done) {
+        let statement = sqb.select()
+            .from('table1')
+            .where([sqb.select('ID').from('table1').as('t1'), 1]).onFetchRow(
+                function (){
+                }
+            );
+        assert.ok(typeof statement._onfetchrow === 'function');
         done();
       });
 
