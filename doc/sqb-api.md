@@ -1,7 +1,7 @@
 1. [Introduction](#introduction)
     * [Installation](#installation)
-1. [Coding SQL statements with SQB](#coding)     
-    * Select statement
+1. [Coding SQL statements with SQB](#2-coding-sql-statements-with-sqb)     
+    * [Select statement](#21-select-statement)
     * Insert statement
     * Update statement
     * Delete statement
@@ -65,11 +65,11 @@
             * Properties
             * Methods
 
-# <a name="introduction"></a> 1. Introduction
+# Introduction
 
-# <a name="coding"></a> 2. Coding SQL statements with SQB
+# 2. Coding SQL statements with SQB
 
-## <a name="coding"></a> 2.1 Select statement
+## 2.1 Select statement
 
 *Usage*
 
