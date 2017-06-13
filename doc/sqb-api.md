@@ -1,5 +1,5 @@
-1. [Introduction](#introduction)
-    * [Installation](#installation)
+1. [Introduction](#1-introduction)
+    * [Installation](#11-installation)
 1. [Coding SQL statements with SQB](#2-coding-sql-statements-with-sqb)     
     * [Select statement](#21-select-statement)
     * Insert statement
@@ -65,7 +65,12 @@
             * Properties
             * Methods
 
-# Introduction
+# 1. Introduction
+
+## 1.1 Installation
+`
+npm install sqb --save
+`
 
 # 2. Coding SQL statements with SQB
 
