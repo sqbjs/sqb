@@ -1,23 +1,18 @@
 1. [Introduction](#introduction)
     * [Installation](#installation)
-1. [Serializing SQL statements](#serializing)
-    * Defining SQL statements
-        * *Select* statement
-        * *Insert* statement
-        * *Update* statement
-        * *Delete* statement
-        * *Raw*
-        * *Join*'s
-        * *Conditions*
-        * *Case/when*
-    * Serializing statements to SQL string
-        * Choosing dialect
-        * Pretty printing
-        * Names vs Indexed params
-    * Serializer class
-        * Properties
-        * Methods
-        * Static Methods
+1. [Coding SQL statements with SQB](#coding)     
+    * Select statement
+    * Insert statement
+    * Update statement
+    * Delete statement
+    * Join expressions
+    * SQL Conditions
+    * Raw expressions
+    * Case/when expressions
+1. [Serializing statements to SQL string](#serializing)
+    * Choosing dialect
+    * Pretty printing
+    * Names vs Indexed params
 1. Connecting and working with Databases
     * Bridging with database drivers
     * Configuring connection pool
@@ -72,7 +67,35 @@
 
 # <a name="introduction"></a> 1. Introduction
 
-# <a name="serializing"></a> 2. Serializing SQL statements
+# <a name="coding"></a> 2. Coding SQL statements with SQB
+
+## <a name="coding"></a> 2.1 Select statement
+
+*Usage*
+
+```js
+  sqb.select(...columns)
+     .from(...tables)
+     .join(...joins)
+     .where(...conditions)
+     .groupBy(...groups)
+     .orderBy(...orders)
+```
+
+**columns**: Array of column expressions. String representation of column name and alias, Raw strings, case/when expressions and Sub selects are accepted.
+
+  ```js
+    sqb.select(
+        'field1',               // Column name
+        'field2 as alias2',     // Column name with alias
+        'field3 alias3',        // Column name with alias
+        'table1.field4 alias4', // Table and Column name with alias
+        sqb.raw('func(1) alias5'),      // Raw expressions
+        sqb.case().when('field1', 5).then().as('alias6'),  // Case/when expression with alias
+        sqb.select('a1').from('table2').as('alias7')       // sub select with alias
+        )
+       .from()       
+```
 
 # <a name="connecting"></a> 3. Connecting and working with Databases
 
