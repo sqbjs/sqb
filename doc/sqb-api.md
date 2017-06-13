@@ -82,7 +82,7 @@
      .orderBy(...orders)
 ```
 
-**columns**: Array of column expressions. String representation of column name and alias, Raw strings, case/when expressions and Sub selects are accepted.
+**columns**: Array of columns. String representation of column names, raw strings, case/when expressions and sub-selects are accepted.
 
   ```js
     sqb.select(
