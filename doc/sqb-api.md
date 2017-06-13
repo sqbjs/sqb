@@ -49,7 +49,6 @@
             * Properties
             * Methods
         * [DbPool class](#sqb-DbPool)
-            * constructor
             * Properties
                 * dialect
                 * config                
