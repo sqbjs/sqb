@@ -12,7 +12,7 @@
 1. [Serializing statements to SQL string](#serializing)
     * Choosing dialect
     * Pretty printing
-    * Names vs Indexed params
+    * Named vs Indexed params
 1. Connecting and working with Databases
     * Bridging with database drivers
     * Configuring connection pool
@@ -87,7 +87,8 @@ npm install sqb --save
      .orderBy(...orders)
 ```
 
-**columns**: Array of columns. String representation of column names, raw strings, case/when expressions and sub-selects are accepted.
+**columns** [String|Raw|Case|SelectStatement] :  
+Array of columns. String representation of column names, raw strings, case/when expressions and sub-selects are accepted.
 
   ```js
     sqb.select(
@@ -101,6 +102,9 @@ npm install sqb --save
         )
        .from()       
 ```
+
+**tables** [String|Raw|SelectStatement] :  
+Array of tables. String representation of table/view names, raw strings and sub-selects are accepted.  
 
 # <a name="connecting"></a> 3. Connecting and working with Databases
 
