@@ -25,7 +25,7 @@ describe('Serialize select statements', function() {
           'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
           'field10').from('table1');
       let result = statement.build();
-      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, '+
+      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, ' +
           'field6, field7, field8, field9, field10 from table1');
       done();
     });
@@ -48,13 +48,12 @@ describe('Serialize select statements', function() {
     it('should serialize select/from - test 4', function(done) {
       let statement = sqb.select(['field1', 'field2', 'field3',
         'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
-        'field10','']).from('table1', '').join(null).groupBy('').orderBy('');
+        'field10', '']).from('table1', '').join(null).groupBy('').orderBy('');
       let result = statement.build();
-      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, '+
+      assert.equal(result.sql, 'select field1, field2, field3, field4, field5, ' +
           'field6, field7, field8, field9, field10 from table1');
       done();
     });
-
 
     it('should validate field name', function(done) {
       let ok;
@@ -564,10 +563,10 @@ describe('Serialize select statements', function() {
         let statement = sqb.select()
             .from('table1')
             .where([sqb.select('ID').from('table1').as('t1'), 1]).onFetchRow(
-                function (){
+                function() {
                 }
             );
-        assert.ok(typeof statement._onfetchrow === 'function');
+        assert.ok(statement._onfetchrow && statement._onfetchrow.length > 0);
         done();
       });
 

@@ -22,7 +22,8 @@
   "dependencies": {
     "debug": "^2.6.8",
     "putil-flattentext": "^1.0.1",
-    "putil-promisify": "^1.0.3"
+    "putil-promisify": "^1.0.3",
+    "putil-taskqueue": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
