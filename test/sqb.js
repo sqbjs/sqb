@@ -25,7 +25,7 @@ describe('Initialize sql objects', function() {
 
   it('should initialize "select"', function(done) {
     let obj = sqb.select('id');
-    assert.ok(obj instanceof sqb.Select);
+    assert.ok(obj instanceof sqb.SelectStatement);
     assert.equal(obj.type, 'select');
     done();
   });

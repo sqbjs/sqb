@@ -1,14 +1,14 @@
 {
   "name": "sqb",
   "description": "Plugin-driven, multi-dialect SQL query builder and Database connection framework for JavaScript",
-  "version": "0.4.0",
+  "version": "0.4.11",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],
   "license": "MIT",
   "repository": "panates/sqb",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "keywords": [
     "javascript",
     "sql",
@@ -20,7 +20,10 @@
     "framework"
   ],
   "dependencies": {
-    "debug": "^2.6.8"
+    "debug": "^2.6.8",
+    "putil-flattentext": "^1.0.1",
+    "putil-promisify": "^1.0.3",
+    "putil-taskqueue": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
@@ -32,10 +35,13 @@
   "engines": {
     "node": ">= 6.0"
   },
+  "directories": {
+    "lib": "./lib"
+  },
   "files": [
     "LICENSE",
     "README.md",
-    "src/"
+    "lib/"
   ],
   "scripts": {
     "test": "mocha --require test/support/env --reporter spec --bail --check-leaks test/",

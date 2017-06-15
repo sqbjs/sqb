@@ -15,6 +15,16 @@ describe('Serialize update statements', function() {
     done();
   });
 
+  it('should serialize formal update statement without where clause', function(done) {
+    let statement = sqb.update('table1').set({
+      name: 'name',
+      address: 'earth'
+    }).where();
+    let result = statement.build();
+    assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\'');
+    done();
+  });
+
   it('should serialize params', function(done) {
     let statement = sqb.update('table1').set({
       name: /name/,
