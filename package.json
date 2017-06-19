@@ -23,11 +23,11 @@
     "debug": "^2.6.8",
     "putil-flattentext": "^1.0.1",
     "putil-promisify": "^1.0.3",
-    "putil-taskqueue": "^1.0.0"
+    "putil-taskqueue": "^1.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^3.19.0",
+    "eslint": "^4.0.0",
     "eslint-config-google": "^0.8.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2"

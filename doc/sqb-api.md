@@ -115,7 +115,7 @@ Array of tables. String representation of table/view names, raw strings and sub-
 ## <a name="sqb-methods"></a>4.2 Methods
 
 ### <a name="sqb-serializer"></a> .serializer()
-Creates and initializes new Serializer class for desired dialect.
+Creates and initializes new Serializer object for desired dialect.
 
 *Note: No dialects included in SQB package by default. Before using any dialect, be sure you have loaded its serialization plugin.*
 
