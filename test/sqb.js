@@ -2,7 +2,7 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('Initialize sql objects', function() {
+describe('Initialize sql objects sqb.js', function() {
 
   it('should create serializer', function(done) {
     let obj = sqb.serializer();
@@ -55,6 +55,17 @@ describe('Initialize sql objects', function() {
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.innerJoin, obj.joinType);
+    done();
+  });
+
+  it('should initialize undefined "join"', function(done) {
+    let ok;
+    try {
+      let obj = sqb.join(new sqb.Join(8));
+    } catch(e) {
+      ok = true;
+    }
+    assert.ok(ok);
     done();
   });
 
