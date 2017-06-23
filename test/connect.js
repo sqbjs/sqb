@@ -25,7 +25,6 @@ describe('Connect', function() {
     });
 
     it('should create db pool', function(done) {
-
       db = sqb.pool({
         dialect: 'testdb',
         user: 'user',

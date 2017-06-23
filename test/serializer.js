@@ -68,6 +68,22 @@ describe('Serializer', function() {
     done();
   });
 
+  it('Should pretty print - test4', function(done) {
+    let statement = sqb.select('field1', sqb.select('field2').from('table2'))
+        .from('table1')
+        .where(
+            ['field1', 1]
+        )
+        .orderBy('ID');
+    let result = statement.build({
+      prettyPrint: true
+    });
+    assert.equal(result.sql,
+        'select field1, (select field2 from table2) from table1 where field1 = 1\n' +
+        'order by ID');
+    done();
+  });
+
   it('Should serialize indexed params', function(done) {
     let statement = sqb.select().from('table1').where(['ID', /ID/]);
     let result = statement.build({

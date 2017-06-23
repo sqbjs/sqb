@@ -2,7 +2,7 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('Serialize select statements', function() {
+describe('Serialize select statements -- serialize-select.js', function() {
 
   describe('Serialize "select/from" part', function() {
 
@@ -229,6 +229,21 @@ describe('Serialize select statements', function() {
       done();
     });
 
+    it('should serialize without condition in "when"', function(done) {
+      let ok;
+      try {
+        let statement = sqb.select(
+            sqb.case().when().then(1).else(100)
+        ).from('table1');
+      } catch (e) {
+        ok = 1;
+      }
+      ;
+
+      assert.ok(ok);
+      done();
+    });
+
     it('should serialize group of conditions in "when"', function(done) {
       let statement = sqb.select(
           sqb.case().when(['col1', 5], 'or', ['col2', 4]).then(1).else(100)
@@ -339,12 +354,34 @@ describe('Serialize select statements', function() {
         done();
       });
 
+      it('should serialize wrong operator', function(done) {
+        let ok;
+        try {
+          let statement = sqb.select()
+              .from('table1')
+              .where(['NAME', '>>', '%abc%']);
+        } catch (e) {
+          ok = 1;
+        }
+        assert.ok(ok);
+        done();
+      });
+
       it('should serialize "between" operator', function(done) {
         let statement = sqb.select()
             .from('table1')
             .where(['id', 'between', [1, 4]]);
         let result = statement.build();
         assert.equal(result.sql, 'select * from table1 where id between 1 and 4');
+        done();
+      });
+
+      it('should serialize "between" operator test2', function(done) {
+        let statement = sqb.select()
+            .from('table1')
+            .where(['id', 'between', 1]);
+        let result = statement.build();
+        assert.equal(result.sql, 'select * from table1 where id between 1 and 1');
         done();
       });
 
@@ -359,17 +396,80 @@ describe('Serialize select statements', function() {
         done();
       });
 
-      it('should serialize raw in "where"', function(done) {
+      it('should serialize wrong sub group', function(done) {
+        let ok;
+        try {
+          let statement = sqb.select().from('table1').where(['ID', 'is', null],
+              [
+                [2, 1], 'orr', [2, 2]
+              ]
+          );
+        } catch (e) {
+          ok = 1;
+        }
+        assert.ok(ok);
+        done();
+      });
+
+      it('should serialize raw in where test1', function(done) {
+        let statement = sqb.select().from('table1').where(sqb.raw('id = 1'));
+        let result = statement.build();
+        assert.equal(result.sql, 'select * from table1 where id = 1');
+        done();
+      });
+
+      it('should serialize raw in "where" test2', function(done) {
         let statement = sqb.select().from('table1').where([[sqb.raw('ID')]]);
         let result = statement.build();
         assert.equal(result.sql, 'select * from table1 where (ID = null)');
         done();
       });
 
-      it('should use double quotes for reserved words', function(done) {
+      it('should use double quotes for reserved words test1', function(done) {
         let statement = sqb.select().from('table1').where(['select', 1]);
         let result = statement.build();
         assert.equal(result.sql, 'select * from table1 where "select" = 1');
+        done();
+      });
+
+      it('should serialize raw', function(done) {
+        let statement = sqb.select('field1', sqb.raw('')).from('table1');
+        let result = statement.build();
+        assert.equal(result.sql, 'select field1 from table1');
+        done();
+      });
+
+      it('should set reserved words', function(done) {
+        let xx = new sqb.serializer();
+        xx.reservedWords = xx.reservedWords + 'newword';
+        done();
+      });
+
+      it('should set strict Params', function(done) {
+        let xx = new sqb.serializer();
+        xx.strictParams = 'newword';
+        done();
+      });
+
+      it('should get dialect', function(done) {
+        require('./support/test_dialect');
+        let xx = new sqb.serializer(
+            {
+              dialect: 'testdialect'
+            }
+        );
+        assert.equal(xx.dialect, 'testdialect');
+        done();
+      });
+
+      it('should get prmGen', function(done) {
+        //require('./support/test_dialect');
+        let xx = new sqb.serializer(
+            {
+              prmGen: 1
+            }
+        );
+        assert.equal(xx.prmGen, 'generated_parameter_1');
         done();
       });
 
