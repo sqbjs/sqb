@@ -16,9 +16,9 @@ Summary
 * [Join expressions](sql-statements/join.md)
 * [Case/When expressions](sql-statements/casewhen.md)
 
-## Using as a serializer
+## Serializer
 
-## Using as DB framework
+## Connection wrapper
 
 * Connecting database servers
 * Executing statements
