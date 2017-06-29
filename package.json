@@ -21,13 +21,14 @@
   ],
   "dependencies": {
     "debug": "^2.6.8",
+    "gitbook-plugin-theme-api": "^1.1.2",
     "putil-flattentext": "^1.0.1",
     "putil-promisify": "^1.0.3",
     "putil-taskqueue": "^1.0.3"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.0.0",
+    "eslint": "^4.1.1",
     "eslint-config-google": "^0.8.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.4.2"
@@ -46,6 +47,9 @@
   "scripts": {
     "test": "mocha --require test/support/env --reporter spec --bail --check-leaks test/",
     "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --require test/support/env --reporter dot --check-leaks test/",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require test/support/env --reporter spec --check-leaks test/"
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --require test/support/env --reporter spec --check-leaks test/",
+    "gitbook:update": "gitbook install",
+    "gitbook:watch": "npm run gitbook:prepare && gitbook serve",
+    "gitbook:build": "rm -rf _book && gitbook build book docs"
   }
 }
