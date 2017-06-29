@@ -7,6 +7,14 @@ Summary
 * [Installation](README.md)
 
 ## Creating SQL Statements
+* [Select statement](sql-statements/select.md)
+* [Insert statement](sql-statements/insert.md)
+* [Update statement](sql-statements/update.md)
+* [Delete statement](sql-statements/delete.md)
+* [Raw expressions](sql-statements/raw.md)
+* [Join expressions](sql-statements/join.md)
+* [Conditions](sql-statements/conditions.md)
+* [Case/When expressions](sql-statements/casewhen.md)
 
 ## Using as a serializer
 

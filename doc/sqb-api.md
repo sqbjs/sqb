@@ -468,7 +468,7 @@ Array using for grouping. String using for use logical operator.
 
 ## <a name="sqb-methods"></a>5.2 Methods
 
-### <a name="sqb-serializer"></a> .serializer()
+### .serializer()
 Creates and initializes new Serializer object for desired dialect.
 
 *Note: No dialects included in SQB package by default. Before using any dialect, be sure you have loaded its serialization plugin.*
