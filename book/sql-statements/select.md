@@ -21,11 +21,11 @@ Array of column names, raw expressions, case/when expressions and sub-selects.
 
 ```js
     sqb.select(
-        'field1',               // Column name
-        'field2 as alias2',     // Column name with alias
-        'field3 alias3',        // Column name with alias
-        'table1.field4 alias4', // Table and Column name with alias
-        sqb.raw('func(1) alias5'),      // Raw expression
+        'field1',                   // Column name
+        'field2 as alias2',         // Column name with alias
+        'field3 alias3',            // Column name with alias
+        'table1.field4 alias4',     // Table and Column name with alias
+        sqb.raw('func(1) alias5'),  // Raw expression
         sqb.case().when('field1', 5).then().as('alias6'),  // Case/when expression with alias
         sqb.select('a1').from('table2').as('alias7')       // sub select with alias
         )
@@ -55,9 +55,9 @@ Defines "join" part of select query.
 Array of join expressions. Look at detailed use of [Join expressions](sql-statements/join.md)
 ```js
   .join(
-        sqb.join('table1 t1').on(['t1.table2_id', raw('t2.id')]),   // join default inner join
+        sqb.join('table1 t1').on(['t1.table2_id', raw('t2.id')]),      // join default inner join
         sqb.join('table2 as alias2').on(['field3','=',raw('field4')]), // Table name with alias
-        sqb.join('table3').on('field1',raw('field2')) // Raw expression
+        sqb.join('table3').on('field1',raw('field2'))                  // Raw expression
         
         )
 ```
@@ -75,7 +75,8 @@ Array of column names.
  
 ```js
    .groupBy(
-        "field1"   // Column name
+        "field1",     // Column name
+        "t1.field2",  // Column name with table name
            )
 ```
 
@@ -87,9 +88,9 @@ Array of column names following sort direction keywords optionally.
 
 ```js
    .orderBy(
-        "field1",   // Column name
+        "field1",        // Column name
         "table2.field2", // Table name and field name
-        "field3 asc",  // asc meaning order by ascending
-        "field4 desc" // desc meaning order by descending
+        "field3 asc",    // asc meaning order by ascending
+        "field4 desc"    // desc meaning order by descending
         )
 ```

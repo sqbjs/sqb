@@ -429,11 +429,11 @@
 </code></pre>
 <p><strong>.select(...<em>column</em>)</strong><br>Starts a select query.<br><em>colums</em> [String|Raw|Case|SelectStatement] :<br>Array of column names, raw expressions, case/when expressions and sub-selects.</p>
 <pre><code class="lang-js">    sqb.select(
-        <span class="hljs-string">&apos;field1&apos;</span>,               <span class="hljs-comment">// Column name</span>
-        <span class="hljs-string">&apos;field2 as alias2&apos;</span>,     <span class="hljs-comment">// Column name with alias</span>
-        <span class="hljs-string">&apos;field3 alias3&apos;</span>,        <span class="hljs-comment">// Column name with alias</span>
-        <span class="hljs-string">&apos;table1.field4 alias4&apos;</span>, <span class="hljs-comment">// Table and Column name with alias</span>
-        sqb.raw(<span class="hljs-string">&apos;func(1) alias5&apos;</span>),      <span class="hljs-comment">// Raw expression</span>
+        <span class="hljs-string">&apos;field1&apos;</span>,                   <span class="hljs-comment">// Column name</span>
+        <span class="hljs-string">&apos;field2 as alias2&apos;</span>,         <span class="hljs-comment">// Column name with alias</span>
+        <span class="hljs-string">&apos;field3 alias3&apos;</span>,            <span class="hljs-comment">// Column name with alias</span>
+        <span class="hljs-string">&apos;table1.field4 alias4&apos;</span>,     <span class="hljs-comment">// Table and Column name with alias</span>
+        sqb.raw(<span class="hljs-string">&apos;func(1) alias5&apos;</span>),  <span class="hljs-comment">// Raw expression</span>
         sqb.case().when(<span class="hljs-string">&apos;field1&apos;</span>, <span class="hljs-number">5</span>).then().as(<span class="hljs-string">&apos;alias6&apos;</span>),  <span class="hljs-comment">// Case/when expression with alias</span>
         sqb.select(<span class="hljs-string">&apos;a1&apos;</span>).from(<span class="hljs-string">&apos;table2&apos;</span>).as(<span class="hljs-string">&apos;alias7&apos;</span>)       <span class="hljs-comment">// sub select with alias</span>
         )
@@ -452,9 +452,9 @@
 <p><strong>.join(...<em>join</em>)</strong><br>Defines &quot;join&quot; part of select query.
 <em>joins</em> [Join]<br>Array of join expressions. Look at detailed use of <a href="sql-statements/join.md">Join expressions</a></p>
 <pre><code class="lang-js">  .join(
-        sqb.join(<span class="hljs-string">&apos;table1 t1&apos;</span>).on([<span class="hljs-string">&apos;t1.table2_id&apos;</span>, raw(<span class="hljs-string">&apos;t2.id&apos;</span>)]),   <span class="hljs-comment">// join default inner join</span>
+        sqb.join(<span class="hljs-string">&apos;table1 t1&apos;</span>).on([<span class="hljs-string">&apos;t1.table2_id&apos;</span>, raw(<span class="hljs-string">&apos;t2.id&apos;</span>)]),      <span class="hljs-comment">// join default inner join</span>
         sqb.join(<span class="hljs-string">&apos;table2 as alias2&apos;</span>).on([<span class="hljs-string">&apos;field3&apos;</span>,<span class="hljs-string">&apos;=&apos;</span>,raw(<span class="hljs-string">&apos;field4&apos;</span>)]), <span class="hljs-comment">// Table name with alias</span>
-        sqb.join(<span class="hljs-string">&apos;table3&apos;</span>).on(<span class="hljs-string">&apos;field1&apos;</span>,raw(<span class="hljs-string">&apos;field2&apos;</span>)) <span class="hljs-comment">// Raw expression</span>
+        sqb.join(<span class="hljs-string">&apos;table3&apos;</span>).on(<span class="hljs-string">&apos;field1&apos;</span>,raw(<span class="hljs-string">&apos;field2&apos;</span>))                  <span class="hljs-comment">// Raw expression</span>
 
         )
 </code></pre>
@@ -463,16 +463,17 @@ in <code>.where()</code> method is passed to inner Condition Group. So same rule
 <p><strong>.groupBy(...<em>column</em>)</strong><br>Defines &quot;group by&quot; part of select query.<br><strong>column</strong> [String] 
 Array of column names.</p>
 <pre><code class="lang-js">   .groupBy(
-        <span class="hljs-string">&quot;field1&quot;</span>   <span class="hljs-comment">// Column name</span>
+        <span class="hljs-string">&quot;field1&quot;</span>,     <span class="hljs-comment">// Column name</span>
+        <span class="hljs-string">&quot;t1.field2&quot;</span>,  <span class="hljs-comment">// Column name with table name</span>
            )
 </code></pre>
 <p><strong>.orderBy(...<em>column</em>)</strong><br>Defines &quot;order by&quot; part of select query.<br><strong>column</strong> [String] 
 Array of column names following sort direction keywords optionally.</p>
 <pre><code class="lang-js">   .orderBy(
-        <span class="hljs-string">&quot;field1&quot;</span>,   <span class="hljs-comment">// Column name</span>
+        <span class="hljs-string">&quot;field1&quot;</span>,        <span class="hljs-comment">// Column name</span>
         <span class="hljs-string">&quot;table2.field2&quot;</span>, <span class="hljs-comment">// Table name and field name</span>
-        <span class="hljs-string">&quot;field3 asc&quot;</span>,  <span class="hljs-comment">// asc meaning order by ascending</span>
-        <span class="hljs-string">&quot;field4 desc&quot;</span> <span class="hljs-comment">// desc meaning order by descending</span>
+        <span class="hljs-string">&quot;field3 asc&quot;</span>,    <span class="hljs-comment">// asc meaning order by ascending</span>
+        <span class="hljs-string">&quot;field4 desc&quot;</span>    <span class="hljs-comment">// desc meaning order by descending</span>
         )
 </code></pre>
 
@@ -518,7 +519,7 @@ Array of column names following sort direction keywords optionally.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Creating \"select\" queries","level":"2.1","depth":1,"next":{"title":"Creating \"insert\" queries","level":"2.2","depth":1,"path":"sql-statements/insert.md","ref":"sql-statements/insert.md","articles":[]},"previous":{"title":"Installation","level":"1.2","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"sql-statements/select.md","mtime":"2017-06-29T12:44:20.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-06-29T12:44:42.672Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Creating \"select\" queries","level":"2.1","depth":1,"next":{"title":"Creating \"insert\" queries","level":"2.2","depth":1,"path":"sql-statements/insert.md","ref":"sql-statements/insert.md","articles":[]},"previous":{"title":"Installation","level":"1.2","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"sql-statements/select.md","mtime":"2017-06-29T12:56:58.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-06-29T12:57:16.337Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
