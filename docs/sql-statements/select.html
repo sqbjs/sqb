@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>Select statement · GitBook</title>
+        <title>Creating "select" queries · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.2">
@@ -120,7 +120,7 @@
 
     
         
-        <li class="header">Creating SQL Statements</li>
+        <li class="header">SQL Query Builder</li>
         
         
     
@@ -129,7 +129,7 @@
                 <a href="select.html">
             
                     
-                    Select statement
+                    Creating "select" queries
             
                 </a>
             
@@ -142,7 +142,7 @@
                 <a href="insert.html">
             
                     
-                    Insert statement
+                    Creating "insert" queries
             
                 </a>
             
@@ -155,7 +155,7 @@
                 <a href="update.html">
             
                     
-                    Update statement
+                    Creating "update" queries
             
                 </a>
             
@@ -168,7 +168,7 @@
                 <a href="delete.html">
             
                     
-                    Delete statement
+                    Creating "delete" queries
             
                 </a>
             
@@ -176,7 +176,20 @@
             
         </li>
     
-        <li class="chapter " data-level="2.5" data-path="raw.html">
+        <li class="chapter " data-level="2.5" data-path="conditions.html">
+            
+                <a href="conditions.html">
+            
+                    
+                    Defining Conditions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="2.6" data-path="raw.html">
             
                 <a href="raw.html">
             
@@ -189,25 +202,12 @@
             
         </li>
     
-        <li class="chapter " data-level="2.6" data-path="join.html">
+        <li class="chapter " data-level="2.7" data-path="join.html">
             
                 <a href="join.html">
             
                     
                     Join expressions
-            
-                </a>
-            
-
-            
-        </li>
-    
-        <li class="chapter " data-level="2.7" data-path="conditions.html">
-            
-                <a href="conditions.html">
-            
-                    
-                    Conditions
             
                 </a>
             
@@ -402,7 +402,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >Select statement</a>
+        <a href=".." >Creating "select" queries</a>
     </h1>
 </div>
 
@@ -417,8 +417,9 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h2 id="21-select-statement">2.1 Select statement</h2>
-<p><em>Usage</em></p>
+                                <h2 id="21-creating-select-queries">2.1 Creating &quot;select&quot; queries</h2>
+<p><code>.select()</code> function in sqb namespace is used to start a sequence for creating select queries.</p>
+<h4 id="usage">Usage</h4>
 <pre><code class="lang-js">  sqb.select(...columns)
      .from(...tables)
      .join(...joins)
@@ -526,7 +527,7 @@ Array using for grouping. String using for use logical operator.</p>
                 </a>
                 
                 
-                <a href="insert.html" class="navigation navigation-next " aria-label="Next page: Insert statement">
+                <a href="insert.html" class="navigation navigation-next " aria-label="Next page: Creating "insert" queries">
                     <i class="fa fa-angle-right"></i>
                 </a>
                 
@@ -537,7 +538,7 @@ Array using for grouping. String using for use logical operator.</p>
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"Select statement","level":"2.1","depth":1,"next":{"title":"Insert statement","level":"2.2","depth":1,"path":"sql-statements/insert.md","ref":"sql-statements/insert.md","articles":[]},"previous":{"title":"Installation","level":"1.2","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"sql-statements/select.md","mtime":"2017-06-29T11:25:41.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-06-29T11:32:17.634Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"Creating \"select\" queries","level":"2.1","depth":1,"next":{"title":"Creating \"insert\" queries","level":"2.2","depth":1,"path":"sql-statements/insert.md","ref":"sql-statements/insert.md","articles":[]},"previous":{"title":"Installation","level":"1.2","depth":1,"path":"README.md","ref":"README.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"sql-statements/select.md","mtime":"2017-06-29T11:59:57.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2017-06-29T12:01:22.105Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

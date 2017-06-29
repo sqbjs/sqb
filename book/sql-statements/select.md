@@ -1,6 +1,8 @@
-## 2.1 Select statement
+## 2.1 Creating "select" queries
 
-*Usage*
+`.select()` function in sqb namespace is used to start a sequence for creating select queries.
+
+#### Usage
 
 ```js
   sqb.select(...columns)
