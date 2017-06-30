@@ -27,7 +27,7 @@ const sqb = require('sqb'),
       namedParams: false  // Serialize named params (:prm) except (?)
     });
 
-let statement =
+let query =
         select(
             'b.ID as book_id', 'b.name book_name', 'c.name category_name',
             select(raw('count(*)')).from('articles a')
@@ -50,7 +50,7 @@ let statement =
             )
             .orderBy("c.name", "b.release_date desc");
 
-let result = serializer.build(statement,
+let result = serializer.build(query,
     {
         name: 'WIHTE DOG',
         release_date: [new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2001, 0, 1, 0, 0, 0, 0)]
@@ -83,24 +83,24 @@ Paremeters output
 
 Codding pattern in SQB is very similar to standard sql language.
 
-## Insert statements
+## Insert query
 
-SQB supports both Array and Object argument to pass values into Insert statements.
+SQB supports both Array and Object argument to pass values into Insert query.
 
 ```js
-let statement = sqb.insert('id', 'name', 'address').into('BOOKS')
+let query = sqb.insert('id', 'name', 'address').into('BOOKS')
     .values([1, 'Hello SQB', 'The Earth']);
 ```
 or
 ```js
-let statement = sqb.insert('id', 'name', 'address').into('BOOKS')
+let query = sqb.insert('id', 'name', 'address').into('BOOKS')
     .values({
       id:-1, 
       name: 'Hello SQB', 
       address:'The Earth'
     });
 
-let result = statement.build();
+let result = query.build();
 ```
 result.sql output will be 
 ```sql
@@ -112,10 +112,10 @@ insert into BOOKS (id, name, address) values (1, 'Hello SQB', 'The Earth')
 SQB can generate parameter placeholders except serializing values. To do this, just place field names in RegExp pattern.
 
 ```js
-let statement = sqb.insert('id', 'name', 'address').into('BOOKS')
+let query = sqb.insert('id', 'name', 'address').into('BOOKS')
     .values([/id/, /name/, /address/]);
 
-let result = statement.build(
+let result = query.build(
     {namedParams: false}, 
     [1, 'Hello SQB', 'The Earth']);
 

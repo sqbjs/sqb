@@ -27,10 +27,10 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test1', function(done) {
-    let statement = sqb.select('field1')
+    let query = sqb.select('field1')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = statement.build({
+    let result = query.build({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1 from table1\ninner join table2');
@@ -38,10 +38,10 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test2', function(done) {
-    let statement = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
+    let query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = statement.build({
+    let result = query.build({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1, field2, field3, field4, field5, field6 from table1\ninner join table2');
@@ -49,7 +49,7 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test3', function(done) {
-    let statement = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
+    let query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
         .from('table1')
         .where(
             ['field1', 'abcdefgh1234567890'],
@@ -57,7 +57,7 @@ describe('Serializer', function() {
             ['field3', 'abcdefgh1234567890']
         )
         .orderBy('ID');
-    let result = statement.build({
+    let result = query.build({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -69,13 +69,13 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test4', function(done) {
-    let statement = sqb.select('field1', sqb.select('field2').from('table2'))
+    let query = sqb.select('field1', sqb.select('field2').from('table2'))
         .from('table1')
         .where(
             ['field1', 1]
         )
         .orderBy('ID');
-    let result = statement.build({
+    let result = query.build({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -85,8 +85,8 @@ describe('Serializer', function() {
   });
 
   it('Should serialize indexed params', function(done) {
-    let statement = sqb.select().from('table1').where(['ID', /ID/]);
-    let result = statement.build({
+    let query = sqb.select().from('table1').where(['ID', /ID/]);
+    let result = query.build({
       namedParams: false
     }, {id: 5});
     assert.equal(result.sql, 'select * from table1 where ID = ?');

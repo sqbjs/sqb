@@ -3,34 +3,34 @@ const assert = require('assert'),
     sqb = require('../'),
     and = sqb.and;
 
-describe('Serialize update statements', function() {
+describe('Serialize update query', function() {
 
-  it('should serialize formal update statement', function(done) {
-    let statement = sqb.update('table1').set({
+  it('should serialize formal update query', function(done) {
+    let query = sqb.update('table1').set({
       name: 'name',
       address: 'earth'
     }).where(['id', 1]);
-    let result = statement.build();
+    let result = query.build();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
 
-  it('should serialize formal update statement without where clause', function(done) {
-    let statement = sqb.update('table1').set({
+  it('should serialize formal update query without where clause', function(done) {
+    let query = sqb.update('table1').set({
       name: 'name',
       address: 'earth'
     }).where();
-    let result = statement.build();
+    let result = query.build();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\'');
     done();
   });
 
   it('should serialize params', function(done) {
-    let statement = sqb.update('table1').set({
+    let query = sqb.update('table1').set({
       name: /name/,
       address: /earth/
     }).where(['id', /id/]);
-    let result = statement.build(undefined,
+    let result = query.build(undefined,
         {
           id: 1,
           name: 'name',
@@ -41,21 +41,21 @@ describe('Serialize update statements', function() {
   });
 
   it('should use Raw in table', function(done) {
-    let statement = sqb.update(sqb.raw('table1')).set({
+    let query = sqb.update(sqb.raw('table1')).set({
       name: 'name',
       address: 'earth'
     }).where(['id', 1]);
 
-    let result = statement.build();
+    let result = query.build();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
 
   it('should use Raw in values', function(done) {
-    let statement = sqb.update('table1')
+    let query = sqb.update('table1')
         .set(sqb.raw('NAME = \'name\', ADDRESS = \'earth\''))
         .where(['id', 1]);
-    let result = statement.build();
+    let result = query.build();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
@@ -73,11 +73,11 @@ describe('Serialize update statements', function() {
   });
 
   it('should pretty print', function(done) {
-    let statement = sqb.update('table1').set({
+    let query = sqb.update('table1').set({
       name: 'name',
       address: 'earth'
     }).where(['id', 1]);
-    let result = statement.build({
+    let result = query.build({
       prettyPrint: true
     });
     assert.equal(result.sql, 'update table1 set\n' +

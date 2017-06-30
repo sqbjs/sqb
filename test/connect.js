@@ -37,7 +37,7 @@ describe('Connect', function() {
       done();
     });
 
-    it('should execute statement', function(done) {
+    it('should execute query', function(done) {
 
       db.select('ID', 'ADI').from('ULKE').action('aaaaa').then(result => {
         assert.deepEqual(result.rows, [[1, 'a'], [2, 'b']]);
@@ -97,7 +97,7 @@ describe('Connect', function() {
 
     });
 
-    it('should execute select statement', function(done) {
+    it('should execute select query', function(done) {
 
       db.connect().then(conn => {
         conn.select().then(result => {
@@ -114,7 +114,7 @@ describe('Connect', function() {
 
     });
 
-    it('should execute insert statement', function(done) {
+    it('should execute insert query', function(done) {
 
       db.connect().then(conn => {
 
@@ -129,7 +129,7 @@ describe('Connect', function() {
 
     });
 
-    it('should execute update statement', function(done) {
+    it('should execute update query', function(done) {
 
       db.connect().then(conn => {
         return conn.update('table2').set({a: 1}).then(result => {
@@ -142,7 +142,7 @@ describe('Connect', function() {
 
     });
 
-    it('should execute delete statement', function(done) {
+    it('should execute delete query', function(done) {
 
       db.connect().then(conn => {
         return conn.delete('table1').then(result => {

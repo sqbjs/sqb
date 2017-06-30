@@ -25,12 +25,12 @@ describe('Initialize sql objects sqb.js', function() {
 
   it('should initialize "select"', function(done) {
     let obj = sqb.select('id');
-    assert.ok(obj instanceof sqb.SelectStatement);
+    assert.ok(obj instanceof sqb.SelectQuery);
     assert.equal(obj.type, 'select');
     done();
   });
 
-  it('should set action/clientId/module of statements', function(done) {
+  it('should set action/clientId/module of query', function(done) {
     let obj = sqb.select('id').action('123').clientId('5').module('abc');
     assert.equal(obj._action, 123);
     assert.equal(obj._clientId, 5);
@@ -125,7 +125,7 @@ describe('Initialize sql objects sqb.js', function() {
     done();
   });
 
-  describe('Select statement', function() {
+  describe('Select query', function() {
 
     it('should "type" member must be "select"', function(done) {
       let obj = sqb.select().where().groupBy().orderBy();

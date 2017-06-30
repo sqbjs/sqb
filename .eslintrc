@@ -8,10 +8,6 @@
     "es6": true,
     "node": true
   },
-  "ecmaFeatures": {
-    "destructuring": true,
-    "modules": true
-  },
   "rules": {
     "no-console": 1,
     "no-const-assign": 2,
