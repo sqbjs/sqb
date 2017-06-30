@@ -16,9 +16,6 @@ Take a look at [documentation](https://panates.gitbooks.io/sqb/content/) for det
 Note: SQB is in alpha state. Use it only for testing purposes only! 
 
 
-
-```
-
 ## Node Compatibility
 
   - node `>= 6.x`;
