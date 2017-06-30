@@ -9,19 +9,32 @@
 [![DevDependencies][devdependencies-image]][devdependencies-url]
 [![Package Quality][quality-image]][quality-url]
 
-SQB (Sequential Query Builder) is a Plugin-driven, multi-dialect SQL query builder and Database connection wrapper for NodeJS.
+#
+What is SQB
+
+SQB (Sequential Query Builder) is a Plugin-driven, multi-dialect SQL query builder and Database connection wrapper for NodeJS. SQB can be used as a pure sql query builder or database connection wrapper.
 
 Take a look at [documentation](https://panates.gitbooks.io/sqb/content/) for details
 
-Note: SQB is in alpha state. Use it only for testing purposes only! 
+You can report bugs and discuss features on the [GitHub issues](https://github.com/panates/sqb/issues) page
 
+Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs/contributors) to the project.
+
+***Note:*** *SQB is in alpha state. Use it only for testing purposes only!* 
+
+#
+# Installation
+
+```bash
+npm install sqb --save
+```
 
 ## Node Compatibility
 
-  - node `>= 6.x`;
+  - node >= 6.x
   
 ### License
-[MIT](LICENSE)
+SQB is available under [MIT](LICENSE) license.
 
 [npm-image]: https://img.shields.io/npm/v/sqb.svg
 [npm-url]: https://npmjs.org/package/sqb
