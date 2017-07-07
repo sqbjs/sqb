@@ -12,13 +12,6 @@ describe('Serialize insert query', function() {
         .values({id: 1, name: 'aaa'});
     let result = query.build();
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
-
-    query = sqb.insert()
-        .columns('id', 'name')
-        .into('table1')
-        .values({id: 1, name: 'aaa'});
-    result = query.build();
-    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
     done();
   });
 
@@ -33,8 +26,6 @@ describe('Serialize insert query', function() {
 
   it('should skip empty columns', function(done) {
     let query = sqb.insert('id', 'name')
-        .columns()
-        .columns(undefined)
         .into('table1')
         .values({
           id: 1,
