@@ -88,7 +88,7 @@ describe('Serializer', function() {
     let query = sqb.select().from('table1').where(['ID', /ID/]);
     let result = query.build({
       namedParams: false
-    }, {id: 5});
+    }, {ID: 5});
     assert.equal(result.sql, 'select * from table1 where ID = ?');
     assert.deepEqual(result.params, [5]);
     done();

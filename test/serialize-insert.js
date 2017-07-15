@@ -52,9 +52,9 @@ describe('Serialize insert query', function() {
         .values({id: /id/, name: /name/});
     let result = query.build({
       namedParams: true
-    }, {ID: 1, NAME: 'aaa'});
-    assert.equal(result.sql, 'insert into table1 (id, name) values (:ID, :NAME)');
-    assert.deepEqual(result.params, {ID: 1, NAME: 'aaa'});
+    }, {id: 1, name: 'aaa'});
+    assert.equal(result.sql, 'insert into table1 (id, name) values (:id, :name)');
+    assert.deepEqual(result.params, {id: 1, name: 'aaa'});
     done();
   });
 

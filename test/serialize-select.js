@@ -540,8 +540,8 @@ describe('Serialize select query -- serialize-select', function() {
         const d2 = new Date();
         const serializer = sqb.serializer(),
             query = sqb.select().from('table1').where(
-                ['adate', 'between', /adate/],
-                ['bdate', 'between', /bdate/]
+                ['adate', 'between', /ADATE/],
+                ['bdate', 'between', /BDATE/]
             );
         let result = serializer.build(query, {
           ADATE: [d1, d2],
@@ -583,7 +583,7 @@ describe('Serialize select query -- serialize-select', function() {
 
     describe('Serialize "order by" part', function() {
 
-      it('should serialize (field1, field2)', function(done) {
+      it('should serialize (fieldname)', function(done) {
         let query = sqb.select()
             .from('table1')
             .orderBy('field1', 'field2');
@@ -592,30 +592,12 @@ describe('Serialize select query -- serialize-select', function() {
         done();
       });
 
-      it('should serialize (field1 asc, field2 ascending, +field3)', function(done) {
+      it('should serialize (fieldname)', function(done) {
         let query = sqb.select()
             .from('table1')
-            .orderBy('field1 asc', 'field2 ascending', '+field3');
+            .orderBy('field1', 'field2 descending', sqb.raw('field3'), sqb.raw(''));
         let result = query.build();
-        assert.equal(result.sql, 'select * from table1 order by field1, field2, field3');
-        done();
-      });
-
-      it('should serialize (field1 desc, field2 descending, -field3)', function(done) {
-        let query = sqb.select()
-            .from('table1')
-            .orderBy('field1 desc', 'field2 descending', '-field3');
-        let result = query.build();
-        assert.equal(result.sql, 'select * from table1 order by field1 desc, field2 desc, field3 desc');
-        done();
-      });
-
-      it('should serialize raw', function(done) {
-        let query = sqb.select()
-            .from('table1')
-            .orderBy('field1', sqb.raw('field2'), sqb.raw(''));
-        let result = query.build();
-        assert.equal(result.sql, 'select * from table1 order by field1, field2');
+        assert.equal(result.sql, 'select * from table1 order by field1, field2 desc, field3');
         done();
       });
 
