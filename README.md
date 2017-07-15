@@ -20,7 +20,7 @@ You can report bugs and discuss features on the [GitHub issues](https://github.c
 
 Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs/contributors) to the project.
 
-***Note:*** *SQB is in alpha state. Use it only for testing purposes only!* 
+***Note:*** *SQB is in alpha state. Currently, production use is not recommended.* 
 
 ## Installation
 
