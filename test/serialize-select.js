@@ -583,12 +583,39 @@ describe('Serialize select query -- serialize-select', function() {
 
     describe('Serialize "order by" part', function() {
 
-      it('should serialize order by', function(done) {
+      it('should serialize (field1, field2)', function(done) {
         let query = sqb.select()
             .from('table1')
-            .orderBy('field1', 'field2 descending', sqb.raw('field3'), sqb.raw(''));
+            .orderBy('field1', 'field2');
         let result = query.build();
-        assert.equal(result.sql, 'select * from table1 order by field1, field2 desc, field3');
+        assert.equal(result.sql, 'select * from table1 order by field1, field2');
+        done();
+      });
+
+      it('should serialize (field1 asc, field2 ascending, +field3)', function(done) {
+        let query = sqb.select()
+            .from('table1')
+            .orderBy('field1 asc', 'field2 ascending', '+field3');
+        let result = query.build();
+        assert.equal(result.sql, 'select * from table1 order by field1, field2, field3');
+        done();
+      });
+
+      it('should serialize (field1 desc, field2 descending, -field3)', function(done) {
+        let query = sqb.select()
+            .from('table1')
+            .orderBy('field1 desc', 'field2 descending', '-field3');
+        let result = query.build();
+        assert.equal(result.sql, 'select * from table1 order by field1 desc, field2 desc, field3 desc');
+        done();
+      });
+
+      it('should serialize raw', function(done) {
+        let query = sqb.select()
+            .from('table1')
+            .orderBy('field1', sqb.raw('field2'), sqb.raw(''));
+        let result = query.build();
+        assert.equal(result.sql, 'select * from table1 order by field1, field2');
         done();
       });
 

@@ -43,7 +43,7 @@ describe('Connect', function() {
         assert.deepEqual(result.rows, [[1, 'a'], [2, 'b']]);
         done();
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -53,7 +53,7 @@ describe('Connect', function() {
       db.connect((conn, close) => {
         done();
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -63,7 +63,7 @@ describe('Connect', function() {
       db.connect((conn, close) => {
         done();
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -87,12 +87,12 @@ describe('Connect', function() {
           done();
         }).catch(err => {
           conn.close();
-          done(new Error(err));
+          done(err);
         });
 
       }).catch(err => {
         close();
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -104,12 +104,12 @@ describe('Connect', function() {
           done();
         }).catch(err => {
           conn.close();
-          done(new Error(err));
+          done(err);
         });
 
       }).catch(err => {
         close();
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -124,7 +124,7 @@ describe('Connect', function() {
             });
 
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -137,7 +137,7 @@ describe('Connect', function() {
         });
 
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
@@ -150,7 +150,7 @@ describe('Connect', function() {
         });
 
       }).catch(err => {
-        done(new Error(err));
+        done(err);
       });
 
     });
