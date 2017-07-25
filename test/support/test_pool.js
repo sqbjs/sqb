@@ -2,37 +2,36 @@
 /* Internal module dependencies. */
 const TestConnection = require('./test_connection');
 
-/* External module dependencies. */
-const sqb = require('../../');
-const DbPool = sqb.DbPool;
+class TestPool {
 
-/**
- * @class
- * @extends DbPool
- */
-class TestPool extends DbPool {
+  constructor() {
+  }
 
-    constructor(config) {
-        super(config);
-        this.serializer = sqb.serializer({
-            namedParams: false,
-            prettyPrint: false
-        });
-    }
+  //noinspection JSUnusedGlobalSymbols
+  /**
+   *
+   * @param {Function<Error, Connection>} callback
+   * @protected
+   * @override
+   */
+  connect(callback) {
+    callback(undefined, new TestConnection(this));
+  }
 
-    //noinspection JSUnusedGlobalSymbols
-    /**
-     *
-     * @param {Function<Error, Connection>} callback
-     * @protected
-     * @override
-     */
-    _getConnection(callback) {
-        callback(undefined, new TestConnection(this));
-    }
+  close(callback) {
+    callback();
+  }
+
+  test(callback) {
+    callback();
+  }
 
 }
 
-DbPool.register('testdb', TestPool);
-
-module.exports = TestPool;
+module.exports = {
+  createPool(cfg) {
+    if (cfg.dialect === 'test') {
+      return new TestPool(cfg);
+    }
+  }
+};

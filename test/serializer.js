@@ -14,11 +14,11 @@ describe('Serializer', function() {
     done();
   });
 
-  it('should check arguments in .build()', function(done) {
+  it('should check arguments in .generate()', function(done) {
     let ok;
     try {
       let serializer = sqb.serializer();
-      serializer.build(1);
+      serializer.generate(1);
     } catch (e) {
       ok = true;
     }
@@ -30,7 +30,7 @@ describe('Serializer', function() {
     let query = sqb.select('field1')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = query.build({
+    let result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1 from table1\ninner join table2');
@@ -41,7 +41,7 @@ describe('Serializer', function() {
     let query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = query.build({
+    let result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1, field2, field3, field4, field5, field6 from table1\ninner join table2');
@@ -57,7 +57,7 @@ describe('Serializer', function() {
             ['field3', 'abcdefgh1234567890']
         )
         .orderBy('ID');
-    let result = query.build({
+    let result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -75,7 +75,7 @@ describe('Serializer', function() {
             ['field1', 1]
         )
         .orderBy('ID');
-    let result = query.build({
+    let result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -86,11 +86,11 @@ describe('Serializer', function() {
 
   it('Should serialize indexed params', function(done) {
     let query = sqb.select().from('table1').where(['ID', /ID/]);
-    let result = query.build({
+    let result = query.generate({
       namedParams: false
     }, {ID: 5});
     assert.equal(result.sql, 'select * from table1 where ID = ?');
-    assert.deepEqual(result.params, [5]);
+    assert.deepEqual(result.values, [5]);
     done();
   });
 
@@ -101,21 +101,5 @@ describe('Serializer', function() {
     done();
   });
 
-  it('Should register serializer class', function(done) {
-    sqb.Serializer.register('test', sqb.Serializer);
-    done();
-  });
-
-  it('Should get serializer class', function(done) {
-    let clazz = sqb.Serializer.get('test');
-    assert.equal(clazz, sqb.Serializer);
-    done();
-  });
-
-  it('Should create serializer', function(done) {
-    let serializer = sqb.Serializer.create('test');
-    assert.ok(serializer);
-    done();
-  });
 
 });

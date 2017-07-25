@@ -10,7 +10,7 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values()
         .values({id: 1, name: 'aaa'});
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
     done();
   });
@@ -19,7 +19,7 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('id', 'name', 'address')
         .into('table1')
         .values([1, 'aaa']);
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (id, name, address) values (1, \'aaa\', null)');
     done();
   });
@@ -31,7 +31,7 @@ describe('Serialize insert query', function() {
           id: 1,
           name: 'aaa'
         });
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
     done();
   });
@@ -40,9 +40,9 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('id', 'name')
         .into('table1')
         .values({id: /id/, name: /name/});
-    let result = query.build({}, {id: 1, name: 'aaa'});
+    let result = query.generate({}, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values (?, ?)');
-    assert.deepEqual(result.params, [1, 'aaa']);
+    assert.deepEqual(result.values, [1, 'aaa']);
     done();
   });
 
@@ -50,11 +50,11 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('id', 'name')
         .into('table1')
         .values({id: /id/, name: /name/});
-    let result = query.build({
+    let result = query.generate({
       namedParams: true
     }, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-    assert.deepEqual(result.params, {id: 1, name: 'aaa'});
+    assert.deepEqual(result.values, {id: 1, name: 'aaa'});
     done();
   });
 
@@ -62,9 +62,9 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('id', 'name', 'address')
         .into('table1')
         .values([/id/, 'name', /address/]);
-    let result = query.build({}, [1, 'earth']);
+    let result = query.generate({}, [1, 'earth']);
     assert.equal(result.sql, 'insert into table1 (id, name, address) values (?, \'name\', ?)');
-    assert.deepEqual(result.params, [1, 'earth']);
+    assert.deepEqual(result.values, [1, 'earth']);
     done();
   });
 
@@ -72,7 +72,7 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('id', 'name')
         .into(sqb.raw('table1'))
         .values({id: 1, name: 'aaa'});
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
     done();
   });
@@ -81,7 +81,7 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('ID', 'NAME').into('table1').values(
         sqb.select('id', 'name').from('table2').where(['id', '>', 5])
     );
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (ID, NAME) select id, name from table2 where id > 5');
     done();
   });
@@ -90,7 +90,7 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('ID', 'NAME').into('table1').values(
         sqb.raw('values (1,2)')
     );
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'insert into table1 (ID, NAME) values (1,2)');
     done();
   });

@@ -10,7 +10,7 @@ describe('Serialize update query', function() {
       name: 'name',
       address: 'earth'
     }).where(['id', 1]);
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
@@ -20,7 +20,7 @@ describe('Serialize update query', function() {
       name: 'name',
       address: 'earth'
     }).where();
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\'');
     done();
   });
@@ -30,7 +30,7 @@ describe('Serialize update query', function() {
       name: /name/,
       address: /earth/
     }).where(['id', /id/]);
-    let result = query.build(undefined,
+    let result = query.generate(undefined,
         {
           id: 1,
           name: 'name',
@@ -46,7 +46,7 @@ describe('Serialize update query', function() {
       address: 'earth'
     }).where(['id', 1]);
 
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
@@ -55,7 +55,7 @@ describe('Serialize update query', function() {
     let query = sqb.update('table1')
         .set(sqb.raw('NAME = \'name\', ADDRESS = \'earth\''))
         .where(['id', 1]);
-    let result = query.build();
+    let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
     done();
   });
@@ -77,7 +77,7 @@ describe('Serialize update query', function() {
       name: 'name',
       address: 'earth'
     }).where(['id', 1]);
-    let result = query.build({
+    let result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'update table1 set\n' +

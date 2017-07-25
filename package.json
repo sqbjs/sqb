@@ -24,7 +24,8 @@
     "putil-flattentext": "^1.0.1",
     "putil-isplainobject": "^1.0.0",
     "putil-promisify": "^1.0.4",
-    "putil-taskqueue": "^1.0.3"
+    "putil-taskqueue": "^1.0.3",
+    "putil-waterfall": "^1.0.8"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
