@@ -135,6 +135,39 @@ describe('DbPool', function() {
           });
     });
 
+    it('should release connection after closing dataset', function(done) {
+      db.connect((err, conn) => {
+        if (err)
+          return done(err);
+        conn.on('close', () => done());
+        conn.select()
+            .from()
+            .execute({
+              fetchRows: 2,
+              cursor: true
+            }, (err, result) => {
+              result.dataset.next(err => {
+                result.dataset.close(() => conn.close());
+              });
+            });
+      });
+    });
+
+    it('should release connection after closing dataset', function(done) {
+      db.select()
+          .from()
+          .execute({
+            fetchRows: 2,
+            objectRows: true,
+            cursor: true
+          }, (err, result) => {
+            result.dataset.connection.on('close', () => done());
+            result.dataset.next(err => {
+              result.dataset.close();
+            });
+          });
+    });
+
   });
 
 });
