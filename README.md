@@ -25,7 +25,7 @@ Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs
 ## Installation
 
 ```bash
-npm install sqb --save
+$ npm install sqb --save
 ```
 
 ## Node Compatibility
