@@ -24,6 +24,14 @@ describe('Serialize insert query', function() {
     done();
   });
 
+  it('should serialize insert query with Object argument', function(done) {
+    let query = sqb.insert({id: 1, name: 'aaa'})
+        .into('table1');
+    let result = query.generate();
+    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
+    done();
+  });
+
   it('should skip empty columns', function(done) {
     let query = sqb.insert('id', 'name')
         .into('table1')
