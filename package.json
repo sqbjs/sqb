@@ -20,7 +20,6 @@
     "framework"
   ],
   "dependencies": {
-    "debug": "^2.6.8",
     "putil-flattentext": "^1.0.1",
     "putil-isplainobject": "^1.0.0",
     "putil-promisify": "^1.0.4",
@@ -29,10 +28,10 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
-    "eslint": "^4.3.0",
+    "eslint": "^4.6.1",
     "eslint-config-google": "^0.9.1",
     "istanbul": "^0.4.5",
-    "mocha": "^3.4.2"
+    "mocha": "^3.5.0"
   },
   "engines": {
     "node": ">= 6.0"
