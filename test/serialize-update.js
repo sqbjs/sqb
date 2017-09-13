@@ -7,8 +7,8 @@ describe('Serialize update query', function() {
 
   it('should serialize formal update query', function(done) {
     let query = sqb.update('table1').set({
-      name: 'name',
-      address: 'earth'
+      NAME: 'name',
+      ADDRESS: 'earth'
     }).where(['id', 1]);
     let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
@@ -17,8 +17,8 @@ describe('Serialize update query', function() {
 
   it('should serialize formal update query without where clause', function(done) {
     let query = sqb.update('table1').set({
-      name: 'name',
-      address: 'earth'
+      NAME: 'name',
+      ADDRESS: 'earth'
     }).where();
     let result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\'');
@@ -27,8 +27,8 @@ describe('Serialize update query', function() {
 
   it('should serialize params', function(done) {
     let query = sqb.update('table1').set({
-      name: /name/,
-      address: /earth/
+      NAME: /name/,
+      ADDRESS: /earth/
     }).where(['id', /id/]);
     let result = query.generate(undefined,
         {
@@ -42,8 +42,8 @@ describe('Serialize update query', function() {
 
   it('should use Raw in table', function(done) {
     let query = sqb.update(sqb.raw('table1')).set({
-      name: 'name',
-      address: 'earth'
+      NAME: 'name',
+      ADDRESS: 'earth'
     }).where(['id', 1]);
 
     let result = query.generate();
@@ -81,8 +81,8 @@ describe('Serialize update query', function() {
       prettyPrint: true
     });
     assert.equal(result.sql, 'update table1 set\n' +
-        '  NAME = \'name\',\n' +
-        '  ADDRESS = \'earth\'\n' +
+        '  name = \'name\',\n' +
+        '  address = \'earth\'\n' +
         'where id = 1');
     done();
   });
