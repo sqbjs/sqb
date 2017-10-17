@@ -5,27 +5,27 @@ const assert = require('assert'),
 describe('Initialize sql objects sqb.js', function() {
 
   it('should create serializer', function(done) {
-    let obj = sqb.serializer();
+    var obj = sqb.serializer();
     assert.ok(obj instanceof sqb.Serializer);
     done();
   });
 
   it('should initialize "raw"', function(done) {
-    let obj = sqb.raw('test');
+    var obj = sqb.raw('test');
     assert.ok(obj instanceof sqb.Raw);
     assert.equal(obj.type, 'raw');
     done();
   });
 
   it('should initialize "select"', function(done) {
-    let obj = sqb.select('id');
+    var obj = sqb.select('id');
     assert.ok(obj instanceof sqb.SelectQuery);
     assert.equal(obj.type, 'select');
     done();
   });
 
   it('should set action/clientId/module of query', function(done) {
-    let obj = sqb.select('id').action('123').clientId('5').module('abc');
+    var obj = sqb.select('id').action('123').clientId('5').module('abc');
     assert.equal(obj._action, 123);
     assert.equal(obj._clientId, 5);
     assert.equal(obj._module, 'abc');
@@ -33,7 +33,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should validate arguments in "join"', function(done) {
-    let ok;
+    var ok;
     try {
       new sqb.Join(sqb.Join.Type.innerJoin, 1);
       new sqb.Join(-1, 'table');
@@ -45,7 +45,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "join"', function(done) {
-    let obj = sqb.join('table');
+    var obj = sqb.join('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.innerJoin, obj.joinType);
@@ -53,10 +53,10 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize undefined "join"', function(done) {
-    let ok;
+    var ok;
     try {
-      let obj = sqb.join(new sqb.Join(8));
-    } catch(e) {
+      var obj = sqb.join(new sqb.Join(8));
+    } catch (e) {
       ok = true;
     }
     assert.ok(ok);
@@ -64,7 +64,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "innerJoin"', function(done) {
-    let obj = sqb.innerJoin('table');
+    var obj = sqb.innerJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.innerJoin, obj.joinType);
@@ -72,7 +72,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "leftJoin"', function(done) {
-    let obj = sqb.leftJoin('table');
+    var obj = sqb.leftJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.leftJoin, obj.joinType);
@@ -80,7 +80,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "leftOuterJoin"', function(done) {
-    let obj = sqb.leftOuterJoin('table');
+    var obj = sqb.leftOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.leftOuterJoin, obj.joinType);
@@ -88,7 +88,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "rightJoin"', function(done) {
-    let obj = sqb.rightJoin('table');
+    var obj = sqb.rightJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.rightJoin, obj.joinType);
@@ -96,7 +96,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "rightOuterJoin"', function(done) {
-    let obj = sqb.rightOuterJoin('table');
+    var obj = sqb.rightOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.rightOuterJoin, obj.joinType);
@@ -104,7 +104,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "outerJoin"', function(done) {
-    let obj = sqb.outerJoin('table');
+    var obj = sqb.outerJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.outerJoin, obj.joinType);
@@ -112,7 +112,7 @@ describe('Initialize sql objects sqb.js', function() {
   });
 
   it('should initialize "fullOuterJoin"', function(done) {
-    let obj = sqb.fullOuterJoin('table');
+    var obj = sqb.fullOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
     assert.equal(sqb.Join.Type.fullOuterJoin, obj.joinType);
@@ -122,14 +122,14 @@ describe('Initialize sql objects sqb.js', function() {
   describe('Select query', function() {
 
     it('should "type" member must be "select"', function(done) {
-      let obj = sqb.select().where().groupBy().orderBy();
+      var obj = sqb.select().where().groupBy().orderBy();
       assert.equal(obj.type, 'select');
       assert.equal(obj.isSelect, true);
       done();
     });
 
     it('should define columns with string', function(done) {
-      let obj = sqb.select('col1', 'col2 c2', 'tbl.col3 c3');
+      var obj = sqb.select('col1', 'col2 c2', 'tbl.col3 c3');
       assert.equal(obj._columns.length, 3);
       assert.equal(obj._columns[0].type === 'column', true);
       assert.equal(obj._columns[0].field, 'col1');
@@ -142,7 +142,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should define table in "from"', function(done) {
-      let obj = sqb.select().from('table1', 'table2');
+      var obj = sqb.select().from('table1', 'table2');
       assert.equal(obj._tables.length, 2);
       assert.equal(obj._tables[0].table, 'table1');
       assert.equal(obj._tables[1].table, 'table2');
@@ -155,7 +155,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should define "join"', function(done) {
-      let obj = sqb.select().join(sqb.join('table1'));
+      var obj = sqb.select().join(sqb.join('table1'));
       assert.equal(obj._joins.length, 1);
       assert.ok(obj._joins[0] instanceof sqb.Join);
       assert.equal(obj._joins[0].table.table, 'table1');
@@ -163,7 +163,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should define "where"', function(done) {
-      let obj = sqb.select().where(['ID', 1]);
+      var obj = sqb.select().where(['ID', 1]);
       assert.equal(obj._where.length, 1);
       assert.ok(obj._where.item(0) instanceof sqb.Condition);
       assert.equal(obj._where.item(0).field, 'ID');
@@ -171,7 +171,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should validate arguments in "where"', function(done) {
-      let ok;
+      var ok;
       try {
         sqb.select().where(1);
       } catch (e) {
@@ -182,7 +182,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should validate arguments in "condition"', function(done) {
-      let ok;
+      var ok;
       try {
         sqb.select().where(sqb.and());
       } catch (e) {
@@ -193,7 +193,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should validate operator in "condition"', function(done) {
-      let ok;
+      var ok;
       try {
         sqb.select().where(sqb.and('id', '-', 1));
       } catch (e) {
@@ -204,7 +204,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should validate arguments in "joing"', function(done) {
-      let ok;
+      var ok;
       try {
         sqb.select().join(1);
       } catch (e) {
@@ -215,7 +215,7 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should define "order by"', function(done) {
-      let obj = sqb.select('ID').orderBy('t1.field1', 'field2 desc');
+      var obj = sqb.select('ID').orderBy('t1.field1', 'field2 desc');
       assert.equal(obj._orderby.length, 2);
       assert.equal(obj._orderby[0].table, 't1');
       assert.equal(obj._orderby[0].field, 'field1');
@@ -225,19 +225,19 @@ describe('Initialize sql objects sqb.js', function() {
     });
 
     it('should define "alias"', function(done) {
-      let obj = sqb.select().as('t1');
+      var obj = sqb.select().as('t1');
       assert.equal(obj._alias, 't1');
       done();
     });
 
     it('should define "limit"', function(done) {
-      let obj = sqb.select().limit(5);
+      var obj = sqb.select().limit(5);
       assert.equal(obj._limit, 5);
       done();
     });
 
     it('should define "offset"', function(done) {
-      let obj = sqb.select().offset(10);
+      var obj = sqb.select().offset(10);
       assert.equal(obj._offset, 10);
       done();
     });

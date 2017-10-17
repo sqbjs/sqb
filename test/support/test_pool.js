@@ -2,34 +2,26 @@
 /* Internal module dependencies. */
 const TestConnection = require('./test_connection');
 
-class TestPool {
-
-  constructor() {
-  }
-
-  //noinspection JSUnusedGlobalSymbols
-  /**
-   *
-   * @param {Function<Error, Connection>} callback
-   * @protected
-   * @override
-   */
-  connect(callback) {
-    callback(undefined, new TestConnection(this));
-  }
-
-  close(callback) {
-    callback();
-  }
-
-  test(callback) {
-    callback();
-  }
-
+function TestPool() {
 }
 
+const proto = TestPool.prototype = {};
+proto.constructor = TestPool;
+
+proto.connect = function(callback) {
+  callback(undefined, new TestConnection(this));
+};
+
+proto.close = function(callback) {
+  callback();
+};
+
+proto.test = function(callback) {
+  callback();
+};
+
 module.exports = {
-  createPool(cfg) {
+  createPool: function(cfg) {
     if (cfg.dialect === 'test') {
       return new TestPool(cfg);
     }

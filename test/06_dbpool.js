@@ -7,7 +7,7 @@ describe('DbPool', function() {
   sqb.use(require('./support/test_serializer'));
   sqb.use(require('./support/test_pool'));
 
-  let db;
+  var db;
 
   it('should create a pool for test dialect', function(done) {
     db = sqb.pool({
@@ -23,32 +23,28 @@ describe('DbPool', function() {
   });
 
   it('should create connection', function(done) {
-    db.connect((err, conn) => {
+    db.connect(function(err, conn) {
       assert(!err && conn.isConnection);
-      conn.close(() => done());
+      conn.close(done);
     });
   });
 
   it('should terminate pool', function(done) {
-    db.close((err) => {
+    db.close(function(err) {
       assert(!err && db.isClosed);
       done();
     });
   });
 
   it('should test pool', function(done) {
-    db.test((err) => {
+    db.test(function(err) {
       assert(!err);
       done();
     });
   });
 
   it('should test pool (Promise)', function(done) {
-    db.test().then(() => {
-      done();
-    }).catch(e => {
-      done(e);
-    });
+    db.test().then(done).catch(done);
   });
 
   describe('execute query ', function() {
@@ -56,7 +52,7 @@ describe('DbPool', function() {
     it('should return array row array', function(done) {
       db.select().from().execute({
         fetchRows: 2
-      }, (err, result) => {
+      }, function(err, result) {
         assert(!err && result && result.rows &&
             result.rows.length === 2 &&
             Array.isArray(result.rows[0]) &&
@@ -71,7 +67,7 @@ describe('DbPool', function() {
           .execute({
             fetchRows: 2,
             objectRows: true
-          }, (err, result) => {
+          }, function(err, result) {
             assert(!err && result && result.rows &&
                 result.rows.length === 2 &&
                 !Array.isArray(result.rows[0]) &&
@@ -87,11 +83,11 @@ describe('DbPool', function() {
             fetchRows: 2,
             objectRows: true,
             dataset: true
-          }, (err, result) => {
+          }, function(err, result) {
             assert(!err && result && result.dataset);
             assert.equal(result.dataset.mode, 'static');
-            result.dataset.next(err => {
-              assert.equal(result.dataset.values.ID, 'LFOI');
+            result.dataset.next(function(err) {
+              assert.equal(result.dataset.getValue('ID'), 'LFOI');
               done();
             });
           });
@@ -104,11 +100,11 @@ describe('DbPool', function() {
             fetchRows: 2,
             objectRows: true,
             cursor: true
-          }, (err, result) => {
+          }, function(err, result) {
             assert(!err && result && result.dataset);
             assert.equal(result.dataset.mode, 'cursor');
-            result.dataset.next(err => {
-              assert.equal(result.dataset.values.ID, 'LFOI');
+            result.dataset.next(function(err) {
+              assert.equal(result.dataset.getValue('ID'), 'LFOI');
               assert.equal(result.dataset.rowNum, 1);
               done();
             });
@@ -123,12 +119,12 @@ describe('DbPool', function() {
             objectRows: true,
             dataset: true,
             caching: true
-          }, (err, result) => {
+          }, function(err, result) {
             assert(!err && result && result.dataset);
             assert.equal(result.dataset.mode, 'cursor');
-            result.dataset.next(err => {
+            result.dataset.next(function(err) {
               assert(result.dataset._cache);
-              assert.equal(result.dataset.values.ID, 'LFOI');
+              assert.equal(result.dataset.getValue('ID'), 'LFOI');
               assert.equal(result.dataset.rowNum, 1);
               done();
             });
@@ -136,18 +132,20 @@ describe('DbPool', function() {
     });
 
     it('should release connection after closing dataset', function(done) {
-      db.connect((err, conn) => {
+      db.connect(function(err, conn) {
         if (err)
           return done(err);
-        conn.on('close', () => done());
+        conn.on('close', done);
         conn.select()
             .from()
             .execute({
               fetchRows: 2,
               cursor: true
-            }, (err, result) => {
-              result.dataset.next(err => {
-                result.dataset.close(() => conn.close());
+            }, function(err, result) {
+              result.dataset.next(function(err) {
+                result.dataset.close(function() {
+                  conn.close();
+                });
               });
             });
       });
@@ -160,9 +158,9 @@ describe('DbPool', function() {
             fetchRows: 2,
             objectRows: true,
             cursor: true
-          }, (err, result) => {
-            result.dataset.connection.on('close', () => done());
-            result.dataset.next(err => {
+          }, function(err, result) {
+            result.dataset.connection.on('close', done);
+            result.dataset.next(function(err) {
               result.dataset.close();
             });
           });

@@ -5,7 +5,7 @@ const assert = require('assert'),
 describe('Serializer', function() {
 
   it('should configure', function(done) {
-    let serializer = sqb.serializer({
+    var serializer = sqb.serializer({
       prettyPrint: 1,
       namedParams: 1
     });
@@ -15,9 +15,9 @@ describe('Serializer', function() {
   });
 
   it('should check arguments in .generate()', function(done) {
-    let ok;
+    var ok;
     try {
-      let serializer = sqb.serializer();
+      var serializer = sqb.serializer();
       serializer.generate(1);
     } catch (e) {
       ok = true;
@@ -27,10 +27,10 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test1', function(done) {
-    let query = sqb.select('field1')
+    var query = sqb.select('field1')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = query.generate({
+    var result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1 from table1\ninner join table2');
@@ -38,10 +38,10 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test2', function(done) {
-    let query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
+    var query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
         .from('table1')
         .join(sqb.join('table2'));
-    let result = query.generate({
+    var result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'select field1, field2, field3, field4, field5, field6 from table1\ninner join table2');
@@ -49,7 +49,7 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test3', function(done) {
-    let query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
+    var query = sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
         .from('table1')
         .where(
             ['field1', 'abcdefgh1234567890'],
@@ -57,7 +57,7 @@ describe('Serializer', function() {
             ['field3', 'abcdefgh1234567890']
         )
         .orderBy('ID');
-    let result = query.generate({
+    var result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -69,13 +69,13 @@ describe('Serializer', function() {
   });
 
   it('Should pretty print - test4', function(done) {
-    let query = sqb.select('field1', sqb.select('field2').from('table2'))
+    var query = sqb.select('field1', sqb.select('field2').from('table2'))
         .from('table1')
         .where(
             ['field1', 1]
         )
         .orderBy('ID');
-    let result = query.generate({
+    var result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql,
@@ -85,8 +85,8 @@ describe('Serializer', function() {
   });
 
   it('Should serialize indexed params', function(done) {
-    let query = sqb.select().from('table1').where(['ID', /ID/]);
-    let result = query.generate({
+    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var result = query.generate({
       namedParams: false
     }, {ID: 5});
     assert.equal(result.sql, 'select * from table1 where ID = ?');
@@ -95,11 +95,10 @@ describe('Serializer', function() {
   });
 
   it('should return serializer that already passed in first argument', function(done) {
-    let obj = sqb.serializer();
-    let obj2 = sqb.serializer(obj);
+    var obj = sqb.serializer();
+    var obj2 = sqb.serializer(obj);
     assert.ok(obj === obj2);
     done();
   });
-
 
 });

@@ -1,14 +1,12 @@
-
-class TestSerializer {
-
-  constructor(config) {
-    this.dialect = config.dialect;
-  }
-
+function TestSerializer(config) {
+  this.dialect = config.dialect;
 }
 
+const proto = TestSerializer.prototype = {};
+proto.constructor = TestSerializer;
+
 module.exports = {
-  createSerializer(config) {
+  createSerializer: function(config) {
     if (config.dialect === 'test') {
       return new TestSerializer(config);
     }
