@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "errorex": "^1.0.5",
-    "putil-flattentext": "^1.1.0",
+    "putil-flattentext": "^1.1.1",
     "putil-isplainobject": "^1.0.1",
     "putil-promisify": "^1.1.0",
     "putil-taskqueue": "^1.0.3",
