@@ -35,7 +35,7 @@ proto.execute = function(sql, params, options, callback) {
     return;
   }
 
-  if (sql.includes('error'))
+  if (sql.indexOf('error') >= 0)
     return callback(new Error('Test error'));
   const out = {metaData: this._data.metaData};
   const fetchRows = options.fetchRows || 100;
