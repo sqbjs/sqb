@@ -7,10 +7,10 @@ describe('Serializer', function() {
   it('should configure', function(done) {
     var serializer = sqb.serializer({
       prettyPrint: 1,
-      namedParams: 1
+      paramType: sqb.ParamType.COLON
     });
     assert.equal(serializer.prettyPrint, true);
-    assert.equal(serializer.namedParams, true);
+    assert.equal(serializer.paramType, sqb.ParamType.COLON);
     done();
   });
 
@@ -84,12 +84,33 @@ describe('Serializer', function() {
     done();
   });
 
-  it('Should serialize indexed params', function(done) {
+
+  it('Should serialize COLON params', function(done) {
     var query = sqb.select().from('table1').where(['ID', /ID/]);
     var result = query.generate({
-      namedParams: false
+      paramType: sqb.ParamType.COLON
+    }, {ID: 5});
+    assert.equal(result.sql, 'select * from table1 where ID = :ID');
+    assert.deepEqual(result.values, {ID: 5});
+    done();
+  });
+
+  it('Should serialize QUESTION_MARK params', function(done) {
+    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var result = query.generate({
+      paramType: sqb.ParamType.QUESTION_MARK
     }, {ID: 5});
     assert.equal(result.sql, 'select * from table1 where ID = ?');
+    assert.deepEqual(result.values, [5]);
+    done();
+  });
+
+  it('Should serialize DOLLAR params', function(done) {
+    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var result = query.generate({
+      paramType: sqb.ParamType.DOLLAR
+    }, {ID: 5});
+    assert.equal(result.sql, 'select * from table1 where ID = $1');
     assert.deepEqual(result.values, [5]);
     done();
   });

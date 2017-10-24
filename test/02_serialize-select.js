@@ -513,15 +513,17 @@ describe('Serialize select query -- serialize-select', function() {
       it('should serialize parameter', function(done) {
         var query = sqb.select().from('table1').where(['ID', /ID/]);
         var result = query.generate(undefined, {ID: 1});
-        assert.equal(result.sql, 'select * from table1 where ID = ?');
-        assert.equal(result.values[0], 1);
+        assert.equal(result.sql, 'select * from table1 where ID = :ID');
+        assert.equal(result.values.ID, 1);
         done();
       });
 
       it('should serialize parameter for "between"', function(done) {
         const d1 = new Date();
         const d2 = new Date();
-        const serializer = sqb.serializer(),
+        const serializer = sqb.serializer({
+              paramType: sqb.ParamType.QUESTION_MARK
+            }),
             query = sqb.select().from('table1').where(
                 ['adate', 'between', /ADATE/],
                 ['bdate', 'between', /BDATE/]
@@ -536,7 +538,7 @@ describe('Serialize select query -- serialize-select', function() {
           ADATE: [d1, d2],
           BDATE: d1
         });
-        result = query.generate({namedParams: true});
+        result = query.generate({paramType: sqb.ParamType.COLON});
         assert.equal(result.sql, 'select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2');
         assert.deepEqual(result.values.ADATE1, d1);
         assert.deepEqual(result.values.ADATE2, d2);

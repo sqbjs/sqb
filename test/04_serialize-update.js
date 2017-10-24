@@ -35,7 +35,7 @@ describe('Serialize update query', function() {
           name: 'name',
           address: 'earth'
         });
-    assert.equal(result.sql, 'update table1 set NAME = ?, ADDRESS = ? where id = ?');
+    assert.equal(result.sql, 'update table1 set NAME = :NAME, ADDRESS = :ADDRESS where id = :id');
     done();
   });
 
