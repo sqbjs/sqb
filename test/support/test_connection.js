@@ -1,19 +1,45 @@
 /* eslint-disable */
 
-module.exports = TestConnection;
+module.exports = {
+  createConnector: function(cfg) {
+    if (cfg.dialect === 'test') {
+      return function(callback) {
+        callback(undefined, new TestConnection(cfg));
+      };
+    }
+  }
+};
 
-function TestConnection() {
-  this._rowidx = 0;
-  this._data = require('./test_data_obj.json');
-  const rowsarr = this._rowsarr = [];
-  const keys = Object.getOwnPropertyNames(this._data.rows[0]);
-  this._data.rows.forEach(function(src) {
+var sessionId = 0;
+const data = {};
+
+function fillTable(tableName) {
+  var obj = require('./test_data_' + tableName + '.json');
+  data[tableName] = {
+    metaData: obj.metaData,
+    obj: obj.rows,
+    arr: []
+  };
+  var rowsarr = data[tableName].arr;
+  const keys = Object.getOwnPropertyNames(obj.rows[0]);
+  obj.rows.forEach(function(src) {
     var row = [];
     keys.forEach(function(key) {
-      row.push(src[key]);
+      row.push(src[key] || null);
     });
     rowsarr.push(row);
   });
+}
+
+fillTable('table1');
+
+/**
+ *
+ * @param cfg
+ * @constructor
+ */
+function TestConnection(cfg) {
+  this.sessionId = ++sessionId;
 }
 
 const proto = TestConnection.prototype = {
@@ -35,19 +61,26 @@ proto.execute = function(sql, params, options, callback) {
     return;
   }
 
-  if (sql.indexOf('error') >= 0)
-    return callback(new Error('Test error'));
-  const out = {metaData: this._data.metaData};
+  if (sql === 'select 1')
+    return callback(undefined, {rows: []});
+
+  const m = sql.match(/\bfrom (\w+)\b/i);
+
+  if (!(m && m[1]))
+    return callback(new Error('Invalid query'));
+
+  const o = data[m[1]];
+  if (!o)
+    return callback(new Error('Table unknown (' + m[1] + ')'));
+  const out = {metaData: o.metaData};
   const fetchRows = options.fetchRows || 100;
-  const rows = options.objectRows ? this._data.rows.slice(this._rowidx, fetchRows) :
-      this._rowsarr.slice(this._rowidx, fetchRows);
-  this._rowidx += rows.length;
+  const rows = options.objectRows ?
+      o.obj.slice(0, fetchRows) :
+      o.arr.slice(0, fetchRows);
   if (options.cursor) {
     out.cursor = new TestCursor(this, rows);
   } else out.rows = rows;
-
   callback(undefined, out);
-
 };
 
 //noinspection JSUnusedGlobalSymbols
@@ -57,6 +90,11 @@ proto.commit = function(callback) {
 
 //noinspection JSUnusedGlobalSymbols
 proto.rollback = function(callback) {
+  callback();
+};
+
+//noinspection JSUnusedGlobalSymbols
+proto.test = function(callback) {
   callback();
 };
 
