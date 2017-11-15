@@ -1,5 +1,5 @@
 {
-  "metaData": [
+  "fields": [
     {
       "name": "ID"
     },
@@ -38,6 +38,12 @@
     },
     {
       "name": "Longitude"
+    },
+    {
+      "name": "datevalue"
+    },
+    {
+      "name": "TestNoValue"
     }
   ],
   "rows": [
@@ -48,7 +54,7 @@
       "Region": "FR",
       "ICAO": "LFOI",
       "Flags": 72,
-      "Catalog": 0,
+      "Catalog": null,
       "Length": 1260,
       "Elevation": 67,
       "Runway": "0213",

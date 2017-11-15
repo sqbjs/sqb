@@ -6,11 +6,18 @@ describe('Serializer', function() {
 
   it('should configure', function(done) {
     var serializer = sqb.serializer({
-      prettyPrint: 1,
-      paramType: sqb.ParamType.COLON
+      prettyPrint: 0
     });
+    assert(!serializer.prettyPrint);
+    assert.equal(serializer.paramType, 1);
+    assert(!serializer.strictParams);
+    serializer.prettyPrint = 1;
     assert.equal(serializer.prettyPrint, true);
+    serializer.paramType = sqb.ParamType.COLON;
     assert.equal(serializer.paramType, sqb.ParamType.COLON);
+    serializer.strictParams = 1;
+    assert.equal(serializer.strictParams, true);
+    sqb.use(require('./support/test_serializer'));
     done();
   });
 
@@ -84,7 +91,6 @@ describe('Serializer', function() {
     done();
   });
 
-
   it('Should serialize COLON params', function(done) {
     var query = sqb.select().from('table1').where(['ID', /ID/]);
     var result = query.generate({
@@ -96,22 +102,32 @@ describe('Serializer', function() {
   });
 
   it('Should serialize QUESTION_MARK params', function(done) {
-    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var query = sqb.select().from('table1')
+        .where(['ID', /ID/],
+            ['DT', 'between', /dt/],
+            ['DT2', 'between', /dt2/],
+            ['ID4', /ID4/]
+        );
     var result = query.generate({
       paramType: sqb.ParamType.QUESTION_MARK
-    }, {ID: 5});
-    assert.equal(result.sql, 'select * from table1 where ID = ?');
-    assert.deepEqual(result.values, [5]);
+    }, {ID: 5, dt: [1, 3], dt2: 2});
+    assert.equal(result.sql, 'select * from table1 where ID = ? and DT between ? and ? and DT2 between ? and ? and ID4 = ?');
+    assert.deepEqual(result.values, [5, 1, 3, 2, 2, null]);
     done();
   });
 
   it('Should serialize DOLLAR params', function(done) {
-    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var query = sqb.select().from('table1')
+        .where(['ID', /ID/],
+            ['DT', 'between', /dt/],
+            ['DT2', 'between', /dt2/],
+            ['ID4', /ID4/]
+        );
     var result = query.generate({
       paramType: sqb.ParamType.DOLLAR
-    }, {ID: 5});
-    assert.equal(result.sql, 'select * from table1 where ID = $1');
-    assert.deepEqual(result.values, [5]);
+    }, {ID: 5, dt: [1, 3], dt2: 2});
+    assert.equal(result.sql, 'select * from table1 where ID = $1 and DT between $2 and $3 and DT2 between $4 and $5 and ID4 = $6');
+    assert.deepEqual(result.values, [5, 1, 3, 2, 2, null]);
     done();
   });
 

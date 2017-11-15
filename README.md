@@ -30,7 +30,7 @@ $ npm install sqb --save
 
 ## Node Compatibility
 
-  - node >= 6.x
+  - node >= 4.x
   
 ### License
 SQB is available under [MIT](LICENSE) license.

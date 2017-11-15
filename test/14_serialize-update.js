@@ -4,27 +4,25 @@ const assert = require('assert'),
 
 describe('Serialize update query', function() {
 
-  it('should serialize formal update query', function(done) {
+  it('should serialize formal update query', function() {
     var query = sqb.update('table1').set({
       NAME: 'name',
       ADDRESS: 'earth'
     }).where(['id', 1]);
     var result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
-    done();
   });
 
-  it('should serialize formal update query without where clause', function(done) {
+  it('should serialize formal update query without where clause', function() {
     var query = sqb.update('table1').set({
       NAME: 'name',
       ADDRESS: 'earth'
     }).where();
     var result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\'');
-    done();
   });
 
-  it('should serialize params', function(done) {
+  it('should serialize params', function() {
     var query = sqb.update('table1').set({
       NAME: /name/,
       ADDRESS: /earth/
@@ -36,10 +34,9 @@ describe('Serialize update query', function() {
           address: 'earth'
         });
     assert.equal(result.sql, 'update table1 set NAME = :NAME, ADDRESS = :ADDRESS where id = :id');
-    done();
   });
 
-  it('should use Raw in table', function(done) {
+  it('should use Raw in table', function() {
     var query = sqb.update(sqb.raw('table1')).set({
       NAME: 'name',
       ADDRESS: 'earth'
@@ -47,19 +44,17 @@ describe('Serialize update query', function() {
 
     var result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
-    done();
   });
 
-  it('should use Raw in values', function(done) {
+  it('should use Raw in values', function() {
     var query = sqb.update('table1')
         .set(sqb.raw('NAME = \'name\', ADDRESS = \'earth\''))
         .where(['id', 1]);
     var result = query.generate();
     assert.equal(result.sql, 'update table1 set NAME = \'name\', ADDRESS = \'earth\' where id = 1');
-    done();
   });
 
-  it('should check invalid argument for in "set"', function(done) {
+  it('should check invalid argument for in "set"', function() {
     var ok;
     try {
       sqb.update('table1').set(1).where();
@@ -68,22 +63,56 @@ describe('Serialize update query', function() {
     }
 
     assert.ok(ok);
-    done();
   });
 
-  it('should pretty print', function(done) {
+  it('should pretty print', function() {
     var query = sqb.update('table1').set({
       name: 'name',
       address: 'earth'
-    }).where(['id', 1]);
+    }).where(['id', 1])
+        .returning({
+          id: 'string'
+        });
     var result = query.generate({
       prettyPrint: true
     });
     assert.equal(result.sql, 'update table1 set\n' +
         '  name = \'name\',\n' +
         '  address = \'earth\'\n' +
-        'where id = 1');
-    done();
+        'where id = 1\n' +
+        'returning id');
+  });
+
+  it('should validate returning() arguments', function() {
+    try {
+      sqb.update('table1').set({
+        name: 'name',
+        address: 'earth'
+      }).returning(1234);
+    } catch (e) {
+      sqb.update('table1').set({
+        name: 'name',
+        address: 'earth'
+      }).returning(null);
+      return;
+    }
+    assert(0, 'Failed');
+  });
+
+  it('should validate returning() data types', function() {
+    try {
+      sqb.update('table1').set({
+        name: 'name',
+        address: 'earth'
+      }).returning({id: 'invalid'});
+    } catch (e) {
+      sqb.update('table1').set({
+        name: 'name',
+        address: 'earth'
+      }).returning({id: 'string'});
+      return;
+    }
+    assert(0, 'Failed');
   });
 
 });
