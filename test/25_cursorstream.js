@@ -198,9 +198,8 @@ describe('CursorStream', function() {
       result.cursor.next = function(cb) {
         cb(new Error('Any error'));
       };
-      stream.on('error', function(fields) {
-        stream.close();
-        done();
+      stream.once('error', function(fields) {
+        stream.close(done);
       });
       readStream(stream, function() {
       });
