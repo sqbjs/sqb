@@ -4,15 +4,22 @@ const assert = require('assert'),
 
 describe('Serialize insert query', function() {
 
+  var serializer;
+
+  before(function() {
+    serializer = new sqb.serializer({
+      dialect: 'test',
+      prettyPrint: false
+    });
+  });
+
   it('should serialize formal insert query with Object values', function() {
     var query = sqb.insert('id', 'name')
         .into()
         .into('table1')
         .values()
         .values({id: 1, name: 'aaa'});
-    var result = query.generate({
-      paramType: sqb.ParamType.QUESTION_MARK
-    });
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
@@ -20,14 +27,14 @@ describe('Serialize insert query', function() {
     var query = sqb.insert('id', 'name', 'address')
         .into('table1')
         .values([1, 'aaa']);
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (id, name, address) values (1, \'aaa\', null)');
   });
 
   it('should serialize insert query with Object argument', function() {
     var query = sqb.insert({id: 1, name: 'aaa'})
         .into('table1');
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
@@ -38,7 +45,7 @@ describe('Serialize insert query', function() {
           id: 1,
           name: 'aaa'
         });
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
@@ -47,7 +54,8 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values({id: /id/, name: /name/});
     var result = query.generate({
-      paramType: sqb.ParamType.QUESTION_MARK
+      paramType: sqb.ParamType.QUESTION_MARK,
+      prettyPrint: false
     }, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values (?, ?)');
     assert.deepEqual(result.values, [1, 'aaa']);
@@ -58,7 +66,8 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values({id: /id/, name: /name/});
     var result = query.generate({
-      paramType: sqb.ParamType.COLON
+      paramType: sqb.ParamType.COLON,
+      prettyPrint: false
     }, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values (:id, :name)');
     assert.deepEqual(result.values, {id: 1, name: 'aaa'});
@@ -69,7 +78,8 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values({id: /id/, name: /name/});
     var result = query.generate({
-      paramType: sqb.ParamType.QUESTION_MARK
+      paramType: sqb.ParamType.QUESTION_MARK,
+      prettyPrint: false
     }, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values (?, ?)');
     assert.deepEqual(result.values, [1, 'aaa']);
@@ -80,7 +90,8 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values({id: /id/, name: /name/});
     var result = query.generate({
-      paramType: sqb.ParamType.DOLLAR
+      paramType: sqb.ParamType.DOLLAR,
+      prettyPrint: false
     }, {id: 1, name: 'aaa'});
     assert.equal(result.sql, 'insert into table1 (id, name) values ($1, $2)');
     assert.deepEqual(result.values, [1, 'aaa']);
@@ -91,7 +102,8 @@ describe('Serialize insert query', function() {
         .into('table1')
         .values([/id/, 'name', /address/]);
     var result = query.generate({
-      paramType: sqb.ParamType.QUESTION_MARK
+      paramType: sqb.ParamType.QUESTION_MARK,
+      prettyPrint: false
     }, [1, 'earth']);
     assert.equal(result.sql, 'insert into table1 (id, name, address) values (?, \'name\', ?)');
     assert.deepEqual(result.values, [1, 'earth']);
@@ -101,7 +113,7 @@ describe('Serialize insert query', function() {
     var query = sqb.insert('id', 'name')
         .into(sqb.raw('table1'))
         .values({id: 1, name: 'aaa'});
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
@@ -109,7 +121,7 @@ describe('Serialize insert query', function() {
     var query = sqb.insert('ID', 'NAME').into('table1').values(
         sqb.select('id', 'name').from('table2').where(['id', '>', 5])
     );
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (ID, NAME) select id, name from table2 where id > 5');
   });
 
@@ -117,18 +129,17 @@ describe('Serialize insert query', function() {
     var query = sqb.insert('ID', 'NAME').into('table1').values(
         sqb.raw('values (1,2)')
     );
-    var result = query.generate();
+    var result = serializer.generate(query);
     assert.equal(result.sql, 'insert into table1 (ID, NAME) values (1,2)');
   });
 
   it('should check arguments in .values()', function() {
-    var ok;
     try {
       sqb.insert('id', 'name').into(sqb.raw('table1')).values(1);
     } catch (e) {
-      ok = true;
+      return
     }
-    assert.ok(ok);
+    assert(0, 'Failed');
   });
 
   it('should validate returning() arguments', function() {

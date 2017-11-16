@@ -2,12 +2,15 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('Serialize select query -- serialize-select', function() {
+describe('Serialize SelectQuery', function() {
 
   var serializer;
 
   before(function() {
-    serializer = new sqb.serializer({dialect: 'test'});
+    serializer = new sqb.serializer({
+      dialect: 'test',
+      prettyPrint: false
+    });
   });
 
   describe('Serialize "select/from" part', function() {
@@ -56,7 +59,7 @@ describe('Serialize select query -- serialize-select', function() {
           .join(null)
           .groupBy('')
           .orderBy('');
-      var result = query.generate({prettyPrint: true});
+      var result = query.generate();
       assert.equal(result.sql,
           'select\n' +
           '  t1.field1 f1, t1.field2, field3, field4, field5, field6, field7,\n' +
@@ -71,7 +74,7 @@ describe('Serialize select query -- serialize-select', function() {
               'field4', 'field5', 'field6', 'field7', 'field8')
               .from('table1')
               .as('t1'));
-      var result = query.generate({prettyPrint: true});
+      var result = query.generate();
       assert.equal(result.sql,
           'select *\n' +
           'from (\n' +
@@ -84,7 +87,7 @@ describe('Serialize select query -- serialize-select', function() {
       var query = sqb.select()
           .from(sqb.select('field1', 'field2', 'field3',
               'field4', 'field5', 'field6', 'field7', 'field8').from('table1'));
-      var result = query.generate({prettyPrint: true});
+      var result = query.generate();
       assert.equal(result.sql,
           'select *\n' +
           'from (\n' +
@@ -119,7 +122,7 @@ describe('Serialize select query -- serialize-select', function() {
           .where(['ID', 1], ['name', 'value of the field should be too long'],
               ['ID', 1], ['ID', 12345678])
           .groupBy('field1', 'field2', sqb.raw('field3'));
-      var result = query.generate({prettyPrint: true});
+      var result = query.generate();
       assert.equal(result.sql, 'select * from table1\n' +
           'where ID = 1 and name = \'value of the field should be too long\' and\n' +
           '  ID = 1 and ID = 12345678\n' +
@@ -192,7 +195,7 @@ describe('Serialize select query -- serialize-select', function() {
           .join(sqb.join(sqb.select().from('table2')))
           .join(sqb.join(sqb.select('field1', 'field2', 'field3', 'field4', 'field5', 'field6')
               .from('table4')));
-      var result = query.generate({prettyPrint: true});
+      var result = query.generate();
       assert.equal(result.sql,
           'select field1 from table1\n' +
           'inner join (select * from table2)\n' +
@@ -584,13 +587,17 @@ describe('Serialize select query -- serialize-select', function() {
         const d1 = new Date();
         const d2 = new Date();
         const serializer = sqb.serializer({
-              paramType: sqb.ParamType.QUESTION_MARK
+              paramType: sqb.ParamType.QUESTION_MARK,
+              prettyPrint: false
             }),
             query = sqb.select().from('table1').where(
                 ['adate', 'between', /ADATE/],
                 ['bdate', 'between', /BDATE/]
             );
-        var result = serializer.generate(query, {
+        var result = query.generate({
+          paramType: sqb.ParamType.QUESTION_MARK,
+          prettyPrint: false
+        }, {
           ADATE: [d1, d2],
           BDATE: d1
         });
@@ -600,7 +607,10 @@ describe('Serialize select query -- serialize-select', function() {
           ADATE: [d1, d2],
           BDATE: d1
         });
-        result = query.generate({paramType: sqb.ParamType.COLON});
+        result = query.generate({
+          paramType: sqb.ParamType.COLON,
+          prettyPrint: false
+        });
         assert.equal(result.sql, 'select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2');
         assert.deepEqual(result.values.ADATE1, d1);
         assert.deepEqual(result.values.ADATE2, d2);
@@ -636,7 +646,7 @@ describe('Serialize select query -- serialize-select', function() {
             .where(['ID', 'abcd'],
                 ['ID2', 'like', ['a', 'b']],
                 ['ID3', '!like', ['a', 'b']]);
-        var result = query.generate();
+        var result = serializer.generate(query);
         assert.equal(result.sql, 'select * from table1 where ID = \'abcd\' and (ID2 like \'a\' or ID2 like \'b\') and (ID3 not like \'a\' or ID3 not like \'b\')');
       });
 
