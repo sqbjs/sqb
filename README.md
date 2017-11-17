@@ -1,5 +1,10 @@
-# SQB
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/3836517/32965280-1a2b63ce-cbe7-11e7-8ee1-ba47313503c5.png" width="500px" alt="SQB Logo"/>
+</p>
+
+<br>
+  
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 [![Build Status][travis-image]][travis-url]
@@ -12,7 +17,7 @@
 
 ## What is SQB
 
-SQB (Sequential Query Builder) is a Plugin-driven, multi-dialect SQL query builder and Database connection wrapper for NodeJS. SQB can be used as a pure sql query builder or database connection wrapper.
+SQB is a Plugin-driven, multi-dialect SQL query builder and Database connection wrapper for NodeJS. SQB can be used as a pure sql query builder or database connection wrapper.
 
 Take a look at [documentation](https://panates.gitbooks.io/sqb/content/) for details
 

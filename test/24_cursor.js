@@ -825,10 +825,10 @@ describe('Cursor', function() {
     });
   });
 
-  it('should call queries onFetchRow events on fetching new rows', function(done) {
+  it('should call queries `fetch` events on fetching new rows', function(done) {
     var l = 0;
     pool.select().from('table1')
-        .onFetchRow(function(row) {
+        .on('fetch', function(row) {
           l++;
         })
         .execute({

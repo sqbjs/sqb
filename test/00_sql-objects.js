@@ -25,12 +25,12 @@ describe('Initialize sql objects sqb.js', function() {
     var obj = sqb.join('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.innerJoin, obj.joinType);
+    assert.equal(sqb.JoinType.INNER, obj.joinType);
   });
 
   it('should validate arguments in "join"', function() {
     try {
-      new sqb.Join(sqb.Join.Type.innerJoin, 1);
+      new sqb.Join(sqb.JoinType.INNER, 1);
       new sqb.Join(-1, 'table');
       new sqb.Join(7, 'table');
     } catch (e) {
@@ -52,49 +52,49 @@ describe('Initialize sql objects sqb.js', function() {
     var obj = sqb.innerJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.innerJoin, obj.joinType);
+    assert.equal(sqb.JoinType.INNER, obj.joinType);
   });
 
   it('should initialize "leftJoin"', function() {
     var obj = sqb.leftJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.leftJoin, obj.joinType);
+    assert.equal(sqb.JoinType.LEFT, obj.joinType);
   });
 
   it('should initialize "leftOuterJoin"', function() {
     var obj = sqb.leftOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.leftOuterJoin, obj.joinType);
+    assert.equal(sqb.JoinType.LEFT_OUTER, obj.joinType);
   });
 
   it('should initialize "rightJoin"', function() {
     var obj = sqb.rightJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.rightJoin, obj.joinType);
+    assert.equal(sqb.JoinType.RIGHT, obj.joinType);
   });
 
   it('should initialize "rightOuterJoin"', function() {
     var obj = sqb.rightOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.rightOuterJoin, obj.joinType);
+    assert.equal(sqb.JoinType.RIGHT_OUTER, obj.joinType);
   });
 
   it('should initialize "outerJoin"', function() {
     var obj = sqb.outerJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.outerJoin, obj.joinType);
+    assert.equal(sqb.JoinType.OUTER, obj.joinType);
   });
 
   it('should initialize "fullOuterJoin"', function() {
     var obj = sqb.fullOuterJoin('table');
     assert.ok(obj instanceof sqb.Join);
     assert.equal(obj.type, 'join');
-    assert.equal(sqb.Join.Type.fullOuterJoin, obj.joinType);
+    assert.equal(sqb.JoinType.FULL_OUTER, obj.joinType);
   });
 
   it('should set action/clientId/module of query', function() {
@@ -219,15 +219,6 @@ describe('Initialize sql objects sqb.js', function() {
       assert(0, 'Failed');
     });
 
-    it('should validate onFetchRow arguments', function() {
-      try {
-        sqb.select().onFetchRow(123);
-      } catch (e) {
-        sqb.select().onFetchRow(null);
-        return;
-      }
-      assert(0, 'Failed');
-    });
   });
 
 });

@@ -285,10 +285,10 @@ describe('Connection', function() {
     });
   });
 
-  it('should select() and call onFetchRow', function(done) {
+  it('should emit `fetch` event ', function(done) {
     pool.connect(function(err, conn) {
       conn.select().from('table1')
-          .onFetchRow(function(row) {
+          .on('fetch', function(row) {
             try {
               assert.equal(row.ID, 'LFOI');
             } catch (e) {

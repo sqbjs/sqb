@@ -9,7 +9,7 @@ describe('Serializer', function() {
       prettyPrint: 0
     });
     assert(serializer.prettyPrint);
-    assert.equal(serializer.paramType, 1);
+    assert.equal(serializer.paramType, sqb.ParamType.COLON);
     assert(!serializer.strictParams);
     serializer.prettyPrint = 1;
     assert.equal(serializer.prettyPrint, true);

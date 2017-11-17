@@ -16,7 +16,7 @@ describe('Serialize SelectQuery', function() {
   describe('Serialize "select/from" part', function() {
 
     it('should serialize * for when no columns given', function() {
-      var query = sqb.select().columns().from('table1').join();
+      var query = sqb.select('*').columns().from('table1').join();
       var result = serializer.generate(query);
       assert.equal(result.sql, 'select * from table1');
     });
@@ -259,10 +259,10 @@ describe('Serialize SelectQuery', function() {
 
     it('should serialize single condition in "when"', function() {
       var query = sqb.select(
-          sqb.case().when('col1', 5).then().else(100)
+          sqb.case().when('age', '>=', 16).then(1).else(0)
       ).from('table1');
       var result = serializer.generate(query);
-      assert.equal(result.sql, 'select case when col1 = 5 then null else 100 end from table1');
+      assert.equal(result.sql, 'select case when age >= 16 then 1 else 0 end from table1');
     });
 
     it('should serialize without condition in "when"', function() {
@@ -428,9 +428,9 @@ describe('Serialize SelectQuery', function() {
       it('should serialize "between" operator test2', function() {
         var query = sqb.select()
             .from('table1')
-            .where(['id', 'between', 1]);
+            .where(['id', '!between', 1]);
         var result = serializer.generate(query);
-        assert.equal(result.sql, 'select * from table1 where id between 1 and 1');
+        assert.equal(result.sql, 'select * from table1 where id not between 1 and 1');
       });
 
       it('should serialize sub group', function() {
@@ -580,7 +580,6 @@ describe('Serialize SelectQuery', function() {
         var result = query.generate(undefined, {ID: 1});
         assert.equal(result.sql, 'select * from table1 where ID = :ID');
         assert.equal(result.values.ID, 1);
-
       });
 
       it('should serialize parameter for "between"', function() {
@@ -592,7 +591,7 @@ describe('Serialize SelectQuery', function() {
             }),
             query = sqb.select().from('table1').where(
                 ['adate', 'between', /ADATE/],
-                ['bdate', 'between', /BDATE/]
+                ['bdate', 'not between', /BDATE/]
             );
         var result = query.generate({
           paramType: sqb.ParamType.QUESTION_MARK,
@@ -601,7 +600,7 @@ describe('Serialize SelectQuery', function() {
           ADATE: [d1, d2],
           BDATE: d1
         });
-        assert.equal(result.sql, 'select * from table1 where adate between ? and ? and bdate between ? and ?');
+        assert.equal(result.sql, 'select * from table1 where adate between ? and ? and bdate not between ? and ?');
         assert.deepEqual(result.values, [d1, d2, d1, d1]);
         query.params({
           ADATE: [d1, d2],
@@ -611,7 +610,7 @@ describe('Serialize SelectQuery', function() {
           paramType: sqb.ParamType.COLON,
           prettyPrint: false
         });
-        assert.equal(result.sql, 'select * from table1 where adate between :ADATE1 and :ADATE2 and bdate between :BDATE1 and :BDATE2');
+        assert.equal(result.sql, 'select * from table1 where adate between :ADATE1 and :ADATE2 and bdate not between :BDATE1 and :BDATE2');
         assert.deepEqual(result.values.ADATE1, d1);
         assert.deepEqual(result.values.ADATE2, d2);
         assert.deepEqual(result.values.BDATE1, d1);
@@ -728,16 +727,6 @@ describe('Serialize SelectQuery', function() {
             .from('table1')
             .where([sqb.select('ID').from('table1').as('t1'), 1]).offset(5);
         assert.equal(query._offset, 5);
-      });
-
-      it('should assign on Fetch Row', function() {
-        var query = sqb.select()
-            .from('table1')
-            .where([sqb.select('ID').from('table1').as('t1'), 1]).onFetchRow(
-                function() {
-                }
-            );
-        assert.ok(query._onFetchRow && query._onFetchRow.length > 0);
       });
 
     });

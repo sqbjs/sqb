@@ -24,7 +24,7 @@ describe('Pool', function() {
 
   it('should not create a pool with unknown dialect', function() {
     try {
-      pool = sqb.createPool({
+      pool = sqb.pool({
         dialect: 'test2',
         user: 'user',
         schema: 'schema'
@@ -51,7 +51,7 @@ describe('Pool', function() {
     assert.equal(pool.schema, 'schema');
     assert(pool.metaData);
     assert(typeof pool.metaData, 'object');
-    assert.equal(pool.state, pool.PoolState.IDLE);
+    assert.equal(pool.state, sqb.PoolState.IDLE);
   });
 
   it('should create a pool with default options', function() {
@@ -68,7 +68,7 @@ describe('Pool', function() {
     assert.equal(pool2.options.min, 0);
     assert.equal(pool2.options.minIdle, 0);
     assert.equal(pool2.options.maxQueue, 1000);
-    assert.equal(pool2.options.validation, true);
+    assert.equal(pool2.options.validation, false);
   });
 
   it('should start pool', function(done) {
