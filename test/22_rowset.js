@@ -316,9 +316,11 @@ describe('Rowset', function() {
         const rowset = result && result.rowset;
         assert(rowset);
         assert.equal(rowset.isBof, true);
-        assert.equal(rowset.moveTo(5), rowset);
+        assert.equal(rowset.moveTo(5), 5);
         assert.equal(rowset.row[0], rowset.rows[4][0]);
-        assert.equal(rowset.moveTo(), rowset);
+        assert.equal(rowset.moveTo(), 0);
+        assert.equal(rowset.moveTo(100000), rowset.length + 1);
+        assert.equal(rowset.moveTo(-1), 0);
         assert.equal(rowset.rowNum, 0);
       } catch (e) {
         return done(e);
