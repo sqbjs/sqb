@@ -27,7 +27,7 @@ describe('Serialize SelectQuery', function() {
       assert.equal(result.sql, 'select *');
     });
 
-    it('should serialize select/from - test 1', function() {
+    it('should serialize simple query', function() {
       var query = sqb.select('field1', 'field2', 'field3',
           'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
           'field10').from('table1');
@@ -36,43 +36,53 @@ describe('Serialize SelectQuery', function() {
           'field6, field7, field8, field9, field10 from table1');
     });
 
-    it('should serialize select/from - test 2', function() {
+    it('should serialize schema and table alias in "from" part', function() {
       var query = sqb.select('t1.field1 f1').from('schema1.table1 t1');
       var result = serializer.generate(query);
       assert.equal(result.sql, 'select t1.field1 f1 from schema1.table1 t1');
     });
 
-    it('should serialize select/from - test 3', function() {
-      var query = sqb.select('field1 f1', 'field2', sqb.raw('\nfield3'),
-          sqb.select('id').from('table2').as('id2'))
-          .from('schema1.table1 t1', sqb.raw('\ntable2'));
+    it('should serialize alias in columns', function() {
+      var query = sqb.select('field1 f1', 'field2 as f2')
+          .from('schema1.table1 t1');
       var result = serializer.generate(query);
-      assert.equal(result.sql, 'select field1 f1, field2, field3, (select id from table2) id2 from schema1.table1 t1, table2');
+      assert.equal(result.sql, 'select field1 f1, field2 f2 from schema1.table1 t1');
     });
 
-    it('should serialize select/from - test 4', function() {
-      var query = sqb.select(['t1.field1 f1', 't1.field2', 'field3',
-        'field4', 'field5', 'field6', 'field7', 'field8', 'field9',
-        'field10', 'field11', 'field12', 'field13', 'field14', 'field15',
-        'field16', 'field17', 'where w', 'field18 and', ''])
-          .from('table1', '')
+    it('should serialize raw in columns', function() {
+      var query = sqb.select(sqb.raw('\'John\'\'s Bike\' f1'))
+          .from('table1');
+      var result = serializer.generate(query);
+      assert.equal(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
+    });
+
+    it('should serialize sub-select in columns', function() {
+      var query = sqb.select(sqb.select('id').from('table2').as('id2'))
+          .from('table1');
+      var result = serializer.generate(query);
+      assert.equal(result.sql, 'select (select id from table2) id2 from table1');
+    });
+
+    it('should serialize raw in "from" part', function() {
+      var query = sqb.select().from('table1', sqb.raw('func1()'));
+      var result = serializer.generate(query);
+      assert.equal(result.sql, 'select * from table1, func1()');
+    });
+
+    it('should skip empty columns, tables, joins, group columns and order columns', function() {
+      var query = sqb.select('field1', '')
+          .from('schema1.table1 t1', '')
           .join(null)
           .groupBy('')
           .orderBy('');
-      var result = query.generate();
-      assert.equal(result.sql,
-          'select\n' +
-          '  t1.field1 f1, t1.field2, field3, field4, field5, field6, field7,\n' +
-          '  field8, field9, field10, field11, field12, field13, field14, field15,\n' +
-          '  field16, field17, "where" w, field18 "and"\n' +
-          'from table1');
+      var result = serializer.generate(query);
+      assert.equal(result.sql, 'select field1 from schema1.table1 t1');
     });
 
-    it('should serialize select/from - test 5', function() {
+    it('should serialize sub-select in "from" part', function() {
       var query = sqb.select()
           .from(sqb.select('field1', 'field2', 'field3',
-              'field4', 'field5', 'field6', 'field7', 'field8')
-              .from('table1')
+              'field4', 'field5', 'field6', 'field7', 'field8').from('table1')
               .as('t1'));
       var result = query.generate();
       assert.equal(result.sql,
@@ -81,19 +91,6 @@ describe('Serialize SelectQuery', function() {
           '  select\n' +
           '    field1, field2, field3, field4, field5, field6, field7, field8\n' +
           '  from table1) t1');
-    });
-
-    it('should serialize select/from - test 6', function() {
-      var query = sqb.select()
-          .from(sqb.select('field1', 'field2', 'field3',
-              'field4', 'field5', 'field6', 'field7', 'field8').from('table1'));
-      var result = query.generate();
-      assert.equal(result.sql,
-          'select *\n' +
-          'from (\n' +
-          '  select\n' +
-          '    field1, field2, field3, field4, field5, field6, field7, field8\n' +
-          '  from table1)');
     });
 
     it('should validate field name', function() {

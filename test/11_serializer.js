@@ -123,6 +123,15 @@ describe('Serializer', function() {
     assert.deepEqual(result.values, [5, 1, 3, 2, 2, null]);
   });
 
+  it('Should serialize AT params', function() {
+    var query = sqb.select().from('table1').where(['ID', /ID/]);
+    var result = query.generate({
+      paramType: sqb.ParamType.AT
+    }, {ID: 5});
+    assert.equal(result.sql, 'select * from table1 where ID = @ID');
+    assert.deepEqual(result.values, {ID: 5});
+  });
+
   it('should return serializer that already passed in first argument', function() {
     var obj = sqb.serializer();
     var obj2 = sqb.serializer(obj);

@@ -97,6 +97,18 @@ describe('Serialize insert query', function() {
     assert.deepEqual(result.values, [1, 'aaa']);
   });
 
+  it('should serialize AT param type', function() {
+    var query = sqb.insert('id', 'name')
+        .into('table1')
+        .values({id: /id/, name: /name/});
+    var result = query.generate({
+      paramType: sqb.ParamType.AT,
+      prettyPrint: false
+    }, {id: 1, name: 'aaa'});
+    assert.equal(result.sql, 'insert into table1 (id, name) values (@id, @name)');
+    assert.deepEqual(result.values, {id: 1, name: 'aaa'});
+  });
+
   it('should serialize array params', function() {
     var query = sqb.insert('id', 'name', 'address')
         .into('table1')
@@ -137,7 +149,7 @@ describe('Serialize insert query', function() {
     try {
       sqb.insert('id', 'name').into(sqb.raw('table1')).values(1);
     } catch (e) {
-      return
+      return;
     }
     assert(0, 'Failed');
   });
