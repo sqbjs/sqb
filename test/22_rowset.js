@@ -210,6 +210,31 @@ describe('Rowset', function() {
     });
   });
 
+  it('should iterate over rows', function(done) {
+    pool.select().from('table1').execute({
+      fetchRows: 10
+    }, function(err, result) {
+      try {
+        assert(!err, err);
+        const rowset = result && result.rowset;
+        assert(rowset);
+        assert.equal(rowset.isBof, true);
+        var k = 0;
+        for (var o of rowset) {
+          assert.equal(o[0], rowset.rows[k][0]);
+          assert.equal(o[0], rowset.row[0]);
+          k++;
+        }
+        assert.equal(rowset.isEof, true);
+        assert.equal(rowset.next(), undefined);
+        assert.equal(k, 10);
+      } catch (e) {
+        return done(e);
+      }
+      done();
+    });
+  });
+
   it('should next() iterate over rows', function(done) {
     pool.select().from('table1').execute({
       fetchRows: 10
