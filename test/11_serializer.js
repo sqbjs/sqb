@@ -8,7 +8,7 @@ describe('Serializer', function() {
     var serializer = sqb.serializer({
       prettyPrint: 0
     });
-    assert(serializer.prettyPrint);
+    assert.equal(serializer.prettyPrint, false);
     assert.equal(serializer.paramType, sqb.ParamType.COLON);
     assert(!serializer.strictParams);
     serializer.prettyPrint = 1;
