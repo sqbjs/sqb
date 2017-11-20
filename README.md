@@ -27,6 +27,15 @@ Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs
 
 ***Note:*** *SQB is in BETA state. Currently, production use is not recommended.* 
 
+## Main goals
+
+- Single code base for any sql based database
+- Powerful and simplified query coding scheme
+- Fast applications with low memory requirements
+- Support latest JavaScript language standards
+- Light and extensible framework with plugin system
+
+
 ## Installation
 
 ```bash
