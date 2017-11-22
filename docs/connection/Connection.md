@@ -160,7 +160,7 @@ connection.execute('any sql').then((result) => {
 - **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
 
 ### Connection.prototype.get()
-This call returns values of properties that connection drivers exposes. 
+This call returns values of properties that connection adapter exposes. 
 
 `connection.get(property)`
 
