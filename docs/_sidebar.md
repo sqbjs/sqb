@@ -4,8 +4,8 @@
 
 - SQL Query Builder
 
-    - [Introduction](/query-builder/introduction)
-    - [Serializer Class](/query-builder/Serializer)
+    - [Introduction](query-builder/introduction)
+    - [Serializer Class](query-builder/Serializer)
     - Query Objects
         - [DeleteQuery Clas](/query-builder/query/DeleteQuery)
         - [InsertQuery Class](/query-builder/query/InsertQuery)
