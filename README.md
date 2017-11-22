@@ -19,7 +19,7 @@
 
 SQB is an extensible, multi-dialect SQL query builder and Database connection wrapper for NodeJS. SQB can be used as a pure sql query builder or database connection wrapper.
 
-Take a look at [DOCUMENTATION](https://panates.gitbooks.io/sqb/content/) for details
+Take a look at [DOCUMENTATION](https://panates.github.io/sqb/) for details
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/panates/sqb/issues) page
 
