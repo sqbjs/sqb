@@ -20,8 +20,6 @@
 - [Connection.prototype.insert()](#connectionprototypeinsert)
 - [Connection.prototype.update()](#connectionprototypeupdate)
 - [Connection.prototype.select()](#connectionprototypeselect)
-- [Connection.prototype.start()](#connectionprototypestart)
-- [Connection.prototype.close()](#connectionprototypeclose)
 - [Connection.prototype.case()](#connectionprototypecase)
 - [Connection.prototype.raw()](#connectionprototyperaw)
 - [Connection.prototype.join()](#connectionprototypejoin)
@@ -200,6 +198,14 @@ This call rolls back the current transaction in progress on the connection.
 
 
 - **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+
+
+### Connection.prototype.metaData()
+Creates a [MetaData](query-builder/connection/MetaData.md) associated with this connection.
+
+`query = connection.metaData()`
+
+- ***Returns***: Returns instance of `MetaData` instance which helps working with database meta-data.
 
 
 ### Connection.prototype.delete()

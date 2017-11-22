@@ -17,7 +17,6 @@ When applications use a lot of connections for short periods, we recommend using
 - [acquired](#acquired)
 - [available](#available)
 - [pending](#pending)
-- [metaData](#metadata)
 - [state](#state)
 
 #### Methods
@@ -25,12 +24,11 @@ When applications use a lot of connections for short periods, we recommend using
 - [Pool.prototype.close()](#poolprototypeclose)
 - [Pool.prototype.connect()](#poolprototypeconnect)
 - [Pool.prototype.execute()](#poolprototypeexecute)
+- [Pool.prototype.metaData()](#poolprototypemetadata)
 - [Pool.prototype.delete()](#poolprototypedelete)
 - [Pool.prototype.insert()](#poolprototypeinsert)
 - [Pool.prototype.update()](#poolprototypeupdate)
 - [Pool.prototype.select()](#poolprototypeselect)
-- [Pool.prototype.start()](#poolprototypestart)
-- [Pool.prototype.close()](#poolprototypeclose)
 - [Pool.prototype.case()](#poolprototypecase)
 - [Pool.prototype.raw()](#poolprototyperaw)
 - [Pool.prototype.join()](#poolprototypejoin)
@@ -127,11 +125,6 @@ Returns number of idle connections.
 
 Returns number of acquire request waits in the Pool queue.
 
-### metaData
-*getter (`MetaData`)*
-
-Returns instance of `MetaData` instance which helps working with database meta-data.
-
 ### state
 *getter ([PoolState](types/PoolState.md))*
 
@@ -220,7 +213,7 @@ pool.connect().then(connection => {
 
 ### Pool.prototype.execute()
 
-This method acquires a new connection from the pool, executes the query and releases connection immediately.
+This call acquires a connection, executes the query and releases connection immediately.
 
 `pool.execute(query[, values[, options[, callback]]])`
             
@@ -260,6 +253,35 @@ pool.execute('any sql').then((result) => {
   console.error(error);
 });
 ```
+
+### Pool.prototype.metaData()
+Creates a [MetaData](query-builder/connection/MetaData.md) associated with this pool.
+
+`query = pool.metaData()`
+
+- ***Returns***: Returns instance of `MetaData` instance which helps working with database meta-data.
+
+
+### Pool.prototype.test()
+
+This call tests the pool.
+
+`pool.test([callback])`
+            
+- `callback` (Function) : Function, taking one argument:
+
+  `function(error)`  
+  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
+
+- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+
+```js
+pool.test((err) => {
+  if (err)
+    return console.error(err);
+  console.log('Pool works');
+});
+``` 
 
 ### Pool.prototype.delete()
 Creates an executable [DeleteQuery](query-builder/query/DeleteQuery.md) associated with this pool.
