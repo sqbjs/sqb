@@ -7,23 +7,23 @@
     - [Introduction](query-builder/introduction)
     - [Serializer Class](query-builder/Serializer)
     - Query Objects
-        - [DeleteQuery Clas](/query-builder/query/DeleteQuery)
-        - [InsertQuery Class](/query-builder/query/InsertQuery)
-        - [SelectQuery Class](/query-builder/query/SelectQuery)
-        - [UpdateQuery Class](/query-builder/query/UpdateQuery)
+        - [DeleteQuery Clas](query-builder/query/DeleteQuery)
+        - [InsertQuery Class](query-builder/query/InsertQuery)
+        - [SelectQuery Class](query-builder/query/SelectQuery)
+        - [UpdateQuery Class](query-builder/query/UpdateQuery)
     - SQL Objects
-        - [Raw Class](/query-builder/sql-object/Raw)
-        - [Join Class](/query-builder/sql-object/Join)
-        - [Case Class](/query-builder/sql-object/Case)
-    - [SQL Conditions](/query-builder/conditions)
+        - [Raw Class](query-builder/sql-object/Raw)
+        - [Join Class](query-builder/sql-object/Join)
+        - [Case Class](query-builder/sql-object/Case)
+    - [SQL Conditions](query-builder/conditions)
 
 - Connection wrapper
 
-    - [Pool Class](/connection/Pool)
-    - [Connection Class](/connection/Connection)
-    - [Cursor Class](/connection/Cursor)
-    - [Rowset Class](/connection/Rowset)
-    - [MetaData Class](/connection/MetaData)
+    - [Pool Class](connection/Pool)
+    - [Connection Class](connection/Connection)
+    - [Cursor Class](connection/Cursor)
+    - [Rowset Class](connection/Rowset)
+    - [MetaData Class](connection/MetaData)
 
-- [Enumerated Types](/enumerated-types)
-- [Extensions](/extensions)
+- [Enumerated Types](enumerated-types)
+- [Extensions](extensions)
