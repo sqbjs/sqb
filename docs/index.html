@@ -13,20 +13,23 @@
     <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/dark.css" title="dark" disabled>
     <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/buble.css" title="buble" disabled>
     <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/pure.css" title="pure" disabled>
-    <link rel="stylesheet" href="//unpkg.com/docsify-copy-code/styles.css" />
+    <link rel="stylesheet" href="//unpkg.com/docsify-copy-code/styles.css"/>
 </head>
 <body>
 <div id="app">Please wait...</div>
 <script src="//unpkg.com/docsify-copy-code/index.js"></script>
 <script>
+  const baseURL = 'https://raw.githubusercontent.com/panates/sqb/master';
   window.$docsify = {
-    name: 'SQB',
+    name: '<img src="https://user-images.githubusercontent.com/3836517/32965280-1a2b63ce-cbe7-11e7-8ee1-ba47313503c5.png" height="32px">',
+    homepage: (baseURL + '/README.md'),
     repo: 'panates/sqb',
     basePath: '/',
     auto2top: true,
     loadSidebar: true,
     maxLevel: 2,
     subMaxLevel: 2,
+    routerMode: 'history', // default: 'hash'
     plugins: [
       window.DocsifyCopyCodePlugin.init()
     ]
