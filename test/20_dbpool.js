@@ -2,7 +2,7 @@
 const assert = require('assert');
 const sqb = require('../');
 const testDriver = require('./support/test_driver');
-const plugins = require('../lib/plugins');
+const extensions = require('../lib/extensions');
 
 describe('Pool', function() {
 
@@ -12,14 +12,14 @@ describe('Pool', function() {
     pool.close(true);
   });
 
-  it('should drivers can be registered as plugins', function() {
-    assert(plugins.items);
-    assert.equal(plugins.items.length, 1);
-    assert.equal(plugins.stringify, undefined);
+  it('should drivers can be registered as extension', function() {
+    assert(extensions.items);
+    assert.equal(extensions.items.length, 1);
+    assert.equal(extensions.stringify, undefined);
     sqb.use(require('./support/test_serializer'));
     sqb.use(testDriver);
-    assert.equal(plugins.items.length, 2);
-    assert(plugins.stringify);
+    assert.equal(extensions.items.length, 2);
+    assert(extensions.stringify);
   });
 
   it('should not create a pool with unknown dialect', function() {
