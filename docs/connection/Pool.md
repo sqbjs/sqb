@@ -25,10 +25,11 @@ When applications use a lot of connections for short periods, we recommend using
 - [Pool.prototype.connect()](#poolprototypeconnect)
 - [Pool.prototype.execute()](#poolprototypeexecute)
 - [Pool.prototype.metaData()](#poolprototypemetadata)
-- [Pool.prototype.delete()](#poolprototypedelete)
+
+- [Pool.prototype.select()](#poolprototypeselect)
 - [Pool.prototype.insert()](#poolprototypeinsert)
 - [Pool.prototype.update()](#poolprototypeupdate)
-- [Pool.prototype.select()](#poolprototypeselect)
+- [Pool.prototype.delete()](#poolprototypedelete)
 - [Pool.prototype.case()](#poolprototypecase)
 - [Pool.prototype.raw()](#poolprototyperaw)
 - [Pool.prototype.join()](#poolprototypejoin)
@@ -283,10 +284,10 @@ pool.test((err) => {
 });
 ``` 
 
-### Pool.prototype.delete()
-Creates an executable [DeleteQuery](query-builder/query/DeleteQuery.md) associated with this pool.
+### Pool.prototype.select()
+Creates an executable [SelectQuery](query-builder/query/SelectQuery.md) associated with this pool.
 
-`query = pool.delete()`
+`query = pool.select()`
 
 ### Pool.prototype.insert()
 Creates an executable [InsertQuery](query-builder/query/InsertQuery.md) associated with this pool.
@@ -298,10 +299,10 @@ Creates an executable [UpdateQuery](query-builder/query/UpdateQuery.md) associat
 
 `query = pool.update()`
 
-### Pool.prototype.select()
-Creates an executable [SelectQuery](query-builder/query/SelectQuery.md) associated with this pool.
+### Pool.prototype.delete()
+Creates an executable [DeleteQuery](query-builder/query/DeleteQuery.md) associated with this pool.
 
-`query = pool.select()`
+`query = pool.delete()`
 
 ### Pool.prototype.case()
 Creates a [Case](query-builder/sql-object/Case.md) sql object.

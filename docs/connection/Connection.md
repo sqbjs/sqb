@@ -11,15 +11,18 @@
 
 #### Methods
 - [Connection.prototype.acquire()](#connectionprototypeacquire)
-- [Connection.prototype.commit()](#connectionprototypecommit)
-- [Connection.prototype.execute()](#connectionprototypeexecute)
-- [Connection.prototype.get()](#connectionprototypeget)
 - [Connection.prototype.release()](#connectionprototyperelease)
+- [Connection.prototype.execute()](#connectionprototypeexecute)
+- [Connection.prototype.startTransaction()](#connectionprototypecommit)
+- [Connection.prototype.commit()](#connectionprototypecommit)
 - [Connection.prototype.rollback()](#connectionprototyperollback)
-- [Connection.prototype.delete()](#connectionprototypedelete)
+- [Connection.prototype.get()](#connectionprototypeget)
+- [Connection.prototype.metaData()](#connectionprototypemetada)
+
+- [Connection.prototype.select()](#connectionprototypeselect)
 - [Connection.prototype.insert()](#connectionprototypeinsert)
 - [Connection.prototype.update()](#connectionprototypeupdate)
-- [Connection.prototype.select()](#connectionprototypeselect)
+- [Connection.prototype.delete()](#connectionprototypedelete)
 - [Connection.prototype.case()](#connectionprototypecase)
 - [Connection.prototype.raw()](#connectionprototyperaw)
 - [Connection.prototype.join()](#connectionprototypejoin)
@@ -102,17 +105,12 @@ pool.connect((error, connection) => {
 ```
 *In the example above, the connection will back to the pool after last sub operation finished.*
    
-   
-### Connection.prototype.commit()
-This call commits the current transaction in progress on the connection.
 
-`connection.commit([callback])`
+### Connection.prototype.release()
+This method decreases the internal reference counter. When reference count is 0, connection returns to the pool.
 
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
+`connection.release()`
+  
 
 ### Connection.prototype.execute()
 This method executes `Query` instances or sql statement strings.
@@ -157,7 +155,47 @@ connection.execute('any sql').then((result) => {
 });
 ```  
 
+### Connection.prototype.startTransaction()
+This call starts a new transaction on the connection.
+
+`connection.startTransaction([callback])`
+
+- `callback` (Function) : Function, taking one argument:
+
+  `function(error)`  
+  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
+
+
 - **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+
+
+### Connection.prototype.commit()
+This call commits the current transaction in progress on the connection.
+
+`connection.commit([callback])`
+
+- `callback` (Function) : Function, taking one argument:
+
+  `function(error)`  
+  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
+
+
+- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+
+
+### Connection.prototype.rollback()
+This call rolls back the current transaction in progress on the connection.
+
+`connection.rollback([callback])`
+
+- `callback` (Function) : Function, taking one argument:
+
+  `function(error)`  
+  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
+
+
+- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+
 
 ### Connection.prototype.get()
 This call returns values of properties that connection adapter exposes. 
@@ -180,26 +218,6 @@ connection.get('serverVersion');
 - **Returns** : Value.
 
 
-### Connection.prototype.release()
-This method decreases the internal reference counter. When reference count is 0, connection returns to the pool.
-
-`connection.release()`
-
-
-### Connection.prototype.rollback()
-This call rolls back the current transaction in progress on the connection.
-
-`connection.rollback([callback])`
-
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
-
-
 ### Connection.prototype.metaData()
 Creates a [MetaData](query-builder/connection/MetaData.md) associated with this connection.
 
@@ -208,10 +226,10 @@ Creates a [MetaData](query-builder/connection/MetaData.md) associated with this 
 - ***Returns***: Returns instance of `MetaData` instance which helps working with database meta-data.
 
 
-### Connection.prototype.delete()
-Creates an executable [DeleteQuery](query-builder/query/DeleteQuery.md) associated with this pool.
+### Connection.prototype.select()
+Creates an executable [SelectQuery](query-builder/query/SelectQuery.md) associated with this pool.
 
-`query = pool.delete()`
+`query = pool.select()`
 
 ### Connection.prototype.insert()
 Creates an executable [InsertQuery](query-builder/query/InsertQuery.md) associated with this pool.
@@ -223,10 +241,12 @@ Creates an executable [UpdateQuery](query-builder/query/UpdateQuery.md) associat
 
 `query = pool.update()`
 
-### Connection.prototype.select()
-Creates an executable [SelectQuery](query-builder/query/SelectQuery.md) associated with this pool.
 
-`query = pool.select()`
+### Connection.prototype.delete()
+Creates an executable [DeleteQuery](query-builder/query/DeleteQuery.md) associated with this pool.
+
+`query = pool.delete()`
+
 
 ### Connection.prototype.case()
 Creates a [Case](query-builder/sql-object/Case.md) sql object.
