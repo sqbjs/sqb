@@ -9,22 +9,22 @@ When applications use a lot of connections for short periods, we recommend using
 #### Properties
 - [config](#config)
 - [dialect](#dialect)
-- [isClosed](#isclosed)
 - [user](#user)
 - [schema](#schema)
-- [size](#size)
+- [isClosed](#isclosed)
 - [acquired](#acquired)
 - [acquired](#acquired)
 - [available](#available)
 - [pending](#pending)
+- [size](#size)
 - [state](#state)
+- [metaData](#state)
 
 #### Methods
 - [Pool.prototype.start()](#poolprototypestart)
 - [Pool.prototype.close()](#poolprototypeclose)
 - [Pool.prototype.connect()](#poolprototypeconnect)
 - [Pool.prototype.execute()](#poolprototypeexecute)
-- [Pool.prototype.metaData()](#poolprototypemetadata)
 
 - [Pool.prototype.select()](#poolprototypeselect)
 - [Pool.prototype.insert()](#poolprototypeinsert)
@@ -90,11 +90,6 @@ This is a read only property that returns the configuration object given at crea
 *getter (String)*
 
 This is a read only property to shortcut to *dialect* property in the configuration object.
-    
-### isClosed
-*getter (Boolean)*
-
-Returns true if pool is closed, false otherwise.
 
 ### user
 *getter (String)*
@@ -105,6 +100,11 @@ This is a read only property to shortcut to *user* property in the configuration
 *getter (String)*
 
 This is a read only property to shortcut to *schema* property in the configuration object.
+    
+### isClosed
+*getter (Boolean)*
+
+Returns true if pool is closed, false otherwise.
 
 ### size
 *getter (Number)*
@@ -131,8 +131,12 @@ Returns number of acquire request waits in the Pool queue.
 
 Returns current state of the Pool.
 
-<hr/>
+### metaData
+Retuns [MetaData](connection/MetaData.md) instance that helps working with database meta-data.
 
+`pool.metaData.query(...)`
+
+<hr/>
 ## Methods
 
 ### Pool.prototype.start()
@@ -254,13 +258,6 @@ pool.execute('any sql').then((result) => {
   console.error(error);
 });
 ```
-
-### Pool.prototype.metaData()
-Creates a [MetaData](query-builder/connection/MetaData.md) associated with this pool.
-
-`query = pool.metaData()`
-
-- ***Returns***: Returns instance of `MetaData` instance which helps working with database meta-data.
 
 
 ### Pool.prototype.test()

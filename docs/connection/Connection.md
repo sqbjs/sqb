@@ -4,10 +4,10 @@
 
 #### Properties
 - [isClosed](#isclosed)
-- [metaData](#metadata)
 - [pool](#pool)
 - [referenceCount](#referencecount)
 - [sessionId](#sessionid)
+- [metaData](#metadata)
 
 #### Methods
 - [Connection.prototype.acquire()](#connectionprototypeacquire)
@@ -17,7 +17,6 @@
 - [Connection.prototype.commit()](#connectionprototypecommit)
 - [Connection.prototype.rollback()](#connectionprototyperollback)
 - [Connection.prototype.get()](#connectionprototypeget)
-- [Connection.prototype.metaData()](#connectionprototypemetada)
 
 - [Connection.prototype.select()](#connectionprototypeselect)
 - [Connection.prototype.insert()](#connectionprototypeinsert)
@@ -53,11 +52,6 @@ Connection object is created by Pool instance only when it needs a new one. `poo
 
 Returns true if connection is permanently closed, false otherwise.
     
-### metaData
-*getter (`MetaData`)*
-
-Returns instance of `MetaData` instance which helps working with database meta-data.
-
 ### pool
 *getter ([Pool](connection/Pool.md))* 
 
@@ -72,6 +66,11 @@ Returns internal reference counter number.
 *getter (String|Number)*
 
 Returns session id of the connection given by database server.
+
+### metaData
+*getter (`MetaData`)*
+
+Returns instance of `MetaData` instance which helps working with database meta-data.
 
 
 <hr/>
@@ -216,14 +215,6 @@ connection.get('serverVersion');
 
 
 - **Returns** : Value.
-
-
-### Connection.prototype.metaData()
-Creates a [MetaData](query-builder/connection/MetaData.md) associated with this connection.
-
-`query = connection.metaData()`
-
-- ***Returns***: Returns instance of `MetaData` instance which helps working with database meta-data.
 
 
 ### Connection.prototype.select()
