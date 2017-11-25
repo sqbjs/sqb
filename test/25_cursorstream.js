@@ -206,8 +206,10 @@ describe('CursorStream', function() {
     });
   });
 
-  it('shutdown pool', function(done) {
-    pool.close(done);
+  describe('Finalize', function() {
+    it('shutdown pool', function(done) {
+      pool.close(done);
+    });
   });
 
 });

@@ -16,7 +16,7 @@ module.exports = {
         },
         paramType: 1,
         serverVersion: '2.0',
-        metaOperator: new TestMetaOperator(this)
+        metaData: new TestMetaOperator()
       };
     }
   },

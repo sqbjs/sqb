@@ -220,6 +220,7 @@ describe('Rowset', function() {
         assert(rowset);
         assert.equal(rowset.isBof, true);
         var k = 0;
+        // noinspection JSAnnotator
         for (var o of rowset) {
           assert.equal(o[0], rowset.rows[k][0]);
           assert.equal(o[0], rowset.row[0]);
@@ -503,8 +504,10 @@ describe('Rowset', function() {
     });
   });
 
-  it('shutdown pool', function(done) {
-    pool.close(done);
+  describe('Finalize', function() {
+    it('shutdown pool', function(done) {
+      pool.close(done);
+    });
   });
 
 });

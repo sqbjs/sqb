@@ -49,8 +49,7 @@ describe('Pool', function() {
     assert.equal(pool.dialect, 'test');
     assert.equal(pool.user, 'user');
     assert.equal(pool.schema, 'schema');
-    assert(pool.metaData());
-    assert(typeof pool.metaData(), 'object');
+    assert(typeof pool.metaData, 'object');
     assert.equal(pool.state, sqb.PoolState.IDLE);
   });
 
@@ -88,8 +87,7 @@ describe('Pool', function() {
         assert.equal(pool.available, 0);
         assert.equal(pool.pending, 0);
         assert.equal(pool.acquired, 1);
-        assert(conn.metaData());
-        assert(typeof conn.metaData(), 'object');
+        assert(typeof conn.metaData, 'object');
       } catch (e) {
         return done(e);
       }

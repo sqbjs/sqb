@@ -449,9 +449,9 @@ describe('Serialize SelectQuery', function() {
       });
 
       it('should serialize raw in "where" test2', function() {
-        var query = sqb.select().from('table1').where([[sqb.raw('ID')]]);
+        var query = sqb.select().from('table1').where([[sqb.raw('ID'),1]]);
         var result = serializer.generate(query);
-        assert.equal(result.sql, 'select * from table1 where (ID = null)');
+        assert.equal(result.sql, 'select * from table1 where (ID = 1)');
       });
 
       it('should use double quotes for reserved words test1', function() {
