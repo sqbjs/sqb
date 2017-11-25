@@ -384,18 +384,6 @@ describe('Serialize SelectQuery', function() {
         assert.ok(ok);
       });
 
-      it('should not serialize with invalid field string', function() {
-        var ok;
-        try {
-          sqb.select()
-              .from('table1')
-              .where(['-NAME', '=', '%abc%']);
-        } catch (e) {
-          ok = 1;
-        }
-        assert.ok(ok);
-      });
-
       it('should ignore empty group arguments', function() {
         sqb.select()
             .from('table1')
