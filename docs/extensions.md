@@ -25,8 +25,9 @@ database: 'dbpath'
 
 |Extension|Category|Features|
 |---|---|---|
-|[sqb-connect-oracledb](https://github.com/panates/sqb-connect-oracledb)<br>Connection adapter for Oracle<br>Includes: [oracledb](https://github.com/oracle/node-oracledb), [sqb-serializer-oracle](https://github.com/panates/sqb-serializer-oracle)|Adapter|:white_check_mark: Native<br>:x: PureJS<br>:white_check_mark: Cursor<br>:white_check_mark: Query MetaData|
-|[sqb-connect-pg](https://github.com/panates/sqb-connect-pg)<br>Connection adapter for Postgre SQL<br>Includes: [node-postgres](https://github.com/brianc/node-postgres), [sqb-serializer-pg](https://github.com/panates/sqb-serializer-pg)|Adapter|:x: Native<br>:white_check_mark: PureJS<br>:white_check_mark: Cursor<br>:x: Query MetaData|
+|[sqb-connect-oracledb](https://github.com/panates/sqb-connect-oracledb)<br>Connection adapter for Oracle<br>Includes: [oracledb](https://github.com/oracle/node-oracledb), [sqb-serializer-oracle](https://github.com/panates/sqb-serializer-oracle)|Adapter|Native<br>:white_check_mark: Cursor<br>:white_check_mark: MetaData/Query|
+|[sqb-connect-pg](https://github.com/panates/sqb-connect-pg)<br>Connection adapter for Postgre SQL<br>Includes: [node-postgres](https://github.com/brianc/node-postgres), [sqb-serializer-pg](https://github.com/panates/sqb-serializer-pg)|Adapter|PureJS<br>:white_check_mark: Cursor<br>:x: MetaData/Query|
+|[sqb-connect-sqlite](https://github.com/panates/sqb-connect-sqlite)<br>Connection adapter for SQLite<br>Includes: [node-postgres](https://github.com/brianc/node-postgres), [sqb-serializer-pg](https://github.com/panates/sqb-serializer-sqlite)|Adapter|PureJS<br>:white_check_mark: Cursor<br>:white_check_mark: MetaData/Query|
 |[sqb-serializer-oracle](https://github.com/panates/sqb-serializer-oracle)<br>Serializer extension for Oracle|Serialization|-|
 |[sqb-serializer-pg](https://github.com/panates/sqb-serializer-pg)<br>Serializer extension for Postgre SQL|Serialization|-|
 
