@@ -2,7 +2,7 @@
 const assert = require('assert');
 const sqb = require('../lib/index');
 const testDriver = require('../test/support/test_driver');
-const table1 = testDriver.data.table1;
+const airports = testDriver.data.airports;
 
 describe('Cursor', function() {
 
@@ -12,7 +12,11 @@ describe('Cursor', function() {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
-      schema: 'schema'
+      schema: 'schema',
+      defaults: {
+        cursor: true,
+        fetchRows: 10
+      }
     });
   });
 
@@ -21,10 +25,7 @@ describe('Cursor', function() {
   });
 
   it('should return Cursor for select queries', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       try {
         assert(!err, err);
         cursor = result && result.cursor;
@@ -38,10 +39,7 @@ describe('Cursor', function() {
   });
 
   it('should cursor.fields property return FieldCollection', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       try {
         assert(!err, err);
         cursor = result && result.cursor;
@@ -56,10 +54,7 @@ describe('Cursor', function() {
   });
 
   it('should close', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result.cursor;
       cursor.on('close', function() {
         done();
@@ -69,19 +64,13 @@ describe('Cursor', function() {
   });
 
   it('should close (Promise)', function() {
-    return pool.select().from('table1').then({
-      cursor: true,
-      fetchRows: 10
-    }, function(result) {
+    return pool.select().from('airports').then(function(result) {
       return result.cursor.close();
     });
   });
 
   it('should handle close error', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result.cursor;
       //var oldClose = Object.getPrototypeOf(cursor._cursor).close;
       cursor._cursor.close = function(cb) {
@@ -98,10 +87,7 @@ describe('Cursor', function() {
   });
 
   it('should cache rows', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       var k = 0;
       cursor.cached();
@@ -113,7 +99,7 @@ describe('Cursor', function() {
             assert.equal(typeof more, 'function');
             assert.equal(typeof row, 'object');
             assert.equal(Array.isArray(row), true);
-            assert.equal(row[0], table1.arr[k++][0]);
+            assert.equal(row[0], airports.arr[k++][0]);
             assert.equal(cursor.rowNum, k);
             return more();
           }
@@ -127,10 +113,7 @@ describe('Cursor', function() {
   });
 
   it('should not enable cache after fetch', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.next(function(err, row, more) {
         try {
@@ -145,16 +128,13 @@ describe('Cursor', function() {
   });
 
   it('should seek() move cursor', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       var moveRowNum;
       cursor.on('move', function(row, rowNum) {
         moveRowNum = rowNum;
       });
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       cursor.seek(10, function(err, row, rowNum) {
         try {
           assert(!err, err);
@@ -162,7 +142,7 @@ describe('Cursor', function() {
           assert.equal(typeof row, 'object');
           assert.equal(Array.isArray(row), true);
           assert.equal(rowNum, 10);
-          assert.equal(row[0], table1.arr[rowNum - 1][0]);
+          assert.equal(row[0], airports.arr[rowNum - 1][0]);
           assert.equal(cursor.rowNum, rowNum);
           assert.equal(cursor.rowNum, moveRowNum);
           assert.equal(cursor.row, row);
@@ -175,9 +155,7 @@ describe('Cursor', function() {
   });
 
   it('should seek(10000) move cursor to eof', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.seek(10000, function(err, row, rowNum) {
         try {
@@ -185,7 +163,7 @@ describe('Cursor', function() {
           assert.equal(cursor.isBof, false);
           assert.equal(cursor.isEof, true);
           assert(!row);
-          assert.equal(rowNum, table1.arr.length + 1);
+          assert.equal(rowNum, airports.arr.length + 1);
         } catch (e) {
           return done(e);
         }
@@ -195,9 +173,7 @@ describe('Cursor', function() {
   });
 
   it('should seek(10000) move cursor to eof (cached)', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor.seek(10000, function(err, row, rowNum) {
@@ -206,8 +182,8 @@ describe('Cursor', function() {
           assert.equal(cursor.isBof, false);
           assert.equal(cursor.isEof, true);
           assert(!row);
-          assert.equal(rowNum, table1.arr.length + 1);
-          assert.equal(cursor._cache.length, table1.arr.length);
+          assert.equal(rowNum, airports.arr.length + 1);
+          assert.equal(cursor._cache.length, airports.arr.length);
         } catch (e) {
           return done(e);
         }
@@ -217,9 +193,7 @@ describe('Cursor', function() {
   });
 
   it('should seek() move cursor back', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor.seek(10000, function(err, row, rowNum) {
@@ -246,9 +220,7 @@ describe('Cursor', function() {
   });
 
   it('should seek() move cursor back (Promise)', function() {
-    return pool.select().from('table1').then({
-      cursor: true
-    }, function(result) {
+    return pool.select().from('airports').then(function(result) {
       cursor = result && result.cursor;
       cursor.cached();
       return cursor.seek(10000).then(function(row) {
@@ -266,9 +238,7 @@ describe('Cursor', function() {
   });
 
   it('should seek(0) do nothing', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       const rn = cursor.rowNum;
       cursor.seek(0, function(err, row, rowNum) {
@@ -284,9 +254,7 @@ describe('Cursor', function() {
   });
 
   it('should not seek(-1) if cache not enabled', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.seek(-1, function(err, row, rowNum) {
         cursor.close();
@@ -298,9 +266,7 @@ describe('Cursor', function() {
   });
 
   it('should seek() handle errors', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor._cursor.fetch = function(nRows, cb) {
@@ -322,9 +288,7 @@ describe('Cursor', function() {
   });
 
   it('should fetchAll() fetch all records and emit eof', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       var eofCalled;
@@ -344,9 +308,7 @@ describe('Cursor', function() {
   });
 
   it('should fetchAll() fetch all records and emit eof (Promise)', function() {
-    return pool.select().from('table1').then({
-      cursor: true
-    }, function(result) {
+    return pool.select().from('airports').then(function(result) {
       cursor = result && result.cursor;
       cursor.cached();
       var ok;
@@ -361,9 +323,7 @@ describe('Cursor', function() {
   });
 
   it('should not call fetchAll() if cache not enabled', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.fetchAll(function(err) {
         assert(err);
@@ -373,9 +333,7 @@ describe('Cursor', function() {
   });
 
   it('should fetchAll() handle errors', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor._seek = function(step, cb) {
@@ -397,9 +355,7 @@ describe('Cursor', function() {
   });
 
   it('should auto close cursor after fetch all rows', function() {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       var ok;
@@ -408,13 +364,13 @@ describe('Cursor', function() {
       });
       cursor.fetchAll(function(err) {
         assert(ok);
-        const table1 = testDriver.data.table1;
+        const airports = testDriver.data.airports;
         var k = 0;
         cursor.next(function(err, row, more) {
           try {
             assert(!err, err);
             if (row) {
-              assert.equal(row[0], table1.arr[k][0]);
+              assert.equal(row[0], airports.arr[k][0]);
               assert.equal(cursor.rowNum, ++k);
               assert.equal(cursor.row, row);
               return more();
@@ -429,9 +385,7 @@ describe('Cursor', function() {
   });
 
   it('should moveTo() move cursor given record', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor.moveTo(100, function(err, row, rowNum) {
@@ -455,12 +409,9 @@ describe('Cursor', function() {
   });
 
   it('should next() iterate over rows', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       var k = 0;
       cursor.next(function(err, row, more) {
         try {
@@ -470,7 +421,7 @@ describe('Cursor', function() {
             assert.equal(typeof more, 'function');
             assert.equal(typeof row, 'object');
             assert.equal(Array.isArray(row), true);
-            assert.equal(row[0], table1.arr[k][0]);
+            assert.equal(row[0], airports.arr[k][0]);
             assert.equal(cursor.rowNum, ++k);
             assert.equal(cursor.row, row);
             return more();
@@ -484,23 +435,21 @@ describe('Cursor', function() {
   });
 
   it('should next() iterate over rows (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10,
+    pool.select().from('airports').execute({
       objectRows: true
     }, function(err, result) {
       const cursor = result && result.cursor;
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       var k = 0;
       cursor.next(function(err, row, more) {
         try {
           assert(!err, err);
           assert.equal(cursor.isBof, false);
-          if (k < table1.arr.length) {
+          if (k < airports.arr.length) {
             assert.equal(typeof more, 'function');
             assert.equal(typeof row, 'object');
             assert.equal(Array.isArray(row), false);
-            assert.equal(row.ID, table1.obj[k++].ID);
+            assert.equal(row.ID, airports.obj[k++].ID);
             assert.equal(cursor.rowNum, k);
             return more();
           }
@@ -513,17 +462,14 @@ describe('Cursor', function() {
   });
 
   it('should next() iterate over rows (Promise)', function() {
-    return pool.select().from('table1').then({
-      cursor: true,
-      fetchRows: 10
-    }, function(result) {
+    return pool.select().from('airports').then(function(result) {
       cursor = result && result.cursor;
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       return cursor.next().then(function(row) {
         assert.equal(cursor.isBof, false);
         assert.equal(typeof row, 'object');
         assert.equal(Array.isArray(row), true);
-        assert.equal(row[0], table1.arr[0][0]);
+        assert.equal(row[0], airports.arr[0][0]);
         assert.equal(cursor.rowNum, 1);
         return cursor.close();
       });
@@ -531,9 +477,7 @@ describe('Cursor', function() {
   });
 
   it('should next() handle errors', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor._seek = function(step, cb) {
@@ -547,13 +491,10 @@ describe('Cursor', function() {
   });
 
   it('should prev() iterate over rows', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       var k;
       cursor.seek(10000, function(err) {
         k = cursor.rowNum;
@@ -564,7 +505,7 @@ describe('Cursor', function() {
               assert.equal(typeof row, 'object');
               assert.equal(Array.isArray(row), true);
               assert.equal(cursor.rowNum, k);
-              assert.equal(row[0], table1.arr[k - 1][0]);
+              assert.equal(row[0], airports.arr[k - 1][0]);
               assert.equal(cursor.row, row);
               return more();
             }
@@ -578,20 +519,17 @@ describe('Cursor', function() {
   });
 
   it('should prev() move cursor back (Promise)', function() {
-    return pool.select().from('table1').then({
-      cursor: true,
-      fetchRows: 10
-    }, function(result) {
+    return pool.select().from('airports').then(function(result) {
       cursor = result && result.cursor;
       cursor.cached();
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       var k;
       return cursor.seek(10000).then(function() {
         return cursor.prev().then(function(row) {
           assert.equal(typeof row, 'object');
           assert.equal(Array.isArray(row), true);
-          assert.equal(cursor.rowNum, table1.arr.length);
-          assert.equal(row[0], table1.arr[cursor.rowNum - 1][0]);
+          assert.equal(cursor.rowNum, airports.arr.length);
+          assert.equal(row[0], airports.arr[cursor.rowNum - 1][0]);
           assert.equal(cursor.row, row);
           return cursor.close();
         });
@@ -600,9 +538,7 @@ describe('Cursor', function() {
   });
 
   it('should prev() handle errors', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor._seek = function(step, cb) {
@@ -616,10 +552,7 @@ describe('Cursor', function() {
   });
 
   it('should reset cursor in cached mode', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.cached();
       cursor.next(function(err, row, more) {
@@ -637,10 +570,7 @@ describe('Cursor', function() {
   });
 
   it('should not reset cursor if cache is not enabled', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.next(function(err, row, more) {
         try {
@@ -655,16 +585,13 @@ describe('Cursor', function() {
   });
 
   it('should get() return field value', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       cursor.next(function(err, row, more) {
         try {
-          assert.equal(cursor.get('id'), table1.arr[0][0]);
-          assert.equal(cursor.get('ID'), table1.arr[0][0]);
+          assert.equal(cursor.get('id'), airports.arr[0][0]);
+          assert.equal(cursor.get('ID'), airports.arr[0][0]);
           assert.equal(cursor.get('TestNoValue'), null);
         } catch (e) {
           return done(e);
@@ -675,17 +602,15 @@ describe('Cursor', function() {
   });
 
   it('should get() return field value (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10,
+    pool.select().from('airports').execute({
       objectRows: true
     }, function(err, result) {
       cursor = result && result.cursor;
-      const table1 = testDriver.data.table1;
+      const airports = testDriver.data.airports;
       cursor.next(function(err, row, more) {
         try {
-          assert.equal(cursor.get('id'), table1.arr[0][0]);
-          assert.equal(cursor.get('ID'), table1.arr[0][0]);
+          assert.equal(cursor.get('id'), airports.arr[0][0]);
+          assert.equal(cursor.get('ID'), airports.arr[0][0]);
           assert.equal(cursor.get('TestNoValue'), null);
         } catch (e) {
           return done(e);
@@ -696,10 +621,7 @@ describe('Cursor', function() {
   });
 
   it('should get() throw error if field not found', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.next(function(err, row, more) {
         try {
@@ -713,10 +635,7 @@ describe('Cursor', function() {
   });
 
   it('should get() return undefined if no row located', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       try {
         assert.equal(cursor.get('id'), undefined);
@@ -728,9 +647,7 @@ describe('Cursor', function() {
   });
 
   it('should set() update field value', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       var k = 0;
       cursor.next(function(err, row, more) {
@@ -750,9 +667,7 @@ describe('Cursor', function() {
   });
 
   it('should set() update field value (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10,
+    pool.select().from('airports').execute({
       objectRows: true
     }, function(err, result) {
       cursor = result && result.cursor;
@@ -773,10 +688,7 @@ describe('Cursor', function() {
   });
 
   it('should set() throw error if field not found', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.next(function(err, row, more) {
         try {
@@ -790,10 +702,7 @@ describe('Cursor', function() {
   });
 
   it('should set() throw error if Bof', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       try {
         assert.equal(cursor.isBof, true);
@@ -806,10 +715,7 @@ describe('Cursor', function() {
   });
 
   it('should set() throw error if Eof', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true,
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.next(function(err, row, more) {
         if (row)
@@ -827,18 +733,15 @@ describe('Cursor', function() {
 
   it('should call queries `fetch` events on fetching new rows', function(done) {
     var l = 0;
-    pool.select().from('table1')
+    pool.select().from('airports')
         .on('fetch', function(row) {
           l++;
         })
-        .execute({
-          cursor: true,
-          fetchRows: 10
-        }, function(err, result) {
+        .execute(function(err, result) {
           if (err)
             return done(err);
           cursor = result && result.cursor;
-          const table1 = testDriver.data.table1;
+          const airports = testDriver.data.airports;
           var k = 0;
           cursor.next(function(err, row, more) {
             try {
@@ -848,7 +751,7 @@ describe('Cursor', function() {
                 assert.equal(typeof more, 'function');
                 assert.equal(typeof row, 'object');
                 assert.equal(Array.isArray(row), true);
-                assert.equal(row[0], table1.arr[k][0]);
+                assert.equal(row[0], airports.arr[k][0]);
                 assert.equal(cursor.rowNum, ++k);
                 assert.equal(cursor.row, row);
                 return more();
@@ -863,9 +766,7 @@ describe('Cursor', function() {
   });
 
   it('should not fetch rows if closed', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       cursor = result && result.cursor;
       cursor.close(function() {
         cursor.next(function(err) {

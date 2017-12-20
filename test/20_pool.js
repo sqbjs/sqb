@@ -49,7 +49,7 @@ describe('Pool', function() {
     assert.equal(pool.dialect, 'test');
     assert.equal(pool.user, 'user');
     assert.equal(pool.schema, 'schema');
-    assert(typeof pool.metaData, 'object');
+    assert.equal(typeof pool.metaData, 'object');
     assert.equal(pool.state, sqb.PoolState.IDLE);
   });
 
@@ -67,7 +67,7 @@ describe('Pool', function() {
     assert.equal(pool2.options.min, 0);
     assert.equal(pool2.options.minIdle, 0);
     assert.equal(pool2.options.maxQueue, 1000);
-    assert.equal(pool2.options.validation, false);
+    assert(pool2.options.validation);
   });
 
   it('should start pool', function(done) {
@@ -101,6 +101,22 @@ describe('Pool', function() {
           return done(e);
         }
         done();
+      });
+      conn.release();
+    });
+  });
+
+  it('should validate connection', function(done) {
+    pool.connect(function(err, conn) {
+      conn.on('close', function() {
+        pool.connect(function(err, conn) {
+          conn.on('close', function() {
+            done();
+          });
+          if (conn._client._tested)
+            conn.release();
+          else done(new Error('Failed'));
+        });
       });
       conn.release();
     });
@@ -199,12 +215,12 @@ describe('Pool', function() {
   });
 
   it('should execute() select query - 3 args', function(done) {
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert(Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0][0] === 'LFOI');
+        assert(result && result.rows);
+        assert(Array.isArray(result.rows[0]));
+        assert(result.rows[0][0] === 'LFOI');
       } catch (e) {
         return done(e);
       }
@@ -213,12 +229,12 @@ describe('Pool', function() {
   });
 
   it('should execute() select query - 2 args', function(done) {
-    pool.execute('select * from table1', function(err, result) {
+    pool.execute('select * from airports', function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert(Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0][0] === 'LFOI');
+        assert(result && result.rows);
+        assert(Array.isArray(result.rows[0]));
+        assert(result.rows[0][0] === 'LFOI');
       } catch (e) {
         return done(e);
       }
@@ -227,15 +243,15 @@ describe('Pool', function() {
   });
 
   it('should execute() limit fetchRows', function(done) {
-    pool.execute('select * from table1', [], {
+    pool.execute('select * from airports', [], {
       fetchRows: 2
     }, function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert.equal(result.rowset.length, 2);
-        assert(Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0][0] === 'LFOI');
+        assert(result && result.rows);
+        assert.equal(result.rows.length, 2);
+        assert(Array.isArray(result.rows[0]));
+        assert(result.rows[0][0] === 'LFOI');
       } catch (e) {
         return done(e);
       }
@@ -243,16 +259,27 @@ describe('Pool', function() {
     });
   });
 
+  it('should execute() (Promise)', function(done) {
+    pool.execute('select * from airports', []).then(function(result) {
+      assert(result && result.rows);
+      assert(Array.isArray(result.rows[0]));
+      assert(result.rows[0][0] === 'LFOI');
+      done();
+    }).catch(function(reason) {
+      done(reason);
+    });
+  });
+
   it('should select() and return array rows', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 2
     }, function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert.equal(result.rowset.length, 2);
-        assert(Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0][0] === 'LFOI');
+        assert(result && result.rows);
+        assert.equal(result.rows.length, 2);
+        assert(Array.isArray(result.rows[0]));
+        assert(result.rows[0][0] === 'LFOI');
       } catch (e) {
         return done(e);
       }
@@ -261,16 +288,16 @@ describe('Pool', function() {
   });
 
   it('should select() and return object rows', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 2,
       objectRows: true
     }, function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert.equal(result.rowset.length, 2);
-        assert(!Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0].ID === 'LFOI');
+        assert(result && result.rows);
+        assert.equal(result.rows.length, 2);
+        assert(!Array.isArray(result.rows[0]));
+        assert(result.rows[0].ID === 'LFOI');
       } catch (e) {
         return done(e);
       }
@@ -279,7 +306,7 @@ describe('Pool', function() {
   });
 
   it('should insert()', function(done) {
-    pool.insert({id: 1}).into('table1').execute(function(err, result) {
+    pool.insert({id: 1}).into('airports').execute(function(err, result) {
       try {
         assert(!err, err);
       } catch (e) {
@@ -290,7 +317,7 @@ describe('Pool', function() {
   });
 
   it('should update()', function(done) {
-    pool.update('table1').set({id: 1}).execute(function(err, result) {
+    pool.update('airports').set({id: 1}).execute(function(err, result) {
       try {
         assert(!err, err);
       } catch (e) {
@@ -301,7 +328,7 @@ describe('Pool', function() {
   });
 
   it('should delete()', function(done) {
-    pool.delete('table1').execute(function(err, result) {
+    pool.delete('airports').execute(function(err, result) {
       try {
         assert(!err, err);
       } catch (e) {
@@ -324,19 +351,19 @@ describe('Pool', function() {
 
   it('should set defaults.objectRows option', function() {
     pool.defaults.objectRows = true;
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
-        assert(typeof result.rowset.rows[0] === 'object' &&
-            !Array.isArray(result.rowset.rows[0]));
+        assert(typeof result.rows[0] === 'object' &&
+            !Array.isArray(result.rows[0]));
       } catch (e) {
         return done(e);
       }
       pool.defaults.objectRows = null;
-      pool.execute('select * from table1', [], function(err, result) {
+      pool.execute('select * from airports', [], function(err, result) {
         try {
           assert(!err, err);
-          assert(Array.isArray(result.rowset.rows[0]));
+          assert(Array.isArray(result.rows[0]));
         } catch (e) {
           return done(e);
         }
@@ -349,22 +376,22 @@ describe('Pool', function() {
   it('should set defaults.naming option', function() {
     pool.defaults.objectRows = true;
     pool.defaults.naming = 'lowercase';
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
-        assert(result && result.rowset);
-        assert(Array.isArray(result.rowset.rows[0]));
-        assert(result.rowset.rows[0].id === 'LFOI');
+        assert(result && result.rows);
+        assert(Array.isArray(result.rows[0]));
+        assert(result.rows[0].id === 'LFOI');
       } catch (e) {
         return done(e);
       }
       pool.defaults.naming = null;
-      pool.execute('select * from table1', [], function(err, result) {
+      pool.execute('select * from airports', [], function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
-          assert(Array.isArray(result.rowset.rows[0]));
-          assert(result.rowset.rows[0].ID === 'LFOI');
+          assert(result && result.rows);
+          assert(Array.isArray(result.rows[0]));
+          assert(result.rows[0].ID === 'LFOI');
         } catch (e) {
           return done(e);
         }
@@ -375,7 +402,7 @@ describe('Pool', function() {
 
   it('should set defaults.showSql option', function() {
     pool.defaults.showSql = true;
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
         assert(result.sql);
@@ -390,7 +417,7 @@ describe('Pool', function() {
   it('should set defaults.autoCommit option', function() {
     pool.defaults.showSql = true;
     pool.defaults.autoCommit = true;
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
         assert.equal(result.options.autoCommit, true);
@@ -403,7 +430,7 @@ describe('Pool', function() {
   });
   it('should set defaults.fields option', function() {
     pool.defaults.fields = true;
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
         assert(result.fields);
@@ -418,7 +445,7 @@ describe('Pool', function() {
   it('should set defaults.ignoreNulls option', function() {
     pool.defaults.objectRows = true;
     pool.defaults.ignoreNulls = true;
-    pool.execute('select * from table1', [], function(err, result) {
+    pool.execute('select * from airports', [], function(err, result) {
       try {
         assert(!err, err);
         assert.equal(result.rows[0].Catalog, undefined);
@@ -426,7 +453,7 @@ describe('Pool', function() {
         return done(e);
       }
       pool.defaults.ignoreNulls = null;
-      pool.execute('select * from table1', [], function(err, result) {
+      pool.execute('select * from airports', [], function(err, result) {
         try {
           assert(!err, err);
           assert.equal(result.rows[0].Catalog, null);

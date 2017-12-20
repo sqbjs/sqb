@@ -24,7 +24,10 @@ describe('RowsetStream', function() {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
-      schema: 'schema'
+      schema: 'schema',
+      defaults: {
+        rowset: true
+      }
     });
   });
 
@@ -33,7 +36,8 @@ describe('RowsetStream', function() {
   });
 
   it('test outFormat = 0', function(done) {
-    pool.select().from('table1').execute({
+    this.slow(150);
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       var stream;
@@ -67,7 +71,7 @@ describe('RowsetStream', function() {
   });
 
   it('test outFormat = 1', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       var stream;
@@ -103,7 +107,7 @@ describe('RowsetStream', function() {
   });
 
   it('test objectMode = true', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       var stream;
@@ -129,7 +133,7 @@ describe('RowsetStream', function() {
       stream.on('end', function() {
         try {
           assert.equal(arr.length, 10);
-          assert.equal(arr[0][0], 'LFOI');
+          assert.equal(arr[0].data[0], 'LFOI');
         } catch (e) {
           return done(e);
         }

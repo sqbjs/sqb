@@ -9,7 +9,10 @@ describe('Rowset', function() {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
-      schema: 'schema'
+      schema: 'schema',
+      defaults: {
+        rowset: true
+      }
     });
   });
 
@@ -18,7 +21,7 @@ describe('Rowset', function() {
   });
 
   it('should return Rowset for select queries', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -32,20 +35,20 @@ describe('Rowset', function() {
   });
 
   it('should return Rowset for select queries - Promise - 1', function() {
-    const promise = pool.select().from('table1').then();
+    const promise = pool.select().from('airports').then();
     return promise.then(function(result) {
       assert(result && result.rowset);
     });
   });
 
   it('should return Rowset for select queries - Promise - 2', function() {
-    return pool.select().from('table1').then(function(result) {
+    return pool.select().from('airports').then(function(result) {
       assert(result && result.rowset);
     });
   });
 
   it('should rowset.rows property return Array of row objects', function() {
-    const promise = pool.select().from('table1').then();
+    const promise = pool.select().from('airports').then();
     return promise.then(function(result) {
       const rowset = result && result.rowset;
       assert(rowset);
@@ -54,7 +57,7 @@ describe('Rowset', function() {
   });
 
   it('should rowset.length property return Row count', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -68,7 +71,7 @@ describe('Rowset', function() {
   });
 
   it('should rowset.fields property return FieldCollection', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -85,25 +88,29 @@ describe('Rowset', function() {
   });
 
   it('should set rowset.rowNum property', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
         assert(rowset);
+        rowset.on('move', function() {
+          if (rowset.rowNum === 3)
+            done();
+        });
         assert.equal(rowset.isBof, true);
         rowset.rowNum = 5;
         assert.equal(rowset.row[0], rowset.rows[4][0]);
+        rowset.rowNum = 3;
       } catch (e) {
         return done(e);
       }
-      done();
     });
   });
 
   it('should not set rowset.rowNum negative value', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -120,7 +127,7 @@ describe('Rowset', function() {
   });
 
   it('should not set rowset.rowNum more than length+1', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -137,7 +144,7 @@ describe('Rowset', function() {
   });
 
   it('should fetch object rows (options.naming = lowercase)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true,
       naming: 'lowercase'
@@ -156,7 +163,7 @@ describe('Rowset', function() {
   });
 
   it('should fetch object rows (options.naming = uppercase)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true,
       naming: 'uppercase'
@@ -175,7 +182,7 @@ describe('Rowset', function() {
   });
 
   it('should fetch object rows (options.ignoreNulls = true)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true,
       ignoreNulls: true
@@ -193,7 +200,7 @@ describe('Rowset', function() {
   });
 
   it('should fetch object rows (options.fetchAsString = [Date])', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true,
       fetchAsString: [Date]
@@ -202,7 +209,7 @@ describe('Rowset', function() {
         assert(!err, err);
         const rowset = result && result.rowset;
         assert(rowset);
-        assert.equal(typeof rowset.rows[0].datevalue, 'string');
+        assert.equal(typeof rowset.rows[0].get('datevalue'), 'string');
       } catch (e) {
         return done(e);
       }
@@ -211,7 +218,7 @@ describe('Rowset', function() {
   });
 
   it('should iterate over rows', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -222,8 +229,8 @@ describe('Rowset', function() {
         var k = 0;
         // noinspection JSAnnotator
         for (var o of rowset) {
-          assert.equal(o[0], rowset.rows[k][0]);
-          assert.equal(o[0], rowset.row[0]);
+          assert.equal(o, rowset.rows[k]);
+          assert.equal(o, rowset.row);
           k++;
         }
         assert.equal(rowset.isEof, true);
@@ -237,7 +244,7 @@ describe('Rowset', function() {
   });
 
   it('should next() iterate over rows', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -248,7 +255,7 @@ describe('Rowset', function() {
         var k = 0;
         var o;
         while ((o = rowset.next())) {
-          assert.equal(rowset.row[0], rowset.rows[k][0]);
+          assert.equal(rowset.row, rowset.rows[k]);
           assert.equal(rowset.rowNum, k + 1);
           k++;
         }
@@ -263,7 +270,7 @@ describe('Rowset', function() {
   });
 
   it('should next() iterate over rows (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true
     }, function(err, result) {
@@ -275,7 +282,7 @@ describe('Rowset', function() {
         var k = 0;
         var o;
         while ((o = rowset.next())) {
-          assert.equal(rowset.row.ID, rowset.rows[k].ID);
+          assert.equal(rowset.row, rowset.rows[k]);
           assert.equal(rowset.rowNum, k + 1);
           k++;
         }
@@ -289,7 +296,7 @@ describe('Rowset', function() {
   });
 
   it('should prev() iterate over rows', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -302,7 +309,7 @@ describe('Rowset', function() {
         assert.equal(rowset.isEof, true);
         while ((o = rowset.prev())) {
           k--;
-          assert.equal(rowset.row[0], rowset.rows[k][0]);
+          assert.equal(rowset.row, rowset.rows[k]);
           assert.equal(rowset.rowNum, k + 1);
         }
         assert.equal(rowset.isBof, true);
@@ -315,8 +322,28 @@ describe('Rowset', function() {
     });
   });
 
+  it('should seek() move current row', function(done) {
+    pool.select().from('airports').execute({
+      fetchRows: 10
+    }, function(err, result) {
+      try {
+        assert(!err, err);
+        const rowset = result && result.rowset;
+        assert.equal(rowset.rowNum, 0);
+        rowset.seek(5);
+        assert.equal(rowset.rowNum, 5);
+        rowset.seek(-1);
+        assert.equal(rowset.rowNum, 4);
+        rowset.seek(-1);
+      } catch (e) {
+        return done(e);
+      }
+      done();
+    });
+  });
+
   it('should reset() move cursor to bof', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -334,7 +361,7 @@ describe('Rowset', function() {
   });
 
   it('should set moveTo() move cursor to given row', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
@@ -343,7 +370,7 @@ describe('Rowset', function() {
         assert(rowset);
         assert.equal(rowset.isBof, true);
         assert.equal(rowset.moveTo(5), 5);
-        assert.equal(rowset.row[0], rowset.rows[4][0]);
+        assert.equal(rowset.row, rowset.rows[4]);
         assert.equal(rowset.moveTo(), 0);
         assert.equal(rowset.moveTo(100000), rowset.length + 1);
         assert.equal(rowset.moveTo(-1), 0);
@@ -356,13 +383,12 @@ describe('Rowset', function() {
   });
 
   it('should get() return field value', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
-        assert.equal(rowset.get('id'), undefined);
         rowset.next();
         assert.equal(rowset.get('id'), 'LFOI');
         assert.equal(rowset.get('TestNoValue'), null);
@@ -374,14 +400,13 @@ describe('Rowset', function() {
   });
 
   it('should get() return field value (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10,
       objectRows: true
     }, function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
-        assert.equal(rowset.get('id'), undefined);
         rowset.next();
         assert.equal(rowset.get('id'), 'LFOI');
         assert.equal(rowset.get('TestNoValue'), null);
@@ -393,10 +418,11 @@ describe('Rowset', function() {
   });
 
   it('should get() throw error when unknown field given', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       const rowset = result && result.rowset;
+      rowset.next();
       try {
         rowset.get('noid');
       } catch (e) {
@@ -406,11 +432,41 @@ describe('Rowset', function() {
     });
   });
 
+  it('should get() throw error when BOF', function(done) {
+    pool.select().from('airports').execute({
+      fetchRows: 10
+    }, function(err, result) {
+      const rowset = result && result.rowset;
+      try {
+        rowset.get('id');
+      } catch (e) {
+        return done();
+      }
+      done(new Error('Failed'));
+    });
+  });
+
+  it('should get() throw error when EOF', function(done) {
+    pool.select().from('airports').execute({
+      fetchRows: 10
+    }, function(err, result) {
+      const rowset = result && result.rowset;
+      rowset.rowNum = 999999;
+      try {
+        rowset.get('id');
+      } catch (e) {
+        return done();
+      }
+      done(new Error('Failed'));
+    });
+  });
+
   it('should set() update field value', function(done) {
-    pool.select().from('table1').execute(function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
+        rowset.next();
         const d = Date.now();
         rowset.rowNum = 100;
         rowset.set('TestNoValue', d);
@@ -423,12 +479,13 @@ describe('Rowset', function() {
   });
 
   it('should set() update field value - (objectRows = true)', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       objectRows: true
     }, function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
+        rowset.next();
         rowset.rowNum = 99;
         const d = Date.now();
         assert.equal(rowset.set('TestNoValue', d), rowset);
@@ -441,11 +498,12 @@ describe('Rowset', function() {
   });
 
   it('should set() throw error when unknown field given', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       const rowset = result && result.rowset;
       try {
+        rowset.next();
         rowset.set('noid');
       } catch (e) {
         return done();
@@ -455,7 +513,7 @@ describe('Rowset', function() {
   });
 
   it('should set() throw error when BOF', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       const rowset = result && result.rowset;
@@ -469,11 +527,12 @@ describe('Rowset', function() {
   });
 
   it('should set() throw error when EOF', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       const rowset = result && result.rowset;
-      rowset.rowNum = 100;
+      rowset.next();
+      rowset.rowNum = 99999;
       try {
         rowset.set('id', 1);
       } catch (e) {
@@ -484,19 +543,40 @@ describe('Rowset', function() {
   });
 
   it('should toJSON() return json representation of Rowset', function(done) {
-    pool.select().from('table1').execute({
+    pool.select().from('airports').execute({
       fetchRows: 10
     }, function(err, result) {
       try {
         assert(!err, err);
         const rowset = result && result.rowset;
+        rowset.next();
         const obj = rowset.toJSON();
         assert.equal(typeof obj, 'object');
         assert(!Array.isArray(obj));
         assert(obj.fields.ID);
-        assert.equal(obj.rows[0][0], 'LFOI');
+        assert.equal(obj.rows[0].data[0], 'LFOI');
         assert.equal(obj.numRows, 10);
         assert.equal(obj.eof, true);
+      } catch (e) {
+        return done(e);
+      }
+      done();
+    });
+  });
+
+  it('should emit query.fetch event', function(done) {
+    const query = pool.select().from('airports');
+    query.on('fetch', function(row) {
+      row.set('Flags', 123456);
+    });
+    query.execute({
+      fetchRows: 10
+    }, function(err, result) {
+      try {
+        assert(!err, err);
+        const rowset = result && result.rowset;
+        rowset.next();
+        assert.equal(rowset.get('Flags'), 123456);
       } catch (e) {
         return done(e);
       }

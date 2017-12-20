@@ -25,15 +25,16 @@ module.exports = {
 };
 
 function fillTable(tableName) {
-  var obj = require('./test_data_' + tableName + '.json');
+  var obj = require('./db/' + tableName + '.json');
   data[tableName] = {
     fields: obj.fields,
     obj: obj.rows,
     arr: []
   };
-  obj.rows.forEach(function(t) {
-    t.datevalue = new Date();
-  });
+  if (tableName === 'airports')
+    obj.rows.forEach(function(t) {
+      t.datevalue = new Date();
+    });
   var rowsarr = data[tableName].arr;
   obj.rows.forEach(function(src) {
     var row = [];
@@ -45,7 +46,10 @@ function fillTable(tableName) {
   });
 }
 
-fillTable('table1');
+fillTable('schemas');
+fillTable('tables');
+fillTable('columns');
+fillTable('airports');
 
 /**
  *
@@ -130,11 +134,16 @@ TestConnection.prototype.commit = function(callback) {
   callback();
 };
 
+TestConnection.prototype.startTransaction = function(callback) {
+  callback();
+};
+
 TestConnection.prototype.rollback = function(callback) {
   callback();
 };
 
 TestConnection.prototype.test = function(callback) {
+  this._tested = (this._tested || 0) + 1;
   callback();
 };
 

@@ -2,7 +2,7 @@
 const assert = require('assert');
 const sqb = require('../lib/index');
 const testDriver = require('../test/support/test_driver');
-const table1 = testDriver.data.table1;
+const airports = testDriver.data.airports;
 
 function readStream(stream, callback) {
   var bytes = new Buffer('');
@@ -26,7 +26,10 @@ describe('CursorStream', function() {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
-      schema: 'schema'
+      schema: 'schema',
+      defaults: {
+        cursor: true
+      }
     });
   });
 
@@ -40,9 +43,7 @@ describe('CursorStream', function() {
 
   it('test outFormat = 0', function(done) {
     this.slow(200);
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       var stream;
       try {
         assert(!err, err);
@@ -64,7 +65,7 @@ describe('CursorStream', function() {
         try {
           const obj = JSON.parse(buf);
           assert(Array.isArray(obj));
-          assert.equal(obj.length, table1.arr.length);
+          assert.equal(obj.length, airports.arr.length);
           assert(stream.isClosed);
         } catch (e) {
           return done(e);
@@ -76,9 +77,7 @@ describe('CursorStream', function() {
 
   it('test outFormat = 1', function(done) {
     this.slow(200);
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       var stream;
       try {
         assert(!err, err);
@@ -100,7 +99,7 @@ describe('CursorStream', function() {
         try {
           const obj = JSON.parse(buf);
           assert(!Array.isArray(obj));
-          assert.equal(obj.numRows, table1.arr.length);
+          assert.equal(obj.numRows, airports.arr.length);
           assert(Array.isArray(obj.rows));
           assert(obj.fields);
           assert(stream.isClosed);
@@ -113,9 +112,7 @@ describe('CursorStream', function() {
   });
 
   it('test objectMode = true', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       var stream;
       try {
         assert(!err, err);
@@ -138,7 +135,7 @@ describe('CursorStream', function() {
 
       stream.on('end', function() {
         try {
-          assert.equal(arr.length, table1.arr.length);
+          assert.equal(arr.length, airports.arr.length);
           assert.equal(arr[0][0], 'LFOI');
         } catch (e) {
           return done(e);
@@ -149,9 +146,7 @@ describe('CursorStream', function() {
   });
 
   it('should cursor.close emit stream close event', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       const stream = result.cursor.toStream();
       stream.on('close', function(fields) {
         done();
@@ -161,9 +156,7 @@ describe('CursorStream', function() {
   });
 
   it('should stream.close also close the cursor', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       const stream = result.cursor.toStream();
       result.cursor.on('close', function(fields) {
         done();
@@ -173,9 +166,7 @@ describe('CursorStream', function() {
   });
 
   it('should handle error on cursor close', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       const stream = result.cursor.toStream();
       result.cursor.close = function(cb) {
         cb(new Error('Any error'));
@@ -191,9 +182,7 @@ describe('CursorStream', function() {
   });
 
   it('should handle error on cursor fetch', function(done) {
-    pool.select().from('table1').execute({
-      cursor: true
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       const stream = result.cursor.toStream();
       result.cursor.next = function(cb) {
         cb(new Error('Any error'));

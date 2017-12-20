@@ -12,6 +12,8 @@ describe('Metadata', function() {
       schema: 'schema'
     });
   });
+  var schema;
+  var table;
 
   after(function() {
     pool.close(true);
@@ -21,7 +23,7 @@ describe('Metadata', function() {
     const old = pool._driver.metaData;
     try {
       pool._driver.metaData = null;
-      pool.metaData.query();
+      pool.metaData.select().from('tables');
     } catch (e) {
       pool._driver.metaData = old;
       return;
@@ -29,84 +31,131 @@ describe('Metadata', function() {
     assert(0, 'Failed');
   });
 
-  it('should call query(callback)', function(done) {
-    pool.metaData.query(done);
+  it('should create select query for schemas', function() {
+    var q = pool.metaData.select().from('schemas').generate();
+    assert.equal(q.sql, 'select * from (select * from schemas) t');
   });
 
-  it('should call query({}, callback)', function(done) {
-    pool.metaData.query({}, done);
+  it('should create select query for tables', function() {
+    var q = pool.metaData.select().from('tables').generate();
+    assert.equal(q.sql, 'select * from (select * from tables) t');
   });
 
-  describe('For dialects that supports schemas', function() {
-    it('should query all schemas with "*"', function(done) {
-      pool._driver.supportsSchemas = true;
-      pool.metaData.query({schemas: '*'}, function(err, result) {
-        assert.deepEqual(result, {schemas: '*'});
-        done();
-      });
-    });
-
-    it('should query some schema', function(done) {
-      pool._driver.supportsSchemas = true;
-      pool.metaData.query({
-        schemas: {
-          test1: '*'
-        }
-      }, function(err, result) {
-        assert.deepEqual(result, {
-          schemas: {
-            test1: '*'
-          }
-        });
-        done();
-      });
-    });
-
-    it('should query some tables', function(done) {
-      pool._driver.supportsSchemas = true;
-      pool.metaData.query({
-        schemas: {
-          test1: {
-            tables: ['table1', 'table2']
-          }
-        }
-      }, function(err, result) {
-        assert.deepEqual(result, {
-          schemas: {
-            test1: {
-              tables: ['table1', 'table2']
-            }
-          }
-        });
-        done();
-      });
-    });
-
+  it('should create select query for columns', function() {
+    var q = pool.metaData.select().from('columns').generate();
+    assert.equal(q.sql, 'select * from (select * from columns) t');
   });
 
-  describe('For dialects that does not supports schemas', function() {
-    it('should call query({schemas: "*"}, callback) - (not supports schemas)', function(done) {
-      pool._driver.supportsSchemas = false;
-      pool.metaData.query({schemas: '*'}, function(err, result) {
-        assert(err);
-        pool.metaData.query({tables: '*'}, function(err, result) {
-          assert.deepEqual(result, {tables: '*'});
-          done();
-        });
-      });
-    });
+  it('should create select query for primary keys', function() {
+    var q = pool.metaData.select().from('primary_keys').generate();
+    assert.equal(q.sql, 'select * from (select * from primary_keys) t');
+  });
 
-    it('should query some tables', function(done) {
-      pool._driver.supportsSchemas = false;
-      pool.metaData.query({
-        tables: ['table1', 'table2']
-      }, function(err, result) {
-        assert.deepEqual(result, {
-          tables: ['table1', 'table2']
-        });
+  it('should create select query for foreign keys', function() {
+    var q = pool.metaData.select().from('foreign_keys').generate();
+    assert.equal(q.sql, 'select * from (select * from foreign_keys) t');
+  });
+
+  it('should not create select query for invalid selector', function() {
+    try {
+      pool.metaData.select().from('invalid').generate();
+    } catch (e) {
+      return;
+    }
+    throw new Error('Failed');
+  });
+
+  it('should get schema objects', function(done) {
+    pool.metaData.getSchemas(function(err, schemas) {
+      if (err)
+        return done(err);
+      try {
+        assert.equal(schemas.length, 2);
+        schema = schemas[0];
+        assert.equal(schema.meta.schema_name, 'SCHEMA_1');
         done();
-      });
+      } catch (e) {
+        done(e);
+      }
     });
+  });
+
+  it('should get schema objects (Promise)', function(done) {
+    pool.metaData.getSchemas('schema_1').then(function(schemas) {
+      assert.equal(schemas.length, 2);
+      schema = schemas[0];
+      assert.equal(schema.meta.schema_name, 'SCHEMA_1');
+      done();
+    }).catch(function(reason) {
+      done(reason);
+    });
+  });
+
+  it('should get table object', function(done) {
+    schema.getTables(function(err, tables) {
+      if (err)
+        return done(err);
+      try {
+        assert.equal(tables.length, 3);
+        table = tables[0];
+        assert.equal(table.meta.table_name, 'AIRPORTS');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should get table objects (Promise)', function(done) {
+    schema.getTables('airports').then(function(tables) {
+      assert.equal(tables.length, 3);
+      table = tables[0];
+      assert.equal(table.meta.table_name, 'AIRPORTS');
+      done();
+    }).catch(function(reason) {
+      done(reason);
+    });
+  });
+
+  it('should get single table info', function(done) {
+    table.refresh(function(err) {
+      if (err)
+        return done(err);
+      try {
+        assert(table.columns);
+        assert(table.columns.ID);
+        assert.equal(table.columns.ID.data_type, 'TEXT');
+        assert(table.primaryKey);
+        assert.equal(table.primaryKey.columns, 'ID');
+        assert(table.foreignKeys);
+        assert(table.foreignKeys.length);
+        assert.equal(table.foreignKeys[0].columns, 'REGION');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('should get single table info (Promise)', function(done) {
+    table.refresh().then(function() {
+
+      assert(table.columns);
+      assert(table.columns.ID);
+      assert.equal(table.columns.ID.data_type, 'TEXT');
+      assert(table.primaryKey);
+      assert.equal(table.primaryKey.columns, 'ID');
+      assert(table.foreignKeys);
+      assert(table.foreignKeys.length);
+      assert.equal(table.foreignKeys[0].columns, 'REGION');
+      done();
+    }).catch(function(reason) {
+      done(reason);
+    });
+  });
+
+  it('should call invalidate()', function() {
+    assert(pool.metaData.invalidate());
   });
 
   describe('Finalize', function() {

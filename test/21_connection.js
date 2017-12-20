@@ -66,6 +66,49 @@ describe('Connection', function() {
     });
   });
 
+  it('should startTransaction()', function(done) {
+    pool.connect(function(err, conn) {
+      conn.on('start-transaction', function() {
+        done();
+      });
+      conn.startTransaction(function(err) {
+        try {
+          assert(!err, err);
+        } catch (e) {
+          return done(e);
+        }
+        conn.release();
+      });
+    });
+  });
+
+  it('should startTransaction() (Promise)', function(done) {
+    pool.connect().then(function(conn) {
+      conn.on('start-transaction', function() {
+        done();
+      });
+      conn.startTransaction().then(function() {
+        conn.release();
+      });
+    });
+  });
+
+  it('should not start transaction if closed', function(done) {
+    pool.connect(function(err, conn) {
+      conn.on('close', function() {
+        conn.startTransaction(function(err) {
+          try {
+            assert(err);
+          } catch (e) {
+            return done(e);
+          }
+          done();
+        });
+      });
+      conn.release();
+    });
+  });
+
   it('should commit()', function(done) {
     pool.connect(function(err, conn) {
       conn.on('commit', function() {
@@ -168,13 +211,13 @@ describe('Connection', function() {
 
   it('should execute(sql, params, options, callback)', function(done) {
     pool.connect(function(err, conn) {
-      conn.execute('select * from table1', [], {
+      conn.execute('select * from airports', [], {
         fetchRows: 2
       }, function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
-          assert.equal(result.rowset.length, 2);
+          assert(result && result.rows);
+          assert.equal(result.rows.length, 2);
         } catch (e) {
           return done(e);
         }
@@ -186,10 +229,10 @@ describe('Connection', function() {
 
   it('should execute(sql, params, callback)', function(done) {
     pool.connect(function(err, conn) {
-      conn.execute('select * from table1', [], function(err, result) {
+      conn.execute('select * from airports', [], function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
+          assert(result && result.rows);
         } catch (e) {
           return done(e);
         }
@@ -201,10 +244,10 @@ describe('Connection', function() {
 
   it('should execute(sql, callback)', function(done) {
     pool.connect(function(err, conn) {
-      conn.execute('select * from table1', function(err, result) {
+      conn.execute('select * from airports', function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
+          assert(result && result.rows);
         } catch (e) {
           return done(e);
         }
@@ -216,9 +259,9 @@ describe('Connection', function() {
 
   it('should execute(sql) (Promise)', function(done) {
     pool.connect(function(err, conn) {
-      conn.execute('select * from table1').then(function(result) {
+      conn.execute('select * from airports').then(function(result) {
         try {
-          assert(result && result.rowset);
+          assert(result && result.rows);
         } catch (e) {
           return done(e);
         }
@@ -246,15 +289,15 @@ describe('Connection', function() {
 
   it('should select() and return array rows', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1').execute({
+      conn.select().from('airports').execute({
         fetchRows: 2
       }, function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
-          assert.equal(result.rowset.length, 2);
-          assert.equal(typeof result.rowset.rows[0], 'object');
-          assert(Array.isArray(result.rowset.rows[0]));
+          assert(result && result.rows);
+          assert.equal(result.rows.length, 2);
+          assert.equal(typeof result.rows[0], 'object');
+          assert(Array.isArray(result.rows[0]));
         } catch (e) {
           return done(e);
         }
@@ -266,16 +309,16 @@ describe('Connection', function() {
 
   it('should select() and return object rows', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1').execute({
+      conn.select().from('airports').execute({
         fetchRows: 2,
         objectRows: true
       }, function(err, result) {
         try {
           assert(!err, err);
-          assert(result && result.rowset);
-          assert.equal(result.rowset.length, 2);
-          assert.equal(typeof result.rowset.rows[0], 'object');
-          assert(!Array.isArray(result.rowset.rows[0]));
+          assert(result && result.rows);
+          assert.equal(result.rows.length, 2);
+          assert.equal(typeof result.rows[0], 'object');
+          assert(!Array.isArray(result.rows[0]));
         } catch (e) {
           return done(e);
         }
@@ -287,10 +330,10 @@ describe('Connection', function() {
 
   it('should emit `fetch` event ', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1')
+      conn.select().from('airports')
           .on('fetch', function(row) {
             try {
-              assert.equal(row.ID, 'LFOI');
+              assert.equal(row.get('ID'), 'LFOI');
             } catch (e) {
               return done(e);
             }
@@ -312,7 +355,7 @@ describe('Connection', function() {
 
   it('should set types that will fetched as string - fetchAsString option - 1', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1')
+      conn.select().from('airports')
           .execute({
             fetchRows: 1,
             objectRows: true,
@@ -320,7 +363,7 @@ describe('Connection', function() {
           }, function(err, result) {
             try {
               assert(!err, err);
-              assert.equal(typeof result.rowset.rows[0].Flags, 'string');
+              assert.equal(typeof result.rows[0].Flags, 'string');
             } catch (e) {
               return done(e);
             }
@@ -332,7 +375,7 @@ describe('Connection', function() {
 
   it('should set types that will fetched as string - fetchAsString option - 2', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1')
+      conn.select().from('airports')
           .execute({
             fetchRows: 1,
             objectRows: true,
@@ -340,7 +383,7 @@ describe('Connection', function() {
           }, function(err, result) {
             try {
               assert(!err, err);
-              assert.equal(typeof result.rowset.rows[0].Flags, 'string');
+              assert.equal(typeof result.rows[0].Flags, 'string');
             } catch (e) {
               return done(e);
             }
@@ -353,7 +396,7 @@ describe('Connection', function() {
   it('should insert()', function(done) {
     pool.connect(function(err, conn) {
       conn.insert({id: 1})
-          .into('table1')
+          .into('airports')
           .returning({ID: 'string'})
           .execute(function(err, result) {
             try {
@@ -370,7 +413,7 @@ describe('Connection', function() {
 
   it('should update()', function(done) {
     pool.connect(function(err, conn) {
-      conn.update('table1')
+      conn.update('airports')
           .set({id: 1})
           .execute(function(err, result) {
             try {
@@ -387,7 +430,7 @@ describe('Connection', function() {
 
   it('should delete()', function(done) {
     pool.connect(function(err, conn) {
-      conn.delete('table1').execute(function(err, result) {
+      conn.delete('airports').execute(function(err, result) {
         try {
           assert(!err, err);
         } catch (e) {
@@ -401,7 +444,7 @@ describe('Connection', function() {
 
   it('should get sql and values in result', function(done) {
     pool.connect(function(err, conn) {
-      conn.select().from('table1').execute({
+      conn.select().from('airports').execute({
         fetchRows: 2,
         showSql: true
       }, function(err, result) {

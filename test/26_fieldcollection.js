@@ -9,7 +9,11 @@ describe('FieldCollection', function() {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
-      schema: 'schema'
+      schema: 'schema',
+      defaults: {
+        rowset: true,
+        fetchRows: 10
+      }
     });
   });
 
@@ -18,9 +22,7 @@ describe('FieldCollection', function() {
   });
 
   it('should initialize FieldCollection', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert(fields);
@@ -31,8 +33,7 @@ describe('FieldCollection', function() {
   });
 
   it('should initialize FieldCollection (options.naming = lowercase)', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10,
+    pool.select().from('airports').execute({
       naming: 'lowercase'
     }, function(err, result) {
       assert(!err, err);
@@ -44,8 +45,7 @@ describe('FieldCollection', function() {
   });
 
   it('should initialize FieldCollection (options.naming = uppercase)', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10,
+    pool.select().from('airports').execute({
       naming: 'uppercase'
     }, function(err, result) {
       assert(!err, err);
@@ -57,9 +57,7 @@ describe('FieldCollection', function() {
   });
 
   it('should get field index', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert.equal(fields.indexOf('id'), 0);
@@ -70,9 +68,7 @@ describe('FieldCollection', function() {
   });
 
   it('should get field object', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert.equal(fields.get('id').name, 'ID');
@@ -84,9 +80,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray();
@@ -98,9 +92,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with lowercase names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'lowercase'});
@@ -112,9 +104,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with uppercase names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'uppercase'});
@@ -126,9 +116,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with original names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'invalidvalue'});
@@ -140,9 +128,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject();
@@ -153,9 +139,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with lowercase names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'lowercase'});
@@ -166,9 +150,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with uppercase names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'uppercase'});
@@ -179,9 +161,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with original names', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'invalidvalue'});
@@ -192,9 +172,7 @@ describe('FieldCollection', function() {
   });
 
   it('should toJSON() convert to object of fields', function(done) {
-    pool.select().from('table1').execute({
-      fetchRows: 10
-    }, function(err, result) {
+    pool.select().from('airports').execute(function(err, result) {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toJSON();

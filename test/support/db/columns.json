@@ -1,0 +1,216 @@
+{
+  "fields": [
+    {
+      "name": "schema_name"
+    },
+    {
+      "name": "table_name"
+    },
+    {
+      "name": "column_name"
+    },
+    {
+      "name": "data_type"
+    },
+    {
+      "name": "data_type_mean"
+    },
+    {
+      "name": "char_length"
+    },
+    {
+      "name": "data_size"
+    },
+    {
+      "name": "is_notnull"
+    },
+    {
+      "name": "default_value"
+    },
+    {
+      "name": "pk"
+    }
+  ],
+  "rows": [
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "ID",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 1
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "ShortName",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Name",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Region",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": 64,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "ICAO",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Flags",
+      "data_type": "INTEGER",
+      "data_type_mean": "INTEGER",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Catalog",
+      "data_type": "INTEGER",
+      "data_type_mean": "INTEGER",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Length",
+      "data_type": "NUMBER",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Elevation",
+      "data_type": "INTEGER",
+      "data_type_mean": "INTEGER",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Runway",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Frequency",
+      "data_type": "NUMBER",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Latitude",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "column_name": "Longitude",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "REGIONS",
+      "column_name": "ID",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 1
+    },
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "REGIONS",
+      "column_name": "Name",
+      "data_type": "TEXT",
+      "data_type_mean": "VARCHAR",
+      "char_length": null,
+      "data_size": null,
+      "is_notnull": 0,
+      "default_value": null,
+      "pk": 0
+    }
+  ]
+}
