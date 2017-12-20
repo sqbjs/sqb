@@ -5,85 +5,74 @@ MetaData is a special class that helps working with database meta data.
 ## Index
 
 #### Methods
-- [MetaData.prototype.query()](#metadataprototypequery)
+- [MetaData.prototype.select()](#metadataprototypeselect)
+- [MetaData.prototype.getSchemas()](#metadataprototypegetschemas)
 
 <hr/>
 
 ## Methods
 
-### MetaData.prototype.query()
-Queries database meta-data with given "request" object.
+### MetaData.prototype.select()
+Starts a function chain that helps creating a "select query" for querying meta-data.
 
-` metaData.query([request], callback)`
+` metaData.select([...column])`
 
-- `request` (Object) : Request object:
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
+- `column` : String representation of column name
 
 
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
-
-
-#### Examples for databases which support schemas (Oracle, Postgres, MSSQL etc)
+#### Examples
 
 ```js
-// Query all 
-pool.metaData.query(function(err, result) {
+// Query schemas 
+pool.metaData.select().from('schemas').execute(function(err, result) {
   // ...
 });
 
-// Query all 
-pool.metaData.query({
-  schemas: '*'
-}, function(err, result) {
-  // ...
-});
+// Query tables 
+pool.metaData.select().from('tables')
+  .where(['schema_name', 'my_schema'])
+  .execute(function(err, result) {
+    // ...
+  });
 
-// Query all under "my_schema"
-pool.metaData.query({
-  schemas: {
-    my_schema: '*'
-  }
-}, function(err, result) {
-  // ...
-});
+// Query columns 
+pool.metaData.select().from('columns')
+  .where(['schema_name', 'my_schema'], ['table_name', 'like', 'TBL_%'])
+  .execute(function(err, result) {
+    // ...
+  });
 
-// Query only "table1" and "table2" under "my_schema"
-pool.metaData.query({
-  schemas: {
-    my_schema: {
-      tables: ['table1', 'table2']
-    }
-  }
-}, function(err, result) {
-  // ...
-});
+// Query primary keys 
+pool.metaData.select().from('primary_keys')
+  .where(['schema_name', 'my_schema'], ['table_name', 'TBL_1'])
+  .execute(function(err, result) {
+    // ...
+  });
+
+// Query foreign keys 
+pool.metaData.select().from('foreign_keys')
+  .where(['schema_name', 'my_schema'], ['table_name', 'TBL_1'])
+  .execute(function(err, result) {
+    // ...
+  });
 
 ```
 
-#### Examples for databases which does not support schemas (SQLite, Firebird, Interbase etc.)
+
+
+### MetaData.prototype.getSchemas()
+
+  Queryies and returns SchemaMeta objects which helps working with database schema.
+  
+` metaData.getSchemas([schemaName][, callback])`
+
+- `schemaName` : Allows filtering for schema names.
+
+
+#### Examples
 
 ```js
-// Query all 
-pool.metaData.query(function(err, result) {
-  // ...
-});
-
-// Query all
-pool.metaData.query({
-  tables: '*'
-}, function(err, result) {
-  // ...
-});
-
-
-// Query only "table1" and "table2" under "my_schema"
-pool.metaData.query({     
-  tables: ['table1', 'table2']  
-}, function(err, result) {
-  // ...
-});
-
+// Query schemas 
+let schemas = await pool.metaData.getSchemas('MY%');
+let tables = awit schemas[0].getTables();
 ```
