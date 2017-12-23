@@ -15,9 +15,13 @@ module.exports = {
           callback(null, new TestConnection(cfg));
         },
         paramType: 1,
-        serverVersion: '2.0',
-        metaData: new TestMetaOperator()
+        serverVersion: '2.0'
       };
+    }
+  },
+  createMetaOperator: function(config) {
+    if (config.dialect === 'test') {
+      return new TestMetaOperator();
     }
   },
   stringify: JSON.stringify,
@@ -49,6 +53,8 @@ function fillTable(tableName) {
 fillTable('schemas');
 fillTable('tables');
 fillTable('columns');
+fillTable('primary_keys');
+fillTable('foreign_keys');
 fillTable('airports');
 
 /**

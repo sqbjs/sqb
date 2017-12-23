@@ -1,0 +1,24 @@
+{
+  "fields": [
+    {
+      "name": "schema_name"
+    },
+    {
+      "name": "table_name"
+    },
+    {
+      "name": "constraint_name"
+    },
+    {
+      "name": "columns"
+    }
+  ],
+  "rows": [
+    {
+      "schema_name": "SCHEMA_1",
+      "table_name": "AIRPORTS",
+      "constraint_name": "PK_AIRPORTS_ID",
+      "columns": "ID"
+    }
+  ]
+}

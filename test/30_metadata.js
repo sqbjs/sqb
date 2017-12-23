@@ -19,41 +19,29 @@ describe('Metadata', function() {
     pool.close(true);
   });
 
-  it('should throw error if driver does not support metaData', function() {
-    const old = pool._driver.metaData;
-    try {
-      pool._driver.metaData = null;
-      pool.metaData.select().from('tables');
-    } catch (e) {
-      pool._driver.metaData = old;
-      return;
-    }
-    assert(0, 'Failed');
-  });
-
   it('should create select query for schemas', function() {
     var q = pool.metaData.select().from('schemas').generate();
-    assert.equal(q.sql, 'select * from (select * from schemas) t');
+    assert.equal(q.sql, 'select * from (select * from schemas) schemas');
   });
 
   it('should create select query for tables', function() {
     var q = pool.metaData.select().from('tables').generate();
-    assert.equal(q.sql, 'select * from (select * from tables) t');
+    assert.equal(q.sql, 'select * from (select * from tables) tables');
   });
 
   it('should create select query for columns', function() {
     var q = pool.metaData.select().from('columns').generate();
-    assert.equal(q.sql, 'select * from (select * from columns) t');
+    assert.equal(q.sql, 'select * from (select * from columns) columns');
   });
 
   it('should create select query for primary keys', function() {
     var q = pool.metaData.select().from('primary_keys').generate();
-    assert.equal(q.sql, 'select * from (select * from primary_keys) t');
+    assert.equal(q.sql, 'select * from (select * from primary_keys) primary_keys');
   });
 
   it('should create select query for foreign keys', function() {
     var q = pool.metaData.select().from('foreign_keys').generate();
-    assert.equal(q.sql, 'select * from (select * from foreign_keys) t');
+    assert.equal(q.sql, 'select * from (select * from foreign_keys) foreign_keys');
   });
 
   it('should not create select query for invalid selector', function() {
@@ -91,67 +79,103 @@ describe('Metadata', function() {
     });
   });
 
-  it('should get table object', function(done) {
-    schema.getTables(function(err, tables) {
-      if (err)
-        return done(err);
-      try {
+  describe('SchemaMeta', function() {
+    it('should get table object', function(done) {
+      schema.getTables(function(err, tables) {
+        if (err)
+          return done(err);
+        try {
+          assert.equal(tables.length, 3);
+          table = tables[0];
+          assert.equal(table.meta.table_name, 'AIRPORTS');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+
+    it('should get table objects (Promise)', function(done) {
+      schema.getTables('airports').then(function(tables) {
         assert.equal(tables.length, 3);
         table = tables[0];
         assert.equal(table.meta.table_name, 'AIRPORTS');
         done();
-      } catch (e) {
-        done(e);
-      }
+      }).catch(function(reason) {
+        done(reason);
+      });
     });
   });
 
-  it('should get table objects (Promise)', function(done) {
-    schema.getTables('airports').then(function(tables) {
-      assert.equal(tables.length, 3);
-      table = tables[0];
-      assert.equal(table.meta.table_name, 'AIRPORTS');
-      done();
-    }).catch(function(reason) {
-      done(reason);
-    });
-  });
+  describe('TableMeta', function() {
 
-  it('should get single table info', function(done) {
-    table.refresh(function(err) {
-      if (err)
-        return done(err);
-      try {
-        assert(table.columns);
-        assert(table.columns.ID);
-        assert.equal(table.columns.ID.data_type, 'TEXT');
-        assert(table.primaryKey);
-        assert.equal(table.primaryKey.columns, 'ID');
-        assert(table.foreignKeys);
-        assert(table.foreignKeys.length);
-        assert.equal(table.foreignKeys[0].columns, 'REGION');
-        done();
-      } catch (e) {
-        done(e);
-      }
+    it('should get columns', function(done) {
+      table.getColumns(function(err, result) {
+        if (err)
+          return done(err);
+        try {
+          assert(result);
+          assert(result.ID);
+          assert.equal(result.ID.data_type, 'TEXT');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
     });
-  });
 
-  it('should get single table info (Promise)', function(done) {
-    table.refresh().then(function() {
-
-      assert(table.columns);
-      assert(table.columns.ID);
-      assert.equal(table.columns.ID.data_type, 'TEXT');
-      assert(table.primaryKey);
-      assert.equal(table.primaryKey.columns, 'ID');
-      assert(table.foreignKeys);
-      assert(table.foreignKeys.length);
-      assert.equal(table.foreignKeys[0].columns, 'REGION');
-      done();
-    }).catch(function(reason) {
-      done(reason);
+    it('should get columns (Promise)', function() {
+      return table.getColumns().then(function(result) {
+        assert(result);
+        assert(result.ID);
+        assert.equal(result.ID.data_type, 'TEXT');
+      });
     });
+
+    it('should get primary key', function(done) {
+      table.getPrimaryKey(function(err, result) {
+        if (err)
+          return done(err);
+        try {
+          assert(result);
+          assert.equal(result.columns, 'ID');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+
+    it('should get columns (Promise)', function() {
+      return table.getPrimaryKey().then(function(result) {
+        assert(result);
+        assert.equal(result.columns, 'ID');
+      });
+    });
+
+    it('should get foreign keys', function(done) {
+      table.getForeignKeys(function(err, result) {
+        if (err)
+          return done(err);
+        try {
+          assert(result);
+          assert(result.length);
+          assert.equal(result[0].column, 'REGION');
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+
+    it('should get columns (Promise)', function() {
+      return table.getForeignKeys().then(function(result) {
+        assert(result);
+        assert(result.length);
+        assert.equal(result[0].column, 'REGION');
+      });
+    });
+
   });
 
   it('should call invalidate()', function() {
