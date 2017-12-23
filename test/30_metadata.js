@@ -146,7 +146,7 @@ describe('Metadata', function() {
       });
     });
 
-    it('should get columns (Promise)', function() {
+    it('should get primary key (Promise)', function() {
       return table.getPrimaryKey().then(function(result) {
         assert(result);
         assert.equal(result.columns, 'ID');
@@ -168,7 +168,7 @@ describe('Metadata', function() {
       });
     });
 
-    it('should get columns (Promise)', function() {
+    it('should get foreign keys (Promise)', function() {
       return table.getForeignKeys().then(function(result) {
         assert(result);
         assert(result.length);
