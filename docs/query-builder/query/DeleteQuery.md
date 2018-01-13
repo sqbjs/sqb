@@ -14,12 +14,9 @@
 
 ## Construction
 
-SQB namespace exposes DeleteQuery class. And also SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have `delete()` function that creates SelectQuery instance.
+SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have `delete()` function that creates SelectQuery instance.
 
 A Query instance that created by [Pool](connection/Pool.md) and [Connection](connection/Connection.md) can be executed directly.
-
-
-`query = new sqb.DeleteQuery([tableName])`
 
 `query = (sqb|pool|connection).delete([tableName])`
 
@@ -28,7 +25,7 @@ A Query instance that created by [Pool](connection/Pool.md) and [Connection](con
 
 ```js
 var query = sqb.delete('customer')
-    .where(['id', 1]);
+    .where(Op.eq('id', 1));
 ```
 ```sql
 Generated SQL for Postgres:
@@ -62,12 +59,12 @@ Defines "where" part of `query`.
 
 `.where(..conditions)`
 
-- `conditions`: [condition](query-builder/conditions.md) arrays.
+- `conditions`: [condition](query-builder/operators.md) arrays.
 - **Returns**: UpdateQuery itself.
 
 ```js
 const query = sqb.delete('customer')
-    .where(['name', 'like', '%john%']);
+    .where(Op.like('name', '%john%'));
 ```
 ```sql
 Generated SQL for Postgres:
@@ -79,7 +76,7 @@ Executes query. Please check [executing queries](query-builder/executingqueries.
 
 ```js
 pool.delete('customer')
-    .where(['name', 'like', '%john%'])
+    .where(Op.like('name', '%john%'))
     .execute({
        autoCommit: true
      }, function(err, result) {
@@ -94,7 +91,7 @@ Sets execution params for query. Please check [executing queries](query-builder/
 
 ```js
 const query = pool.delete('customer')
-    .where(['id', '=', /Id/]);
+    .where(Op.eq('id', /Id/));
 ....    
 query.params({ID: request.params.ID)    
     .execute({
@@ -113,7 +110,7 @@ Executes query and returns Promise. Please check [executing queries](query-build
 
 ```js
 const promise = pool.delete('customer')
-    .where(['name', 'like', '%john%'])
+    .where(Op.like('name', '%john%'))
     .then({
        autoCommit: true
      }, result => {

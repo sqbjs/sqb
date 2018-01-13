@@ -23,11 +23,9 @@
 
 ## Construction
 
-SQB namespace exposes SelectQuery class. And also SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have `select()` function that creates SelectQuery instance.
+SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have `select()` function that creates SelectQuery instance.
 
 A Query instance that created by [Pool](connection/Pool.md) and [Connection](connection/Connection.md) can be executed directly.
-
-`query = new sqb.SelectQuery(..column)`
 
 `query = (sqb|pool|connection).select(..column)`
 
@@ -103,7 +101,7 @@ select c.id, c.name customer_name from customer c
 
 ```js
 var query = sqb.select('c.id',
-    sqb.select('name').from('person').where(['id', 1]).as('persone_name')
+    sqb.select('name').from('person').where(Op.eq('id', 1)).as('persone_name')
 ).from('customer c');
 ```
 ```sql
@@ -329,13 +327,13 @@ Defines "where" part of `query`.
 
 `.where(..conditions)`
 
-- `conditions`: [condition](query-builder/conditions.md) arrays.
+- `conditions`: [condition](query-builder/operators.md) arrays.
 - **Returns**: UpdateQuery itself.
 
 
 ```js
 const query = sqb.delete('customer')
-    .where(['name', 'like', '%john%']);
+    .where(Op.like('name', '%john%'));
 ```
 
 
@@ -346,7 +344,7 @@ Executes query. Please check [executing queries](query-builder/executingqueries.
 ```js
 pool.select()
     .from('customer')
-    .where(['name', 'like', '%john%'])
+    .where(Op.like('name', '%john%'))
     .execute({
        autoCommit: true
      }, function(err, result) {
@@ -362,7 +360,7 @@ Sets execution params for query. Please check [executing queries](query-builder/
 ```js
 const query = pool.select()
     .from('customer')
-    .where(['name', 'like', /Name/])
+    .where(Op.like('name', /Name/))
 
 ....    
 query.params({Name: request.params.Name)    
@@ -382,7 +380,7 @@ Executes query and returns Promise. Please check [executing queries](query-build
 ```js
 const promise = pool.select()
     .from('customer')
-    .where(['name', 'like', '%john%'])
+    .where(Op.like('name', '%john%'))
     .then({
        autoCommit: true
      }, result => {

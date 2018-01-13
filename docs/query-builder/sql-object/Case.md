@@ -29,7 +29,7 @@ Defines "when" part of `Case` object.
 
 `.when(..conditions)`
 
-- `conditions`: [condition](query-builder/conditions.md) arrays.
+- `conditions`: [condition](query-builder/operators.md) arrays.
 - **Returns**: Case object itself.
 
 ### Case.prototype.then()
@@ -50,7 +50,7 @@ Defines "else" part of `Case` object.
 
 ```js
 var query = sqb.select(
-    sqb.case().when('age', '>=', 16).then(1).else(0)
+    sqb.case().when(Op.gte('age', 16)).then(1).else(0)
 ).from('person');
 ```
 ```sql
@@ -73,7 +73,7 @@ Sets alias to case expression.
 
 ```js
 var query = sqb.select(
-    sqb.case().when('age', '>=', 16).then(1).else(0).as('is_ok')
+    sqb.case().when(Op.gte('age', 16)).then(1).else(0).as('is_ok')
 ).from('person');
 ```
 ```sql

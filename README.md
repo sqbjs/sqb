@@ -25,13 +25,14 @@ You can report bugs and discuss features on the [GitHub issues](https://github.c
 
 Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs/contributors) to the project.
 
-***Note:*** *SQB is in BETA state. Currently, production use is not recommended.* 
+***Note:*** *SQB IS IN ALPHA STATE AND NOT STABLE YET. PRODUCTION USE IS NOT RECOMMENDED.* 
 
 ## Main goals
 
 - Single code base for any sql based database
 - Powerful and simplified query coding scheme
 - Fast applications with low memory requirements
+- Let applications work with large data tables efficiently
 - Support latest JavaScript language standards
 - Lightweight and extensible framework
 
@@ -45,6 +46,14 @@ $ npm install sqb --save
 ## Node Compatibility
 
   - node >= 4.x
+  
+## Change log
+
+2018-01-13 | 1.0.1-alpha.1 : Bulk updates
+- Serialization logic has been re-designed.
+- Operations logic has been re-designed
+- Test has been re-organized and 100% covered
+- Documentation has been updated
   
 ### License
 SQB is available under [MIT](LICENSE) license.

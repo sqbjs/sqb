@@ -21,13 +21,14 @@ SQB is an extensible, multi-dialect SQL query builder and Database connection wr
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/panates/sqb/issues) page
 
-***Note:*** *SQB is in BETA state. Currently, production use is not recommended.* 
+***Note:*** *SQB IS IN ALPHA STATE AND NOT STABLE YET. PRODUCTION USE IS NOT RECOMMENDED.* 
 
 ## Main goals
 
 - Single code base for any sql based database
 - Powerful and simplified query coding scheme
 - Fast applications with low memory requirements
+- Let applications work with large data tables efficiently
 - Support latest JavaScript language standards
 - Lightweight and extensible framework
 
@@ -41,6 +42,7 @@ $ npm install sqb --save
 ## Node Compatibility
 
   - node >= 4.x
+  
   
 ## License
 

@@ -12,9 +12,7 @@ Sql object for adding `join` expressions.
 
 ## Construction
 
-SQB namespace exposes Join class. And also SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have 8 methods to create Join object.
-
-`query = new sqb.Join(joinType, tableName)`
+SQB namespace, [Pool](connection/Pool.md) and [Connection](connection/Connection.md) have 8 methods to create Join object.
 
 `query = (sqb|pool|connection).join(tableName)`
 
@@ -41,7 +39,7 @@ Defines "on" part of `join`.
 
 `.where(..conditions)`
 
-- `conditions`: [condition](query-builder/conditions.md) arrays.
+- `conditions`: [condition](query-builder/operators.md) arrays.
 - **Returns**: UpdateQuery itself.
 
 
@@ -49,8 +47,8 @@ Defines "on" part of `join`.
 var query = sqb.select('c.*')
     .from('customer c')
     .join(
-        sqb.innerJoin('person p').on(['p.id', sqb.raw('c.person_id')]),
-        sqb.leftOuterJoin('contact cn').on(['cn.id', sqb.raw('c.contact_id')])
+        sqb.innerJoin('person p').on(Op.eq('p.id', sqb.raw('c.person_id'))),
+        sqb.leftOuterJoin('contact cn').on(Op.eq('cn.id', sqb.raw('c.contact_id')))
     );
 ```
 ```sql
