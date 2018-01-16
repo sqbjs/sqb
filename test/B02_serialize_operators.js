@@ -280,6 +280,14 @@ describe('serialize "Operators"', function() {
       assert.equal(result.sql, 'select * from table1 where id between 10 and 10');
     });
 
+    it('should serialize with one array arg', function() {
+      var query = sqb.select()
+          .from('table1')
+          .where(Op.between('id', [10, 20]));
+      var result = query.generate(options);
+      assert.equal(result.sql, 'select * from table1 where id between 10 and 20');
+    });
+
     it('should serialize params', function() {
       var query = sqb.select()
           .from('table1')
