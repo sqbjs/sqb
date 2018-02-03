@@ -25,7 +25,6 @@ You can report bugs and discuss features on the [GitHub issues](https://github.c
 
 Thanks to all of the great [contributions](https://github.com/panates/sqb/graphs/contributors) to the project.
 
-***Note:*** *SQB IS IN ALPHA STATE AND NOT STABLE YET. PRODUCTION USE IS NOT RECOMMENDED.* 
 
 ## Main goals
 
@@ -48,6 +47,9 @@ $ npm install sqb --save
   - node >= 4.x
   
 ## Change log
+
+2018-02-03 | 1.0.1-rc.1 : First RC version has been released.
+
 
 2018-01-13 | 1.0.1-alpha.1 : Bulk updates
 - Serialization logic has been re-designed.
