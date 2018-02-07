@@ -136,6 +136,17 @@ describe('Connection', function() {
     });
   });
 
+  it('should commit when returned promise resolved', function(done) {
+    pool.connect(function(err, conn) {
+      conn.on('commit', function() {
+        done();
+      });
+      return new Promise(function(resolve, reject) {
+        resolve();
+      });
+    });
+  });
+
   it('should not commit if closed', function(done) {
     pool.connect(function(err, conn) {
       conn.on('close', function() {
@@ -175,6 +186,17 @@ describe('Connection', function() {
       });
       conn.rollback().then(function() {
         conn.release();
+      });
+    });
+  });
+
+  it('should rollback when returned promise rejected', function(done) {
+    pool.connect(function(err, conn) {
+      conn.on('rollback', function() {
+        done();
+      });
+      return new Promise(function(resolve, reject) {
+        reject('Any error');
       });
     });
   });
