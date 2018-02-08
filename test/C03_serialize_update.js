@@ -19,14 +19,14 @@ describe('Serialize update query', function() {
     var query = sqb.update('table1', {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
     var result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 2 and name = \'aaa\' where id = 1');
+    assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
   it('should pass raw as table name', function() {
     var query = sqb.update(sqb.raw('table1'), {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
     var result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 2 and name = \'aaa\' where id = 1');
+    assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
   it('should validate first (tableName) argument', function() {
@@ -59,7 +59,7 @@ describe('Serialize update query', function() {
       id: 1,
       name: 'abc'
     });
-    assert.equal(result.sql, 'update table1 set id = :id and name = :name');
+    assert.equal(result.sql, 'update table1 set id = :id, name = :name');
     assert.deepEqual(result.values, {
       id: 1,
       name: 'abc'
@@ -74,7 +74,7 @@ describe('Serialize update query', function() {
       id: 1,
       name: 'abc'
     });
-    assert.equal(result.sql, 'update table1 set id = ? and name = ?');
+    assert.equal(result.sql, 'update table1 set id = ?, name = ?');
     assert.deepEqual(result.values, [1, 'abc']);
   });
 
@@ -86,7 +86,7 @@ describe('Serialize update query', function() {
       id: 1,
       name: 'abc'
     });
-    assert.equal(result.sql, 'update table1 set id = $1 and name = $2');
+    assert.equal(result.sql, 'update table1 set id = $1, name = $2');
     assert.deepEqual(result.values, [1, 'abc']);
   });
 
@@ -98,7 +98,7 @@ describe('Serialize update query', function() {
       id: 1,
       name: 'abc'
     });
-    assert.equal(result.sql, 'update table1 set id = @id and name = @name');
+    assert.equal(result.sql, 'update table1 set id = @id, name = @name');
     assert.deepEqual(result.values, {
       id: 1,
       name: 'abc'
@@ -112,7 +112,7 @@ describe('Serialize update query', function() {
           name: 'abc'
         });
     var result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = :id and name = :name');
+    assert.equal(result.sql, 'update table1 set id = :id, name = :name');
     assert.deepEqual(result.values, {
       id: 1,
       name: 'abc'
@@ -133,7 +133,7 @@ describe('Serialize update query', function() {
     var query = sqb.update('table1', {id: 1, name: 'aaa'})
         .returning({'id': 'number', name: 'string'});
     var result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 1 and name = \'aaa\' returning id, name');
+    assert.equal(result.sql, 'update table1 set id = 1, name = \'aaa\' returning id, name');
   });
 
   it('should validate returning() arguments', function() {
