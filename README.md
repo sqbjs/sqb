@@ -48,6 +48,9 @@ $ npm install sqb --save
   
 ## Change log
 
+2018-02-19 | 1.0.1 : First stable of sqb released
+
+
 2018-02-03 | 1.0.1-rc.1 : First RC version has been released.
 
 

@@ -21,8 +21,6 @@ SQB is an extensible, multi-dialect SQL query builder and Database connection wr
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/panates/sqb/issues) page
 
-***Note:*** *SQB IS IN ALPHA STATE AND NOT STABLE YET. PRODUCTION USE IS NOT RECOMMENDED.* 
-
 ## Main goals
 
 - Single code base for any sql based database
