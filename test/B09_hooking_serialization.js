@@ -26,7 +26,7 @@ describe('Hooking serialization', function() {
         .from('table1')
         .where(Op.eq('id', 1))
         .hook('serialize', function(ctx, type, o, defFn) {
-          if (type.substring(0, 9) === 'operator_')
+          if (type === 'operator')
             o.expression = 'new_id';
         });
     var result = query.generate(options);

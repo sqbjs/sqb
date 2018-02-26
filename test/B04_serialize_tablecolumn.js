@@ -2,7 +2,7 @@
 const assert = require('assert'),
     sqb = require('../');
 
-describe('serialize "TableColumn"', function() {
+describe('serialize "SelectColumn"', function() {
 
   var options = {
     dialect: 'test',
