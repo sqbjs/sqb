@@ -72,7 +72,7 @@ delete from customer where name like '%john%'
 ```
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.delete('customer')
@@ -87,7 +87,7 @@ pool.delete('customer')
 ```
 
 ### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.delete('customer')
@@ -106,7 +106,7 @@ query.params({ID: request.params.ID)
 
 
 ### Query.prototype.then() 
-Executes query and returns Promise. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const promise = pool.delete('customer')

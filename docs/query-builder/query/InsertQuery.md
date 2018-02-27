@@ -61,7 +61,7 @@ returning id into :returning$id, name into :returning$name
 ```
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.insert('customer', {id: 1, name: 'John'})    
@@ -75,7 +75,7 @@ pool.insert('customer', {id: 1, name: 'John'})
 ```
 
 ### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.insert('customer', {id: /ID/, name: /Name/});
@@ -92,7 +92,7 @@ query.params({ID: request.params.ID, Name: request.params.Name)
 
 
 ### Query.prototype.then() 
-Executes query and returns Promise. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const promise = pool.insert('customer', {id: 1, name: 'John'})    

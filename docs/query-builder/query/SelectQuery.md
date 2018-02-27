@@ -339,7 +339,7 @@ const query = sqb.delete('customer')
 
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.select()
@@ -355,7 +355,7 @@ pool.select()
 ```
 
 ### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.select()
@@ -375,7 +375,7 @@ query.params({Name: request.params.Name)
 
 
 ### Query.prototype.then() 
-Executes query and returns Promise. Please check [executing queries](query-builder/executingqueries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const promise = pool.select()
