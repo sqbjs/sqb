@@ -275,7 +275,7 @@ describe('serialize "Operators"', function() {
     it('should serialize with one arg', function() {
       var query = sqb.select()
           .from('table1')
-          .where(Op.between('id', 10));
+          .where(Op.btw('id', 10));
       var result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id between 10 and 10');
     });
@@ -322,9 +322,17 @@ describe('serialize "Operators"', function() {
       it('should serialize with one arg', function() {
         var query = sqb.select()
             .from('table1')
-            .where(Op.notBetween('id', 10));
+            .where(Op.nbtw('id', 10));
         var result = query.generate(options);
         assert.equal(result.sql, 'select * from table1 where id not between 10 and 10');
+      });
+
+      it('should serialize with one array arg', function() {
+        var query = sqb.select()
+            .from('table1')
+            .where(Op.notBetween('id', [10, 20]));
+        var result = query.generate(options);
+        assert.equal(result.sql, 'select * from table1 where id not between 10 and 20');
       });
 
       it('should serialize params', function() {
@@ -395,7 +403,7 @@ describe('serialize "Operators"', function() {
     it('should serialize params', function() {
       var query = sqb.select()
           .from('table1')
-          .where(Op.notLike('name', /name/));
+          .where(Op.nlike('name', /name/));
       var result = query.generate(options, {
         name: 'John'
       });
@@ -448,7 +456,7 @@ describe('serialize "Operators"', function() {
     it('should serialize', function() {
       var query = sqb.select()
           .from('table1')
-          .where(Op.notILike('name', 'John\'s'), Op.notILike('id', 10));
+          .where(Op.nilike('name', 'John\'s'), Op.notILike('id', 10));
       var result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where name not ilike \'John\'\'s\'' +
           ' and id not ilike \'10\'');
@@ -519,7 +527,7 @@ describe('serialize "Operators"', function() {
     it('should serialize params', function() {
       var query = sqb.select()
           .from('table1')
-          .where(Op.notIn('id', /id/));
+          .where(Op.nin('id', /id/));
       var result = query.generate(options, {
         id: [1, 2, 3]
       });
