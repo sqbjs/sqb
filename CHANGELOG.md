@@ -1,7 +1,7 @@
   
 ## Change log
 
-**2018-02-19 | 1.4.0**
+**2018-02-19 | 1.4.1**
 
 * [+] Alternative way added for defining conditions. (Native objects) 
 
