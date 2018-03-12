@@ -1,12 +1,14 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert');
 const sqb = require('../lib/index');
 
 describe('Metadata', function() {
 
-  var pool;
-  var metaData;
-  before(function() {
+  let pool;
+  let metaData;
+  before(() => {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
@@ -15,15 +17,13 @@ describe('Metadata', function() {
     });
 
   });
-  var schema;
-  var table;
-  var options = {
+  let schema;
+  let table;
+  let options = {
     prettyPrint: false
   };
 
-  after(function() {
-    pool.close(true);
-  });
+  after(() => pool.close(true));
 
   it('should validate arguments', function() {
     try {
@@ -39,7 +39,7 @@ describe('Metadata', function() {
   });
 
   it('should initialize with connection', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       assert(!err, err);
       conn.release();
       new sqb.DBMeta(conn);
@@ -48,27 +48,27 @@ describe('Metadata', function() {
   });
 
   it('should create select query for schemas', function() {
-    var q = metaData.select().from('schemas').generate(options);
+    let q = metaData.select().from('schemas').generate(options);
     assert.equal(q.sql, 'select * from (select * from schemas) schemas');
   });
 
   it('should create select query for tables', function() {
-    var q = metaData.select().from('tables').generate(options);
+    let q = metaData.select().from('tables').generate(options);
     assert.equal(q.sql, 'select * from (select * from tables) tables');
   });
 
   it('should create select query for columns', function() {
-    var q = metaData.select().from('columns').generate(options);
+    let q = metaData.select().from('columns').generate(options);
     assert.equal(q.sql, 'select * from (select * from columns) columns');
   });
 
   it('should create select query for primary keys', function() {
-    var q = metaData.select().from('primary_keys').generate(options);
+    let q = metaData.select().from('primary_keys').generate(options);
     assert.equal(q.sql, 'select * from (select * from primary_keys) primary_keys');
   });
 
   it('should create select query for foreign keys', function() {
-    var q = metaData.select().from('foreign_keys').generate(options);
+    let q = metaData.select().from('foreign_keys').generate(options);
     assert.equal(q.sql, 'select * from (select * from foreign_keys) foreign_keys');
   });
 
@@ -82,7 +82,7 @@ describe('Metadata', function() {
   });
 
   it('should get schema objects', function(done) {
-    metaData.getSchemas(function(err, schemas) {
+    metaData.getSchemas((err, schemas) => {
       if (err)
         return done(err);
       try {
@@ -97,19 +97,19 @@ describe('Metadata', function() {
   });
 
   it('should get schema objects (Promise)', function(done) {
-    metaData.getSchemas('schema_1').then(function(schemas) {
+    metaData.getSchemas('schema_1').then((schemas) => {
       assert.equal(schemas.length, 2);
       schema = schemas[0];
       assert.equal(schema.meta.schema_name, 'SCHEMA_1');
       done();
-    }).catch(function(reason) {
+    }).catch((reason) => {
       done(reason);
     });
   });
 
   describe('SchemaMeta', function() {
     it('should get table object', function(done) {
-      schema.getTables(function(err, tables) {
+      schema.getTables((err, tables) => {
         if (err)
           return done(err);
         try {
@@ -124,12 +124,12 @@ describe('Metadata', function() {
     });
 
     it('should get table objects (Promise)', function(done) {
-      schema.getTables('airports').then(function(tables) {
+      schema.getTables('airports').then((tables) => {
         assert.equal(tables.length, 3);
         table = tables[0];
         assert.equal(table.meta.table_name, 'AIRPORTS');
         done();
-      }).catch(function(reason) {
+      }).catch((reason) => {
         done(reason);
       });
     });
@@ -138,7 +138,7 @@ describe('Metadata', function() {
   describe('TableMeta', function() {
 
     it('should get columns', function(done) {
-      table.getColumns(function(err, result) {
+      table.getColumns((err, result) => {
         if (err)
           return done(err);
         try {
@@ -153,7 +153,7 @@ describe('Metadata', function() {
     });
 
     it('should get columns (Promise)', function() {
-      return table.getColumns().then(function(result) {
+      return table.getColumns().then((result) => {
         assert(result);
         assert(result.ID);
         assert.equal(result.ID.data_type, 'TEXT');
@@ -175,14 +175,14 @@ describe('Metadata', function() {
     });
 
     it('should get primary key (Promise)', function() {
-      return table.getPrimaryKey().then(function(result) {
+      return table.getPrimaryKey().then((result) => {
         assert(result);
         assert.equal(result.columns, 'ID');
       });
     });
 
     it('should get foreign keys', function(done) {
-      table.getForeignKeys(function(err, result) {
+      table.getForeignKeys((err, result) => {
         if (err)
           return done(err);
         try {
@@ -197,7 +197,7 @@ describe('Metadata', function() {
     });
 
     it('should get foreign keys (Promise)', function() {
-      return table.getForeignKeys().then(function(result) {
+      return table.getForeignKeys().then((result) => {
         assert(result);
         assert(result.length);
         assert.equal(result[0].column, 'REGION');

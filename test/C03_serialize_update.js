@@ -1,11 +1,13 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert'),
     sqb = require('../'),
     Op = sqb.Op;
 
 describe('Serialize update query', function() {
 
-  var options = {
+  let options = {
     dialect: 'test',
     prettyPrint: false
   };
@@ -16,16 +18,16 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize update', function() {
-    var query = sqb.update('table1', {id: 2, name: 'aaa'})
+    let query = sqb.update('table1', {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
   it('should pass raw as table name', function() {
-    var query = sqb.update(sqb.raw('table1'), {id: 2, name: 'aaa'})
+    let query = sqb.update(sqb.raw('table1'), {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
@@ -52,8 +54,8 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize params with "values" argument: COLON', function() {
-    var query = sqb.update('table1', {id: /id/, name: /name/});
-    var result = query.generate(Object.assign({
+    let query = sqb.update('table1', {id: /id/, name: /name/});
+    let result = query.generate(Object.assign({
       paramType: sqb.ParamType.COLON
     }, options), {
       id: 1,
@@ -67,8 +69,8 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize params with "values" argument: QUESTION_MARK', function() {
-    var query = sqb.update('table1', {id: /id/, name: /name/});
-    var result = query.generate(Object.assign({
+    let query = sqb.update('table1', {id: /id/, name: /name/});
+    let result = query.generate(Object.assign({
       paramType: sqb.ParamType.QUESTION_MARK
     }, options), {
       id: 1,
@@ -79,8 +81,8 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize params with "values" argument: DOLLAR', function() {
-    var query = sqb.update('table1', {id: /id/, name: /name/});
-    var result = query.generate(Object.assign({
+    let query = sqb.update('table1', {id: /id/, name: /name/});
+    let result = query.generate(Object.assign({
       paramType: sqb.ParamType.DOLLAR
     }, options), {
       id: 1,
@@ -91,8 +93,8 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize params with "values" argument: AT', function() {
-    var query = sqb.update('table1', {id: /id/, name: /name/});
-    var result = query.generate(Object.assign({
+    let query = sqb.update('table1', {id: /id/, name: /name/});
+    let result = query.generate(Object.assign({
       paramType: sqb.ParamType.AT
     }, options), {
       id: 1,
@@ -106,12 +108,12 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize params with query.params', function() {
-    var query = sqb.update('table1', {id: /id/, name: /name/})
+    let query = sqb.update('table1', {id: /id/, name: /name/})
         .params({
           id: 1,
           name: 'abc'
         });
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'update table1 set id = :id, name = :name');
     assert.deepEqual(result.values, {
       id: 1,
@@ -130,9 +132,9 @@ describe('Serialize update query', function() {
   });
 
   it('should serialize update with returning', function() {
-    var query = sqb.update('table1', {id: 1, name: 'aaa'})
+    let query = sqb.update('table1', {id: 1, name: 'aaa'})
         .returning({'id': 'number', name: 'string'});
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'update table1 set id = 1, name = \'aaa\' returning id, name');
   });
 

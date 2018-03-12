@@ -1,22 +1,23 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert'),
-    sqb = require('../'),
-    Op = sqb.Op;
+    sqb = require('../');
 
-describe('serialize "Raw"', function() {
+describe('serialize "Raw"', ()=> {
 
-  var options = {
+  let options = {
     prettyPrint: false
   };
 
-  it('should initialize Raw', function() {
+  it('should initialize Raw', ()=> {
     assert(sqb.raw().isRaw);
   });
 
-  it('should serialize Raw', function() {
-    var query = sqb.select(sqb.raw('\'John\'\'s Bike\' f1'))
+  it('should serialize Raw', ()=> {
+    let query = sqb.select(sqb.raw('\'John\'\'s Bike\' f1'))
         .from('table1');
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
   });
 

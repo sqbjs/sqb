@@ -1,12 +1,14 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert');
 const sqb = require('../lib/index');
 const testAdapter = require('./support/test_adapter');
 const airports = testAdapter.data.airports;
 
 function readStream(stream, callback) {
-  var bytes = new Buffer('');
-  stream.on('data', function(chunk) {
+  let bytes = new Buffer('');
+  stream.on('data', (chunk) => {
     bytes = Buffer.concat([bytes, chunk]);
   });
 
@@ -21,8 +23,8 @@ function readStream(stream, callback) {
 
 describe('CursorStream', function() {
 
-  var pool;
-  before(function() {
+  let pool;
+  before(() => {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
@@ -33,33 +35,29 @@ describe('CursorStream', function() {
     });
   });
 
-  after(function() {
-    pool.close(true);
-  });
-
-  after(function() {
-    pool.close(true);
-  });
+  after(() => pool.close(true));
+  after(() => pool.close(true));
 
   it('test outFormat = 0', function(done) {
     this.slow(200);
-    pool.select().from('airports').execute(function(err, result) {
-      var stream;
+    pool.select().from('airports').execute((err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.cursor.toStream();
         assert(stream);
+        assert.equal(stream.inspect(), '[object CursorStream]');
       } catch (e) {
         return done(e);
       }
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      readStream(stream, function(err, buf) {
+      readStream(stream, (err, buf) => {
         if (err)
           return done(err);
         try {
@@ -77,8 +75,8 @@ describe('CursorStream', function() {
 
   it('test outFormat = 1', function(done) {
     this.slow(200);
-    pool.select().from('airports').execute(function(err, result) {
-      var stream;
+    pool.select().from('airports').execute((err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.cursor.toStream({outFormat: 1});
@@ -86,14 +84,14 @@ describe('CursorStream', function() {
       } catch (e) {
         return done(e);
       }
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      readStream(stream, function(err, buf) {
+      readStream(stream, (err, buf) => {
         if (err)
           return done(err);
         try {
@@ -112,8 +110,8 @@ describe('CursorStream', function() {
   });
 
   it('test objectMode = true', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
-      var stream;
+    pool.select().from('airports').execute((err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.cursor.toStream({objectMode: true});
@@ -122,18 +120,16 @@ describe('CursorStream', function() {
         return done(e);
       }
       const arr = [];
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      stream.on('data', function(chunk) {
-        arr.push(chunk);
-      });
+      stream.on('data', (chunk) => arr.push(chunk));
 
-      stream.on('end', function() {
+      stream.on('end', () => {
         try {
           assert.equal(arr.length, airports.arr.length);
           assert.equal(arr[0][0], 'LFOI');
@@ -146,9 +142,9 @@ describe('CursorStream', function() {
   });
 
   it('should cursor.close emit stream close event', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       const stream = result.cursor.toStream();
-      stream.on('close', function(fields) {
+      stream.on('close', () => {
         done();
       });
       result.cursor.close();
@@ -156,9 +152,9 @@ describe('CursorStream', function() {
   });
 
   it('should stream.close also close the cursor', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       const stream = result.cursor.toStream();
-      result.cursor.on('close', function(fields) {
+      result.cursor.on('close', () => {
         done();
       });
       stream.close();
@@ -166,37 +162,35 @@ describe('CursorStream', function() {
   });
 
   it('should handle error on cursor close', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       const stream = result.cursor.toStream();
-      result.cursor.close = function(cb) {
+      result.cursor.close = (cb) => {
         cb(new Error('Any error'));
       };
-      stream.on('error', function(fields) {
+      stream.on('error', (fields) => {
         delete result.cursor.close;
         stream.close();
         done();
       });
-      stream.close(function(err) {
-      });
+      stream.close((err) => {});
     });
   });
 
   it('should handle error on cursor fetch', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       const stream = result.cursor.toStream();
-      result.cursor.next = function(cb) {
+      result.cursor.next = (cb) => {
         cb(new Error('Any error'));
       };
-      stream.once('error', function(fields) {
+      stream.once('error', () => {
         stream.close(done);
       });
-      readStream(stream, function() {
-      });
+      readStream(stream, () => {});
     });
   });
 
   describe('Finalize', function() {
-    it('shutdown pool', function(done) {
+    it('shutdown pool', (done) => {
       pool.close(done);
     });
   });

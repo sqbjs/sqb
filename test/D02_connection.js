@@ -1,11 +1,13 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert');
 const sqb = require('../lib/index');
 
 describe('Connection', function() {
 
-  var pool;
-  before(function() {
+  let pool;
+  before(() => {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
@@ -17,18 +19,27 @@ describe('Connection', function() {
     });
   });
 
-  after(function() {
-    pool.close(true);
+  after(() => pool.close(true));
+
+  it('should toString/inspect returns formatted string', function(done) {
+    pool.connect((err, conn) => {
+      try {
+        assert(conn.inspect().match(/\[object Connection\(\d\)]/));
+        conn.release();
+      } catch (e) {
+        return done(e);
+      }
+      done();
+    });
   });
 
   it('should use reference counting for acquire/release operations', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       try {
         assert(!err, err);
         assert(conn);
-        assert(conn.isConnection);
         assert(!conn.isClosed);
-        conn.on('close', function() {
+        conn.on('close', () => {
           try {
             assert.equal(conn.referenceCount, 0);
           } catch (e) {
@@ -49,7 +60,7 @@ describe('Connection', function() {
   });
 
   it('should not release() more than acquired', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       try {
         assert(!err, err);
         assert(conn);
@@ -67,10 +78,9 @@ describe('Connection', function() {
   });
 
   it('should startTransaction()', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('start-transaction', function() {
-        done();
-      });
+    pool.connect((err, conn) => {
+      conn.on('start-transaction', () => done());
+
       conn.startTransaction(function(err) {
         try {
           assert(!err, err);
@@ -83,20 +93,16 @@ describe('Connection', function() {
   });
 
   it('should startTransaction() (Promise)', function(done) {
-    pool.connect().then(function(conn) {
-      conn.on('start-transaction', function() {
-        done();
-      });
-      conn.startTransaction().then(function() {
-        conn.release();
-      });
+    pool.connect().then((conn) => {
+      conn.on('start-transaction', () => done());
+      conn.startTransaction().then(() => conn.release());
     });
   });
 
   it('should not start transaction if closed', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('close', function() {
-        conn.startTransaction(function(err) {
+    pool.connect((err, conn) => {
+      conn.on('close', () => {
+        conn.startTransaction((err) => {
           try {
             assert(err);
           } catch (e) {
@@ -110,11 +116,10 @@ describe('Connection', function() {
   });
 
   it('should commit()', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('commit', function() {
-        done();
-      });
-      conn.commit(function(err) {
+    pool.connect((err, conn) => {
+      conn.on('commit', () => done());
+
+      conn.commit((err) => {
         try {
           assert(!err, err);
         } catch (e) {
@@ -126,31 +131,23 @@ describe('Connection', function() {
   });
 
   it('should commit() (Promise)', function(done) {
-    pool.connect().then(function(conn) {
-      conn.on('commit', function() {
-        done();
-      });
-      conn.commit().then(function() {
-        conn.release();
-      });
+    pool.connect().then((conn) => {
+      conn.on('commit', () => done());
+      conn.commit().then(() => conn.release());
     });
   });
 
   it('should commit when returned promise resolved', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('commit', function() {
-        done();
-      });
-      return new Promise(function(resolve, reject) {
-        resolve();
-      });
+    pool.connect((err, conn) => {
+      conn.on('commit', () => done());
+      return new Promise((resolve) => resolve());
     });
   });
 
   it('should not commit if closed', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('close', function() {
-        conn.commit(function(err) {
+    pool.connect((err, conn) => {
+      conn.on('close', () => {
+        conn.commit((err) => {
           try {
             assert(err);
           } catch (e) {
@@ -164,11 +161,9 @@ describe('Connection', function() {
   });
 
   it('should rollback()', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('rollback', function() {
-        done();
-      });
-      conn.rollback(function(err) {
+    pool.connect((err, conn) => {
+      conn.on('rollback', () => done());
+      conn.rollback((err) => {
         try {
           assert(!err, err);
         } catch (e) {
@@ -180,32 +175,24 @@ describe('Connection', function() {
   });
 
   it('should rollback() (Promise)', function(done) {
-    pool.connect().then(function(conn) {
-      conn.on('rollback', function() {
-        done();
-      });
-      conn.rollback().then(function() {
-        conn.release();
-      });
+    pool.connect().then((conn) => {
+      conn.on('rollback', () => done());
+      conn.rollback().then(() => conn.release());
     });
   });
 
   it('should rollback when returned promise rejected', function(done) {
-    pool.connect(function(err, conn) {
-      conn.on('rollback', function() {
-        done();
-      });
-      return new Promise(function(resolve, reject) {
-        reject('Any error');
-      });
+    pool.connect((err, conn) => {
+      conn.on('rollback', () => done());
+      return new Promise((resolve, reject) => reject('Any error'));
     });
   });
 
   it('should not rollback if closed', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       assert(!err, err);
-      conn.on('close', function() {
-        conn.rollback(function(err) {
+      conn.on('close', () => {
+        conn.rollback((err) => {
           try {
             assert(err);
           } catch (e) {
@@ -219,7 +206,7 @@ describe('Connection', function() {
   });
 
   it('should read client variables', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       try {
         assert(!err, err);
         assert.equal(conn.get('server_version'), '12.0');
@@ -232,10 +219,10 @@ describe('Connection', function() {
   });
 
   it('should execute(sql, params, options, callback)', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.execute('select * from airports', [], {
         fetchRows: 2
-      }, function(err, result) {
+      }, (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
@@ -250,8 +237,8 @@ describe('Connection', function() {
   });
 
   it('should execute(sql, params, callback)', function(done) {
-    pool.connect(function(err, conn) {
-      conn.execute('select * from airports', [], function(err, result) {
+    pool.connect((err, conn) => {
+      conn.execute('select * from airports', [], (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
@@ -265,8 +252,8 @@ describe('Connection', function() {
   });
 
   it('should execute(sql, callback)', function(done) {
-    pool.connect(function(err, conn) {
-      conn.execute('select * from airports', function(err, result) {
+    pool.connect((err, conn) => {
+      conn.execute('select * from airports', (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
@@ -280,8 +267,8 @@ describe('Connection', function() {
   });
 
   it('should execute(sql) (Promise)', function(done) {
-    pool.connect(function(err, conn) {
-      conn.execute('select * from airports').then(function(result) {
+    pool.connect((err, conn) => {
+      conn.execute('select * from airports').then((result) => {
         try {
           assert(result && result.rows);
         } catch (e) {
@@ -289,15 +276,13 @@ describe('Connection', function() {
         }
         conn.release();
         done();
-      }).catch(function(e) {
-        done(e);
-      });
+      }).catch((e) => done(e));
     });
   });
 
   it('should get error if no response got from adapter', function(done) {
-    pool.connect(function(err, conn) {
-      conn.execute('no response', function(err, result) {
+    pool.connect((err, conn) => {
+      conn.execute('no response', (err) => {
         try {
           assert(err);
         } catch (e) {
@@ -310,10 +295,10 @@ describe('Connection', function() {
   });
 
   it('should select() and return array rows', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports').execute({
         fetchRows: 2
-      }, function(err, result) {
+      }, (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
@@ -330,11 +315,11 @@ describe('Connection', function() {
   });
 
   it('should select() and return object rows', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports').execute({
         fetchRows: 2,
         objectRows: true
-      }, function(err, result) {
+      }, (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
@@ -351,10 +336,11 @@ describe('Connection', function() {
   });
 
   it('should emit `fetch` event ', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports')
-          .on('fetch', function(row) {
+          .on('fetch', (row) => {
             try {
+              assert.equal(row.inspect(), '[object Row]');
               assert.equal(row.get('ID'), 'LFOI');
             } catch (e) {
               return done(e);
@@ -364,7 +350,7 @@ describe('Connection', function() {
           .execute({
             fetchRows: 1,
             objectRows: true
-          }, function(err, result) {
+          }, (err) => {
             try {
               assert(!err, err);
             } catch (e) {
@@ -376,13 +362,13 @@ describe('Connection', function() {
   });
 
   it('should set types that will fetched as string - fetchAsString option - 1', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports')
           .execute({
             fetchRows: 1,
             objectRows: true,
             fetchAsString: Number
-          }, function(err, result) {
+          }, (err, result) => {
             try {
               assert(!err, err);
               assert.equal(typeof result.rows[0].Flags, 'string');
@@ -396,13 +382,13 @@ describe('Connection', function() {
   });
 
   it('should set types that will fetched as string - fetchAsString option - 2', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports')
           .execute({
             fetchRows: 1,
             objectRows: true,
             fetchAsString: [Number]
-          }, function(err, result) {
+          }, (err, result) => {
             try {
               assert(!err, err);
               assert.equal(typeof result.rows[0].Flags, 'string');
@@ -416,10 +402,10 @@ describe('Connection', function() {
   });
 
   it('should insert()', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.insert('airports', {id: 1})
           .returning({ID: 'string'})
-          .execute(function(err, result) {
+          .execute((err, result) => {
             try {
               assert(!err, err);
               assert.equal(result.returns.ID, 1);
@@ -433,9 +419,9 @@ describe('Connection', function() {
   });
 
   it('should update()', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.update('airports', {id: 1})
-          .execute(function(err, result) {
+          .execute((err) => {
             try {
               assert(!err, err);
             } catch (e) {
@@ -449,8 +435,8 @@ describe('Connection', function() {
   });
 
   it('should delete()', function(done) {
-    pool.connect(function(err, conn) {
-      conn.delete('airports').execute(function(err, result) {
+    pool.connect((err, conn) => {
+      conn.delete('airports').execute((err) => {
         try {
           assert(!err, err);
         } catch (e) {
@@ -463,11 +449,11 @@ describe('Connection', function() {
   });
 
   it('should get sql and values in result', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.select().from('airports').execute({
         fetchRows: 2,
         showSql: true
-      }, function(err, result) {
+      }, (err, result) => {
         try {
           assert(!err, err);
           assert(result.sql);
@@ -483,26 +469,25 @@ describe('Connection', function() {
   });
 
   it('should get sql and values in error', function(done) {
-    pool.connect(function(err, conn) {
-      conn.execute('error', [1, 2], {showSql: true},
-          function(err, result) {
-            try {
-              assert(err);
-              assert(err.sql);
-              assert.deepEqual(err.values, [1, 2]);
-              assert(err.options);
-            } catch (e) {
-              return done(e);
-            }
-            conn.release();
-            done();
-          });
+    pool.connect((err, conn) => {
+      conn.execute('error', [1, 2], {showSql: true}, (err) => {
+        try {
+          assert(err);
+          assert(err.sql);
+          assert.deepEqual(err.values, [1, 2]);
+          assert(err.options);
+        } catch (e) {
+          return done(e);
+        }
+        conn.release();
+        done();
+      });
     });
   });
 
   it('should text connection', function(done) {
-    pool.connect(function(err, conn) {
-      conn.test(function(err) {
+    pool.connect((err, conn) => {
+      conn.test((err) => {
         try {
           assert(!err);
         } catch (e) {
@@ -515,8 +500,8 @@ describe('Connection', function() {
   });
 
   it('should test connection (Promise)', function(done) {
-    pool.connect(function(err, conn) {
-      conn.test().then(function() {
+    pool.connect((err, conn) => {
+      conn.test().then(() => {
         try {
           assert(!err);
         } catch (e) {
@@ -529,9 +514,7 @@ describe('Connection', function() {
   });
 
   describe('Finalize', function() {
-    it('shutdown pool', function(done) {
-      pool.close(done);
-    });
+    it('shutdown pool', (done) => pool.close(done));
   });
 
 });

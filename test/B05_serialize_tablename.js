@@ -1,35 +1,37 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert'),
     sqb = require('../');
 
 describe('serialize "TableName"', function() {
 
-  var options = {
+  let options = {
     dialect: 'test',
     prettyPrint: false
   };
 
   it('should serialize (table)', function() {
-    var query = sqb.select().from('table1');
-    var result = query.generate(options);
+    let query = sqb.select().from('table1');
+    let result = query.generate(options);
     assert.equal(result.sql, 'select * from table1');
   });
 
   it('should serialize (table alias)', function() {
-    var query = sqb.select().from('table1 t1');
-    var result = query.generate(options);
+    let query = sqb.select().from('table1 t1');
+    let result = query.generate(options);
     assert.equal(result.sql, 'select * from table1 t1');
   });
 
   it('should serialize (schema.table)', function() {
-    var query = sqb.select().from('schema1.table1');
-    var result = query.generate(options);
+    let query = sqb.select().from('schema1.table1');
+    let result = query.generate(options);
     assert.equal(result.sql, 'select * from schema1.table1');
   });
 
   it('should serialize (schema.table alias)', function() {
-    var query = sqb.select().from('schema1.table1 t1');
-    var result = query.generate(options);
+    let query = sqb.select().from('schema1.table1 t1');
+    let result = query.generate(options);
     assert.equal(result.sql, 'select * from schema1.table1 t1');
   });
 

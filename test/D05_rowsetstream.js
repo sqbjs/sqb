@@ -1,14 +1,14 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert');
 const sqb = require('../lib/index');
 
 function readStream(stream, callback) {
-  var bytes = new Buffer('');
-  stream.on('data', function(chunk) {
-    bytes = Buffer.concat([bytes, chunk]);
-  });
+  let bytes = new Buffer('');
+  stream.on('data', (chunk) => bytes = Buffer.concat([bytes, chunk]));
 
-  stream.on('end', function() {
+  stream.on('end', () => {
     try {
       callback(null, bytes.toString());
     } catch (err) {
@@ -19,8 +19,8 @@ function readStream(stream, callback) {
 
 describe('RowsetStream', function() {
 
-  var pool;
-  before(function() {
+  let pool;
+  before(() => {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
@@ -31,7 +31,7 @@ describe('RowsetStream', function() {
     });
   });
 
-  after(function() {
+  after(() => {
     pool.close();
   });
 
@@ -39,8 +39,8 @@ describe('RowsetStream', function() {
     this.slow(150);
     pool.select().from('airports').execute({
       fetchRows: 10
-    }, function(err, result) {
-      var stream;
+    }, (err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.rowset.toStream();
@@ -48,14 +48,14 @@ describe('RowsetStream', function() {
       } catch (e) {
         return done(e);
       }
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      readStream(stream, function(err, buf) {
+      readStream(stream, (err, buf) => {
         if (err)
           return done(err);
         try {
@@ -73,8 +73,8 @@ describe('RowsetStream', function() {
   it('test outFormat = 1', function(done) {
     pool.select().from('airports').execute({
       fetchRows: 10
-    }, function(err, result) {
-      var stream;
+    }, (err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.rowset.toStream({outFormat: 1});
@@ -82,14 +82,14 @@ describe('RowsetStream', function() {
       } catch (e) {
         return done(e);
       }
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      readStream(stream, function(err, buf) {
+      readStream(stream, (err, buf) => {
         if (err)
           return done(err);
         try {
@@ -109,8 +109,8 @@ describe('RowsetStream', function() {
   it('test objectMode = true', function(done) {
     pool.select().from('airports').execute({
       fetchRows: 10
-    }, function(err, result) {
-      var stream;
+    }, (err, result) => {
+      let stream;
       try {
         assert(!err, err);
         stream = result.rowset.toStream({objectMode: true});
@@ -119,18 +119,18 @@ describe('RowsetStream', function() {
         return done(e);
       }
       const arr = [];
-      stream.on('fields', function(fields) {
+      stream.on('fields', (fields) => {
         try {
           assert(fields.ID);
         } catch (e) {
           return done(e);
         }
       });
-      stream.on('data', function(chunk) {
+      stream.on('data', (chunk) => {
         arr.push(chunk);
       });
 
-      stream.on('end', function() {
+      stream.on('end', () => {
         try {
           assert.equal(arr.length, 10);
           assert.equal(arr[0].data[0], 'LFOI');
@@ -143,9 +143,7 @@ describe('RowsetStream', function() {
   });
 
   describe('Finalize', function() {
-    it('shutdown pool', function(done) {
-      pool.close(done);
-    });
+    it('shutdown pool', (done) => pool.close(done));
   });
 
 });

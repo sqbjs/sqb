@@ -6,7 +6,7 @@ const assert = require('assert'),
 
 describe('serialize "Operators"', function() {
 
-  var options = {
+  let options = {
     dialect: 'test',
     prettyPrint: false
   };
@@ -22,10 +22,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should skip empty items', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.and(null, undefined, 0, Op.eq('id', 1)));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1)');
     });
 
@@ -39,18 +39,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.and(Op.eq('id', 1), Op.eq('id', 2)));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1 and id = 2)');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({and: [{'id': 1}, {'id': 2}]}, {and: {'id': 3}});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1 and id = 2) and (id = 3)');
     });
 
@@ -67,10 +67,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should skip empty items', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.or(null, undefined, 0, Op.eq('id', 1)));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1)');
     });
 
@@ -84,18 +84,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.or(Op.and(Op.eq('id', 1), Op.eq('id', 2)), Op.eq('id', 3)));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where ((id = 1 and id = 2) or id = 3)');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({or: [{'id': 1}, {'id': 2}]});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1 or id = 2)');
     });
 
@@ -112,26 +112,26 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id = 1');
     });
 
     it('should use Serializable as first arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq(sqb.raw('id'), 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id = 1');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id: 1
       });
       assert.equal(result.sql, 'select * from table1 where id = :id');
@@ -139,10 +139,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a': 1, 'b=': 2, 'c =': 3});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a = 1 and b = 2 and c = 3');
     });
   });
@@ -158,26 +158,26 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.ne('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id not = 1');
     });
 
     it('should use Serializable as first arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.ne(sqb.raw('id'), 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id not = 1');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.ne('id', /id/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id: 1
       });
       assert.equal(result.sql, 'select * from table1 where id not = :id');
@@ -185,10 +185,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a!=': 1, 'b !=': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a not = 1 and b not = 2');
     });
   });
@@ -204,18 +204,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.gt('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id > 1');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a>': 1, 'b >': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a > 1 and b > 2');
     });
 
@@ -232,18 +232,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.lt('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id < 1');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a<': 1, 'b <': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a < 1 and b < 2');
     });
   });
@@ -259,18 +259,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.gte('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id >= 1');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a>=': 1, 'b >=': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a >= 1 and b >= 2');
     });
 
@@ -287,18 +287,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.lte('id', 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id <= 1');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a<=': 1, 'b <=': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a <= 1 and b <= 2');
     });
 
@@ -315,34 +315,34 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.between('id', 10, 20));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id between 10 and 20');
     });
 
     it('should serialize with one arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.btw('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id between 10 and 10');
     });
 
     it('should serialize with one array arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.between('id', [10, 20]));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id between 10 and 20');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.between('id', /id1/, /id2/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id1: 1,
         id2: 5
       });
@@ -352,10 +352,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a btw': [1, 2], 'b between': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a between 1 and 2 and b between 2 and 2');
     });
 
@@ -372,34 +372,34 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.notBetween('id', 10, 20));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id not between 10 and 20');
     });
 
     it('should serialize with one arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.nbtw('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id not between 10 and 10');
     });
 
     it('should serialize with one array arg', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.notBetween('id', [10, 20]));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id not between 10 and 20');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.notBetween('id', /id1/, /id2/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id1: 1,
         id2: 5
       });
@@ -409,10 +409,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a nbtw': [1, 2], 'b notBetween': 2});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a not between 1 and 2 and b not between 2 and 2');
     });
 
@@ -429,19 +429,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.like('name', 'John\'s'), Op.like('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where name like \'John\'\'s\'' +
           ' and id like \'10\'');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.like('name', /name/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         name: 'John'
       });
       assert.equal(result.sql, 'select * from table1 where name like :name');
@@ -449,10 +449,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a like': '1'});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a like \'1\'');
     });
 
@@ -469,19 +469,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.notLike('name', 'John\'s'), Op.notLike('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where name not like \'John\'\'s\'' +
           ' and id not like \'10\'');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.nlike('name', /name/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         name: 'John'
       });
       assert.equal(result.sql, 'select * from table1 where name not like :name');
@@ -489,10 +489,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a !like': '1'});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a not like \'1\'');
     });
 
@@ -509,19 +509,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.ilike('name', 'John\'s'), Op.ilike('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where name ilike \'John\'\'s\'' +
           ' and id ilike \'10\'');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.ilike('name', /name/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         name: 'John'
       });
       assert.equal(result.sql, 'select * from table1 where name ilike :name');
@@ -529,10 +529,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a ilike': '1'});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a ilike \'1\'');
     });
 
@@ -549,19 +549,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.nilike('name', 'John\'s'), Op.notILike('id', 10));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where name not ilike \'John\'\'s\'' +
           ' and id not ilike \'10\'');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.notILike('name', /name/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         name: 'John'
       });
       assert.equal(result.sql, 'select * from table1 where name not ilike :name');
@@ -569,10 +569,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a !ilike': '1'});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a not ilike \'1\'');
     });
   });
@@ -588,19 +588,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.or(Op.in('id', 1), Op.in('id', [4, 5, 6])));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id in (1)' +
           ' or id in (4,5,6))');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.in('id', /id/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id: [1, 2, 3]
       });
       assert.equal(result.sql, 'select * from table1 where id in :id');
@@ -608,10 +608,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a in': 1, 'b in': [1, 2]});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a in (1) and b in (1,2)');
     });
 
@@ -628,19 +628,19 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.or(Op.notIn('id', 1), Op.notIn('id', [4, 5, 6])));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id not in (1)' +
           ' or id not in (4,5,6))');
     });
 
     it('should serialize params', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.nin('id', /id/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id: [1, 2, 3]
       });
       assert.equal(result.sql, 'select * from table1 where id not in :id');
@@ -648,10 +648,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a !in': 1, 'b !in': [1, 2]});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a not in (1) and b not in (1,2)');
     });
 
@@ -668,18 +668,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.is('id', null));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id is null');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a is': null});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a is null');
     });
 
@@ -696,18 +696,18 @@ describe('serialize "Operators"', function() {
     });
 
     it('should serialize', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.not('id', null));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id is not null');
     });
 
     it('should wrap native objects to operators', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where({'a !is': null});
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where a is not null');
     });
 
@@ -719,52 +719,52 @@ describe('serialize "Operators"', function() {
   describe('common', function() {
 
     it('should use sub-select as expression', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq(sqb.select('id').from('table'), 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (select id from table) = 1');
     });
 
     it('should use raw as expression', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq(sqb.raw('id'), 1));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id = 1');
     });
 
     it('should use sub-select as value', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', sqb.select('id').from('table')));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id = (select id from table)');
     });
 
     it('should use raw as value', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', sqb.raw('1')));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where id = 1');
     });
 
     it('should use Date as value', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('dt1', new Date(2017, 0, 15, 10, 30, 0, 0)),
               Op.eq('dt2', new Date(2017, 10, 1, 8, 5, 50, 0)));
-      var result = query.generate(options);
+      let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where dt1 = \'2017-01-15 10:30:00\'' +
           ' and dt2 = \'2017-11-01 08:05:50\'');
     });
 
     it('should user null as params -  COLON', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      var result = query.generate(options, {
+      let result = query.generate(options, {
         id: null
       });
       assert.equal(result.sql, 'select * from table1 where id = :id');
@@ -772,10 +772,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should use null as params - QUESTION_MARK', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      var result = query.generate({
+      let result = query.generate({
         paramType: 1,
         prettyPrint: 0
       }, {
@@ -786,10 +786,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should use null as params - DOLLAR', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      var result = query.generate({
+      let result = query.generate({
         paramType: 2,
         prettyPrint: 0
       }, {
@@ -800,10 +800,10 @@ describe('serialize "Operators"', function() {
     });
 
     it('should use null as params - AT', function() {
-      var query = sqb.select()
+      let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      var result = query.generate({
+      let result = query.generate({
         paramType: 3,
         prettyPrint: 0
       }, {

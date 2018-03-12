@@ -1,11 +1,13 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert'),
     sqb = require('../'),
     Op = sqb.Op;
 
 describe('Serialize delete query', function() {
 
-  var options = {
+  let options = {
     dialect: 'test',
     prettyPrint: false
   };
@@ -16,15 +18,15 @@ describe('Serialize delete query', function() {
   });
 
   it('should serialize delete', function() {
-    var query = sqb.delete('table1')
+    let query = sqb.delete('table1')
         .where(Op.eq('id', 1));
-    var result = query.generate(options);
+    let result = query.generate(options);
     assert.equal(result.sql, 'delete from table1 where id = 1');
   });
 
   it('should pass raw as table name', function() {
-    var query = sqb.delete(sqb.raw('table1'));
-    var result = query.generate(options);
+    let query = sqb.delete(sqb.raw('table1'));
+    let result = query.generate(options);
     assert.equal(result.sql, 'delete from table1');
   });
 

@@ -1,16 +1,16 @@
-# SQL Operators
+# Conditional expressions
 
-All operators are exposed in sqb.Op object.
+SQB provides two ways (Op functions, native js objects) for defining conditional expressions. Both can be used at same time.
+
 
 ## Index
 
-#### Logical Operators
+#### A. Op. functions
+
+SQB module exposes Op object that contains operator functions. This functions allows defining conditional expressions.
 
 - [Op.and()](#opand): And logical operator
 - [Op.or()](#opand): Or logical operator
-
-#### Comparison Operators
-
 - [Op.eq()](#opeq): `equal (=)` comparison operator
 - [Op.ne()](#opne): `not equal (!=)` comparison operator
 - [Op.gt()](#opgt): `greater than (>)` comparison operator
@@ -27,9 +27,13 @@ All operators are exposed in sqb.Op object.
 - [Op.notILike()](#opnotilike): `not ilike` comparison operator
 
 
+#### B. Native JS objects
+
+- [Using native JS objects](#usingnativejsobjects)
+
 <hr/>
 
-## Logical Operators
+## A. Op. functions
 
 ### Op.and()
 
@@ -275,3 +279,38 @@ select * from customer
 where name not ilike '%John%'
 ```
 
+### B. Native JS objects
+
+Alternatively SQB supports defining conditional expressions using native JS objects.
+
+#### Using native JS objects
+
+##### Example-1
+```js
+const query = sqb.select().from('customer')
+    .where({name: 'John'});
+```
+```sql
+select * from customer
+where name = 'John'
+```
+
+##### Example-2
+```js
+const query = sqb.select().from('customer')
+    .where({'name like': '%John%', 'age>=': 18});
+```
+```sql
+select * from customer
+where name like '%John%' and age >= 18
+```
+
+##### Example-3
+```js
+const query = sqb.select().from('customer')
+    .where({'name !like': '%John%', 'age in': [18,19,20]});
+```
+```sql
+select * from customer
+where name not like '%John%' and age in (18,19,20)
+```

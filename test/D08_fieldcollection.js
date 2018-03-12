@@ -1,11 +1,13 @@
 /* eslint-disable */
+'use strict';
+
 const assert = require('assert');
 const sqb = require('../lib/index');
 
 describe('FieldCollection', function() {
 
-  var pool;
-  before(function() {
+  let pool;
+  before(() => {
     pool = new sqb.Pool({
       dialect: 'test',
       user: 'user',
@@ -17,17 +19,16 @@ describe('FieldCollection', function() {
     });
   });
 
-  after(function() {
-    pool.close(true);
-  });
+  after(() => pool.close(true));
 
   it('should initialize FieldCollection', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert(fields);
       assert(fields.items);
       assert(fields.length);
+      assert.equal(fields.inspect(), '[object FieldCollection]');
       done();
     });
   });
@@ -35,7 +36,7 @@ describe('FieldCollection', function() {
   it('should initialize FieldCollection (options.naming = lowercase)', function(done) {
     pool.select().from('airports').execute({
       naming: 'lowercase'
-    }, function(err, result) {
+    }, (err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert(fields);
@@ -47,7 +48,7 @@ describe('FieldCollection', function() {
   it('should initialize FieldCollection (options.naming = uppercase)', function(done) {
     pool.select().from('airports').execute({
       naming: 'uppercase'
-    }, function(err, result) {
+    }, (err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert(fields);
@@ -57,7 +58,7 @@ describe('FieldCollection', function() {
   });
 
   it('should get field index', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert.equal(fields.indexOf('id'), 0);
@@ -68,7 +69,7 @@ describe('FieldCollection', function() {
   });
 
   it('should get field object', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       assert.equal(fields.get('id').name, 'ID');
@@ -80,7 +81,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray();
@@ -92,7 +93,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with lowercase names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'lowercase'});
@@ -104,7 +105,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with uppercase names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'uppercase'});
@@ -116,7 +117,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to array of fields with original names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const arr = fields.toArray({naming: 'invalidvalue'});
@@ -128,7 +129,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject();
@@ -139,7 +140,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with lowercase names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'lowercase'});
@@ -150,7 +151,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with uppercase names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'uppercase'});
@@ -161,7 +162,7 @@ describe('FieldCollection', function() {
   });
 
   it('should convert to object of fields with original names', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toObject({naming: 'invalidvalue'});
@@ -172,7 +173,7 @@ describe('FieldCollection', function() {
   });
 
   it('should toJSON() convert to object of fields', function(done) {
-    pool.select().from('airports').execute(function(err, result) {
+    pool.select().from('airports').execute((err, result) => {
       assert(!err, err);
       const fields = result && result.rowset.fields;
       const obj = fields.toJSON();

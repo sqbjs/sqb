@@ -4,11 +4,9 @@ const sqb = require('../');
 
 describe('Pool', function() {
 
-  var pool;
+  let pool;
 
-  after(function() {
-    pool.close(true);
-  });
+  after(() => pool.close(true));
 
   it('should not create a pool with unknown dialect', function() {
     try {
@@ -66,8 +64,12 @@ describe('Pool', function() {
     assert(pool2.options.validation);
   });
 
+  it('should toString/inspect returns formatted string', function() {
+    assert.equal(pool.inspect(), '[object Pool(test)]');
+  });
+
   it('should start pool', function(done) {
-    pool.on('create', function() {
+    pool.on('create', () => {
       assert.equal(pool.size, 1);
       assert.equal(pool.available, 1);
       done();
@@ -76,9 +78,9 @@ describe('Pool', function() {
   });
 
   it('should create connection', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       try {
-        assert(!err && conn.isConnection);
+        assert(!err && conn);
         assert.equal(pool.size, 1);
         assert.equal(pool.available, 0);
         assert.equal(pool.pending, 0);
@@ -87,7 +89,7 @@ describe('Pool', function() {
       } catch (e) {
         return done(e);
       }
-      conn.on('close', function() {
+      conn.on('close', () => {
         try {
           assert.equal(pool.size, 1);
           assert.equal(pool.available, 1);
@@ -103,7 +105,7 @@ describe('Pool', function() {
   });
 
   it('should validate connection', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.on('close', function() {
         pool.connect(function(err, conn) {
           conn.on('close', function() {
@@ -119,7 +121,7 @@ describe('Pool', function() {
   });
 
   it('should close connection when throw error in callback', function(done) {
-    pool.connect(function(err, conn) {
+    pool.connect((err, conn) => {
       conn.on('close', function() {
         done();
       });
@@ -136,14 +138,14 @@ describe('Pool', function() {
       }
     });
 
-    pool2.connect(function(err, conn) {
+    pool2.connect((err, conn) => {
       try {
         assert(!err, err);
         assert(conn);
       } catch (e) {
         return done(e);
       }
-      pool2.connect(function(err, conn) {
+      pool2.connect((err, conn) => {
         try {
           assert(err);
           assert(!conn);
@@ -156,7 +158,7 @@ describe('Pool', function() {
   });
 
   it('should create connection (Promise)', function(done) {
-    pool.connect().then(function(conn) {
+    pool.connect().then((conn) => {
       try {
         assert.equal(pool.size, 1);
         assert.equal(pool.available, 0);
@@ -165,7 +167,7 @@ describe('Pool', function() {
       } catch (e) {
         return done(e);
       }
-      conn.on('close', function() {
+      conn.on('close', () => {
         try {
           assert.equal(pool.size, 1);
           assert.equal(pool.available, 1);
@@ -181,7 +183,7 @@ describe('Pool', function() {
   });
 
   it('should test pool', function(done) {
-    pool.test(function(err) {
+    pool.test((err) => {
       try {
         assert(!err, err);
       } catch (e) {
@@ -192,10 +194,9 @@ describe('Pool', function() {
   });
 
   it('should test() handle errors', function(done) {
-    pool.connect = function(cb) {
-      cb(new Error('Any error'));
-    };
-    pool.test(function(err) {
+    pool.connect = (cb) => cb(new Error('Any error'));
+
+    pool.test((err) => {
       delete pool.connect;
       try {
         assert(err);
@@ -211,7 +212,7 @@ describe('Pool', function() {
   });
 
   it('should execute() select query - 3 args', function(done) {
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
@@ -225,7 +226,7 @@ describe('Pool', function() {
   });
 
   it('should execute() select query - 2 args', function(done) {
-    pool.execute('select * from airports', function(err, result) {
+    pool.execute('select * from airports', (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
@@ -241,7 +242,7 @@ describe('Pool', function() {
   it('should execute() limit fetchRows', function(done) {
     pool.execute('select * from airports', [], {
       fetchRows: 2
-    }, function(err, result) {
+    }, (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
@@ -256,12 +257,12 @@ describe('Pool', function() {
   });
 
   it('should execute() (Promise)', function(done) {
-    pool.execute('select * from airports', []).then(function(result) {
+    pool.execute('select * from airports', []).then((result) => {
       assert(result && result.rows);
       assert(Array.isArray(result.rows[0]));
       assert(result.rows[0][0] === 'LFOI');
       done();
-    }).catch(function(reason) {
+    }).catch((reason) => {
       done(reason);
     });
   });
@@ -269,7 +270,7 @@ describe('Pool', function() {
   it('should select() and return array rows', function(done) {
     pool.select().from('airports').execute({
       fetchRows: 2
-    }, function(err, result) {
+    }, (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
@@ -287,7 +288,7 @@ describe('Pool', function() {
     pool.select().from('airports').execute({
       fetchRows: 2,
       objectRows: true
-    }, function(err, result) {
+    }, (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
@@ -302,7 +303,7 @@ describe('Pool', function() {
   });
 
   it('should insert()', function(done) {
-    pool.insert('airports', {id: 1}).execute(function(err, result) {
+    pool.insert('airports', {id: 1}).execute((err) => {
       try {
         assert(!err, err);
       } catch (e) {
@@ -313,7 +314,7 @@ describe('Pool', function() {
   });
 
   it('should update()', function(done) {
-    pool.update('airports', {id: 1}).execute(function(err, result) {
+    pool.update('airports', {id: 1}).execute((err) => {
       try {
         assert(!err, err);
       } catch (e) {
@@ -324,7 +325,7 @@ describe('Pool', function() {
   });
 
   it('should delete()', function(done) {
-    pool.delete('airports').execute(function(err, result) {
+    pool.delete('airports').execute((err) => {
       try {
         assert(!err, err);
       } catch (e) {
@@ -334,20 +335,9 @@ describe('Pool', function() {
     });
   });
 
-  it('should terminate pool', function(done) {
-    pool.close(function(err) {
-      try {
-        assert(!err, err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should set defaults.objectRows option', function() {
+  it('should set defaults.objectRows option', function(done) {
     pool.config.defaults.objectRows = true;
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert(typeof result.rows[0] === 'object' &&
@@ -356,7 +346,7 @@ describe('Pool', function() {
         return done(e);
       }
       pool.config.defaults.objectRows = null;
-      pool.execute('select * from airports', [], function(err, result) {
+      pool.execute('select * from airports', [], (err, result) => {
         try {
           assert(!err, err);
           assert(Array.isArray(result.rows[0]));
@@ -369,24 +359,24 @@ describe('Pool', function() {
     });
   });
 
-  it('should set defaults.naming option', function() {
+  it('should set defaults.naming option', function(done) {
     pool.config.defaults.objectRows = true;
     pool.config.defaults.naming = 'lowercase';
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert(result && result.rows);
-        assert(Array.isArray(result.rows[0]));
+        assert(!Array.isArray(result.rows[0]));
         assert(result.rows[0].id === 'LFOI');
       } catch (e) {
         return done(e);
       }
       pool.config.defaults.naming = null;
-      pool.execute('select * from airports', [], function(err, result) {
+      pool.execute('select * from airports', [], (err, result) => {
         try {
           assert(!err, err);
           assert(result && result.rows);
-          assert(Array.isArray(result.rows[0]));
+          assert(!Array.isArray(result.rows[0]));
           assert(result.rows[0].ID === 'LFOI');
         } catch (e) {
           return done(e);
@@ -396,9 +386,9 @@ describe('Pool', function() {
     });
   });
 
-  it('should set defaults.showSql option', function() {
+  it('should set defaults.showSql option', function(done) {
     pool.config.defaults.showSql = true;
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert(result.sql);
@@ -410,13 +400,13 @@ describe('Pool', function() {
     });
   });
 
-  it('should set defaults.autoCommit option', function() {
+  it('should set defaults.autoCommit option', function(done) {
     pool.config.defaults.showSql = true;
     pool.config.defaults.autoCommit = true;
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
-        assert.equal(result.config.autoCommit, true);
+        assert.equal(result.options.autoCommit, true);
       } catch (e) {
         return done(e);
       }
@@ -424,9 +414,9 @@ describe('Pool', function() {
       done();
     });
   });
-  it('should set defaults.fields option', function() {
+  it('should set defaults.fields option', function(done) {
     pool.config.defaults.fields = true;
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert(result.fields);
@@ -438,10 +428,10 @@ describe('Pool', function() {
     });
   });
 
-  it('should set defaults.ignoreNulls option', function() {
+  it('should set defaults.ignoreNulls option', function(done) {
     pool.config.defaults.objectRows = true;
     pool.config.defaults.ignoreNulls = true;
-    pool.execute('select * from airports', [], function(err, result) {
+    pool.execute('select * from airports', [], (err, result) => {
       try {
         assert(!err, err);
         assert.equal(result.rows[0].Catalog, undefined);
@@ -449,7 +439,7 @@ describe('Pool', function() {
         return done(e);
       }
       pool.config.defaults.ignoreNulls = null;
-      pool.execute('select * from airports', [], function(err, result) {
+      pool.execute('select * from airports', [], (err, result) => {
         try {
           assert(!err, err);
           assert.equal(result.rows[0].Catalog, null);
@@ -462,7 +452,7 @@ describe('Pool', function() {
   });
 
   it('shutdown pool', function(done) {
-    pool.close(function() {
+    pool.close(() => {
       if (!pool.isClosed)
         return done(new Error('Failed'));
       done();
