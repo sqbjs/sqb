@@ -48,7 +48,7 @@ $ npm install sqb --save
   
 ## Change log
 
-To see changelog click [here](CHANGELOG)
+To see changelog click [here](CHANGELOG.md)
 
   
 ### License
