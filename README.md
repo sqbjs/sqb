@@ -48,7 +48,7 @@ $ npm install sqb --save
   
 ## Change log
 
-To see changelog click [here](https://panates.github.io/sqb/)
+To see changelog click [here](CHANGELOG)
 
   
 ### License
