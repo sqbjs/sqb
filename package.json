@@ -20,9 +20,9 @@
   ],
   "dependencies": {
     "debug": "^3.1.0",
-    "doublylinked": "^1.0.6",
+    "doublylinked": "^1.0.7",
     "errorex": "^1.0.6",
-    "lightning-pool": "^1.1.0",
+    "lightning-pool": "^1.1.2",
     "putil-flattentext": "^1.1.2",
     "putil-isplainobject": "^1.0.1",
     "putil-merge": "^1.2.0",
