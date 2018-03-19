@@ -24,11 +24,11 @@
 
 **2018-02-19 | 1.1.0**
 
-* [x] TableColumn renamed as SelectColumn
+* [*] TableColumn renamed as SelectColumn
 
 **2018-02-19 | 1.0.4**
 
-* [x] Allowed $ sign in field aliases
+* [*] Allowed $ sign in field aliases
 
 **2018-02-19 | 1.0.1**
   
