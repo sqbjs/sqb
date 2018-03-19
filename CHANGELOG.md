@@ -1,6 +1,15 @@
   
 ## Change log
 
+**2018-03-12 | 2.0.1**
+
+* [*] Updated dependencies 
+
+**2018-03-12 | 2.0.0**
+
+* [*] Moved to ES2015 codebase, dropped support below NodeJS v6 
+
+
 **2018-02-19 | 1.4.1**
 
 * [+] Alternative way added for defining conditions. (Native objects) 
