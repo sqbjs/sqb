@@ -44,7 +44,7 @@ $ npm install sqb --save
 
 ## Node Compatibility
 
-  - node >= 4.x
+  - node >= 6.x
   
 ## Change log
 
