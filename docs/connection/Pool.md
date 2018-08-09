@@ -201,7 +201,7 @@ pool.connect((error, connection) => {
     return;
   }
   connection.execute('any sql', () => {
-    connection.close();
+    connection.release();
   });
 });
 ```
@@ -209,7 +209,7 @@ pool.connect((error, connection) => {
 ```js
 pool.connect().then(connection => {
   connection.execute('any sql', () => {
-    connection.close();
+    connection.release();
   });
 }).catch(error => {
   console.error(error);
