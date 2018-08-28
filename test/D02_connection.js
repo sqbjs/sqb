@@ -22,7 +22,7 @@ describe('Connection', function() {
   after(() => pool.close(true));
 
   it('should toString/inspect returns formatted string', function() {
-    return pool.acquire().then(async conn => {
+    return pool.acquire().then(conn => {
       assert(conn.inspect().match(/\[object Connection\(\d\)]/));
       conn.release();
     });
