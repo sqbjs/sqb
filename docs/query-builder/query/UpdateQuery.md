@@ -6,8 +6,7 @@
 - [UpdateQuery.prototype.where()](#updatequeryprototypewhere)
 - [UpdateQuery.prototype.returning()](#updatequeryprototypereturning)
 - [Query.prototype.execute()](#queryprototypeexecute)
-- [Query.prototype.params()](#queryprototypeparams)
-- [Query.prototype.then()](#queryprototypethen)
+- [Query.prototype.values()](#queryprototypevalues)
 
 <hr/>
 
@@ -66,7 +65,7 @@ Defines "returning" part of `query`.
 
 ```js
 var query = sqb.update('customer', {name:'John'})
-    .where(['id', 1]).returning({
+    .where({'id': 1}).returning({
       id: 'number',
       name: 'string'
     });
@@ -81,50 +80,29 @@ returning id into :returning$id, name into :returning$name
 
 
 ### Query.prototype.execute()
-Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.update('customer', {name: 'John'})
-    .where(['id', 1])
+    .where({'id': 1})
     .execute({
       autoCommit: true
-    }, function(err, result) {
-      if (err)
-        return console.error(err);
+    }).then(result => {
       console.log('Record updated');
     });
 ```
 
-### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
+### Query.prototype.values() 
+Sets execution values for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.pool.update('customer', {name: /Name/})    
-    .where(['id', /ID/])
+    .where({'id': /ID/});
 ....    
-query.params({ID: request.params.ID, Name: request.params.Name)    
+query.values({ID: request.values.ID, Name: request.values.Name)    
     .execute({
        autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
+     }).then(result => {
        console.log('Records inserted');
-     };
-```
-
-
-
-### Query.prototype.then()
-Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
-
-```js
-var promise = pool.update('customer', {name: 'John'})    
-    .where(['id', 1])
-    .then({
-      autoCommit: true
-    }, result => {
-      console.log('Record updated');
-    ). catch(err => {
-      console.error(err);
-    );
+     });
 ```

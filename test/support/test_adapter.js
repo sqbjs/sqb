@@ -2,7 +2,7 @@
 
 const TestMetaOperator = require('./test_metaoperator');
 
-var sessionId = 0;
+let sessionId = 0;
 const data = {};
 
 module.exports = {
@@ -29,25 +29,25 @@ module.exports = {
 };
 
 function fillTable(tableName) {
-  var obj = require('./db/' + tableName + '.json');
+  const obj = require('./db/' + tableName + '.json');
   data[tableName] = {
     fields: obj.fields,
     obj: obj.rows,
     arr: []
   };
   if (tableName === 'airports')
-    obj.rows.forEach(function(t) {
+    for (const t of obj.rows) {
       t.datevalue = new Date();
-    });
-  var rowsarr = data[tableName].arr;
-  obj.rows.forEach(function(src) {
-    var row = [];
-    obj.fields.forEach(function(key, idx) {
+    }
+  const rowsarr = data[tableName].arr;
+  for (const src of obj.rows) {
+    const row = [];
+    for (const [idx, key] of obj.fields.entries()) {
       if (idx < 13)
         row.push(src[key.name] || null);
-    });
+    }
     rowsarr.push(row);
-  });
+  }
 }
 
 fillTable('schemas');
@@ -78,12 +78,13 @@ TestConnection.prototype.close = function(callback) {
   callback();
 };
 
-TestConnection.prototype.execute = function(sql, params, options, callback) {
+TestConnection.prototype.execute = function(query, options, callback) {
 
   if (this.isClosed) {
     callback(new Error('Can not execute while connection is closed'));
     return;
   }
+  let sql = query.sql;
 
   if (sql.substring(0, 6) === 'select') {
     if (sql === 'select 1')
@@ -98,8 +99,8 @@ TestConnection.prototype.execute = function(sql, params, options, callback) {
       return callback(new Error('Table unknown (' + m[1] + ')'));
     const out = {fields: o.fields.slice()};
     // Clone records
-    var i;
-    var len = options.fetchRows ? options.fetchRows : o.obj.length;
+    let i;
+    let len = Math.min(o.obj.length, options.fetchRows ? options.fetchRows : o.obj.length);
     const rows = [];
     if (options.objectRows) {
       for (i = 0; i < len; i++)

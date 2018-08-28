@@ -1,8 +1,8 @@
 /* eslint-disable */
 'use strict';
-const assert = require('assert'),
-    sqb = require('../'),
-    Op = sqb.Op;
+const assert = require('assert');
+const sqb = require('../');
+const Op = sqb.Op;
 
 describe('serialize "Operators"', function() {
 
@@ -131,9 +131,9 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      let result = query.generate(options, {
-        id: 1
-      });
+      let result = query.generate(Object.assign({
+        values: {id: 1}
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id = :id');
       assert.equal(result.values.id, 1);
     });
@@ -177,9 +177,9 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.ne('id', /id/));
-      let result = query.generate(options, {
-        id: 1
-      });
+      let result = query.generate(Object.assign({
+        values: {id: 1}
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id not = :id');
       assert.equal(result.values.id, 1);
     });
@@ -342,10 +342,12 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.between('id', /id1/, /id2/));
-      let result = query.generate(options, {
-        id1: 1,
-        id2: 5
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          id1: 1,
+          id2: 5
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id between :id1 and :id2');
       assert.equal(result.values.id1, 1);
       assert.equal(result.values.id2, 5);
@@ -399,10 +401,12 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.notBetween('id', /id1/, /id2/));
-      let result = query.generate(options, {
-        id1: 1,
-        id2: 5
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          id1: 1,
+          id2: 5
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id not between :id1 and :id2');
       assert.equal(result.values.id1, 1);
       assert.equal(result.values.id2, 5);
@@ -441,9 +445,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.like('name', /name/));
-      let result = query.generate(options, {
-        name: 'John'
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          name: 'John'
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where name like :name');
       assert.equal(result.values.name, 'John');
     });
@@ -481,9 +487,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.nlike('name', /name/));
-      let result = query.generate(options, {
-        name: 'John'
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          name: 'John'
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where name not like :name');
       assert.equal(result.values.name, 'John');
     });
@@ -521,9 +529,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.ilike('name', /name/));
-      let result = query.generate(options, {
-        name: 'John'
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          name: 'John'
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where name ilike :name');
       assert.equal(result.values.name, 'John');
     });
@@ -561,9 +571,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.notILike('name', /name/));
-      let result = query.generate(options, {
-        name: 'John'
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          name: 'John'
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where name not ilike :name');
       assert.equal(result.values.name, 'John');
     });
@@ -600,9 +612,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.in('id', /id/));
-      let result = query.generate(options, {
-        id: [1, 2, 3]
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          id: [1, 2, 3]
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id in :id');
       assert.deepEqual(result.values.id, [1, 2, 3]);
     });
@@ -640,9 +654,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.nin('id', /id/));
-      let result = query.generate(options, {
-        id: [1, 2, 3]
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          id: [1, 2, 3]
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id not in :id');
       assert.deepEqual(result.values.id, [1, 2, 3]);
     });
@@ -764,9 +780,11 @@ describe('serialize "Operators"', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
-      let result = query.generate(options, {
-        id: null
-      });
+      let result = query.generate(Object.assign({
+        values: {
+          id: null
+        }
+      }, options));
       assert.equal(result.sql, 'select * from table1 where id = :id');
       assert.equal(result.values.id, null);
     });
@@ -777,9 +795,10 @@ describe('serialize "Operators"', function() {
           .where(Op.eq('id', /id/));
       let result = query.generate({
         paramType: 1,
-        prettyPrint: 0
-      }, {
-        id: null
+        prettyPrint: 0,
+        values: {
+          id: null
+        }
       });
       assert.equal(result.sql, 'select * from table1 where id = ?');
       assert.equal(result.values[0], null);
@@ -791,9 +810,10 @@ describe('serialize "Operators"', function() {
           .where(Op.eq('id', /id/));
       let result = query.generate({
         paramType: 2,
-        prettyPrint: 0
-      }, {
-        id: null
+        prettyPrint: 0,
+        values: {
+          id: null
+        }
       });
       assert.equal(result.sql, 'select * from table1 where id = $1');
       assert.equal(result.values[0], null);
@@ -805,9 +825,10 @@ describe('serialize "Operators"', function() {
           .where(Op.eq('id', /id/));
       let result = query.generate({
         paramType: 3,
-        prettyPrint: 0
-      }, {
-        id: null
+        prettyPrint: 0,
+        values: {
+          id: null
+        }
       });
       assert.equal(result.sql, 'select * from table1 where id = @id');
       assert.equal(result.values.id, null);

@@ -1,6 +1,26 @@
   
 ## Change log
 
+**2018-08-28 | 3.0.0**
+
+* [*] Optimized all codebase to ES6. Removed obsolete `callback` support.
+* [*] Removed Rowset, Row, FieldCollection classes.
+* [*] Changed forEach() calls to ES6 `for of` clauses.
+
+
+**2018-03-12 | 2.0.4**
+
+* [-] More bug fixes
+
+**2018-03-12 | 2.0.3**
+
+* [*] Updated dependencies 
+
+**2018-03-12 | 2.0.2**
+
+* [-] Fixed issue: Can not call getTables() for sqlite.
+* [-] More bug fixes
+
 **2018-03-12 | 2.0.1**
 
 * [*] Updated dependencies 

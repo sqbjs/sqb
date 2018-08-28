@@ -95,12 +95,10 @@ This call enables caching fetched rows and lets `Cursor` to move both forward an
   
 ```js
 pool.select('*').from('table1')
-  .then({cursor: true}, (result) => {
+  .execute({cursor: true}).then(result => {
     const cursor = result.cursor;
-    cursor.cached();
-    ....
-    Now cursor can move forward and backward.
-    ....
+    cursor.cached();    
+    // Now cursor can move forward and backward.
     cursor.close();
 });
 ```
@@ -110,39 +108,23 @@ pool.select('*').from('table1')
 ### Cursor.prototype.close()
 This call closes cursor permanently and releases [Connection](connection/Connection.md). 
 
-`close([callback])`
+`close()`
 
-- `callback` (Function) : Function, taking one argument:
-  
-  `function(error)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise.
     
 
 ```js
-cursor.close((error) => {
-  if (error)
-    return console.error(error); 
+cursor.close().then(() => {
  console.log('Cursor closed');
-});
+}).catch(e => console.error(e));
 ```
 
 ### Cursor.prototype.fetchAll()
 If cache is enabled, this call fetches and keeps all records in the internal cache. Otherwise it throws error. Once all all records fetched, you can close `Cursor` safely and can continue to use it in memory.
 
-`cursor.fetchAll([callback])`
+`cursor.fetchAll()`
 
-- `callback` (Function) : Function, taking one argument:
-  
-  `function(error)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise.
     
 
 ```js
@@ -154,69 +136,35 @@ do whatever u want with memory cursor.
 });
 ```
 
-### Cursor.prototype.get()
-This call returns value of given field name of current record.
-
-`cursor.get(field)`
-
-- `field` (String|Number) : Name or index of the field. Note that, field name is case insensitive.
-
-- **Returns:** Value of the field.
-    
-
-```js
-cursor.get('Name'); // Gets value of field "Name"
-cursor.get('name'); // Gets value of field "Name"
-cursor.get(0); // Gets value of field at 0
-```
-
 ### Cursor.prototype.moveTo()
 This call moves cursor to given row number. If caching is enabled, cursor can move both forward and backward. Otherwise it throws error.
 
-`cursor.moveTo(rowNum[, callback])`
+`cursor.moveTo(rowNum)`
 
 - `rowNum` (Number) : Row number that will cursor move to. Note that first row number is 1.
 
-- `callback` (Function) : Function, taking one argument:
-  
-  `function(error)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise<Integer>.
     
 
 ```js
 await cursor.moveTo(5);
-var val = cursor.get('Name'); // Reads Name field of 5th record.
+let val = cursor.row.Name; // Value of 'Name' at 5th record.
 ```
 
 
 ### Cursor.prototype.next()
-This call moves cursor forward by one row and returns that row. And also it allows iterating over rows easily. 
+This call moves cursor forward by one row and returns Promise for that row. 
 
-`cursor.next([callback])`
+`cursor.next()`
 
-- `callback` (Function) : Function, taking three arguments:
-  
-  `function(error, row, more)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-  - `row` (`Object`): Current row.
-  
-  - `more` (`Function`): Function that fetches one more record.
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise<Object|Array>.
     
 
 ```js
 // Iterates rows until EOF
-cursor.next((error, row, more) => {
-  if (row) {
-    console.log(cursor.rowNum, row.ID, row.Name);
-    more();
-  } else cursor.close();
+cursor.next().then(row => {
+  if (row) 
+    console.log(cursor.rowNum, row.ID, row.Name);  
 });
 ```
 ```js
@@ -224,43 +172,31 @@ cursor.next((error, row, more) => {
 var row = await cursor.next();
 if (row)
   console.log(cursor.rowNum, row.ID, row.Name);    
-});
 ```
 
 ### Cursor.prototype.prev()
-This call moves cursor back by one row and returns that row. And also it allows iterating over rows easily.
+This call moves cursor back by one row and returns Promise for that row.  
 
 **Note:** Cache must be enabled to move cursor back.
 
-`cursor.prev([callback])`
+`cursor.prev()`
 
-- `callback` (Function) : Function, taking three arguments:
-  
-  `function(error, row, more)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-  - `row` (`Object`): Current row.
-  
-  - `more` (`Function`): Function that fetches one more record.
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise<Object|Array>.
     
 
 ```js
 // Iterates rows until BOF
-cursor.prev((error, row, more) => {
-  if (row) {
-    console.log(cursor.rowNum, row.ID, row.Name);
-    more();
-  };
+cursor.prev().then(row => {
+  if (row) 
+    console.log(cursor.rowNum, row.ID, row.Name);  
 });
+
 ```
 ```js
 // Fetches previous row
 var row = await cursor.prev();
 if (row)
   console.log(cursor.rowNum, row.ID, row.Name);    
-});
 ```
 
 ### Cursor.prototype.reset()
@@ -274,41 +210,18 @@ This call moves cursor before first row.
 ### Cursor.prototype.seek()
 This call moves cursor by given step. If caching is enabled, cursor can move both forward and backward. Otherwise it throws error.
 
-`cursor.seek(step[, callback])`
+`cursor.seek(step)`
 
 - `step` (Number) : Number of rows that will cursor move by. Negative number moves cursor backward.
 
-- `callback` (Function) : Function, taking one argument:
-  
-  `function(error)`
-  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
 
-
-- **Returns:** If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns:** Returns Promise<Number>.
     
 
 ```js
-await cursor.step(-5); // Moves cursor back by 5 rows
-var val = cursor.get('Name');
+await cursor.seek(5); // Moves cursor by 5 rows
+var n = cursor.rowNum; // n = 5;
 ```
-
-### Cursor.prototype.set()
-This call updates cached value of given field name of current record.
-
-**Note:** *This call only updates memory and does not make an update in database*
-
-`cursor.get(field, value)`
-
-- `field` (String|Number) : Name or index of the field. Note that, field name is case insensitive.
-- `value` (*) : Value of the field.
-    
-```js
-cursor.set('Name', 'John');
-cursor.set('name', 'John');
-cursor.set(0, 12345); 
-```
-
 
 ### Cursor.prototype.toStream()
 This method returns a readable stream.
@@ -373,7 +286,7 @@ cursor.on('eof', () => {
 This event is called when current row number changed.
 
 ```js
-cursor.on('move', (rowNum) => {
+cursor.on('move', (rowNum, row) => {
     console.log('Current row is '+ rowNum);
 });
 ```

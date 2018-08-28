@@ -1,6 +1,6 @@
 /* eslint-disable */
 const assert = require('assert');
-const sqb = require('../');
+const sqb = require('../lib/index');
 
 describe('Pool', function() {
 
@@ -69,7 +69,7 @@ describe('Pool', function() {
   });
 
   it('should start pool', function(done) {
-    pool.on('create', () => {
+    pool.once('create', () => {
       assert.equal(pool.size, 1);
       assert.equal(pool.available, 1);
       done();
@@ -77,59 +77,40 @@ describe('Pool', function() {
     pool.start();
   });
 
-  it('should create connection', function(done) {
-    pool.connect((err, conn) => {
-      try {
-        assert(!err && conn);
-        assert.equal(pool.size, 1);
-        assert.equal(pool.available, 0);
-        assert.equal(pool.pending, 0);
-        assert.equal(pool.acquired, 1);
-        assert(typeof conn.metaData, 'object');
-      } catch (e) {
-        return done(e);
-      }
-      conn.on('close', () => {
+  it('should create/release connection', function(done) {
+    pool.acquire().then(conn => {
+      assert.equal(pool.size, 1);
+      assert.equal(pool.available, 0);
+      assert.equal(pool.pending, 0);
+      assert.equal(pool.acquired, 1);
+      assert(typeof conn.metaData, 'object');
+
+      conn.once('close', () => {
         try {
           assert.equal(pool.size, 1);
           assert.equal(pool.available, 1);
           assert.equal(pool.pending, 0);
           assert.equal(pool.acquired, 0);
+          done();
         } catch (e) {
-          return done(e);
+          done(e);
         }
-        done();
       });
       conn.release();
-    });
+    }).catch(e => done(e));
   });
 
-  it('should validate connection', function(done) {
-    pool.connect((err, conn) => {
-      conn.on('close', function() {
-        pool.connect(function(err, conn) {
-          conn.on('close', function() {
-            done();
-          });
-          if (conn._client._tested)
-            conn.release();
-          else done(new Error('Failed'));
-        });
+  it('should validate connection', function() {
+    return pool.acquire().then(conn => {
+      assert(conn.release());
+      return pool.acquire().then(conn => {
+        assert(!conn._client._tested);
+        assert(conn.release());
       });
-      conn.release();
     });
   });
 
-  it('should close connection when throw error in callback', function(done) {
-    pool.connect((err, conn) => {
-      conn.on('close', function() {
-        done();
-      });
-      throw 'test';
-    });
-  });
-
-  it('should get error on adapter create error', function(done) {
+  it('should get error when adapter create fails', function(done) {
     const pool2 = new sqb.Pool({
       dialect: 'test',
       pool: {
@@ -137,325 +118,159 @@ describe('Pool', function() {
         acquireTimeoutMillis: 1
       }
     });
-
-    pool2.connect((err, conn) => {
-      try {
-        assert(!err, err);
-        assert(conn);
-      } catch (e) {
-        return done(e);
-      }
-      pool2.connect((err, conn) => {
-        try {
-          assert(err);
-          assert(!conn);
-        } catch (e) {
-          return done(e);
-        }
-        pool2.close(true, done);
-      });
-    });
-  });
-
-  it('should create connection (Promise)', function(done) {
-    pool.connect().then((conn) => {
-      try {
-        assert.equal(pool.size, 1);
-        assert.equal(pool.available, 0);
-        assert.equal(pool.pending, 0);
-        assert.equal(pool.acquired, 1);
-      } catch (e) {
-        return done(e);
-      }
-      conn.on('close', () => {
-        try {
-          assert.equal(pool.size, 1);
-          assert.equal(pool.available, 1);
-          assert.equal(pool.pending, 0);
-          assert.equal(pool.acquired, 0);
-        } catch (e) {
-          return done(e);
-        }
+    pool2.acquire().then(conn => {
+      pool2.acquire().then(() => done('Failed')).catch(() => {
         done();
+        pool2.close(true);
       });
-      conn.release();
     });
   });
 
-  it('should test pool', function(done) {
-    pool.test((err) => {
-      try {
-        assert(!err, err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
+  it('should test pool', function() {
+    return pool.test();
   });
 
-  it('should test() handle errors', function(done) {
-    pool.connect = (cb) => cb(new Error('Any error'));
-
-    pool.test((err) => {
-      delete pool.connect;
-      try {
-        assert(err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
+  it('should test() handle errors', function() {
+    pool.acquire = () => Promise.reject(new Error('Any error'));
+    return pool.test()
+        .then(() => assert(0, 'Failed'))
+        .catch(err => {
+          delete pool.acquire;
+        });
   });
 
-  it('should test pool (Promise)', function() {
-    return pool.test().then();
-  });
-
-  it('should execute() select query - 3 args', function(done) {
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result && result.rows);
-        assert(Array.isArray(result.rows[0]));
-        assert(result.rows[0][0] === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should execute() select query - 2 args', function(done) {
-    pool.execute('select * from airports', (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result && result.rows);
-        assert(Array.isArray(result.rows[0]));
-        assert(result.rows[0][0] === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should execute() limit fetchRows', function(done) {
-    pool.execute('select * from airports', [], {
-      fetchRows: 2
-    }, (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
-        assert(Array.isArray(result.rows[0]));
-        assert(result.rows[0][0] === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should execute() (Promise)', function(done) {
-    pool.execute('select * from airports', []).then((result) => {
+  it('should execute() select query', function() {
+    return pool.execute('select * from airports', {
+      objectRows: false,
+      values: []
+    }).then(result => {
       assert(result && result.rows);
       assert(Array.isArray(result.rows[0]));
       assert(result.rows[0][0] === 'LFOI');
-      done();
-    }).catch((reason) => {
-      done(reason);
     });
   });
 
-  it('should select() and return array rows', function(done) {
-    pool.select().from('airports').execute({
+  it('should execute() select query - 2 args', function() {
+    return pool.execute('select * from airports').then(result => {
+      assert(result && result.rows);
+      assert(!Array.isArray(result.rows[0]));
+      assert(result.rows[0].ID === 'LFOI');
+    });
+  });
+
+  it('should execute() limit fetchRows', function() {
+    return pool.execute('select * from airports', {
+      objectRows: false,
       fetchRows: 2
-    }, (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
-        assert(Array.isArray(result.rows[0]));
-        assert(result.rows[0][0] === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      done();
+    }).then(result => {
+      assert(result && result.rows);
+      assert.equal(result.rows.length, 2);
+      assert(Array.isArray(result.rows[0]));
+      assert(result.rows[0][0] === 'LFOI');
     });
   });
 
-  it('should select() and return object rows', function(done) {
-    pool.select().from('airports').execute({
-      fetchRows: 2,
-      objectRows: true
-    }, (err, result) => {
-      try {
-        assert(!err, err);
+  it('should select() and return array rows', function() {
+    return pool.select().from('airports').execute({
+      objectRows: false,
+      fetchRows: 2
+    }).then(result => {
+      assert(result && result.rows);
+      assert.equal(result.rows.length, 2);
+      assert(Array.isArray(result.rows[0]));
+      assert(result.rows[0][0] === 'LFOI');
+    });
+  });
+
+  it('should select() and return object rows', function() {
+    return pool.select().from('airports').execute({
+      fetchRows: 2
+    }).then(result => {
+      assert(result && result.rows);
+      assert.equal(result.rows.length, 2);
+      assert(!Array.isArray(result.rows[0]));
+      assert(result.rows[0].ID === 'LFOI');
+    });
+  });
+
+  it('should insert()', function() {
+    return pool.insert('airports', {id: 1}).execute();
+  });
+
+  it('should update()', function() {
+    return pool.update('airports', {id: 1}).execute();
+  });
+
+  it('should delete()', function() {
+    return pool.delete('airports').execute();
+  });
+
+  it('should set defaults.objectRows option', function() {
+    pool.config.defaults.objectRows = false;
+    return pool.execute('select * from airports').then(result => {
+      assert(Array.isArray(result.rows[0]));
+      pool.config.defaults.objectRows = null;
+      return pool.execute('select * from airports').then(result => {
+        assert(!Array.isArray(result.rows[0]));
+        pool.config.defaults.showSql = null;
+      });
+    });
+  });
+
+  it('should set defaults.naming option', function() {
+    pool.config.defaults.naming = 'lowercase';
+    return pool.execute('select * from airports').then(result => {
+      assert(result && result.rows);
+      assert(!Array.isArray(result.rows[0]));
+      assert(result.rows[0].id === 'LFOI');
+      pool.config.defaults.naming = null;
+      return pool.execute('select * from airports').then(result => {
         assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
         assert(!Array.isArray(result.rows[0]));
         assert(result.rows[0].ID === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should insert()', function(done) {
-    pool.insert('airports', {id: 1}).execute((err) => {
-      try {
-        assert(!err, err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should update()', function(done) {
-    pool.update('airports', {id: 1}).execute((err) => {
-      try {
-        assert(!err, err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should delete()', function(done) {
-    pool.delete('airports').execute((err) => {
-      try {
-        assert(!err, err);
-      } catch (e) {
-        return done(e);
-      }
-      done();
-    });
-  });
-
-  it('should set defaults.objectRows option', function(done) {
-    pool.config.defaults.objectRows = true;
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert(typeof result.rows[0] === 'object' &&
-            !Array.isArray(result.rows[0]));
-      } catch (e) {
-        return done(e);
-      }
-      pool.config.defaults.objectRows = null;
-      pool.execute('select * from airports', [], (err, result) => {
-        try {
-          assert(!err, err);
-          assert(Array.isArray(result.rows[0]));
-        } catch (e) {
-          return done(e);
-        }
-        pool.config.defaults.showSql = null;
-        done();
       });
     });
   });
 
-  it('should set defaults.naming option', function(done) {
-    pool.config.defaults.objectRows = true;
-    pool.config.defaults.naming = 'lowercase';
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result && result.rows);
-        assert(!Array.isArray(result.rows[0]));
-        assert(result.rows[0].id === 'LFOI');
-      } catch (e) {
-        return done(e);
-      }
-      pool.config.defaults.naming = null;
-      pool.execute('select * from airports', [], (err, result) => {
-        try {
-          assert(!err, err);
-          assert(result && result.rows);
-          assert(!Array.isArray(result.rows[0]));
-          assert(result.rows[0].ID === 'LFOI');
-        } catch (e) {
-          return done(e);
-        }
-        done();
-      });
-    });
-  });
-
-  it('should set defaults.showSql option', function(done) {
+  it('should set defaults.showSql option', function() {
     pool.config.defaults.showSql = true;
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result.sql);
-      } catch (e) {
-        return done(e);
-      }
+    return pool.execute('select * from airports').then(result => {
+      assert(result.query.sql);
       pool.config.defaults.showSql = null;
-      done();
     });
   });
 
-  it('should set defaults.autoCommit option', function(done) {
+  it('should set defaults.autoCommit option', function() {
     pool.config.defaults.showSql = true;
     pool.config.defaults.autoCommit = true;
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert.equal(result.options.autoCommit, true);
-      } catch (e) {
-        return done(e);
-      }
+    return pool.execute('select * from airports').then(result => {
+      assert.equal(result.options.autoCommit, true);
       pool.config.defaults.showSql = null;
-      done();
     });
   });
-  it('should set defaults.fields option', function(done) {
+  it('should set defaults.fields option', function() {
     pool.config.defaults.fields = true;
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert(result.fields);
-      } catch (e) {
-        return done(e);
-      }
+    return pool.execute('select * from airports').then(result => {
+      assert(result.fields);
       pool.config.defaults.fields = null;
-      done();
     });
   });
 
-  it('should set defaults.ignoreNulls option', function(done) {
-    pool.config.defaults.objectRows = true;
+  it('should set defaults.ignoreNulls option', function() {
     pool.config.defaults.ignoreNulls = true;
-    pool.execute('select * from airports', [], (err, result) => {
-      try {
-        assert(!err, err);
-        assert.equal(result.rows[0].Catalog, undefined);
-      } catch (e) {
-        return done(e);
-      }
+    return pool.execute('select * from airports').then(result => {
+      assert.equal(result.rows[0].Catalog, undefined);
       pool.config.defaults.ignoreNulls = null;
-      pool.execute('select * from airports', [], (err, result) => {
-        try {
-          assert(!err, err);
-          assert.equal(result.rows[0].Catalog, null);
-        } catch (e) {
-          return done(e);
-        }
-        done();
+      return pool.execute('select * from airports').then(result => {
+        assert.equal(result.rows[0].Catalog, null);
       });
     });
   });
 
-  it('shutdown pool', function(done) {
-    pool.close(() => {
+  it('shutdown pool', function() {
+    return pool.close().then(() => {
       if (!pool.isClosed)
-        return done(new Error('Failed'));
-      done();
+        throw new Error('Failed');
     });
   });
 

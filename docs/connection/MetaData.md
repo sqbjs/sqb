@@ -24,7 +24,7 @@ Starts a function chain that helps creating a "select query" for querying meta-d
 
 ```js
 // Query schemas 
-pool.metaData.select().from('schemas').execute(function(err, result) {
+pool.metaData.select().from('schemas').execute().then(result => {
   // ...
 });
 
@@ -38,21 +38,21 @@ pool.metaData.select().from('tables')
 // Query columns 
 pool.metaData.select().from('columns')
   .where(['schema_name', 'my_schema'], ['table_name', 'like', 'TBL_%'])
-  .execute(function(err, result) {
+  .execute().then(result => {
     // ...
   });
 
 // Query primary keys 
 pool.metaData.select().from('primary_keys')
   .where(['schema_name', 'my_schema'], ['table_name', 'TBL_1'])
-  .execute(function(err, result) {
+  .execute().then(result => {
     // ...
   });
 
 // Query foreign keys 
 pool.metaData.select().from('foreign_keys')
   .where(['schema_name', 'my_schema'], ['table_name', 'TBL_1'])
-  .execute(function(err, result) {
+  .execute().then(result => {
     // ...
   });
 
@@ -64,9 +64,9 @@ pool.metaData.select().from('foreign_keys')
 
   Queryies and returns SchemaMeta objects which helps working with database schema.
   
-` metaData.getSchemas([schemaName][, callback])`
+` metaData.getSchemas([schemaLike])`
 
-- `schemaName` : Allows filtering for schema names.
+- `schemaLike` : Allows filtering for schema names.
 
 
 #### Examples

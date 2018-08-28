@@ -2,7 +2,7 @@
 'use strict';
 
 const assert = require('assert');
-const sqb = require('../');
+const sqb = require('../lib/index');
 
 describe('Query', () => {
 
@@ -19,46 +19,25 @@ describe('Query', () => {
     });
   });
 
-  after(() => {
-    pool.close(true);
-  });
+  after(() => pool.close(true));
 
-  it('should hook for query execution', function(done) {
+  it('should hook for query execution', function() {
     let ok;
-    pool.select().from('airports')
-        .hook('execute', (next) => {
+    return pool.select().from('airports')
+        .on('execute', () => {
           ok = 1;
-          next();
         })
-        .execute((err) => {
-          done(err);
+        .execute().then(() => {
+          assert.equal(ok, 1);
         });
   });
 
   it('should not continue execution if error in hook callback', function(done) {
     pool.select().from('airports')
-        .hook('execute', (next) => next(new Error('any error')))
-        .execute((err, result) => {
-          if (!err)
-            return done(new Error('Failed'));
-          done();
-        });
-  });
-
-  it('should query hook validate arguments', () => {
-    try {
-      pool.select().from('airports')
-          .hook(1, () => {
-          });
-    } catch (e) {
-      try {
-        pool.select().from('airports')
-            .hook('aa', 1);
-      } catch (e) {
-        return;
-      }
-    }
-    assert(0, 'Failed');
+        .on('execute', (next) => next(new Error('any error')))
+        .execute().then(() => {
+      done(new Error('Failed'));
+    }).catch(() => done());
   });
 
   it('should validate if query is executable', () => {
@@ -70,11 +49,16 @@ describe('Query', () => {
     assert(0, 'Failed');
   });
 
-  it('shutdown pool', function(done) {
-    pool.close(() => {
-      if (!pool.isClosed)
-        return done(new Error('Failed'));
-      done();
+  describe('Finalize', function() {
+    it('should have no active connection after all tests', function() {
+      assert.equal(pool.acquired, 0);
+    });
+
+    it('should shutdown pool', function() {
+      return pool.close().then(() => {
+        if (!pool.isClosed)
+          throw new Error('Failed');
+      });
     });
   });
 

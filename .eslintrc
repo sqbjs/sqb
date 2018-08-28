@@ -18,7 +18,7 @@
         "args": "none"
       }
     ],
-    "no-var": 0,
+    "no-var": 1,
     "prefer-const": 1,
     "no-trailing-spaces": 0,
     "spaced-comment": 0,
@@ -29,6 +29,8 @@
     "arrow-parens": 0,
     "curly": 0,
     "prefer-rest-params": 0,
-    "prefer-spread": 0
+    "prefer-spread": 0,
+    "space-before-function-paren": 0,
+    "no-extend-native": 0
   }
 }

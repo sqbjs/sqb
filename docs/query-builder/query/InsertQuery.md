@@ -4,8 +4,7 @@
 
 ### Methods
 - [Query.prototype.execute()](#queryprototypeexecute)
-- [Query.prototype.then()](#queryprototypethen)
-- [Query.prototype.params()](#queryprototypeparams)
+- [Query.prototype.values()](#queryprototypevalues)
 
 
 <hr/>
@@ -61,46 +60,27 @@ returning id into :returning$id, name into :returning$name
 ```
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.insert('customer', {id: 1, name: 'John'})    
     .execute({
        autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
+     }).then(result => {
        console.log('Record inserted');
-     };
+     });
 ```
 
-### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
+### Query.prototype.values() 
+Sets execution values for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.insert('customer', {id: /ID/, name: /Name/});
 ....    
-query.params({ID: request.params.ID, Name: request.params.Name)    
+query.values({ID: request.values.ID, Name: request.values.Name)    
     .execute({
        autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
+     }).then(result => {
        console.log('Records inserted');
-     };
-```
-
-
-### Query.prototype.then() 
-Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
-
-```js
-const promise = pool.insert('customer', {id: 1, name: 'John'})    
-    .then({
-       autoCommit: true
-     }, result => {
-       console.log('Record inserted');
-     ). catch(err => {
-       console.error(err);
-     );
+     });
 ```

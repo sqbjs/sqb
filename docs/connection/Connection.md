@@ -43,7 +43,7 @@
 
 ## Construction
 
-Connection object is created by Pool instance only when it needs a new one. `pool.connect()` returns an available connection instance.
+Connection object is created by Pool instance only when it needs a new one. `pool.acquire()` returns an available connection instance.
 
 ## Properties
     
@@ -67,11 +67,6 @@ Returns internal reference counter number.
 
 Returns session id of the connection given by database server.
 
-### metaData
-*getter (`MetaData`)*
-
-Returns instance of `MetaData` instance which helps working with database meta-data.
-
 
 <hr/>
 
@@ -84,23 +79,23 @@ This method increases internal reference counter of connection instance. `connec
 `connection.acquire()`
       
 ```js
-function asyncFunction1(connection) {
+function subOp1(connection) {
   connection.acquire();
   // do anything
   connection.release();
 }
 
-function asyncFunction2(connection) {
+function subOp2(connection) {
   connection.acquire();
   // do anything
   connection.release();
 }
 
-pool.connect((error, connection) => {
-  asyncFunction1(connection);
-  asyncFunction2(connection);
-  connection.release();
-});
+const connection = await pool.acquire();
+subOp1(connection);
+subOp2(connection);
+connection.release();
+
 ```
 *In the example above, the connection will back to the pool after last sub operation finished.*
    
@@ -112,43 +107,39 @@ This method decreases the internal reference counter. When reference count is 0,
   
 
 ### Connection.prototype.execute()
-This method executes `Query` instances or sql statement strings.
+This method executes `Query` instances or raw sql statements.
 
-`connection.execute(query[, values[, options[, callback]]])`
+`connection.execute(query[,options])`
             
 - `query` (Query|String) : Query instance or sql string.
-- `values` (Array|Object) : Array of values or object that contains param/value pairs.
 - `options` (Object) : Execute options.
+  - `values` (Array|Object) : Array of values or object that contains param/value pairs.
   - `autoCommit` (Boolean=false) : If this property is true, the transaction committed at the end of query execution.
-  - `cursor` (Boolean=false) : If this property is true, query returns a `Cursor` object that works in unidirectional "cursor" mode. Otherwise it returns [Rowset](connection/Rowset.md) which fetches exact number of rows. **Important!** `Cursor` keeps connection open until `cursor.close()` method is called.
+  - `cursor` (Boolean=false) : If this property is true, query returns a `Cursor` object that works in unidirectional "cursor" mode. **Important!** `Cursor` keeps connection open until `cursor.close()` method is called.
   - `fetchAsString` (Array`<Class>`) : This property is an array of Classes, determines which value types will represent as string. The valid classes are Date and Number.
   - `fetchRows` (Number) : In "cursor" mode; it provides an initial suggested number of rows to prefetch. Prefetching is a tuning option to maximize data transfer efficiency and minimize round-trips to the database.
-In Rowset mode; it provides the maximum number of rows that are fetched from Connection instance.
+In regular mode; it provides the maximum number of rows that are fetched from Connection instance.
   - `ignoreNulls` (Boolean=false) : Determines whether object rows contains NULL fields.
   - `naming` (Enum`<String>`) : Sets the naming rule for fields. It affects field names in object rows and metadata.
     - lowercase: Table/field names are lower case characters
     - uppercase: Table/field names are upper case characters
   - `objectRows` (Boolean=false) : Determines whether query rows should be returned as Objects or Arrays. This property applies to ResultSet.objectRows property also.
   - `showSql` (Boolean=false): If set true, result object contains executed sql and values.
-- `callback` (Function) : Function, taking one argument:
 
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** : Returns Promise.
 
 ```js
-connection.execute('any sql', (err, result) => {
-  if (err)
-    return console.error(err);
-  .....
+const query = sqb.select('current_date').from('dual');
+connection.execute(query).then(result => {
+  console.log(result);
+}).catch(error => {
+  console.error(error);
 });
-``` 
+```  
+
 ```js
-connection.execute('any sql').then((result) => {
-  ....
+connection.execute('any sql').then(result => {
+  console.log(result);
 }).catch(error => {
   console.error(error);
 });
@@ -157,43 +148,25 @@ connection.execute('any sql').then((result) => {
 ### Connection.prototype.startTransaction()
 This call starts a new transaction on the connection.
 
-`connection.startTransaction([callback])`
+`connection.startTransaction()`
 
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** : Returns Promise.
 
 
 ### Connection.prototype.commit()
 This call commits the current transaction in progress on the connection.
 
-`connection.commit([callback])`
+`connection.commit()`
 
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** : Returns Promise.
 
 
 ### Connection.prototype.rollback()
 This call rolls back the current transaction in progress on the connection.
 
-`connection.rollback([callback])`
+`connection.rollback()`
 
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** : Returns Promise.
 
 
 ### Connection.prototype.get()
@@ -202,20 +175,12 @@ This call returns values of properties that connection adapter exposes.
 `connection.get(property)`
 
 - `property` (String) : Name of the property.
+
 - **Returns**: Value of the property.
 
 ```js
 connection.get('serverVersion');
 ```
-
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : Value.
-
 
 ### Connection.prototype.select()
 Creates an executable [SelectQuery](query-builder/query/SelectQuery.md) associated with this pool.
@@ -311,11 +276,7 @@ connection.on('rollback', () => {
 This event is called before executing a query.
 
 ```js
-connection.on('execute', (options) => {
-    console.log('Executing with options:', options);
+connection.on('execute', (query, options) => {
+    console.log('Executing', query, 'with options', options);
 });
 ```
-
-
-
-

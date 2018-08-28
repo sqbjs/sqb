@@ -6,8 +6,7 @@
 - [DeleteQuery.prototype.from()](#deletequeryprototypefrom)
 - [DeleteQuery.prototype.where()](#deletequeryprototypewhere)
 - [Query.prototype.execute()](#queryprototypeexecute)
-- [Query.prototype.params()](#queryprototypeparams)
-- [Query.prototype.then()](#queryprototypethen)
+- [Query.prototype.values()](#queryprototypevalues)
 
 <hr/>
 
@@ -24,7 +23,7 @@ A Query instance that created by [Pool](connection/Pool.md) and [Connection](con
 - `tableName` (String|Raw) : String representation of table name or Raw sql object.
 
 ```js
-var query = sqb.delete('customer')
+const query = sqb.delete('customer')
     .where(Op.eq('id', 1));
 ```
 ```sql
@@ -72,52 +71,29 @@ delete from customer where name like '%john%'
 ```
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
-
-```js
-pool.delete('customer')
-    .where(Op.like('name', '%john%'))
-    .execute({
-       autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
-       console.log('Records deleted');
-     };
-```
-
-### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
-
-```js
-const query = pool.delete('customer')
-    .where(Op.eq('id', /Id/));
-....    
-query.params({ID: request.params.ID)    
-    .execute({
-       autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
-       console.log('Records deleted');
-     };
-```
-
-
-
-### Query.prototype.then() 
 Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
-const promise = pool.delete('customer')
-    .where(Op.like('name', '%john%'))
-    .then({
+pool.delete('customer')
+    .where({name: '%john%'})
+    .execute({
        autoCommit: true
-     }, result => {
+     }).then(() => {
        console.log('Records deleted');
-     ). catch(err => {
-       console.error(err);
-     );
+     });
 ```
 
+### Query.prototype.values() 
+Sets execution values for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
+```js
+const query = pool.delete('customer')
+    .where({'id': /Id/});
+....    
+query.values({ID: request.values.ID})    
+    .execute({
+       autoCommit: true
+     }).then(() => {
+       console.log('Records deleted');
+     });
+```

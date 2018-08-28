@@ -15,7 +15,7 @@
 [![Package Quality][quality-image]][quality-url]
 
 
-## What is SQB
+## About SQB
 
 SQB is an extensible, multi-dialect SQL query builder and Database connection wrapper for NodeJS.
 

@@ -15,7 +15,7 @@ describe('Hooking serialization', function() {
   it('should hook serialization', function() {
     let query = sqb.select()
         .from('table1')
-        .hook('serialize', function(ctx, type, o, defFn) {
+        .on('serialize', function(ctx, type, o, defFn) {
           if (type === 'table_name')
             return 'table2';
         });
@@ -27,7 +27,7 @@ describe('Hooking serialization', function() {
     let query = sqb.select()
         .from('table1')
         .where(Op.eq('id', 1))
-        .hook('serialize', function(ctx, type, o, defFn) {
+        .on('serialize', function(ctx, type, o, defFn) {
           if (type === 'operator')
             o.expression = 'new_id';
         });

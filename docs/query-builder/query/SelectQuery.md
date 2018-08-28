@@ -13,8 +13,7 @@
 - [SelectQuery.prototype.orderBy()](#selectqueryprototypeorderby)
 - [SelectQuery.prototype.where()](#selectqueryprototypewhere)
 - [Query.prototype.execute()](#queryprototypeexecute)
-- [Query.prototype.params()](#queryprototypeparams)
-- [Query.prototype.then()](#queryprototypethen)
+- [Query.prototype.values()](#queryprototypevalues)
 
 ### Events
 - [fetch](#fetchevent)
@@ -339,55 +338,34 @@ const query = sqb.delete('customer')
 
 
 ### Query.prototype.execute() 
-Executes query. Please check [executing queries](connection/executing-queries.md) section for details.
+Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 pool.select()
     .from('customer')
-    .where(Op.like('name', '%john%'))
+    .where({'name like': '%john%'})
     .execute({
        autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
+     }).then(result => {
        console.log(result.rowset.length, ' rows fetched');
-     };
+     });
 ```
 
-### Query.prototype.params() 
-Sets execution params for query. Please check [executing queries](connection/executing-queries.md) section for details.
+### Query.prototype.values() 
+Sets execution values for query. Please check [executing queries](connection/executing-queries.md) section for details.
 
 ```js
 const query = pool.select()
     .from('customer')
-    .where(Op.like('name', /Name/))
+    .where(Op.like('name', /Name/));
 
 ....    
-query.params({Name: request.params.Name)    
+query.values({Name: request.values.Name)    
     .execute({
        autoCommit: true
-     }, function(err, result) {
-       if (err)
-         return console.error(err);
+     }).then(result => {
        console.log(result.rowset.length, ' rows fetched');
-     };
-```
-
-
-### Query.prototype.then() 
-Executes query and returns Promise. Please check [executing queries](connection/executing-queries.md) section for details.
-
-```js
-const promise = pool.select()
-    .from('customer')
-    .where(Op.like('name', '%john%'))
-    .then({
-       autoCommit: true
-     }, result => {
-       console.log(result.rowset.length, ' rows fetched');
-     ). catch(err => {
-       console.error(err);
-     );
+     });
 ```
 
 ## Events

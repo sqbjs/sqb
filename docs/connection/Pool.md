@@ -23,7 +23,7 @@ When applications use a lot of connections for short periods, we recommend using
 #### Methods
 - [Pool.prototype.start()](#poolprototypestart)
 - [Pool.prototype.close()](#poolprototypeclose)
-- [Pool.prototype.connect()](#poolprototypeconnect)
+- [Pool.prototype.acquire()](#poolprototypeacquire)
 - [Pool.prototype.execute()](#poolprototypeexecute)
 
 - [Pool.prototype.select()](#poolprototypeselect)
@@ -77,6 +77,7 @@ SQB namespace exposes Pool class. And also SQB namespace has `pool()` function t
     - `cursor` (Boolean=false): 
     - `objectRows` (Boolean=false): Sets the default  value of objectRows option of query execution.
     - `naming` (String): [Enum`<String>`] : Sets the default naming rule for fields.
+    - `fetchRows` (Number) : Sets default fetchRows property of execution options.
 
 
 ## Properties
@@ -151,23 +152,10 @@ This method terminates the connection pool.
 
 Any open connections should be released with `Connection.close()` before pool.close() is called.
 
-`pool.close(callback)`
+`pool.close()`
     
-- `callback` (Function) : Function, taking one argument:
+- **Returns** Returns Promise.    
 
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** ([Promise]): If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.    
-
-```js
-pool.close((error) => {
-   if (error)
-    console.error(error);
-  else console.log('Pool terminated');
-});
-```
 ```js
 pool.close().then(() => {
   console.log('Pool terminated');
@@ -176,43 +164,29 @@ pool.close().then(() => {
 });
 ```
 
-### Pool.prototype.connect()
+### Pool.prototype.acquire()
 
-This method obtains a connection from the connection pool.
+This method obtains a connection from the connection pool. If a previously opened connection is available in the pool, that connection is returned. If all connections in the pool are in use, a new connection is created and returned to the caller, as long as the number of connections does not exceed the specified maximum for the pool. If the pool is at its maximum limit, the acquire() call results in an error.
 
-If a previously opened connection is available in the pool, that connection is returned. If all connections in the pool are in use, a new connection is created and returned to the caller, as long as the number of connections does not exceed the specified maximum for the pool. If the pool is at its maximum limit, the connect() call results in an error.
+- `sessionFn` (Function): Allows running tasks in a single transaction. Commit/rollback (on error) operation executed after async task completed then releases the connection.    
 
-`pool.connect(callback)`
+`pool.acquire([sessionFn])`
     
-- `callback` (Function) : Function, taking one argument:
-
-  `function(error, connection)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-  - `connection` ([Connection](connection/Connection.md)): Instance of [Connection](connection/Connection.md) object if method success.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
-
+- **Returns** : Promise<Connection>.
 
 ```js
-pool.connect((error, connection) => {
-  if (error) {
-    console.error(error);
-    return;
-  }
-  connection.execute('any sql', () => {
+pool.acquire().then(async (connection) => {
+  try {
+    const result = await connection.execute('any sql');
+  } finally {
     connection.release();
-  });
+  }      
 });
 ```
 
 ```js
-pool.connect().then(connection => {
-  connection.execute('any sql', () => {
-    connection.release();
-  });
-}).catch(error => {
-  console.error(error);
+pool.acquire(async (connection) => {
+  const result = await connection.execute('any sql');      
 });
 ```
 
@@ -223,62 +197,41 @@ This call acquires a connection, executes the query and releases connection imme
 `pool.execute(query[, values[, options[, callback]]])`
             
 - `query` (Query|String) : Query instance or sql string.
-- `values` (Array|Object) : Array of values or object that contains param/value pairs.
 - `options` (Object) : Execute options.
+  - `values` (Array|Object) : Array of values or object that contains param/value pairs.
   - `autoCommit` (Boolean=false) : If this property is true, the transaction committed at the end of query execution.
-  - `cursor` (Boolean=false) : If this property is true, query returns a `Cursor` object that works in unidirectional "cursor" mode. Otherwise it returns [Rowset](connection/Rowset.md) which fetches exact number of rows. **Important!** `Cursor` keeps connection open until `cursor.close()` method is called.
+  - `cursor` (Boolean=false) : If this property is true, query returns a `Cursor` object that works in unidirectional "cursor" mode. **Important!** `Cursor` keeps connection open until `cursor.close()` method is called.
   - `fetchAsString` (Array`<Class>`) : This property is an array of Classes, determines which value types will represent as string. The valid classes are Date and Number.
   - `fetchRows` (Number) : In "cursor" mode; it provides an initial suggested number of rows to prefetch. Prefetching is a tuning option to maximize data transfer efficiency and minimize round-trips to the database.
-In Rowset mode; it provides the maximum number of rows that are fetched from Connection instance.
+In regular mode; it provides the maximum number of rows that are fetched from Connection instance.
   - `ignoreNulls` (Boolean=false) : Determines whether object rows contains NULL fields.
   - `naming` (Enum`<String>`) : Sets the naming rule for fields. It affects field names in object rows and metadata.
     - lowercase: Table/field names are lower case characters
     - uppercase: Table/field names are upper case characters
   - `objectRows` (Boolean=false) : Determines whether query rows should be returned as Objects or Arrays. This property applies to ResultSet.objectRows property also.
   - `showSql` (Boolean=false): If set true, result object contains executed sql and values.
-- `callback` (Function) : Function, taking one argument:
 
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** : Returns Promise.
 
 ```js
-pool.execute('any sql', (err, result) => {
-  if (err)
-    return console.error(err);
-  .....
+pool.execute('any sql').then(result => {
+  
 });
 ``` 
-```js
-pool.execute('any sql').then((result) => {
-  ....
-}).catch(error => {
-  console.error(error);
-});
-```
 
 
 ### Pool.prototype.test()
 
 This call tests the pool.
 
-`pool.test([callback])`
-            
-- `callback` (Function) : Function, taking one argument:
+`pool.test()`
 
-  `function(error)`  
-  - `error` (`Error`): Error object, if method fails. Undefined otherwise.
-
-- **Returns** : If method is invoked with a callback, it returns a Undefined. Otherwise it returns Promise.
+- **Returns** :  Returns Promise.
 
 ```js
-pool.test((err) => {
-  if (err)
-    return console.error(err);
+pool.test().then(() => {
   console.log('Pool works');
-});
+}).catch((e) => console.log('Pool not working:', e));
 ``` 
 
 ### Pool.prototype.select()
