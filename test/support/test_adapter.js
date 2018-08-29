@@ -9,10 +9,10 @@ module.exports = {
   createAdapter: function(cfg) {
     if (cfg.dialect === 'test') {
       return {
-        createConnection: function(callback) {
+        createConnection: function() {
           if (module.exports.errorCreateConnection)
-            return callback(new Error('Any error'));
-          callback(null, new TestConnection(cfg));
+            return Promise.reject(new Error('Any error'));
+          return Promise.resolve(new TestConnection(cfg));
         },
         paramType: 1,
         serverVersion: '2.0'
@@ -62,102 +62,100 @@ fillTable('airports');
  * @param cfg
  * @constructor
  */
-function TestConnection(cfg) {
-  this.sessionId = ++sessionId;
-}
+class TestConnection {
+  constructor(cfg) {
+    this.sessionId = ++sessionId;
+  }
 
-TestConnection.prototype = {
   get isClosed() {
     return this._closed;
   }
-};
-TestConnection.prototype.constructor = TestConnection;
 
-TestConnection.prototype.close = function(callback) {
-  this._closed = true;
-  callback();
-};
-
-TestConnection.prototype.execute = function(query, options, callback) {
-
-  if (this.isClosed) {
-    callback(new Error('Can not execute while connection is closed'));
-    return;
+  close() {
+    this._closed = true;
+    return Promise.resolve();
   }
-  let sql = query.sql;
 
-  if (sql.substring(0, 6) === 'select') {
-    if (sql === 'select 1')
-      return callback(undefined, {rows: []});
+  execute(query, options) {
 
-    const m = sql.match(/\bfrom (\w+)\b/i);
-    if (!(m && m[1]))
-      return callback(new Error('Invalid query'));
+    if (this.isClosed)
+      return Promise.reject(new Error('Can not execute while connection is closed'));
 
-    const o = data[m[1]];
-    if (!o)
-      return callback(new Error('Table unknown (' + m[1] + ')'));
-    const out = {fields: o.fields.slice()};
-    // Clone records
-    let i;
-    let len = Math.min(o.obj.length, options.fetchRows ? options.fetchRows : o.obj.length);
-    const rows = [];
-    if (options.objectRows) {
-      for (i = 0; i < len; i++)
-        rows.push(Object.assign({}, o.obj[i]));
-    } else {
-      for (i = 0; i < len; i++)
-        rows.push(o.arr[i].slice());
+    let sql = query.sql;
+
+    if (sql.substring(0, 6) === 'select') {
+      if (sql === 'select 1')
+        return Promise.resolve({rows: []});
+
+      const m = sql.match(/\bfrom (\w+)\b/i);
+      if (!(m && m[1]))
+        return Promise.reject(new Error('Invalid query'));
+
+      const o = data[m[1]];
+      if (!o)
+        return Promise.reject(new Error('Table unknown (' + m[1] + ')'));
+      const out = {fields: o.fields.slice()};
+      // Clone records
+      let i;
+      let len = Math.min(o.obj.length, options.fetchRows ? options.fetchRows : o.obj.length);
+      const rows = [];
+      if (options.objectRows) {
+        for (i = 0; i < len; i++)
+          rows.push(Object.assign({}, o.obj[i]));
+      } else {
+        for (i = 0; i < len; i++)
+          rows.push(o.arr[i].slice());
+      }
+
+      if (options.cursor) {
+        out.cursor = new TestCursor(this, rows);
+      } else out.rows = rows;
+      return Promise.resolve(out);
     }
+    if (sql.substring(0, 6) === 'insert') {
+      if (sql.includes('returning'))
+        return Promise.resolve({returns: {ID: 1}});
+      return Promise.resolve({});
+    }
+    if (sql.substring(0, 6) === 'update') {
+      if (sql.includes('returning'))
+        return Promise.resolve({returns: {ID: 1}});
+      return Promise.resolve({});
+    }
+    if (sql.substring(0, 6) === 'delete')
+      return Promise.resolve({});
 
-    if (options.cursor) {
-      out.cursor = new TestCursor(this, rows);
-    } else out.rows = rows;
-    return callback(null, out);
+    if (sql.substring(0, 6) === 'merge')
+      return Promise.resolve({});
+
+    if (sql === 'no response')
+      return Promise.resolve();
+
+    return Promise.reject(new Error('Unknown test SQL'));
   }
-  if (sql.substring(0, 6) === 'insert') {
-    if (sql.includes('returning'))
-      return callback(null, {returns: {ID: 1}});
-    return callback(null, {});
+
+  commit() {
+    return Promise.resolve();
   }
-  if (sql.substring(0, 6) === 'update') {
-    if (sql.includes('returning'))
-      return callback(null, {returns: {ID: 1}});
-    return callback(null, {});
+
+  startTransaction() {
+    return Promise.resolve();
   }
-  if (sql.substring(0, 6) === 'delete')
-    return callback(null, {});
 
-  if (sql.substring(0, 6) === 'merge')
-    return callback(null, {});
+  rollback() {
+    return Promise.resolve();
+  }
 
-  if (sql === 'no response')
-    return callback(null);
+  test() {
+    this._tested = (this._tested || 0) + 1;
+    return Promise.resolve();
+  }
 
-  return callback(new Error('Unknown test SQL'));
-};
-
-TestConnection.prototype.commit = function(callback) {
-  callback();
-};
-
-TestConnection.prototype.startTransaction = function(callback) {
-  callback();
-};
-
-TestConnection.prototype.rollback = function(callback) {
-  callback();
-};
-
-TestConnection.prototype.test = function(callback) {
-  this._tested = (this._tested || 0) + 1;
-  callback();
-};
-
-TestConnection.prototype.get = function(param) {
-  if (param === 'server_version')
-    return '12.0';
-};
+  get(param) {
+    if (param === 'server_version')
+      return '12.0';
+  }
+}
 
 /**
  *
@@ -165,19 +163,23 @@ TestConnection.prototype.get = function(param) {
  * @param rows
  * @constructor
  */
-function TestCursor(conn, rows) {
-  this._rows = rows;
-  this._rowNum = 0;
+class TestCursor {
+  constructor(conn, rows) {
+    this._rows = rows;
+    this._rowNum = 0;
+  }
+
+  close() {
+    return Promise.resolve();
+  }
+
+  fetch(rowCount) {
+    if (!rowCount)
+      return Promise.resolve();
+    const rowNum = this._rowNum;
+    this._rowNum += rowCount;
+    return Promise.resolve(this._rows.slice(rowNum, this._rowNum));
+  }
+
 }
 
-TestCursor.prototype.close = function(callback) {
-  callback();
-};
-
-TestCursor.prototype.fetch = function(rowCount, callback) {
-  if (!rowCount)
-    return callback();
-  const rowNum = this._rowNum;
-  this._rowNum += rowCount;
-  callback(undefined, this._rows.slice(rowNum, this._rowNum));
-};

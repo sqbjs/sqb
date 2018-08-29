@@ -276,7 +276,7 @@ connection.on('rollback', () => {
 This event is called before executing a query.
 
 ```js
-connection.on('execute', (query, options) => {
+connection.on('execute', (connection, query, options) => {
     console.log('Executing', query, 'with options', options);
 });
 ```

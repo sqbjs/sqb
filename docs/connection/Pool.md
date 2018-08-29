@@ -306,7 +306,7 @@ pool.on('close', () => {
 This event is called before executing a query. This is very useful for logging all database activity.
 
 ```js
-pool.on('execute', (sql, values, options) => {
-  logExecute(sql, values, options);
+pool.on('execute', (connection, query, options) => {
+  logExecute(query, options);
 });
 ```

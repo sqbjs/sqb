@@ -125,7 +125,7 @@ describe('CursorStream', function() {
   it('should handle cursor errors', function(done) {
     pool.select().from('airports').execute().then(result => {
       const stream = result.cursor.toStream();
-      result.cursor._cursor.close = (cb) => cb(new Error('Any error'));
+      result.cursor._cursor.close = () => Promise.reject(new Error('Any error'));
       stream.on('error', () => {
         delete result.cursor._cursor.close;
         stream.close().then(() => done());

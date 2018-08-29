@@ -38,9 +38,7 @@ describe('Cursor', function() {
   it('should handle close error', function(done) {
     pool.select().from('airports').execute().then(result => {
       cursor = result.cursor;
-      cursor._cursor.close = (cb) => {
-        cb(new Error('Any error'));
-      };
+      cursor._cursor.close = () => Promise.reject(new Error('Any error'));
       cursor.close()
           .then(() => done(0, 'Failed'))
           .catch(err => {
@@ -161,7 +159,7 @@ describe('Cursor', function() {
     pool.select().from('airports').execute().then(result => {
       cursor = result && result.cursor;
       cursor.cached();
-      cursor._cursor.fetch = (nRows, cb) => cb(new Error('Any error'));
+      cursor._cursor.fetch = () => Promise.reject('Any error');
       cursor.fetchAll()
           .then(() => done('Failed'))
           .catch(() => {

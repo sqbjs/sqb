@@ -104,7 +104,7 @@ describe('Pool', function() {
     return pool.acquire().then(conn => {
       assert(conn.release());
       return pool.acquire().then(conn => {
-        assert(!conn._client._tested);
+        assert(conn._client._tested);
         assert(conn.release());
       });
     });
