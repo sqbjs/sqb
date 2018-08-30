@@ -694,9 +694,9 @@ describe('serialize "Operators"', function() {
     it('should wrap native objects to operators', function() {
       let query = sqb.select()
           .from('table1')
-          .where({'a is': null});
+          .where({'a.a is': null});
       let result = query.generate(options);
-      assert.equal(result.sql, 'select * from table1 where a is null');
+      assert.equal(result.sql, 'select * from table1 where a.a is null');
     });
 
   });
