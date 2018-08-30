@@ -4,10 +4,10 @@ function TestSerializer(config) {
 }
 
 TestSerializer.prototype.serialize = function(ctx, type, o, defFn) {
-  return defFn.apply(null, arguments);
+  return defFn(ctx, o);
 };
 
-TestSerializer.prototype.isReserved = function(ctx, s) {
+TestSerializer.prototype.isReserved = function() {
   return false;
 };
 
