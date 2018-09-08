@@ -10,7 +10,6 @@ describe('serialize "SelectColumn"', function() {
     dialect: 'test',
     prettyPrint: false
   };
-  
 
   it('should serialize (field)', function() {
     let query = sqb.select('field1').from('table1');
@@ -46,6 +45,45 @@ describe('serialize "SelectColumn"', function() {
     let query = sqb.select('schema1.table1.field1 f1').from('table1');
     let result = query.generate(options);
     assert.equal(result.sql, 'select schema1.table1.field1 f1 from table1');
+  });
+
+  it('should table and column start with "_" character', function() {
+    let query = sqb.select('_table1._field1 _f1').from('table1');
+    let result = query.generate(options);
+    assert.equal(result.sql, 'select _table1._field1 _f1 from table1');
+  });
+
+  it('should "$" character can be used for table and column names', function() {
+    let query = sqb.select('table1$.field1$ f1$').from('table1');
+    let result = query.generate(options);
+    assert.equal(result.sql, 'select table1$.field1$ f1$ from table1');
+  });
+
+  it('should not table name start with "$" character', function() {
+    try {
+      sqb.select('$table1.field1 f1').from('table1');
+    } catch (e) {
+      return;
+    }
+    assert(0, 'Failed');
+  });
+
+  it('should not column name start with "$" character', function() {
+    try {
+      sqb.select('table1.$field1 f1').from('table1');
+    } catch (e) {
+      return;
+    }
+    assert(0, 'Failed');
+  });
+
+  it('should not alias name start with "$" character', function() {
+    try {
+      sqb.select('table1.field1 $f1').from('table1');
+    } catch (e) {
+      return;
+    }
+    assert(0, 'Failed');
   });
 
   it('should not print alias if field is *', function() {
