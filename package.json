@@ -1,7 +1,7 @@
 {
   "name": "sqb",
   "description": "Extensible, multi-dialect SQL query builder and Database connection framework for JavaScript",
-  "version": "3.2.5",
+  "version": "3.2.6",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -20,9 +20,9 @@
   ],
   "dependencies": {
     "debug": "^3.1.0",
-    "doublylinked": "^1.0.7",
+    "doublylinked": "^2.0.0",
     "errorex": "^1.0.6",
-    "lightning-pool": "^2.0.1",
+    "lightning-pool": "^2.0.2",
     "putil-flattentext": "^2.0.0",
     "putil-isplainobject": "^1.0.1",
     "putil-merge": "^2.0.1",
@@ -33,7 +33,7 @@
   "devDependencies": {
     "babel-eslint": "^9.0.0",
     "eslint": "^5.5.0",
-    "eslint-config-google": "^0.9.1",
+    "eslint-config-google": "^0.10.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0"
   },
