@@ -150,7 +150,7 @@ describe('serialize "Operators"', function() {
   /*
    *
    */
-  describe('ne (not =) operator', function() {
+  describe('ne (!=) operator', function() {
     it('should initialize', function() {
       const op = Op.ne('id', 1);
       assert(op.isOperator);
@@ -162,7 +162,7 @@ describe('serialize "Operators"', function() {
           .from('table1')
           .where(Op.ne('id', 1));
       let result = query.generate(options);
-      assert.equal(result.sql, 'select * from table1 where id not = 1');
+      assert.equal(result.sql, 'select * from table1 where id != 1');
     });
 
     it('should use Serializable as first arg', function() {
@@ -170,7 +170,7 @@ describe('serialize "Operators"', function() {
           .from('table1')
           .where(Op.ne(sqb.raw('id'), 1));
       let result = query.generate(options);
-      assert.equal(result.sql, 'select * from table1 where id not = 1');
+      assert.equal(result.sql, 'select * from table1 where id != 1');
     });
 
     it('should serialize params', function() {
@@ -180,7 +180,7 @@ describe('serialize "Operators"', function() {
       let result = query.generate(Object.assign({
         values: {id: 1}
       }, options));
-      assert.equal(result.sql, 'select * from table1 where id not = :id');
+      assert.equal(result.sql, 'select * from table1 where id != :id');
       assert.equal(result.values.id, 1);
     });
 
@@ -189,7 +189,7 @@ describe('serialize "Operators"', function() {
           .from('table1')
           .where({'a!=': 1, 'b !=': 2});
       let result = query.generate(options);
-      assert.equal(result.sql, 'select * from table1 where a not = 1 and b not = 2');
+      assert.equal(result.sql, 'select * from table1 where a != 1 and b != 2');
     });
   });
 

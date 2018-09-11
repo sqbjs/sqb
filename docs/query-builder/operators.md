@@ -96,7 +96,7 @@ const query = sqb.select().from('customer')
 ```
 ```sql
 select * from customer
-where age not = 16
+where age != 16
 ```
 
 ### Op.gt()

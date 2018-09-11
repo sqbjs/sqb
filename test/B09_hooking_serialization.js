@@ -28,7 +28,7 @@ describe('Hooking serialization', function() {
         .from('table1')
         .where(Op.eq('id', 1))
         .on('serialize', function(ctx, type, o, defFn) {
-          if (type === 'operator')
+          if (type === 'comparison')
             o.expression = 'new_id';
         });
     let result = query.generate(options);
