@@ -128,6 +128,11 @@ describe('Metadata', function() {
     assert(metaData.invalidate());
   });
 
+  it('should provide that dialect supports schemas', function() {
+    metaData = new sqb.DBMeta(pool);
+    assert.equal(metaData.supportsSchemas, false);
+  });
+
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
       assert.equal(pool.acquired, 0);
