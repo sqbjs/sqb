@@ -1,7 +1,7 @@
 {
   "name": "sqb",
   "description": "Extensible, multi-dialect SQL query builder and Database connection framework for JavaScript",
-  "version": "3.4.2",
+  "version": "3.4.3",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -19,7 +19,7 @@
     "database"
   ],
   "dependencies": {
-    "debug": "^4.0.0",
+    "debug": "^4.0.1",
     "doublylinked": "^2.0.0",
     "errorex": "^1.0.6",
     "lightning-pool": "^2.0.2",
@@ -28,13 +28,13 @@
     "putil-merge": "^2.0.1",
     "putil-promisify": "^1.2.0",
     "putil-taskqueue": "^2.0.1",
-    "putil-waterfall": "^2.0.2"
+    "putil-waterfall": "^2.0.3"
   },
   "devDependencies": {
-    "babel-eslint": "^9.0.0",
-    "eslint": "^5.5.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.6.1",
     "eslint-config-google": "^0.10.0",
-    "istanbul": "^0.4.5",
+    "nyc": "^13.0.1",
     "mocha": "^5.2.0"
   },
   "engines": {
@@ -48,9 +48,12 @@
     "README.md",
     "lib/"
   ],
+  "nyc": {
+    "temp-directory": "./coverage/.nyc_output"
+  },
   "scripts": {
-    "test": "mocha --require test/support/env --reporter spec --bail --check-leaks test/",
-    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec --require test/support/env --reporter dot --check-leaks test/",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- -R spec --require test/support/env --reporter spec --check-leaks test/"
+    "test": "mocha --require ./test/support/env --reporter spec --bail --check-leaks test/",
+    "cover": "nyc --reporter html --reporter text npm run test",
+    "travis-cover": "nyc --reporter lcovonly npm run test"
   }
 }
