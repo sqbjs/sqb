@@ -19,10 +19,10 @@
     "database"
   ],
   "dependencies": {
-    "debug": "^4.0.1",
+    "debug": "^4.1.0",
     "doublylinked": "^2.0.0",
-    "errorex": "^2.0.0",
-    "lightning-pool": "^2.0.2",
+    "errorex": "^2.0.3",
+    "lightning-pool": "^2.0.3",
     "putil-flattentext": "^2.0.0",
     "putil-isplainobject": "^1.0.1",
     "putil-merge": "^2.0.1",
