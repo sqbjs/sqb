@@ -17,7 +17,7 @@
 
 ## About SQB
 
-SQB is an extensible, multi-dialect SQL query builder and Database connection wrapper for NodeJS.
+SQB is an [extensible](./docs/extensions.md), multi-dialect SQL query builder and Database connection wrapper for NodeJS.
 
 ## Main goals
 
@@ -26,7 +26,7 @@ SQB is an extensible, multi-dialect SQL query builder and Database connection wr
 - Fast applications with low memory requirements
 - Let applications work with large data tables efficiently
 - Support latest JavaScript language standards
-- Lightweight and extensible framework
+- Lightweight and [extensible](./docs/extensions.md) framework. 
 
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/panates/sqb/issues) page

@@ -5,8 +5,7 @@ SQB is designed to be a lightweight and extensible interface to keep application
 
 ```js
 const sqb = require('sqb');
-sqb.use(require('sqb-serializer-oracle')); // Load Oracle serialization
-const sr = sqb.serializer('oracle'); // Create Oracle serializer
+sqb.use(require('sqb-serializer-oracle')); // Enable Oracle serialization
 ```
 
 ```js
@@ -14,7 +13,7 @@ const sqb = require('sqb');
 sqb.use(require('sqb-connect-pg')); // Load adapter for Postgre SQL driver
 
 const sr = sqb.createPool({
-dialect:'postgres',
+dialect:'pg',
 user: 'anyuser',
 password: 'anypass',
 database: 'dbpath'
