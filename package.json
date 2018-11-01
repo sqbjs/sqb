@@ -25,17 +25,17 @@
     "debug": "^4.1.0",
     "doublylinked": "^2.0.1",
     "errorex": "^2.0.3",
-    "lightning-pool": "^2.0.4",
+    "lightning-pool": "^2.0.5",
     "putil-flattentext": "^2.0.0",
     "putil-isplainobject": "^1.0.1",
-    "putil-merge": "^2.0.1",
+    "putil-merge": "^2.0.2",
     "putil-promisify": "^1.2.0",
     "putil-taskqueue": "^2.0.1",
-    "putil-waterfall": "^2.0.3"
+    "putil-waterfall": "^2.1.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.7.0",
+    "eslint": "^5.8.0",
     "eslint-config-google": "^0.11.0",
     "nyc": "^13.1.0",
     "mocha": "^5.2.0"
