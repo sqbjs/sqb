@@ -7,7 +7,10 @@
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],
   "license": "MIT",
-  "repository": "panates/sqb",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/panates/sqb.git"
+  },
   "main": "lib/index.js",
   "keywords": [
     "javascript",
@@ -38,7 +41,7 @@
     "mocha": "^5.2.0"
   },
   "engines": {
-    "node": ">= 6.0"
+    "node": ">=6.0"
   },
   "directories": {
     "lib": "./lib"
