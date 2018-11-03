@@ -3,10 +3,9 @@
 
 const assert = require('assert');
 const sqb = require('../lib/index');
-const testAdapter = require('./support/test_adapter');
 
 function readStream(stream, callback) {
-  let bytes = new Buffer('');
+  let bytes = Buffer.from('');
   stream.on('data', (chunk) => {
     bytes = Buffer.concat([bytes, chunk]);
   });
