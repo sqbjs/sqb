@@ -94,7 +94,7 @@ describe('serialize "Operators"', function() {
     it('should wrap native objects to operators', function() {
       let query = sqb.select()
           .from('table1')
-          .where({or: [{'id': 1}, {'id': 2}]});
+          .where({OR: [{'id': 1}, {'id': 2}]});
       let result = query.generate(options);
       assert.equal(result.sql, 'select * from table1 where (id = 1 or id = 2)');
     });
