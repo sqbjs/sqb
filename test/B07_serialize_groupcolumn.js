@@ -46,7 +46,7 @@ describe('serialize "GroupColumn"', function() {
 
   it('should validate table name', function() {
     try {
-      sqb.select().from('table1').groupBy('schema.1field1');
+      sqb.select().from('table1').groupBy('schema.-field1');
     } catch (e) {
       return;
     }
