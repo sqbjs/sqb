@@ -9,7 +9,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/panates/sqb.git"
+    "url": "https://github.com/sqbjs/sqb.git"
   },
   "main": "lib/index.js",
   "keywords": [
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.11.0",
+    "eslint": "^5.11.1",
     "eslint-config-google": "^0.11.0",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0"
