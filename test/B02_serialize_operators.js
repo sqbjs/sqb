@@ -776,7 +776,7 @@ describe('serialize "Operators"', function() {
           ' and dt2 = \'2017-11-01 08:05:50\'');
     });
 
-    it('should user null as params -  COLON', function() {
+    it('should use null as params -  COLON', function() {
       let query = sqb.select()
           .from('table1')
           .where(Op.eq('id', /id/));
