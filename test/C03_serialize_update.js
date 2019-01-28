@@ -21,14 +21,14 @@ describe('Serialize update query', function() {
     let query = sqb.update('table1', {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
     let result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
+    assert.strictEqual(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
   it('should pass raw as table name', function() {
     let query = sqb.update(sqb.raw('table1'), {id: 2, name: 'aaa'})
         .where(Op.eq('id', 1));
     let result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
+    assert.strictEqual(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
   });
 
   it('should validate first (tableName) argument', function() {
@@ -62,8 +62,8 @@ describe('Serialize update query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'update table1 set id = :id, name = :name');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -78,8 +78,8 @@ describe('Serialize update query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'update table1 set id = ?, name = ?');
-    assert.deepEqual(result.values, [1, 'abc']);
+    assert.strictEqual(result.sql, 'update table1 set id = ?, name = ?');
+    assert.deepStrictEqual(result.values, [1, 'abc']);
   });
 
   it('should serialize params with "values" argument: DOLLAR', function() {
@@ -91,8 +91,8 @@ describe('Serialize update query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'update table1 set id = $1, name = $2');
-    assert.deepEqual(result.values, [1, 'abc']);
+    assert.strictEqual(result.sql, 'update table1 set id = $1, name = $2');
+    assert.deepStrictEqual(result.values, [1, 'abc']);
   });
 
   it('should serialize params with "values" argument: AT', function() {
@@ -104,8 +104,8 @@ describe('Serialize update query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'update table1 set id = @id, name = @name');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'update table1 set id = @id, name = @name');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -118,8 +118,8 @@ describe('Serialize update query', function() {
           name: 'abc'
         });
     let result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = :id, name = :name');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -139,7 +139,7 @@ describe('Serialize update query', function() {
     let query = sqb.update('table1', {id: 1, name: 'aaa'})
         .returning({'id': 'number', name: 'string'});
     let result = query.generate(options);
-    assert.equal(result.sql, 'update table1 set id = 1, name = \'aaa\' returning id, name');
+    assert.strictEqual(result.sql, 'update table1 set id = 1, name = \'aaa\' returning id, name');
   });
 
   it('should validate returning() arguments', function() {

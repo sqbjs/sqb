@@ -15,24 +15,24 @@ describe('Hooking serialization', function() {
   it('should hook serialization', function() {
     let query = sqb.select()
         .from('table1')
-        .on('serialize', function(ctx, type, o, defFn) {
+        .on('serialize', function(ctx, type) {
           if (type === 'table_name')
             return 'table2';
         });
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table2');
+    assert.strictEqual(result.sql, 'select * from table2');
   });
 
   it('should continue serialization with modified options', function() {
     let query = sqb.select()
         .from('table1')
         .where(Op.eq('id', 1))
-        .on('serialize', function(ctx, type, o, defFn) {
+        .on('serialize', function(ctx, type, o) {
           if (type === 'comparison')
             o.expression = 'new_id';
         });
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1 where new_id = 1');
+    assert.strictEqual(result.sql, 'select * from table1 where new_id = 1');
   });
 
 });

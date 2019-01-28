@@ -32,7 +32,7 @@ describe('Connection', function() {
     pool.acquire().then(conn => {
       conn.on('close', () => {
         try {
-          assert.equal(conn.referenceCount, 0);
+          assert.strictEqual(conn.referenceCount, 0);
         } catch (e) {
           return done(e);
         }
@@ -40,11 +40,11 @@ describe('Connection', function() {
       });
       try {
         assert(!conn.isClosed);
-        assert.equal(conn.referenceCount, 1);
+        assert.strictEqual(conn.referenceCount, 1);
         conn.acquire();
-        assert.equal(conn.referenceCount, 2);
+        assert.strictEqual(conn.referenceCount, 2);
         conn.release();
-        assert.equal(conn.referenceCount, 1);
+        assert.strictEqual(conn.referenceCount, 1);
         conn.release();
       } catch (e) {
         return done(e);
@@ -118,7 +118,7 @@ describe('Connection', function() {
 
   it('should read client variables', function() {
     return pool.acquire().then(conn => {
-      assert.equal(conn.get('server_version'), '12.0');
+      assert.strictEqual(conn.get('server_version'), '12.0');
       return conn.release();
     });
   });
@@ -129,7 +129,7 @@ describe('Connection', function() {
         fetchRows: 2
       }).then(result => {
         assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
+        assert.strictEqual(result.rows.length, 2);
         return conn.release();
       });
     });
@@ -162,8 +162,8 @@ describe('Connection', function() {
         objectRows: false
       }).then(result => {
         assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
-        assert.equal(typeof result.rows[0], 'object');
+        assert.strictEqual(result.rows.length, 2);
+        assert.strictEqual(typeof result.rows[0], 'object');
         assert(Array.isArray(result.rows[0]));
         return conn.release();
       });
@@ -177,8 +177,8 @@ describe('Connection', function() {
         objectRows: true
       }).then(result => {
         assert(result && result.rows);
-        assert.equal(result.rows.length, 2);
-        assert.equal(typeof result.rows[0], 'object');
+        assert.strictEqual(result.rows.length, 2);
+        assert.strictEqual(typeof result.rows[0], 'object');
         assert(!Array.isArray(result.rows[0]));
         return conn.release();
       });
@@ -189,7 +189,7 @@ describe('Connection', function() {
     let ok;
     return pool.select().from('airports')
         .on('fetch', (row) => {
-          assert.equal(row.ID, 'LFOI');
+          assert.strictEqual(row.ID, 'LFOI');
           ok = 1;
         })
         .execute({
@@ -207,7 +207,7 @@ describe('Connection', function() {
           objectRows: true,
           fetchAsString: Number
         }).then(result => {
-          assert.equal(typeof result.rows[0].Flags, 'string');
+          assert.strictEqual(typeof result.rows[0].Flags, 'string');
         });
   });
 
@@ -218,7 +218,7 @@ describe('Connection', function() {
           objectRows: true,
           fetchAsString: [Number]
         }).then(result => {
-          assert.equal(typeof result.rows[0].Flags, 'string');
+          assert.strictEqual(typeof result.rows[0].Flags, 'string');
         });
   });
 
@@ -226,7 +226,7 @@ describe('Connection', function() {
     return pool.insert('airports', {id: 1})
         .returning({ID: 'string'})
         .execute({}).then(result => {
-          assert.equal(result.returns.ID, 1);
+          assert.strictEqual(result.returns.ID, 1);
         });
   });
 
@@ -255,7 +255,7 @@ describe('Connection', function() {
     return pool.execute('error', {values: [1, 2], showSql: true})
         .catch(err => {
           assert(err.query.sql);
-          assert.deepEqual(err.query.values, [1, 2]);
+          assert.deepStrictEqual(err.query.values, [1, 2]);
           assert(err.options.showSql);
         });
   });
@@ -266,7 +266,7 @@ describe('Connection', function() {
 
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
-      assert.equal(pool.acquired, 0);
+      assert.strictEqual(pool.acquired, 0);
     });
 
     it('should shutdown pool', function() {

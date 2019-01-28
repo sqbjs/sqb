@@ -19,19 +19,19 @@ describe('Serialize insert query', function() {
   it('should serialize insert', function() {
     let query = sqb.insert('table1', {id: 1, name: 'aaa'});
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
   it('should serialize insert.into', function() {
     let query = sqb.insert('table1', {id: 1, name: 'aaa'});
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
   it('should pass raw as table name', function() {
     let query = sqb.insert(sqb.raw('table1'), {id: 1, name: 'aaa'});
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
   it('should validate first (tableName) argument', function() {
@@ -65,8 +65,8 @@ describe('Serialize insert query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -81,8 +81,8 @@ describe('Serialize insert query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'insert into table1 (id, name) values (?, ?)');
-    assert.deepEqual(result.values, [1, 'abc']);
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (?, ?)');
+    assert.deepStrictEqual(result.values, [1, 'abc']);
   });
 
   it('should serialize params with "values" argument: DOLLAR', function() {
@@ -94,8 +94,8 @@ describe('Serialize insert query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'insert into table1 (id, name) values ($1, $2)');
-    assert.deepEqual(result.values, [1, 'abc']);
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values ($1, $2)');
+    assert.deepStrictEqual(result.values, [1, 'abc']);
   });
 
   it('should serialize params with "values" argument: AT', function() {
@@ -107,8 +107,8 @@ describe('Serialize insert query', function() {
         name: 'abc'
       }
     }, options));
-    assert.equal(result.sql, 'insert into table1 (id, name) values (@id, @name)');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (@id, @name)');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -121,8 +121,8 @@ describe('Serialize insert query', function() {
           name: 'abc'
         });
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-    assert.deepEqual(result.values, {
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
+    assert.deepStrictEqual(result.values, {
       id: 1,
       name: 'abc'
     });
@@ -142,14 +142,14 @@ describe('Serialize insert query', function() {
     let query = sqb.insert('table1',
         sqb.select('id', 'the_name name').from('table2'));
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (select id, the_name name from table2)');
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (select id, the_name name from table2)');
   });
 
   it('should serialize insert with returning', function() {
     let query = sqb.insert('table1', {id: 1, name: 'aaa'})
         .returning({'sch1.tbl1.id': 'number', 'update u1': 'string'});
     let result = query.generate(options);
-    assert.equal(result.sql, 'insert into table1 (id, name) values (1, \'aaa\') returning sch1.tbl1.id, "update" u1');
+    assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\') returning sch1.tbl1.id, "update" u1');
   });
 
   it('should validate returning() arguments', function() {

@@ -18,7 +18,7 @@ describe('serialize "Raw"', ()=> {
     let query = sqb.select(sqb.raw('\'John\'\'s Bike\' f1'))
         .from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
+    assert.strictEqual(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
   });
 
 });

@@ -21,13 +21,13 @@ describe('Serialize delete query', function() {
     let query = sqb.delete('table1')
         .where(Op.eq('id', 1));
     let result = query.generate(options);
-    assert.equal(result.sql, 'delete from table1 where id = 1');
+    assert.strictEqual(result.sql, 'delete from table1 where id = 1');
   });
 
   it('should pass raw as table name', function() {
     let query = sqb.delete(sqb.raw('table1'));
     let result = query.generate(options);
-    assert.equal(result.sql, 'delete from table1');
+    assert.strictEqual(result.sql, 'delete from table1');
   });
 
   it('should validate first (tableName) argument', function() {

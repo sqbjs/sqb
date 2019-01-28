@@ -28,8 +28,8 @@ describe('Cursor', function() {
     return pool.select().from('airports').execute().then(result => {
       cursor = result && result.cursor;
       assert(cursor);
-      assert.equal(cursor.isBof, true);
-      assert.equal(cursor.inspect(), '[object Cursor]');
+      assert.strictEqual(cursor.isBof, true);
+      assert.strictEqual(cursor.inspect(), '[object Cursor]');
       assert(cursor.connection);
       return cursor.close();
     });
@@ -41,7 +41,7 @@ describe('Cursor', function() {
       cursor._cursor.close = () => Promise.reject(new Error('Any error'));
       cursor.close()
           .then(() => done(0, 'Failed'))
-          .catch(err => {
+          .catch(() => {
             delete cursor._cursor.close;
             cursor.close().then(() => done());
           });
@@ -53,13 +53,13 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       cursor.cached();
       return cursor.fetchAll().then(() => {
-        assert.equal(cursor.isBof, true);
-        assert.equal(cursor.rowNum, 0);
+        assert.strictEqual(cursor.isBof, true);
+        assert.strictEqual(cursor.rowNum, 0);
         assert(cursor._cache);
-        assert.equal(cursor._cache.length, 10);
+        assert.strictEqual(cursor._cache.length, 10);
         return cursor.next().then(row => {
-          assert.equal(typeof row, 'object');
-          assert.deepEqual(row, airports.obj[0]);
+          assert.strictEqual(typeof row, 'object');
+          assert.deepStrictEqual(row, airports.obj[0]);
           return cursor.close();
         });
       });
@@ -89,11 +89,11 @@ describe('Cursor', function() {
       });
       const airports = testAdapter.data.airports;
       return cursor.seek(10).then((num) => {
-        assert.equal(cursor.isBof, false);
-        assert.equal(num, 10);
-        assert.equal(cursor.rowNum, num);
-        assert.deepEqual(cursor.row, airports.obj[num - 1]);
-        assert.equal(cursor.rowNum, currow);
+        assert.strictEqual(cursor.isBof, false);
+        assert.strictEqual(num, 10);
+        assert.strictEqual(cursor.rowNum, num);
+        assert.deepStrictEqual(cursor.row, airports.obj[num - 1]);
+        assert.strictEqual(cursor.rowNum, currow);
         return cursor.close();
       });
     });
@@ -103,10 +103,10 @@ describe('Cursor', function() {
     return pool.select().from('airports').execute().then(result => {
       cursor = result && result.cursor;
       return cursor.seek(10000).then(() => {
-        assert.equal(cursor.isBof, false);
-        assert.equal(cursor.isEof, true);
+        assert.strictEqual(cursor.isBof, false);
+        assert.strictEqual(cursor.isEof, true);
         assert(!cursor.row);
-        assert.equal(cursor.rowNum, 11);
+        assert.strictEqual(cursor.rowNum, 11);
         return cursor.close();
       });
     });
@@ -117,11 +117,11 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       cursor.cached();
       return cursor.seek(10000).then(() => {
-        assert.equal(cursor.isBof, false);
-        assert.equal(cursor.isEof, true);
+        assert.strictEqual(cursor.isBof, false);
+        assert.strictEqual(cursor.isEof, true);
         assert(!cursor.row);
-        assert.equal(cursor.rowNum, 11);
-        assert.equal(cursor._cache.length, 10);
+        assert.strictEqual(cursor.rowNum, 11);
+        assert.strictEqual(cursor._cache.length, 10);
         return cursor.close();
       });
     });
@@ -132,12 +132,12 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       cursor.cached();
       cursor.seek(10000).then(() => {
-        assert.equal(cursor.isEof, true);
+        assert.strictEqual(cursor.isEof, true);
         cursor.moveTo(1).then((num) => {
-          assert.equal(cursor.isBof, false);
-          assert.equal(cursor.isEof, false);
-          assert.equal(cursor.rowNum, 1);
-          assert.equal(cursor.rowNum, num);
+          assert.strictEqual(cursor.isBof, false);
+          assert.strictEqual(cursor.isEof, false);
+          assert.strictEqual(cursor.rowNum, 1);
+          assert.strictEqual(cursor.rowNum, num);
           return cursor.close();
         });
       });
@@ -149,7 +149,7 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       const rn = cursor.rowNum;
       cursor.seek(0).then(num => {
-        assert.equal(rn, num);
+        assert.strictEqual(rn, num);
         return cursor.close();
       });
     });
@@ -196,7 +196,7 @@ describe('Cursor', function() {
         assert(ok);
         const airports = testAdapter.data.airports;
         return cursor.next().then((row) => {
-          assert.deepEqual(row, airports.obj[0]);
+          assert.deepStrictEqual(row, airports.obj[0]);
         });
       });
     });
@@ -207,9 +207,9 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       cursor.cached();
       return cursor.moveTo(9).then(rowNum => {
-        assert.equal(rowNum, 9);
+        assert.strictEqual(rowNum, 9);
         return cursor.moveTo(5).then(rowNum => {
-          assert.equal(rowNum, 5);
+          assert.strictEqual(rowNum, 5);
           return cursor.close();
         });
       });
@@ -221,9 +221,9 @@ describe('Cursor', function() {
       cursor = result && result.cursor;
       cursor.cached();
       return cursor.next().then(() => {
-        assert.equal(cursor.rowNum, 1);
+        assert.strictEqual(cursor.rowNum, 1);
         cursor.reset();
-        assert.equal(cursor.rowNum, 0);
+        assert.strictEqual(cursor.rowNum, 0);
         return cursor.close();
       });
     });
@@ -246,17 +246,13 @@ describe('Cursor', function() {
   it('should queries call `fetch` events on fetching new rows', function() {
     let l = 0;
     return pool.select().from('airports')
-        .on('fetch', (row) => {
-          l++;
-        })
+        .on('fetch', () => l++)
         .execute().then((result) => {
           cursor = result && result.cursor;
-          const airports = testAdapter.data.airports;
-          let k = 0;
           cursor.seek(10).then(() => {
-            assert.equal(cursor.rowNum, 10);
-            assert.equal(cursor.rowNum, l);
-            assert.equal(cursor._fetchedRows, l);
+            assert.strictEqual(cursor.rowNum, 10);
+            assert.strictEqual(cursor.rowNum, l);
+            assert.strictEqual(cursor._fetchedRows, l);
             return cursor.close();
           });
         });
@@ -273,7 +269,7 @@ describe('Cursor', function() {
 
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
-      assert.equal(pool.acquired, 0);
+      assert.strictEqual(pool.acquired, 0);
     });
 
     it('should shutdown pool', function() {

@@ -41,10 +41,10 @@ describe('Pool', function() {
       }
     });
     assert.ok(pool);
-    assert.equal(pool.dialect, 'test');
-    assert.equal(pool.config.user, 'user');
-    assert.equal(pool.config.schema, 'schema');
-    assert.equal(pool.state, sqb.PoolState.IDLE);
+    assert.strictEqual(pool.dialect, 'test');
+    assert.strictEqual(pool.config.user, 'user');
+    assert.strictEqual(pool.config.schema, 'schema');
+    assert.strictEqual(pool.state, sqb.PoolState.IDLE);
   });
 
   it('should create a pool with default options', function() {
@@ -53,25 +53,25 @@ describe('Pool', function() {
       user: 'user'
     });
     assert.ok(pool2);
-    assert.equal(pool2.options.acquireMaxRetries, 0);
-    assert.equal(pool2.options.acquireRetryWait, 2000);
-    assert.equal(pool2.options.acquireTimeoutMillis, 0);
-    assert.equal(pool2.options.idleTimeoutMillis, 30000);
-    assert.equal(pool2.options.max, 10);
-    assert.equal(pool2.options.min, 0);
-    assert.equal(pool2.options.minIdle, 0);
-    assert.equal(pool2.options.maxQueue, 1000);
+    assert.strictEqual(pool2.options.acquireMaxRetries, 0);
+    assert.strictEqual(pool2.options.acquireRetryWait, 2000);
+    assert.strictEqual(pool2.options.acquireTimeoutMillis, 0);
+    assert.strictEqual(pool2.options.idleTimeoutMillis, 30000);
+    assert.strictEqual(pool2.options.max, 10);
+    assert.strictEqual(pool2.options.min, 0);
+    assert.strictEqual(pool2.options.minIdle, 0);
+    assert.strictEqual(pool2.options.maxQueue, 1000);
     assert(pool2.options.validation);
   });
 
   it('should toString/inspect returns formatted string', function() {
-    assert.equal(pool.inspect(), '[object Pool(test)]');
+    assert.strictEqual(pool.inspect(), '[object Pool(test)]');
   });
 
   it('should start pool', function(done) {
     pool.once('create', () => {
-      assert.equal(pool.size, 1);
-      assert.equal(pool.available, 1);
+      assert.strictEqual(pool.size, 1);
+      assert.strictEqual(pool.available, 1);
       done();
     });
     pool.start();
@@ -79,18 +79,18 @@ describe('Pool', function() {
 
   it('should create/release connection', function(done) {
     pool.acquire().then(conn => {
-      assert.equal(pool.size, 1);
-      assert.equal(pool.available, 0);
-      assert.equal(pool.pending, 0);
-      assert.equal(pool.acquired, 1);
+      assert.strictEqual(pool.size, 1);
+      assert.strictEqual(pool.available, 0);
+      assert.strictEqual(pool.pending, 0);
+      assert.strictEqual(pool.acquired, 1);
       assert(typeof conn.metaData, 'object');
 
       conn.once('close', () => {
         try {
-          assert.equal(pool.size, 1);
-          assert.equal(pool.available, 1);
-          assert.equal(pool.pending, 0);
-          assert.equal(pool.acquired, 0);
+          assert.strictEqual(pool.size, 1);
+          assert.strictEqual(pool.available, 1);
+          assert.strictEqual(pool.pending, 0);
+          assert.strictEqual(pool.acquired, 0);
           done();
         } catch (e) {
           done(e);
@@ -118,7 +118,7 @@ describe('Pool', function() {
         acquireTimeoutMillis: 1
       }
     });
-    pool2.acquire().then(conn => {
+    pool2.acquire().then(() => {
       pool2.acquire().then(() => done('Failed')).catch(() => {
         done();
         pool2.close(true);
@@ -134,7 +134,7 @@ describe('Pool', function() {
     pool.acquire = () => Promise.reject(new Error('Any error'));
     return pool.test()
         .then(() => assert(0, 'Failed'))
-        .catch(err => {
+        .catch(() => {
           delete pool.acquire;
         });
   });
@@ -164,7 +164,7 @@ describe('Pool', function() {
       fetchRows: 2
     }).then(result => {
       assert(result && result.rows);
-      assert.equal(result.rows.length, 2);
+      assert.strictEqual(result.rows.length, 2);
       assert(Array.isArray(result.rows[0]));
       assert(result.rows[0][0] === 'LFOI');
     });
@@ -176,7 +176,7 @@ describe('Pool', function() {
       fetchRows: 2
     }).then(result => {
       assert(result && result.rows);
-      assert.equal(result.rows.length, 2);
+      assert.strictEqual(result.rows.length, 2);
       assert(Array.isArray(result.rows[0]));
       assert(result.rows[0][0] === 'LFOI');
     });
@@ -187,7 +187,7 @@ describe('Pool', function() {
       fetchRows: 2
     }).then(result => {
       assert(result && result.rows);
-      assert.equal(result.rows.length, 2);
+      assert.strictEqual(result.rows.length, 2);
       assert(!Array.isArray(result.rows[0]));
       assert(result.rows[0].ID === 'LFOI');
     });
@@ -244,7 +244,7 @@ describe('Pool', function() {
     pool.config.defaults.showSql = true;
     pool.config.defaults.autoCommit = true;
     return pool.execute('select * from airports').then(result => {
-      assert.equal(result.options.autoCommit, true);
+      assert.strictEqual(result.options.autoCommit, true);
       pool.config.defaults.showSql = null;
     });
   });
@@ -259,10 +259,10 @@ describe('Pool', function() {
   it('should set defaults.ignoreNulls option', function() {
     pool.config.defaults.ignoreNulls = true;
     return pool.execute('select * from airports').then(result => {
-      assert.equal(result.rows[0].Catalog, undefined);
+      assert.strictEqual(result.rows[0].Catalog, undefined);
       pool.config.defaults.ignoreNulls = null;
       return pool.execute('select * from airports').then(result => {
-        assert.equal(result.rows[0].Catalog, null);
+        assert.strictEqual(result.rows[0].Catalog, null);
       });
     });
   });

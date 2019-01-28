@@ -10,12 +10,12 @@ describe('Serializer', function() {
   it('should register serialization extension', () => {
     sqb.use(require('./support/test_serializer'));
     assert(extensions.items);
-    assert.equal(extensions.items.length, 1);
+    assert.strictEqual(extensions.items.length, 1);
   });
 
   it('should register serialization extension', () => {
     sqb.use(require('./support/test_adapter'));
-    assert.equal(extensions.items.length, 2);
+    assert.strictEqual(extensions.items.length, 2);
     assert(extensions.stringify);
   });
 

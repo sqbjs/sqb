@@ -14,25 +14,25 @@ describe('serialize "TableName"', function() {
   it('should serialize (table)', function() {
     let query = sqb.select().from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1');
+    assert.strictEqual(result.sql, 'select * from table1');
   });
 
   it('should serialize (table alias)', function() {
     let query = sqb.select().from('table1 t1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1 t1');
+    assert.strictEqual(result.sql, 'select * from table1 t1');
   });
 
   it('should serialize (schema.table)', function() {
     let query = sqb.select().from('schema1.table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from schema1.table1');
+    assert.strictEqual(result.sql, 'select * from schema1.table1');
   });
 
   it('should serialize (schema.table alias)', function() {
     let query = sqb.select().from('schema1.table1 t1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from schema1.table1 t1');
+    assert.strictEqual(result.sql, 'select * from schema1.table1 t1');
   });
 
   it('should validate schema name', function() {

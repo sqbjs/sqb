@@ -28,7 +28,7 @@ describe('Query', () => {
           ok = 1;
         })
         .execute().then(() => {
-          assert.equal(ok, 1);
+          assert.strictEqual(ok, 1);
         });
   });
 
@@ -51,7 +51,7 @@ describe('Query', () => {
 
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
-      assert.equal(pool.acquired, 0);
+      assert.strictEqual(pool.acquired, 0);
     });
 
     it('should shutdown pool', function() {

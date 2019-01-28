@@ -41,14 +41,14 @@ describe('CursorStream', function() {
       let stream;
       stream = result.cursor.toStream();
       assert(stream);
-      assert.equal(String(stream), '[object CursorStream]');
+      assert.strictEqual(String(stream), '[object CursorStream]');
       readStream(stream, (err, buf) => {
         if (err)
           return done(err);
         try {
           const obj = JSON.parse(buf);
           assert(Array.isArray(obj));
-          assert.equal(obj.length, 10);
+          assert.strictEqual(obj.length, 10);
           assert(stream.isClosed);
         } catch (e) {
           return done(e);
@@ -63,7 +63,7 @@ describe('CursorStream', function() {
       let stream;
       stream = result.cursor.toStream({outFormat: 1});
       assert(stream);
-      assert.equal(String(stream), '[object CursorStream]');
+      assert.strictEqual(String(stream), '[object CursorStream]');
       readStream(stream, (err, buf) => {
         if (err)
           return done(err);
@@ -71,9 +71,9 @@ describe('CursorStream', function() {
           const obj = JSON.parse(buf);
           assert(!Array.isArray(obj));
           assert(obj.rows);
-          assert.equal(obj.numRows, 10);
-          assert.equal(obj.eof, true);
-          assert.equal(obj.rows.length, 10);
+          assert.strictEqual(obj.numRows, 10);
+          assert.strictEqual(obj.eof, true);
+          assert.strictEqual(obj.rows.length, 10);
           assert(stream.isClosed);
         } catch (e) {
           return done(e);
@@ -88,15 +88,15 @@ describe('CursorStream', function() {
       let stream;
       stream = result.cursor.toStream({objectMode: true});
       assert(stream);
-      assert.equal(String(stream), '[object CursorStream]');
+      assert.strictEqual(String(stream), '[object CursorStream]');
       const arr = [];
       stream.on('data', function(chunk) {
         arr.push(chunk);
       });
       stream.on('end', function() {
         try {
-          assert.equal(arr.length, 10);
-          assert.equal(arr[0].ID, 'LFOI');
+          assert.strictEqual(arr.length, 10);
+          assert.strictEqual(arr[0].ID, 'LFOI');
         } catch (e) {
           return done(e);
         }
@@ -135,7 +135,7 @@ describe('CursorStream', function() {
 
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
-      assert.equal(pool.acquired, 0);
+      assert.strictEqual(pool.acquired, 0);
     });
 
     it('should shutdown pool', function() {

@@ -20,13 +20,13 @@ describe('serialize "SelectQuery"', function() {
   it('should serialize * for when no columns given', function() {
     let query = sqb.select('*').columns().from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1');
+    assert.strictEqual(result.sql, 'select * from table1');
   });
 
   it('should serialize when no tables given', function() {
     let query = sqb.select();
     let result = query.generate(options);
-    assert.equal(result.sql, 'select *');
+    assert.strictEqual(result.sql, 'select *');
   });
 
   it('should serialize simple query', function() {
@@ -37,7 +37,7 @@ describe('serialize "SelectQuery"', function() {
     let result = query.generate({
       prettyPrint: true
     });
-    assert.equal(result.sql, 'select\n' +
+    assert.strictEqual(result.sql, 'select\n' +
         '  field1, field2, field3, field4, field5, field6, field7, field8,\n' +
         '  field9, field10, field11, field12, field13, field14, field15,\n' +
         '  field16\n' +
@@ -49,7 +49,7 @@ describe('serialize "SelectQuery"', function() {
         'field4', ['field5', 'field6', 'field7', 'field8', 'field9'],
         'field10').from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select field1, field2, field3, field4, field5, ' +
+    assert.strictEqual(result.sql, 'select field1, field2, field3, field4, field5, ' +
         'field6, field7, field8, field9, field10 from table1');
   });
 
@@ -60,27 +60,27 @@ describe('serialize "SelectQuery"', function() {
         .groupBy('')
         .orderBy('');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select field1 from schema1.table1 t1');
+    assert.strictEqual(result.sql, 'select field1 from schema1.table1 t1');
   });
 
   it('should serialize raw in columns', function() {
     let query = sqb.select(sqb.raw('\'John\'\'s Bike\' f1'))
         .from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
+    assert.strictEqual(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
   });
 
   it('should serialize sub-select in columns', function() {
     let query = sqb.select(sqb.select('id').from('table2').as('id2'))
         .from('table1');
     let result = query.generate(options);
-    assert.equal(result.sql, 'select (select id from table2) id2 from table1');
+    assert.strictEqual(result.sql, 'select (select id from table2) id2 from table1');
   });
 
   it('should serialize raw in "from" part', function() {
     let query = sqb.select().from('table1', sqb.raw('func1()'));
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1,func1()');
+    assert.strictEqual(result.sql, 'select * from table1,func1()');
   });
 
   it('should serialize sub-select in "from"', function() {
@@ -89,7 +89,7 @@ describe('serialize "SelectQuery"', function() {
             'field4', 'field5', 'field6', 'field7', 'field8').from('table1')
             .as('t1'));
     let result = query.generate(options);
-    assert.equal(result.sql,
+    assert.strictEqual(result.sql,
         'select * from ' +
         '(select field1, field2, field3, field4, field5, field6, field7, field8 ' +
         'from table1) t1');
@@ -100,7 +100,7 @@ describe('serialize "SelectQuery"', function() {
         .from('table1')
         .orderBy(sqb.raw('field1'));
     let result = query.generate(options);
-    assert.equal(result.sql, 'select * from table1 order by field1');
+    assert.strictEqual(result.sql, 'select * from table1 order by field1');
   });
 
   it('should pretty print - test1', function() {
@@ -109,7 +109,7 @@ describe('serialize "SelectQuery"', function() {
             'field4', 'field5', 'field6', 'field7', 'field8').from('table1')
             .as('t1'));
     let result = query.generate();
-    assert.equal(result.sql,
+    assert.strictEqual(result.sql,
         'select * from\n' +
         '  (select field1, field2, field3, field4, field5, field6, field7, field8\n' +
         '  from table1) t1');
@@ -125,7 +125,7 @@ describe('serialize "SelectQuery"', function() {
         )
         .groupBy('field1', 'field2', sqb.raw('field3'));
     let result = query.generate();
-    assert.equal(result.sql, 'select * from table1\n' +
+    assert.strictEqual(result.sql, 'select * from table1\n' +
         'where ID = 1 and name = \'value of the field should be too long\' and\n' +
         '  ID = 1 and ID = 12345678\n' +
         'group by field1, field2, field3');
@@ -133,12 +133,12 @@ describe('serialize "SelectQuery"', function() {
 
   it('should assign limit ', function() {
     let query = sqb.select().from('table1').limit(5);
-    assert.equal(query._limit, 5);
+    assert.strictEqual(query._limit, 5);
   });
 
   it('should assign offset ', function() {
     let query = sqb.select().from('table1').offset(5);
-    assert.equal(query._offset, 5);
+    assert.strictEqual(query._offset, 5);
   });
 
   it('should pass only Join instance to join() function', function() {
