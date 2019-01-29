@@ -63,7 +63,7 @@ fillTable('airports');
  * @constructor
  */
 class TestConnection {
-  constructor(cfg) {
+  constructor() {
     this.sessionId = ++sessionId;
   }
 
@@ -120,7 +120,7 @@ class TestConnection {
     if (sql.substring(0, 6) === 'update') {
       if (sql.includes('returning'))
         return Promise.resolve({returns: {ID: 1}});
-      return Promise.resolve({});
+      return Promise.resolve({rowsAffected: 1});
     }
     if (sql.substring(0, 6) === 'delete')
       return Promise.resolve({});
