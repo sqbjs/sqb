@@ -629,6 +629,15 @@ describe('serialize "Operators"', function() {
       assert.strictEqual(result.sql, 'select * from table1 where a in (1) and b in (1,2)');
     });
 
+    it('should throw if value list is empty', function() {
+      let query = sqb.select()
+          .from('table1')
+          .where(Op.or(Op.in('id', [])));
+      assert.throws(() => {
+        query.generate(options);
+      }, /"in" operator does not allow empty list/);
+    });
+
   });
 
   /*
@@ -648,14 +657,6 @@ describe('serialize "Operators"', function() {
       let result = query.generate(options);
       assert.strictEqual(result.sql, 'select * from table1 where (id not in (1)' +
           ' or id not in (4,5,6))');
-    });
-
-    it('should ignore if value array is empty', function() {
-      let query = sqb.select()
-          .from('table1')
-          .where(Op.or(Op.notIn('id', 1), Op.notIn('id', [])));
-      let result = query.generate(options);
-      assert.strictEqual(result.sql, 'select * from table1 where (id not in (1))');
     });
 
     it('should serialize params', function() {

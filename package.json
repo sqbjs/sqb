@@ -24,7 +24,7 @@
   "dependencies": {
     "debug": "^4.1.1",
     "doublylinked": "^2.0.1",
-    "errorex": "^2.3.0",
+    "errorex": "^2.3.1",
     "lightning-pool": "^2.0.10",
     "putil-flattentext": "^2.0.0",
     "putil-isplainobject": "^1.0.1",
@@ -38,7 +38,7 @@
     "eslint": "^5.16.0",
     "eslint-config-google": "^0.12.0",
     "mocha": "^6.1.4",
-    "nyc": "^14.0.0"
+    "nyc": "^14.1.0"
   },
   "engines": {
     "node": ">=6.0"
