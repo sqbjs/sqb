@@ -24,7 +24,7 @@
   "dependencies": {
     "debug": "^4.1.1",
     "doublylinked": "^2.0.1",
-    "errorex": "^2.3.1",
+    "errorex": "^2.3.2",
     "lightning-pool": "^2.0.10",
     "putil-flattentext": "^2.0.0",
     "putil-isplainobject": "^1.0.1",
