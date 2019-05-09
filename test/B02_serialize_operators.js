@@ -771,6 +771,38 @@ describe('serialize "Operators"', function() {
   });
 
   /*
+ *
+ */
+  describe('notExists operator', function() {
+    const q = sqb.select().from('table2');
+
+    it('should initialize', function() {
+      const op = Op.notExists(q);
+      assert(op instanceof sqb.Operator);
+      assert.strictEqual(op.operatorType, 'notExists');
+    });
+
+    it('should serialize', function() {
+      let query = sqb.select()
+          .from('table1')
+          .where(Op.notExists(q));
+      let result = query.generate(options);
+      assert.strictEqual(result.sql, 'select * from table1 where ' +
+          'not exists (select * from table2)');
+    });
+
+    it('should wrap native objects to operators', function() {
+      let query = sqb.select()
+          .from('table1')
+          .where({'!exists': q});
+      let result = query.generate(options);
+      assert.strictEqual(result.sql, 'select * from table1 where ' +
+          'not exists (select * from table2)');
+    });
+
+  });
+
+  /*
    *
    */
   describe('common', function() {
