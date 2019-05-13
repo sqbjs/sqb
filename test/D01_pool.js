@@ -267,6 +267,17 @@ describe('Pool', function() {
     });
   });
 
+  it('should emit `execute` event', function() {
+    let i = 0;
+    const fn = () => {
+      i++;
+    };
+    pool.once('execute', fn);
+    return pool.execute('select * from airports').then(() => {
+      assert.strictEqual(i, 1);
+    });
+  });
+
   it('shutdown pool', function() {
     return pool.close().then(() => {
       if (!pool.isClosed)

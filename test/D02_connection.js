@@ -264,6 +264,19 @@ describe('Connection', function() {
     return pool.acquire(conn => conn.test());
   });
 
+  it('should emit `execute` event', function() {
+    let i = 0;
+    const fn = () => {
+      i++;
+    };
+    return pool.acquire(conn => {
+      conn.once('execute', fn);
+      return conn.execute('select * from airports');
+    }).then(() => {
+      assert.strictEqual(i, 1);
+    });
+  });
+
   describe('Finalize', function() {
     it('should have no active connection after all tests', function() {
       assert.strictEqual(pool.acquired, 0);
