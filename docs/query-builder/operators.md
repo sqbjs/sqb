@@ -5,8 +5,6 @@ SQB provides two ways (Op functions, native js objects) for defining conditional
 
 ## Index
 
-#### A. Op. functions
-
 SQB module exposes Op object that contains operator functions. This functions allows defining conditional expressions.
 
 - [Op.and()](#opand): And logical operator
@@ -25,15 +23,12 @@ SQB module exposes Op object that contains operator functions. This functions al
 - [Op.notLike()](#opnotlike): `not like` comparison operator
 - [Op.ilike()](#oplike): `ilike` comparison operator
 - [Op.notILike()](#opnotilike): `not ilike` comparison operator
+- [Op.exists()](#opexists): `not ilike` exists operator
 
-
-#### B. Native JS objects
-
-- [Using native JS objects](#usingnativejsobjects)
 
 <hr/>
 
-## A. Op. functions
+## Operators
 
 ### Op.and()
 
@@ -42,8 +37,18 @@ SQB module exposes Op object that contains operator functions. This functions al
 Creates an `and` logical operator
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.and(Op.eq('name', 'John'), Op.gte('age', 16)));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({and: {name: 'John', 'age >': 16}});
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -58,12 +63,29 @@ where (name = 'John' and age >= 16)
 Creates an `or` logical operator
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
-    .where(Op.or(Op.eq('name', 'John'), Op.gte('age', 16)));
+    .where(Op.or(
+        Op.eq('name', 'John'), 
+        Op.gte('age', 16)
+        ));
+console.log(query.generate().sql);
 ```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({or: {
+      name: 'John', 
+      'age >': 16
+    }});
+console.log(query.generate().sql);
+```
+
 ```sql
 select * from customer
-where (name = 'John' or age >= 16)
+where (name = 'John' or age > 16)
 ```
 
 ## Comparison Operators
@@ -75,12 +97,28 @@ where (name = 'John' or age >= 16)
 Creates an `equal (=)` comparison operator
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
-    .where(Op.eq('age', 16));
+    .where(
+        Op.eq('name', 'John'), 
+        Op.eq('age', 16)
+        );
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({
+    name: 'John', 
+    'age =': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
-where age = 16
+where name = 'John' and age = 16
 ```
 
 
@@ -91,8 +129,20 @@ Creates an `not equal (!=)` comparison operator
 `Op.ne(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.ne('age', 16));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+    'age !=': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -106,8 +156,20 @@ Creates an `greater than (>)` comparison operator
 `Op.gt(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.gt('age', 16));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+    'age >': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -121,8 +183,20 @@ Creates an `greater than or equal to (>=)` comparison operator
 `Op.gte(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.gte('age', 16));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+    'age >=': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -133,11 +207,23 @@ where age >= 16
 
 Creates an `lower than (>)` comparison operator
 
-`Op.gt(expression, value)`
+`Op.lt(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.lt('age', 16));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+    'age <': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -148,11 +234,23 @@ where age < 16
 
 Creates an `lower than or equal to (<=)` comparison operator
 
-`Op.gte(expression, value)`
+`Op.lte(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.lte('age', 16));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+    'age <=': 16
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -163,30 +261,61 @@ where age <= 16
 
 Creates an `between` comparison operator
 
-`Op.gte(expression, first, second)`
+`Op.between(expression, first, second)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
-    .where(Op.between('age', 16, 28));
+    .where(Op.or(
+        Op.between('age', 18, 22),
+        Op.between('age', 30, 32)
+        ));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({or: {     
+      'age between': [18,22],
+      'age btw': [30,32],
+    }});
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
-where age between 16 and 28
+where (age between 18 and 22 or age between 30 and 32)
 ```
 
 ### Op.notBetween()
 
 Creates an `not between` comparison operator
 
-`Op.gte(expression, first, second)`
-
+`Op.notBetween(expression, first, second)`
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
-    .where(Op.notBetween('age', 16, 28));
+    .where(Op.or(
+        Op.notBetween('age', 18, 22),
+        Op.notBetween('age', 30, 32)
+        ));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({or: {     
+      'age !between': [18,22],
+      'age !btw': [30,32],
+    }});
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
-where age not between 16 and 28
+where (age not between 18 and 22 or age not between 30 and 32)
 ```
 
 ### Op.is()
@@ -196,9 +325,22 @@ Creates an `is` comparison operator
 `Op.is(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.is('gender', null));
+console.log(query.generate().sql);
 ```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'gender is': null
+    });
+console.log(query.generate().sql);
+```
+
 ```sql
 select * from customer
 where gender is null
@@ -208,12 +350,25 @@ where gender is null
 
 Creates an `is not` comparison operator
 
-`Op.is(expression, value)`
+`Op.not(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.not('gender', null));
+console.log(query.generate().sql);
 ```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'gender !is': null
+    });
+console.log(query.generate().sql);
+```
+
 ```sql
 select * from customer
 where gender is not null
@@ -223,11 +378,23 @@ where gender is not null
 
 Creates an `like` comparison operator
 
-`Op.gte(expression, value)`
+`Op.like(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.like('name', '%John%'));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'name like': '%John%'
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -238,11 +405,23 @@ where name like '%John%'
 
 Creates an `not like` comparison operator
 
-`Op.gte(expression, value)`
+`Op.notLike(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.notLike('name', '%John%'));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'name !like': '%John%'
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
@@ -253,12 +432,25 @@ where name not like '%John%'
 
 Creates an `ilike` comparison operator
 
-`Op.gte(expression, value)`
+`Op.iLike(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.ilike('name', '%John%'));
+console.log(query.generate().sql);
 ```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'name ilike': '%John%'
+    });
+console.log(query.generate().sql);
+```
+
 ```sql
 select * from customer
 where name ilike '%John%'
@@ -268,49 +460,103 @@ where name ilike '%John%'
 
 Creates an `not ilike` comparison operator
 
-`Op.gte(expression, value)`
+`Op.notILike(expression, value)`
 
 ```js
+const sqb = require('sqb');
+const Op = sqb.Op;
 const query = sqb.select().from('customer')
     .where(Op.notILike('name', '%John%'));
+console.log(query.generate().sql);
+```
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer')
+    .where({     
+      'name !ilike': '%John%'
+    });
+console.log(query.generate().sql);
 ```
 ```sql
 select * from customer
 where name not ilike '%John%'
 ```
 
-### B. Native JS objects
 
-Alternatively SQB supports defining conditional expressions using native JS objects.
+### Op.exists()
 
-#### Using native JS objects
+Creates an `exists` operator
 
-##### Example-1
+`Op.exists(SelectQuery)`
+
 ```js
-const query = sqb.select().from('customer')
-    .where({name: 'John'});
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer c')
+    .where(Op.exists(
+        sqb.select().from('customer_accounts a')
+        .where(
+            Op.eq('a.customer_id', sqb.raw('c.id')),
+            Op.gt('a.balance', 0)
+            )
+        )
+    );
+console.log(query.generate().sql);
 ```
-```sql
-select * from customer
-where name = 'John'
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer c')
+    .where({exists:
+              sqb.select().from('customer_accounts a')
+                  .where(
+                      Op.eq('a.customer_id', sqb.raw('c.id')),
+                      Op.gt('a.balance', 0)
+                  )
+        }
+    );
+console.log(query.generate().sql);
 ```
 
-##### Example-2
+### Op.notExists()
+
+Creates an `exists` operator
+
+`Op.notExists(SelectQuery)`
+
 ```js
-const query = sqb.select().from('customer')
-    .where({'name like': '%John%', 'age>=': 18});
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer c')
+    .where(Op.notExists(
+        sqb.select().from('customer_accounts a')
+        .where(
+            Op.eq('a.customer_id', sqb.raw('c.id')),
+            Op.gt('a.balance', 0)
+            )
+        )
+    );
+console.log(query.generate().sql);
 ```
-```sql
-select * from customer
-where name like '%John%' and age >= 18
+```js
+const sqb = require('sqb');
+const Op = sqb.Op;
+const query = sqb.select().from('customer c')
+    .where({'!exists':
+              sqb.select().from('customer_accounts a')
+                  .where(
+                      Op.eq('a.customer_id', sqb.raw('c.id')),
+                      Op.gt('a.balance', 0)
+                  )
+        }
+    );
+console.log(query.generate().sql);
 ```
 
-##### Example-3
-```js
-const query = sqb.select().from('customer')
-    .where({'name !like': '%John%', 'age in': [18,19,20]});
-```
 ```sql
-select * from customer
-where name not like '%John%' and age in (18,19,20)
+select * from customer c
+where not exists (select * from customer_accounts a
+  where a.customer_id = c.id and a.balance > 0)
 ```
+
