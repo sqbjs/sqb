@@ -15,7 +15,7 @@
         - [Raw Class](query-builder/sql-object/Raw)
         - [Join Class](query-builder/sql-object/Join)
         - [Case Class](query-builder/sql-object/Case)
-    - [SQL Conditions](query-builder/conditions)
+    - [SQL Operators](query-builder/operators.md)
 
 - Connection wrapper
 
