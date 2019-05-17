@@ -23,7 +23,8 @@ SQB module exposes Op object that contains operator functions. This functions al
 - [Op.notLike()](#opnotlike): `not like` comparison operator
 - [Op.ilike()](#oplike): `ilike` comparison operator
 - [Op.notILike()](#opnotilike): `not ilike` comparison operator
-- [Op.exists()](#opexists): `not ilike` exists operator
+- [Op.exists()](#opexists): `exists` operator
+- [Op.notExists()](#opnotexists): `not exists` operator
 
 
 <hr/>
