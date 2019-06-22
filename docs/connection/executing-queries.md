@@ -13,7 +13,7 @@ This method executes the Query.
   - `values` (Array|Object) : Array of values or object that contains param/value pairs.
   - `autoCommit` (Boolean=false) : If this property is true, the transaction committed at the end of query execution.
   - `cursor` (Boolean=false) : If this property is true, query returns a `Cursor` object that works in unidirectional "cursor" mode. **Important!** `Cursor` keeps connection open until `cursor.close()` method is called.
-  - `fetchAsString` (Array`<Class>`) : This property is an array of Classes, determines which value types will represent as string. The valid classes are Date and Number.
+  - `coercion` Function) : Function for converting data before returning response.
   - `fetchRows` (Number) : In "cursor" mode; it provides an initial suggested number of rows to prefetch. Prefetching is a tuning option to maximize data transfer efficiency and minimize round-trips to the database.
 In regular mode; it provides the maximum number of rows that are fetched from Connection instance.
   - `ignoreNulls` (Boolean=false) : Determines whether object rows contains NULL fields.

@@ -200,23 +200,12 @@ describe('Connection', function() {
         });
   });
 
-  it('should set types that will fetched as string - fetchAsString option - 1', function() {
+  it('should coerce data with custom function', function() {
     return pool.select().from('airports')
         .execute({
           fetchRows: 1,
           objectRows: true,
-          fetchAsString: Number
-        }).then(result => {
-          assert.strictEqual(typeof result.rows[0].Flags, 'string');
-        });
-  });
-
-  it('should set types that will fetched as string - fetchAsString option - 2', function() {
-    return pool.select().from('airports')
-        .execute({
-          fetchRows: 1,
-          objectRows: true,
-          fetchAsString: [Number]
+          coercion: (k, d) => (typeof d === 'number') ? String(d) : d
         }).then(result => {
           assert.strictEqual(typeof result.rows[0].Flags, 'string');
         });
