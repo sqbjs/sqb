@@ -18,15 +18,15 @@ describe('Serialize delete query', function() {
   });
 
   it('should serialize delete', function() {
-    let query = sqb.delete('table1')
+    const query = sqb.delete('table1')
         .where(Op.eq('id', 1));
-    let result = query.generate(options);
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'delete from table1 where id = 1');
   });
 
   it('should pass raw as table name', function() {
-    let query = sqb.delete(sqb.raw('table1'));
-    let result = query.generate(options);
+    const query = sqb.delete(sqb.raw('table1'));
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'delete from table1');
   });
 

@@ -12,26 +12,26 @@ describe('serialize "TableName"', function() {
   };
 
   it('should serialize (table)', function() {
-    let query = sqb.select().from('table1');
-    let result = query.generate(options);
+    const query = sqb.select().from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select * from table1');
   });
 
   it('should serialize (table alias)', function() {
-    let query = sqb.select().from('table1 t1');
-    let result = query.generate(options);
+    const query = sqb.select().from('table1 t1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select * from table1 t1');
   });
 
   it('should serialize (schema.table)', function() {
-    let query = sqb.select().from('schema1.table1');
-    let result = query.generate(options);
+    const query = sqb.select().from('schema1.table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select * from schema1.table1');
   });
 
   it('should serialize (schema.table alias)', function() {
-    let query = sqb.select().from('schema1.table1 t1');
-    let result = query.generate(options);
+    const query = sqb.select().from('schema1.table1 t1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select * from schema1.table1 t1');
   });
 
