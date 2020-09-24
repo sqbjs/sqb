@@ -5,7 +5,7 @@ const assert = require('assert');
 const sqb = require('../');
 const extensions = require('../lib/extensions');
 
-describe('Serializer', function() {
+describe('Plugin Registry', function() {
 
   it('should register serialization extension', () => {
     sqb.use(require('./support/test_serializer'));

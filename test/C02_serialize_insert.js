@@ -17,20 +17,20 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize insert', function() {
-    let query = sqb.insert('table1', {id: 1, name: 'aaa'});
-    let result = query.generate(options);
+    const query = sqb.insert('table1', {id: 1, name: 'aaa'});
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
   it('should serialize insert.into', function() {
-    let query = sqb.insert('table1', {id: 1, name: 'aaa'});
-    let result = query.generate(options);
+    const query = sqb.insert('table1', {id: 1, name: 'aaa'});
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
   it('should pass raw as table name', function() {
-    let query = sqb.insert(sqb.raw('table1'), {id: 1, name: 'aaa'});
-    let result = query.generate(options);
+    const query = sqb.insert(sqb.raw('table1'), {id: 1, name: 'aaa'});
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\')');
   });
 
@@ -57,8 +57,8 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize params with "values" argument: COLON', function() {
-    let query = sqb.insert('table1', {id: /id/, name: /name/});
-    let result = query.generate(Object.assign({
+    const query = sqb.insert('table1', {id: /id/, name: /name/});
+    const result = query.generate(Object.assign({
       paramType: sqb.ParamType.COLON,
       values: {
         id: 1,
@@ -73,8 +73,8 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize params with "values" argument: QUESTION_MARK', function() {
-    let query = sqb.insert('table1', {id: /id/, name: /name/});
-    let result = query.generate(Object.assign({
+    const query = sqb.insert('table1', {id: /id/, name: /name/});
+    const result = query.generate(Object.assign({
       paramType: sqb.ParamType.QUESTION_MARK,
       values: {
         id: 1,
@@ -86,8 +86,8 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize params with "values" argument: DOLLAR', function() {
-    let query = sqb.insert('table1', {id: /id/, name: /name/});
-    let result = query.generate(Object.assign({
+    const query = sqb.insert('table1', {id: /id/, name: /name/});
+    const result = query.generate(Object.assign({
       paramType: sqb.ParamType.DOLLAR,
       values: {
         id: 1,
@@ -99,8 +99,8 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize params with "values" argument: AT', function() {
-    let query = sqb.insert('table1', {id: /id/, name: /name/});
-    let result = query.generate(Object.assign({
+    const query = sqb.insert('table1', {id: /id/, name: /name/});
+    const result = query.generate(Object.assign({
       paramType: sqb.ParamType.AT,
       values: {
         id: 1,
@@ -115,12 +115,12 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize params with query.params', function() {
-    let query = sqb.insert('table1', {id: /id/, name: /name/})
+    const query = sqb.insert('table1', {id: /id/, name: /name/})
         .values({
           id: 1,
           name: 'abc'
         });
-    let result = query.generate(options);
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
     assert.deepStrictEqual(result.values, {
       id: 1,
@@ -139,16 +139,16 @@ describe('Serialize insert query', function() {
   });
 
   it('should serialize insert/select query', function() {
-    let query = sqb.insert('table1',
+    const query = sqb.insert('table1',
         sqb.select('id', 'the_name name').from('table2'));
-    let result = query.generate(options);
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (select id, the_name name from table2)');
   });
 
   it('should serialize insert with returning', function() {
-    let query = sqb.insert('table1', {id: 1, name: 'aaa'})
+    const query = sqb.insert('table1', {id: 1, name: 'aaa'})
         .returning({'sch1.tbl1.id': 'number', 'update u1': 'string'});
-    let result = query.generate(options);
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\') returning sch1.tbl1.id, "update" u1');
   });
 

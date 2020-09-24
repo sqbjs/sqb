@@ -12,50 +12,50 @@ describe('serialize "SelectColumn"', function() {
   };
 
   it('should serialize (field)', function() {
-    let query = sqb.select('field1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('field1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select field1 from table1');
   });
 
   it('should serialize (field alias)', function() {
-    let query = sqb.select('field1 f1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('field1 f1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select field1 f1 from table1');
   });
 
   it('should serialize (table.field)', function() {
-    let query = sqb.select('table1.field1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('table1.field1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select table1.field1 from table1');
   });
 
   it('should serialize (table.field alias)', function() {
-    let query = sqb.select('table1.field1 f1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('table1.field1 f1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select table1.field1 f1 from table1');
   });
 
   it('should serialize (schema.table.field)', function() {
-    let query = sqb.select('schema1.table1.field1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('schema1.table1.field1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select schema1.table1.field1 from table1');
   });
 
   it('should serialize (schema.table.field alias)', function() {
-    let query = sqb.select('schema1.table1.field1 f1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('schema1.table1.field1 f1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select schema1.table1.field1 f1 from table1');
   });
 
   it('should table and column start with "_" character', function() {
-    let query = sqb.select('_table1._field1 _f1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('_table1._field1 _f1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select _table1._field1 _f1 from table1');
   });
 
   it('should "$" character can be used for table and column names', function() {
-    let query = sqb.select('table1$.field1$ f1$').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('table1$.field1$ f1$').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select table1$.field1$ f1$ from table1');
   });
 
@@ -87,14 +87,14 @@ describe('serialize "SelectColumn"', function() {
   });
 
   it('should not print alias if field is *', function() {
-    let query = sqb.select('schema1.table1.* f1').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('schema1.table1.* f1').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select schema1.table1.* from table1');
   });
 
   it('should place into double quote if field name is reserved', function() {
-    let query = sqb.select('with').from('table1');
-    let result = query.generate(options);
+    const query = sqb.select('with').from('table1');
+    const result = query.generate(options);
     assert.strictEqual(result.sql, 'select "with" from table1');
   });
 
