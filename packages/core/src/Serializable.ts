@@ -1,5 +1,6 @@
-import {SerializeContext} from './interfaces';
+import {SerializeContext} from './types';
 import {ParamType, SerializationType} from './enums';
+import {Extension} from './Extension';
 
 export const ReservedWords = [
     'schema', 'table', 'field', 'index', 'foreign', 'key',
@@ -30,13 +31,19 @@ export function serializeFallback(ctx: SerializeContext, type: string, o: any,
                                   defFn: (_ctx: SerializeContext, _o: any) => string): string {
     if (ctx.serializeHooks) {
         for (const hook of ctx.serializeHooks) {
-            const x = hook(ctx, type, o, defFn);
-            if (x)
-                return x;
+            const s = hook(ctx, type, o, defFn);
+            if (s != null)
+                return s;
         }
     }
-    return (ctx.plugin && ctx.plugin.serialize &&
-        ctx.plugin.serialize(ctx, type, o, defFn)) || defFn(ctx, o);
+    for (const ext of Extension.serializers) {
+        if (ext.dialect === ctx.dialect && ext.serialize) {
+            const s = ext.serialize(ctx, type, o, defFn);
+            if (s != null)
+                return s;
+        }
+    }
+    return defFn(ctx, o);
 }
 
 /**
@@ -108,21 +115,20 @@ export function serializeDateValue(date: Date): string {
  */
 export function serializeParam(ctx: SerializeContext, name: string): string {
     const prmValue = ctx.values && ctx.values[name];
-    ctx.prmValue = prmValue == null ? null : prmValue;
     switch (ctx.paramType) {
         case ParamType.COLON:
         case ParamType.AT:
         case undefined: {
             const symb = ctx.paramType === ParamType.COLON ? ':' : '@';
-            ctx.query.values[name] = ctx.prmValue;
+            ctx.query.values[name] = prmValue;
             return symb + name;
         }
         case ParamType.DOLLAR: {
-            ctx.query.values.push(ctx.prmValue);
+            ctx.query.values.push(prmValue);
             return '$' + (ctx.query.values.length);
         }
         case ParamType.QUESTION_MARK: {
-            ctx.query.values.push(ctx.prmValue);
+            ctx.query.values.push(prmValue);
             return '?';
         }
     }
@@ -157,6 +163,15 @@ export function printArray(arr: string[], sep?: string, lfLen?: number): string 
  * Check if a string value is a reserved word
  */
 export function isReservedWord(ctx: SerializeContext, s: string): boolean {
-    return s && ReservedWords.includes(s.toLowerCase()) ||
-        !!(ctx.plugin?.isReserved && ctx.plugin.isReserved(ctx, s));
+    if (!s)
+        return false;
+    if (ReservedWords.includes(s.toLowerCase()))
+        return true;
+    for (const ext of Extension.serializers) {
+        if (ext.dialect === ctx.dialect && ext.isReservedWord) {
+            if (ext.isReservedWord(ctx, s))
+                return true;
+        }
+    }
+    return false;
 }

@@ -5,10 +5,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
+    "strict": false,
     "noEmit": true,
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
+      "@sqb/connect": ["../src"],
       "@sqb/core": ["../../core/src"]
     }
   }

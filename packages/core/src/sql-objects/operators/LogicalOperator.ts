@@ -3,7 +3,7 @@ import isPlainObject from 'putil-isplainobject';
 import {RawStatement} from '../RawStatement';
 import {SerializationType} from '../../enums';
 import {printArray, Serializable, serializeFallback} from '../../Serializable';
-import {SerializeContext} from '../../interfaces';
+import {SerializeContext} from '../../types';
 
 export const WrapOps = {};
 

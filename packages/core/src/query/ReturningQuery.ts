@@ -1,5 +1,5 @@
 import {Query} from './Query';
-import {ReturningData, SerializeContext} from '../interfaces';
+import {ReturningData, SerializeContext} from '../types';
 import {isReservedWord, printArray, serializeFallback} from '../Serializable';
 
 const RETURNING_COLUMN_PATTERN = /^((?:[a-zA-Z]\w*\.){0,2}) *([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;

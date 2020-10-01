@@ -10,7 +10,7 @@ import {GroupColumn} from '../sql-objects/GroupColumn';
 import {OrderColumn} from '../sql-objects/OrderColumn';
 import {printArray, Serializable, serializeFallback} from '../Serializable';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 
 export class SelectQuery extends Query {
 
@@ -130,6 +130,16 @@ export class SelectQuery extends Query {
      */
     offset(offset: number): this {
         this._offset = coerceToInt(offset);
+        return this;
+    }
+
+    onFetch(listener: (...args: any[]) => void): this {
+        this.on('fetch', listener);
+        return this;
+    }
+
+    onceFetch(listener: (...args: any[]) => void): this {
+        this.once('fetch', listener);
         return this;
     }
 

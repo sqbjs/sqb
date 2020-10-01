@@ -1,0 +1,31 @@
+import {FieldInfo} from './types';
+
+export class FieldInfoMap {
+    private _obj: Record<string, FieldInfo> = {};
+    private _arr: FieldInfo[] = [];
+
+    add(field: FieldInfo) {
+        const idx = field.index != null ? field.index: this._arr.length;
+        this._arr[idx] = field;
+        field.index = idx;
+        this._obj = this._arr.reduce((a, f) => {
+            a[f.name] = f;
+            return a;
+        }, {});
+    }
+
+    get(k: string | number): FieldInfo {
+        if (typeof k === 'number')
+            return this._arr[k];
+        return this._obj[k];
+    }
+
+    keys(): string[] {
+        return Object.keys(this._obj);
+    }
+
+    values(): FieldInfo[] {
+        return [...this._arr];
+    }
+
+}

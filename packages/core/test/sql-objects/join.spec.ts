@@ -95,7 +95,7 @@ describe('serialize "Join"', function () {
                     .from('table2')
                     .as('t2')
             ));
-        const result = query.generate();
+        const result = query.generate({prettyPrint: true});
         assert.strictEqual(result.sql, 'select * from table1 t1\n' +
             'inner join (\n' +
             '  select field1, field2, field3, field4, field5 from table2\n' +

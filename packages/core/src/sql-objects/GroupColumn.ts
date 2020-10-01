@@ -1,7 +1,7 @@
 import {isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {Column} from './Column';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 
 const GROUP_COLUMN_PATTERN = /^((?:[a-zA-Z][\w$]*\.){0,2})([\w$]*)$/;
 

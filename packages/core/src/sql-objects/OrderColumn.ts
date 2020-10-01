@@ -1,7 +1,7 @@
 import {isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {Column} from './Column';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 
 const ORDER_COLUMN_PATTERN = /^([-+])?((?:[a-zA-Z][\w$]*\.){0,2})([a-zA-Z][\w$]*|\*) *(asc|dsc|desc|ascending|descending)?$/i;
 

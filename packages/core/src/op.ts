@@ -115,7 +115,7 @@ function NotExists(expression: SelectQuery) {
     return new OpNotExists(expression);
 }
 
-const Op = {
+const op = {
     and: And,
     or: Or,
     eq: Eq,
@@ -156,9 +156,9 @@ const Op = {
     '!exists': NotExists
 }
 
-Object.assign(WrapOps, Op);
+Object.assign(WrapOps, op);
 
-export {Op};
+export {op};
 
 export {
     And,

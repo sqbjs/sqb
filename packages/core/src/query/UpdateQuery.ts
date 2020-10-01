@@ -4,7 +4,7 @@ import {RawStatement} from '../sql-objects/RawStatement';
 import {TableName} from '../sql-objects/TableName';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 import {printArray, serializeFallback, serializeObject} from '../Serializable';
 
 export class UpdateQuery extends ReturningQuery {

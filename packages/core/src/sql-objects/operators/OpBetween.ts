@@ -1,7 +1,7 @@
 import {CompOperator} from './CompOperator';
 import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
 import {OperatorType} from '../../enums';
-import {SerializeContext} from '../../interfaces';
+import {SerializeContext} from '../../types';
 
 export class OpBetween extends CompOperator {
 

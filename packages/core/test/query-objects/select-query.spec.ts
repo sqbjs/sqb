@@ -105,7 +105,7 @@ describe('serialize "SelectQuery"', function () {
             .from(Select('field1', 'field2', 'field3',
                 'field4', 'field5', 'field6', 'field7', 'field8').from('table1')
                 .as('t1'));
-        const result = query.generate();
+        const result = query.generate({prettyPrint: true});
         assert.strictEqual(result.sql,
             'select * from\n' +
             '  (select field1, field2, field3, field4, field5, field6, field7, field8\n' +
@@ -121,7 +121,7 @@ describe('serialize "SelectQuery"', function () {
                 Eq('ID', 1), Eq('ID', 12345678)
             )
             .groupBy('field1', 'field2', Raw('field3'));
-        const result = query.generate();
+        const result = query.generate({prettyPrint: true});
         assert.strictEqual(result.sql, 'select * from table1\n' +
             'where ID = 1 and name = \'value of the field should be too long\' and\n' +
             '  ID = 1 and ID = 12345678\n' +
