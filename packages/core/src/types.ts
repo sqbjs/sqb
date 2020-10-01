@@ -1,4 +1,6 @@
-import {ParamType} from './enums';
+import {ParamType, SerializationType} from './enums';
+
+export type Maybe<T = any> = T | undefined | null;
 
 export interface SerializerExtension {
     dialect: string;
@@ -15,19 +17,19 @@ export interface GenerateOptions {
     prettyPrint?: boolean;
     paramType?: ParamType;
     values?: Record<string, any>;
+    dialectVersion?: string;
 }
 
 export interface SerializeContext extends GenerateOptions {
     serializeHooks?: Function[];
-    // prmValue?: any;
-    query: GenerateResult;
+    queryParams?: Record<string, any> | any[];
+    returningFields?: Record<string, any>;
 }
-
-
 
 export interface GenerateResult {
     sql: string;
-    values?: any;
+    params?: any;
+    returningFields?: Record<string, any>;
 }
 
 export interface ReturningData {
@@ -38,6 +40,7 @@ export interface ReturningData {
     alias?: string;
 }
 
-export type SerializeFunction = (ctx: SerializeContext, type: string, obj,
-                                 defFn: (ctx: SerializeContext, o: any) => string) => string;
+export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
+                                 defFn: DefaultSerializeFunction) => Maybe<string>;
+export type DefaultSerializeFunction = (ctx: SerializeContext, o: any) => string;
 export type IsReservedWordFunction = (ctx: SerializeContext, s: string) => boolean;

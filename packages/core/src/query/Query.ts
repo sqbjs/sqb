@@ -22,19 +22,19 @@ export abstract class Query extends Serializable {
      * Generates Sql script
      */
     generate(options?: GenerateOptions): GenerateResult {
-        const ctx: SerializeContext = {...options, query: {sql: ''}};
-        if (this._values)
-            ctx.values = {...ctx.values, ...this._values};
+        const ctx: SerializeContext = {...options};
         /* paramType default COLON */
         ctx.paramType = ctx.paramType != null ? ctx.paramType : ParamType.COLON;
-        ctx.query.values =
-            (ctx.paramType === ParamType.QUESTION_MARK ||
-            ctx.paramType === ParamType.DOLLAR ? [] : {});
+        if (this._values)
+            ctx.values = {...ctx.values, ...this._values};
         ctx.serializeHooks = this.listeners('serialize');
         /* generate output */
         const sql = this._serialize(ctx);
-        ctx.query.sql = flattenText(sql, {noWrap: !ctx.prettyPrint});
-        return ctx.query;
+        return {
+            sql: flattenText(sql, {noWrap: !ctx.prettyPrint}),
+            params: ctx.queryParams,
+            returningFields: ctx.returningFields
+        }
     }
 
     values(obj: any): this {

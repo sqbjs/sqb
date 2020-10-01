@@ -139,7 +139,7 @@ describe('serialize "Operators"', function () {
                 values: {id: 1}
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id = :id');
-            assert.strictEqual(result.values.id, 1);
+            assert.strictEqual(result.params.id, 1);
         });
 
         it('should wrap native objects to operators', function () {
@@ -185,7 +185,7 @@ describe('serialize "Operators"', function () {
                 values: {id: 1}
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id != :id');
-            assert.strictEqual(result.values.id, 1);
+            assert.strictEqual(result.params.id, 1);
         });
 
         it('should wrap native objects to operators', function () {
@@ -353,8 +353,8 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id between :id1 and :id2');
-            assert.strictEqual(result.values.id1, 1);
-            assert.strictEqual(result.values.id2, 5);
+            assert.strictEqual(result.params.id1, 1);
+            assert.strictEqual(result.params.id2, 5);
         });
 
         it('should wrap native objects to operators', function () {
@@ -412,8 +412,8 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id not between :id1 and :id2');
-            assert.strictEqual(result.values.id1, 1);
-            assert.strictEqual(result.values.id2, 5);
+            assert.strictEqual(result.params.id1, 1);
+            assert.strictEqual(result.params.id2, 5);
         });
 
         it('should wrap native objects to operators', function () {
@@ -455,7 +455,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name like :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -497,7 +497,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name not like :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -539,7 +539,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name ilike :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -581,7 +581,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name not ilike :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -622,7 +622,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id in :id');
-            assert.deepStrictEqual(result.values.id, [1, 2, 3]);
+            assert.deepStrictEqual(result.params.id, [1, 2, 3]);
         });
 
         it('should wrap native objects to operators', function () {
@@ -672,7 +672,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id not in :id');
-            assert.deepStrictEqual(result.values.id, [1, 2, 3]);
+            assert.deepStrictEqual(result.params.id, [1, 2, 3]);
         });
 
         it('should wrap native objects to operators', function () {
@@ -862,7 +862,7 @@ describe('serialize "Operators"', function () {
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id = :id');
-            assert.strictEqual(result.values.id, null);
+            assert.strictEqual(result.params.id, null);
         });
 
         it('should use null as params - QUESTION_MARK', function () {
@@ -877,7 +877,7 @@ describe('serialize "Operators"', function () {
                 }
             });
             assert.strictEqual(result.sql, 'select * from table1 where id = ?');
-            assert.strictEqual(result.values[0], null);
+            assert.strictEqual(result.params[0], null);
         });
 
         it('should use null as params - DOLLAR', function () {
@@ -892,7 +892,7 @@ describe('serialize "Operators"', function () {
                 }
             });
             assert.strictEqual(result.sql, 'select * from table1 where id = $1');
-            assert.strictEqual(result.values[0], null);
+            assert.strictEqual(result.params[0], null);
         });
 
         it('should use null as params - AT', function () {
@@ -907,7 +907,7 @@ describe('serialize "Operators"', function () {
                 }
             });
             assert.strictEqual(result.sql, 'select * from table1 where id = @id');
-            assert.strictEqual(result.values.id, null);
+            assert.strictEqual(result.params.id, null);
         });
 
         it('should validate when wrapping native objects to operators', function () {

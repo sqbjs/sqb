@@ -46,7 +46,7 @@ export abstract class LogicalOperator extends Operator {
                 arr.push(t._type === SerializationType.LOGICAL_EXPRESSION ? '(' + s + ')' : s);
             }
         }
-        return serializeFallback(ctx, 'operator', arr, () => {
+        return serializeFallback(ctx, SerializationType.LOGICAL_EXPRESSION, arr, () => {
             const s = printArray(arr, ' ' + String(this._operatorType));
             return (s.indexOf('\n') > 0) ? s.replace('\n', '\n\t') + '\b' : s;
         });

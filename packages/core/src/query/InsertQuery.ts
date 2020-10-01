@@ -62,7 +62,7 @@ export class InsertQuery extends ReturningQuery {
             }
         } else
             arr = Object.keys(this._input);
-        return serializeFallback(ctx, this._type + 'columns', arr,
+        return serializeFallback(ctx, SerializationType.INSERT_QUERY_COLUMNS, arr,
             () => printArray(arr));
     }
 
@@ -78,7 +78,7 @@ export class InsertQuery extends ReturningQuery {
         for (const n of Object.keys(allValues)) {
             arr.push(serializeObject(ctx, allValues[n]));
         }
-        return serializeFallback(ctx, this._type + '.input', arr,
+        return serializeFallback(ctx, SerializationType.INSERT_QUERY_VALUES, arr,
             () => printArray(arr));
     }
 

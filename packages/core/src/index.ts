@@ -1,4 +1,4 @@
-export {Extension} from './Extension';
+export {registerSerializer, unRegisterSerializer} from './extensions';
 export * as classes from './classes';
 export * from './types';
 export * from './enums';

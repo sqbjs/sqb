@@ -1,56 +1,48 @@
-/* sqb-serializer-oracle
- ------------------------
- (c) 2017-present Panates
- SQB may be freely distributed under the MIT license.
- For details and documentation:
- https://panates.github.io/sqb-serializer-oracle/
- */
-/**
- * Module variables.
- * @private
- */
+import {
+    ParamType,
+    SerializerExtension,
+    SerializeContext,
+    DefaultSerializeFunction,
+    SerializationType,
+    Maybe
+} from '@sqb/core';
+import * as compareVersion from 'compare-versions';
+
 const reservedWords = ['comment', 'dual'];
 
-class OracleSerializer {
+export class OracleSerializer implements SerializerExtension {
 
-    /**
-     *
-     * @constructor
-     */
-    constructor() {
-        // noinspection JSUnusedGlobalSymbols
-        this.paramType = 0;
+    dialect = 'oracle';
+    paramType = ParamType.COLON;
+
+    isReservedWord(ctx, s) {
+        return s && typeof s === 'string' &&
+            reservedWords.includes(s.toLowerCase());
     }
 
-    // noinspection JSMethodCanBeStatic, JSUnusedGlobalSymbols
-    isReserved(ctx, s) {
-        return reservedWords.indexOf(String(s).toLowerCase()) >= 0;
-    }
-
-    // noinspection JSUnusedGlobalSymbols
-    serialize(ctx, type, o, defFn) {
+    serialize(ctx: SerializeContext, type: SerializationType | string, o: any,
+              defFn: DefaultSerializeFunction): Maybe<string> {
         switch (type) {
-            case 'select_query':
-                return this.serializeSelect(ctx, o, defFn);
-            case 'select_from':
-                return this.serializeFrom(ctx, o, defFn);
-            case 'comparison':
-                return this.serializeComparison(ctx, o, defFn);
-            case 'date':
-                return this.serializeDateValue(ctx, o, defFn);
-            case 'returning':
-                return this.serializeReturning(ctx, o, defFn);
+            case SerializationType.SELECT_QUERY:
+                return this._serializeSelect(ctx, o, defFn);
+            case SerializationType.SELECT_QUERY_FROM:
+                return this._serializeFrom(ctx, o, defFn);
+            case SerializationType.COMPARISON_EXPRESSION:
+                return this._serializeComparison(ctx, o, defFn);
+            case SerializationType.DATE_VALUE:
+                return this._serializeDateValue(ctx, o, defFn);
+            case SerializationType.RETURNING_BLOCK:
+                return this._serializeReturning(ctx, o);
         }
     }
 
-    // noinspection JSMethodCanBeStatic
-    serializeSelect(ctx, o, defFn) {
+    private _serializeSelect(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction) {
         let out = defFn(ctx, o);
         const limit = o.limit || 0;
         const offset = Math.max((o.offset || 0), 0);
 
         if (limit || offset) {
-            if (ctx.serverVersion >= 12) {
+            if (ctx.dialectVersion && compareVersion.compare(ctx.dialectVersion, '12', '>=')) {
                 if (offset)
                     out += '\nOFFSET ' + offset + ' ROWS' +
                         (limit ? ' FETCH NEXT ' + limit + ' ROWS ONLY' : '');
@@ -75,33 +67,29 @@ class OracleSerializer {
         return out;
     }
 
-    // noinspection JSMethodCanBeStatic
-    serializeFrom(ctx, o, defFn) {
-        return defFn() || 'from dual';
+    private _serializeFrom(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+        return defFn(ctx, o) || 'from dual';
     }
 
-    // noinspection JSMethodCanBeStatic
-    serializeComparison(ctx, o, defFn) {
+    private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
         if (o.value === 'null') {
             if (o.operatorType === 'eq')
                 o.symbol = 'is';
             if (o.operatorType === 'ne')
                 o.symbol = 'is not';
         }
-        return defFn.apply(this, arguments);
+        return defFn(ctx, o);
     }
 
-    // noinspection JSMethodCanBeStatic
-    serializeDateValue(ctx, o, defFn) {
+    private _serializeDateValue(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
         const s = defFn(ctx, o);
-        return s.length <= 12 ?
+        return s && (s.length <= 12 ?
             'to_date(' + s + ', \'yyyy-mm-dd\')' :
-            'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')';
+            'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')');
     }
 
-    // noinspection JSMethodCanBeStatic
-    serializeReturning(ctx, arr) {
-        const returningFields = ctx.query.returningFields = {};
+    private _serializeReturning(ctx: SerializeContext, arr: any[]): Maybe<string> {
+        const returningFields = ctx.returningFields = {};
         let out = '';
         for (const [i, o] of arr.entries()) {
             const n = (o.alias || o.field);
@@ -115,8 +103,3 @@ class OracleSerializer {
         return out;
     }
 }
-
-/**
- * Expose `OracleSerializer`.
- */
-module.exports = OracleSerializer;

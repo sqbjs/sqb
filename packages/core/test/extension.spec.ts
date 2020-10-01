@@ -1,5 +1,6 @@
 import assert from 'assert';
-import {Extension, Select, SerializationType, SerializerExtension} from '@sqb/core';
+import {registerSerializer, unRegisterSerializer, Select, SerializationType, SerializerExtension} from '@sqb/core';
+import {serializers} from '../src/extensions';
 
 describe('Serializer Extensions', function () {
 
@@ -12,11 +13,11 @@ describe('Serializer Extensions', function () {
             dialect: 'any-dialect',
             isReservedWord: () => true
         }
-        Extension.registerSerializer(extension1, extension2);
-        assert.strictEqual(Extension.serializers.length, 2);
-        assert.strictEqual(Extension.serializers[0], extension1);
-        assert.strictEqual(Extension.serializers[1], extension2);
-        Extension.unRegisterSerializer(extension1, extension2);
+        registerSerializer(extension1, extension2);
+        assert.strictEqual(serializers.length, 2);
+        assert.strictEqual(serializers[0], extension1);
+        assert.strictEqual(serializers[1], extension2);
+        unRegisterSerializer(extension1, extension2);
     });
 
     it('should an extension hook serialization process', function () {
@@ -28,11 +29,11 @@ describe('Serializer Extensions', function () {
                         ' ' + obj.alias.toUpperCase();
             }
         };
-        Extension.registerSerializer(ext);
+        registerSerializer(ext);
         const query = Select('*').addColumn().from('table1 t1');
         const result = query.generate({dialect: 'any-dialect'});
         assert.strictEqual(result.sql, 'select * from TABLE1 T1');
-        Extension.unRegisterSerializer(ext);
+        unRegisterSerializer(ext);
     });
 
     it('should an extension can hook determining reserved words process', function () {
@@ -42,11 +43,11 @@ describe('Serializer Extensions', function () {
                 return s === 'hello'
             }
         };
-        Extension.registerSerializer(ext);
+        registerSerializer(ext);
         const query = Select('hello').addColumn().from('table1');
         const result = query.generate({dialect: 'any-dialect'});
         assert.strictEqual(result.sql, 'select "hello" from table1');
-        Extension.unRegisterSerializer(ext);
+        unRegisterSerializer(ext);
     });
 
 });

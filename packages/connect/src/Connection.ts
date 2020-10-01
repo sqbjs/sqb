@@ -11,6 +11,7 @@ import {
 } from './types';
 import {Adapter} from './Adapter';
 import {Session} from './Session';
+import {adapters} from './extensions';
 
 const debug = _debug('sqb:connection');
 
@@ -24,7 +25,7 @@ export class Connection extends EventEmitter {
         if (!(config && typeof config === 'object'))
             throw new TypeError('Configuration object required');
 
-        this._adapter = Adapter.adapters[config.driver];
+        this._adapter = adapters[config.driver];
         if (!this._adapter)
             throw new Error(`No connection adapter registered for "${config.driver}"`);
         const cfg = this._config = {...config};

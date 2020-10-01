@@ -1,6 +1,6 @@
-import {SerializeContext} from './types';
+import {DefaultSerializeFunction, Maybe, SerializeContext} from './types';
 import {ParamType, SerializationType} from './enums';
-import {Extension} from './Extension';
+import {serializers} from './extensions';
 
 export const ReservedWords = [
     'schema', 'table', 'field', 'index', 'foreign', 'key',
@@ -28,7 +28,7 @@ export abstract class Serializable {
  * Performs a fallback mechanism, tries hook functions, extension than default function to serialize
  */
 export function serializeFallback(ctx: SerializeContext, type: string, o: any,
-                                  defFn: (_ctx: SerializeContext, _o: any) => string): string {
+                                  defFn: DefaultSerializeFunction): string {
     if (ctx.serializeHooks) {
         for (const hook of ctx.serializeHooks) {
             const s = hook(ctx, type, o, defFn);
@@ -36,7 +36,7 @@ export function serializeFallback(ctx: SerializeContext, type: string, o: any,
                 return s;
         }
     }
-    for (const ext of Extension.serializers) {
+    for (const ext of serializers) {
         if (ext.dialect === ctx.dialect && ext.serialize) {
             const s = ext.serialize(ctx, type, o, defFn);
             if (s != null)
@@ -49,7 +49,7 @@ export function serializeFallback(ctx: SerializeContext, type: string, o: any,
 /**
  * Serializes object
  */
-export function serializeObject(ctx, v): string {
+export function serializeObject(ctx, v): Maybe<string> {
     if (v == null)
         return 'null';
     if (v instanceof RegExp)
@@ -69,15 +69,13 @@ export function serializeObject(ctx, v): string {
                 'null';
         }
         if (v instanceof Date) {
-            return serializeFallback(ctx, 'date', v, () => {
-                return serializeDateValue(v);
-            });
+            return serializeFallback(ctx, SerializationType.DATE_VALUE, v,
+                () => serializeDateValue(v));
         }
     }
     if (typeof v === 'string') {
-        return serializeFallback(ctx, 'string', v, () => {
-            return serializeStringValue(v);
-        });
+        return serializeFallback(ctx, SerializationType.STRING_VALUE, v,
+            () => serializeStringValue(v));
     }
     if (v instanceof Serializable)
         return v._serialize(ctx);
@@ -120,15 +118,18 @@ export function serializeParam(ctx: SerializeContext, name: string): string {
         case ParamType.AT:
         case undefined: {
             const symb = ctx.paramType === ParamType.COLON ? ':' : '@';
-            ctx.query.values[name] = prmValue;
+            ctx.queryParams = ctx.queryParams || {};
+            ctx.queryParams[name] = prmValue;
             return symb + name;
         }
         case ParamType.DOLLAR: {
-            ctx.query.values.push(prmValue);
-            return '$' + (ctx.query.values.length);
+            ctx.queryParams = ctx.queryParams || [];
+            ctx.queryParams.push(prmValue);
+            return '$' + (ctx.queryParams.length);
         }
         case ParamType.QUESTION_MARK: {
-            ctx.query.values.push(prmValue);
+            ctx.queryParams = ctx.queryParams || [];
+            ctx.queryParams.push(prmValue);
             return '?';
         }
     }
@@ -167,7 +168,7 @@ export function isReservedWord(ctx: SerializeContext, s: string): boolean {
         return false;
     if (ReservedWords.includes(s.toLowerCase()))
         return true;
-    for (const ext of Extension.serializers) {
+    for (const ext of serializers) {
         if (ext.dialect === ctx.dialect && ext.isReservedWord) {
             if (ext.isReservedWord(ctx, s))
                 return true;

@@ -53,7 +53,7 @@ describe('Serialize insert query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });
@@ -69,7 +69,7 @@ describe('Serialize insert query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (?, ?)');
-        assert.deepStrictEqual(result.values, [1, 'abc']);
+        assert.deepStrictEqual(result.params, [1, 'abc']);
     });
 
     it('should serialize params with "values" argument: DOLLAR', function () {
@@ -82,7 +82,7 @@ describe('Serialize insert query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values ($1, $2)');
-        assert.deepStrictEqual(result.values, [1, 'abc']);
+        assert.deepStrictEqual(result.params, [1, 'abc']);
     });
 
     it('should serialize params with "values" argument: AT', function () {
@@ -95,7 +95,7 @@ describe('Serialize insert query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (@id, @name)');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });
@@ -109,7 +109,7 @@ describe('Serialize insert query', function () {
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });
