@@ -1,7 +1,7 @@
 import {OperatorType, SerializationType} from '../../enums';
 import {SelectQuery} from '../../query/SelectQuery';
 import {CompOperator} from './CompOperator';
-import {SerializeContext} from '../../interfaces';
+import {SerializeContext} from '../../types';
 
 export class OpExists extends CompOperator {
 

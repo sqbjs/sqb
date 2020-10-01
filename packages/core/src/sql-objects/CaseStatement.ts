@@ -2,7 +2,7 @@ import {Serializable, serializeFallback, serializeObject} from '../Serializable'
 import {SerializationType} from '../enums';
 import {LogicalOperator} from './operators/LogicalOperator';
 import {OpAnd} from './operators/OpAnd';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 import {Operator} from './Operator';
 import {RawStatement} from './RawStatement';
 

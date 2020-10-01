@@ -1,7 +1,7 @@
 import {Operator} from '../Operator';
 import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
 import {Query} from '../../query/Query';
-import {SerializeContext} from '../../interfaces';
+import {SerializeContext} from '../../types';
 import {SerializationType} from '../../enums';
 
 export abstract class CompOperator extends Operator {

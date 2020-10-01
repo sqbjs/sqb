@@ -1,6 +1,6 @@
 import {Serializable, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 
 export class RawStatement extends Serializable {
 

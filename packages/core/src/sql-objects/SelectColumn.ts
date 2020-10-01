@@ -1,7 +1,7 @@
 import {isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {Column} from './Column';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 
 const TABLE_COLUMN_PATTERN = /^((?:[a-zA-Z_][\w$_]*\.){0,2}) *([0-9a-zA-Z_][\w$_]*|\*) *(?:as)? *([a-zA-Z_][\w$_]*)?$/;
 

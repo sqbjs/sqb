@@ -58,6 +58,7 @@
         "@typescript-eslint/restrict-plus-operands": "off",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/ban-ts-comment": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
         "arrow-parens": [
           "off",
           "as-needed"

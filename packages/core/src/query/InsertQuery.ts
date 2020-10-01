@@ -3,7 +3,7 @@ import {SerializationType} from '../enums';
 import {TableName} from '../sql-objects/TableName';
 import {printArray, Serializable, serializeFallback, serializeObject} from '../Serializable';
 import type {RawStatement} from '../sql-objects/RawStatement';
-import type {SerializeContext} from '../interfaces';
+import type {SerializeContext} from '../types';
 import type {SelectQuery} from './SelectQuery';
 
 export class InsertQuery extends ReturningQuery {

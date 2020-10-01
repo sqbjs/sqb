@@ -4,7 +4,7 @@ import {TableName} from './TableName';
 import {SelectQuery} from '../query/SelectQuery';
 import {RawStatement} from './RawStatement';
 import {OpAnd} from './operators/OpAnd';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 import {LogicalOperator} from './operators/LogicalOperator';
 
 export class JoinStatement extends Serializable {

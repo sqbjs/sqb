@@ -4,7 +4,7 @@ import {SerializationType} from '../enums';
 import {TableName} from '../sql-objects/TableName';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../interfaces';
+import {SerializeContext} from '../types';
 import {serializeFallback} from '../Serializable';
 
 export class DeleteQuery extends Query {
