@@ -17,8 +17,16 @@ export enum JoinType {
 
 export enum SerializationType {
     SELECT_QUERY = 'select_query',
+    SELECT_QUERY_COLUMNS = 'select_query.columns',
+    SELECT_QUERY_FROM = 'select_query.from',
+    SELECT_QUERY_JOIN = 'select_query.join',
+    SELECT_QUERY_GROUPBY = 'select_query.groupby',
+    SELECT_QUERY_ORDERBY = 'select_query.orderby',
     INSERT_QUERY = 'insert_query',
+    INSERT_QUERY_COLUMNS = 'insert_query.columns',
+    INSERT_QUERY_VALUES = 'insert_query.values',
     UPDATE_QUERY = 'update_query',
+    UPDATE_QUERY_VALUES = 'update_query.values',
     DELETE_QUERY = 'delete_query',
     SELECT_COLUMN = 'select_column',
     GROUP_COLUMN = 'group_column',
@@ -28,8 +36,12 @@ export enum SerializationType {
     JOIN_CONDITIONS = 'join_conditions',
     RAW = 'raw',
     CASE_EXPRESSION = 'case_expression',
+    CONDITIONS_BLOCK = 'conditions_block',
     COMPARISON_EXPRESSION = 'comparison_expression',
-    LOGICAL_EXPRESSION = 'logical_expression'
+    LOGICAL_EXPRESSION = 'logical_expression',
+    RETURNING_BLOCK = 'returning_block',
+    DATE_VALUE = 'date_value',
+    STRING_VALUE = 'string_value'
 }
 
 export enum OperatorType {

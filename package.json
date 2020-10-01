@@ -31,7 +31,8 @@
   },
   "gulp": {
     "package-order": [
-      "query-builder",
+      "core",
+      "oracle-dialect",
       "connect"
     ]
   }

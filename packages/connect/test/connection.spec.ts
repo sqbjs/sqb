@@ -1,6 +1,6 @@
 import assert from 'assert';
 import {Select} from '@sqb/core';
-import {Adapter, Connection} from '../src';
+import {Connection, registerAdapter, unRegisterAdapter} from '@sqb/connect';
 import {TestAdapter} from './_support/test_adapter';
 
 describe('Connection', function () {
@@ -8,13 +8,13 @@ describe('Connection', function () {
     let connection: Connection;
     const testAdapter = new TestAdapter();
 
-    before(() => Adapter.registerAdapter(testAdapter.driver, testAdapter));
+    before(() => registerAdapter(testAdapter.driver, testAdapter));
     before(() => {
         if (!connection)
             connection = new Connection({driver: testAdapter.driver});
     });
 
-    after(() => Adapter.unRegisterAdapter(testAdapter.driver));
+    after(() => unRegisterAdapter(testAdapter.driver));
     after(async () => {
         if (connection)
             await connection.close(true);

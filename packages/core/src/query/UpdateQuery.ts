@@ -67,7 +67,7 @@ export class UpdateQuery extends ReturningQuery {
                 value: serializeObject(ctx, allValues[n])
             });
         }
-        return serializeFallback(ctx, this._type + '.input', arr, () => {
+        return serializeFallback(ctx, SerializationType.UPDATE_QUERY_VALUES, arr, () => {
             const a = arr.map(o => o.field + ' = ' + o.value);
             return printArray(a, ',');
         });
@@ -80,7 +80,7 @@ export class UpdateQuery extends ReturningQuery {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, 'where', s, () => {
+        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });

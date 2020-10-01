@@ -1,6 +1,7 @@
 import {Query} from './Query';
 import {ReturningData, SerializeContext} from '../types';
 import {isReservedWord, printArray, serializeFallback} from '../Serializable';
+import {SerializationType} from '../enums';
 
 const RETURNING_COLUMN_PATTERN = /^((?:[a-zA-Z]\w*\.){0,2}) *([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;
 
@@ -54,7 +55,7 @@ export abstract class ReturningQuery extends Query {
             o.isReservedWord = isReservedWord(ctx, t.field);
             arr.push(o);
         }
-        return serializeFallback(ctx, this._type + '.returning', arr, () => {
+        return serializeFallback(ctx, SerializationType.RETURNING_BLOCK, arr, () => {
             const a: string[] = [];
             for (const o of arr) {
                 a.push((o.schema ? o.schema + '.' : '') +

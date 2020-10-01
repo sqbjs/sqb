@@ -1,7 +1,7 @@
 import assert from 'assert';
 import {Readable} from 'stream';
 import {Select} from '@sqb/core';
-import {Adapter, Connection, Cursor} from '../src';
+import {registerAdapter, unRegisterAdapter, Connection, Cursor} from '../src';
 import {data, TestAdapter} from './_support/test_adapter';
 import {Session} from '../src/Session';
 
@@ -44,7 +44,7 @@ describe('CursorStream', function () {
     const testAdapter = new TestAdapter();
     const airports = data.airports;
 
-    before(() => Adapter.registerAdapter(testAdapter.driver, testAdapter));
+    before(() => registerAdapter(testAdapter.driver, testAdapter));
     before(() => {
         if (!connection)
             connection = new Connection({
@@ -56,7 +56,7 @@ describe('CursorStream', function () {
             });
     });
 
-    after(() => Adapter.unRegisterAdapter(testAdapter.driver));
+    after(() => unRegisterAdapter(testAdapter.driver));
     after(async () => {
         if (connection)
             await connection.close(true);

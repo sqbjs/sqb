@@ -53,7 +53,7 @@ export class DeleteQuery extends Query {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, 'where', s, () => {
+        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });

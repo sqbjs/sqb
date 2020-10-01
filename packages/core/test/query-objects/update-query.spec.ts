@@ -52,7 +52,7 @@ describe('Serialize update query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });
@@ -68,7 +68,7 @@ describe('Serialize update query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = ?, name = ?');
-        assert.deepStrictEqual(result.values, [1, 'abc']);
+        assert.deepStrictEqual(result.params, [1, 'abc']);
     });
 
     it('should serialize params with "values" argument: DOLLAR', function () {
@@ -81,7 +81,7 @@ describe('Serialize update query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = $1, name = $2');
-        assert.deepStrictEqual(result.values, [1, 'abc']);
+        assert.deepStrictEqual(result.params, [1, 'abc']);
     });
 
     it('should serialize params with "values" argument: AT', function () {
@@ -94,7 +94,7 @@ describe('Serialize update query', function () {
             }
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = @id, name = @name');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });
@@ -108,7 +108,7 @@ describe('Serialize update query', function () {
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'abc'
         });

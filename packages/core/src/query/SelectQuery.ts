@@ -212,9 +212,8 @@ export class SelectQuery extends Query {
                         arr.push(s);
                 }
             }
-        return serializeFallback(ctx, this._type + '.columns', arr, () => {
-            return printArray(arr) || '*';
-        });
+        return serializeFallback(ctx, SerializationType.SELECT_QUERY_COLUMNS, arr,
+            () => printArray(arr) || '*');
     }
 
     /**
@@ -235,7 +234,7 @@ export class SelectQuery extends Query {
                         arr.push(s);
                 }
             }
-        return serializeFallback(ctx, this._type + '.from', arr, () => {
+        return serializeFallback(ctx, SerializationType.SELECT_QUERY_FROM, arr, () => {
             const s = arr.join(',');
             return s ? ('from' + (s.substring(0, 1) !== '\n' ? ' ' : '') + s) : '';
         });
@@ -253,7 +252,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, this._type + '.joins', arr, () => {
+        return serializeFallback(ctx, SerializationType.SELECT_QUERY_JOIN, arr, () => {
             return arr.join('\n');
         });
     }
@@ -265,7 +264,7 @@ export class SelectQuery extends Query {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, this._type + '.where', s, () => {
+        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });
@@ -283,7 +282,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, this._type + '.groupby', arr, () => {
+        return serializeFallback(ctx, SerializationType.SELECT_QUERY_GROUPBY, arr, () => {
             const s = printArray(arr);
             return s ? 'group by ' + s : '';
         });
@@ -298,7 +297,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, this._type + '.orderby', arr, () => {
+        return serializeFallback(ctx, SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
             const s = printArray(arr);
             return s ? 'order by ' + s : '';
         });
