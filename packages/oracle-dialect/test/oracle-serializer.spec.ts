@@ -1,8 +1,9 @@
+import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Eq, Insert
-} from '@sqb/core';
+    Select, Eq, Insert, Param
+} from '@sqb/builder';
 import {OracleSerializer} from '../src/OracleSerializer';
 
 describe('OracleSerializer', function () {
@@ -55,7 +56,7 @@ describe('OracleSerializer', function () {
         });
 
         it('Should serialize params', function () {
-            const query = Select().from('table1').where(Eq('ID', /ID/));
+            const query = Select().from('table1').where(Eq('ID', Param('ID')));
             const result = query.generate({
                 dialect: 'oracle',
                 values: {ID: 5}

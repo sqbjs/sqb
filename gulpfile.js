@@ -4,4 +4,4 @@
  * the tasks. The tasks are really inside tools/gulp/tasks.
  */
 
-module.exports = require('./tools/gulp/gulpfile');
+module.exports = require('./support/gulp/gulpfile');

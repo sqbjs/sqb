@@ -1,9 +1,10 @@
+import './_support/env';
 import assert from 'assert';
 import {Readable} from 'stream';
-import {Select} from '@sqb/core';
-import {registerAdapter, unRegisterAdapter, Connection, Cursor} from '../src';
+import {Select} from '@sqb/builder';
+import {registerAdapter, unRegisterAdapter, DbClient, Cursor} from '../src';
 import {data, TestAdapter} from './_support/test_adapter';
-import {Session} from '../src/Session';
+import {Connection} from '../src/Connection';
 
 function readStream(stream: Readable): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -39,24 +40,24 @@ function readObjectStream(stream: Readable): Promise<any> {
 
 describe('CursorStream', function () {
 
-    let connection: Connection;
+    let connection: DbClient;
     let cursor: Cursor;
     const testAdapter = new TestAdapter();
     const airports = data.airports;
 
-    before(() => registerAdapter(testAdapter.driver, testAdapter));
+    before(() => registerAdapter(testAdapter));
     before(() => {
         if (!connection)
-            connection = new Connection({
+            connection = new DbClient({
                 driver: testAdapter.driver,
                 defaults: {
-                    createCursor: true,
+                    cursor: true,
                     fetchRows: 10
                 }
             });
     });
 
-    after(() => unRegisterAdapter(testAdapter.driver));
+    after(() => unRegisterAdapter(testAdapter));
     after(async () => {
         if (connection)
             await connection.close(true);
@@ -64,7 +65,7 @@ describe('CursorStream', function () {
     });
 
     it('should stream string buffer', async function () {
-        await connection.acquire(async (session: Session) => {
+        await connection.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
@@ -78,7 +79,7 @@ describe('CursorStream', function () {
     });
 
     it('should stream row object if objectMode enabled', async function () {
-        await connection.acquire(async (session: Session) => {
+        await connection.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
             const stream = cursor.toStream({objectMode: true});
@@ -90,7 +91,7 @@ describe('CursorStream', function () {
     });
 
     it('should cursor.close() also close the stream', function(done) {
-        connection.acquire(async (session: Session) => {
+        connection.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
@@ -100,7 +101,7 @@ describe('CursorStream', function () {
     });
 
     it('should handle cursor errors', function(done) {
-        connection.acquire(async (session: Session) => {
+        connection.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
             (cursor as any)._adapterCursor.close = () => Promise.reject(new Error('Any error'));

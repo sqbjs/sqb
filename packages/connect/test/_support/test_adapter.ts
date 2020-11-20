@@ -4,10 +4,9 @@
 
 import {
     Adapter,
-    ConnectionConfiguration,
-    PreparedQuery
+    ClientConfiguration,
+    QueryRequest
 } from '@sqb/connect';
-import {ParamType} from '@sqb/core';
 
 let sessionId = 0;
 
@@ -39,14 +38,13 @@ export class TestAdapter implements Adapter {
 
     driver = 'test-driver';
     dialect = 'test-dialect';
-    paramType = ParamType.COLON;
     _data: any;
 
     constructor() {
         this._data = JSON.parse(JSON.stringify(data));
     }
 
-    async connect(config: ConnectionConfiguration): Promise<Adapter.Session> {
+    async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         if (module.exports.errorCreateConnection)
             throw new Error('Any error');
         return new TestSession(this, config);
@@ -57,7 +55,7 @@ export class TestAdapter implements Adapter {
     }
 }
 
-class TestSession implements Adapter.Session {
+class TestSession implements Adapter.Connection {
 
     sessionId: number;
     _closed: boolean;
@@ -65,9 +63,13 @@ class TestSession implements Adapter.Session {
     _data: any;
     _transactionCounter = 0;
 
-    constructor(public adapter: TestAdapter, config: ConnectionConfiguration) {
+    constructor(public adapter: TestAdapter, config: ClientConfiguration) {
         this.sessionId = ++sessionId;
         this._data = adapter._data;
+    }
+
+    onGenerateQuery(request: QueryRequest): void {
+        (request as any).onGenerateQueryCalled = true;
     }
 
     get isClosed() {
@@ -82,16 +84,20 @@ class TestSession implements Adapter.Session {
         return this.rollback();
     }
 
-    async execute(query: PreparedQuery): Promise<Adapter.Response> {
+    async execute(query: QueryRequest): Promise<Adapter.Response> {
 
         if (this.isClosed)
-            throw new Error('Can not execute while connection is closed');
+            throw new Error('Can not execute while db session is closed');
 
         let sql = query.sql;
 
         if (sql.substring(0, 6) === 'select') {
             if (sql === 'select 1')
-                return {fields: [{name: 'field1'}], rows: [['1']], rowType: 'array'};
+                return {
+                    rowType: 'array',
+                    fields: [{fieldName: 'field1'}] as Adapter.FieldInfo[],
+                    rows: [['1']],
+                };
 
             const m = sql.match(/\bfrom (\w+)\b/i);
             const tableName = m && m[1];
@@ -104,14 +110,14 @@ class TestSession implements Adapter.Session {
             const out: any = {fields: [...o.fields]};
             // Clone records
             let i;
-            let len = query.createCursor ? o.rows.length :
+            let len = query.cursor ? o.rows.length :
                 Math.min(o.rows.length, query.fetchRows ? query.fetchRows : o.rows.length);
             const rows = [];
             out.rowType = 'object';
             for (i = 0; i < len; i++)
                 rows.push({...o.rows[i]});
 
-            if (query.createCursor) {
+            if (query.cursor) {
                 out.cursor = new TestCursor(this, rows);
             } else out.rows = rows;
             return out;
@@ -121,7 +127,7 @@ class TestSession implements Adapter.Session {
             const tableName = m && m[1];
             this._data[tableName].rows.push(query.values);
             if (sql.includes('returning'))
-                return {returns: query.values, rowsAffected: 1};
+                return {rows: [query.values], rowsAffected: 1};
             return {rowsAffected: 1};
         }
 
@@ -147,7 +153,7 @@ class TestSession implements Adapter.Session {
         this._data = this.adapter._data;
     }
 
-    async ping(): Promise<void> {
+    async test(): Promise<void> {
         this._pingCount++;
     }
 
@@ -166,11 +172,14 @@ class TestSession implements Adapter.Session {
 class TestCursor implements Adapter.Cursor {
 
     private _rowNum = 0;
+    public isClosed = false;
+    readonly rowType: 'object';
 
     constructor(public session: TestSession, private _rows: any) {
     }
 
     async close() {
+        this.isClosed = true;
     }
 
     async fetch(rowCount: number): Promise<any> {

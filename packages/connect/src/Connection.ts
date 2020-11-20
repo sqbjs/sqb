@@ -1,118 +1,228 @@
 import {EventEmitter} from 'events';
-import {createPool, IPoolFactory, Pool} from 'lightning-pool';
-import {PoolOptions, PoolState} from 'lightning-pool';
-import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
+import {classes} from '@sqb/builder';
 import _debug from 'debug';
-import {classes} from '@sqb/core';
+import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
+import TaskQueue from 'putil-taskqueue';
+import {DbClient} from './DbClient';
 import {
-    ConnectionConfiguration,
+    ConnectionOptions,
+    ExecuteHookFunction,
+    FetchFunction, FieldNaming,
+    QueryRequest,
     QueryExecuteOptions,
-    TransactionFunction, QueryResult, AcquireSessionOptions
+    QueryResult
 } from './types';
+import {callFetchHooks, normalizeFieldMap, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
-import {Session} from './Session';
-import {adapters} from './extensions';
+import {Cursor} from './Cursor';
 
 const debug = _debug('sqb:connection');
 
 export class Connection extends EventEmitter {
-    private readonly _adapter: Adapter;
-    private readonly _pool: Pool<Adapter.Session>;
-    private readonly _config: ConnectionConfiguration;
 
-    constructor(config: ConnectionConfiguration) {
+    private _intlcon?: Adapter.Connection;
+    private readonly _tasks = new TaskQueue();
+    private readonly _cursors: Set<Cursor> = new Set();
+    private readonly _options?: ConnectionOptions;
+    private _refCount = 1;
+
+    constructor(public readonly client: DbClient,
+                adapterConnection: Adapter.Connection,
+                options?: ConnectionOptions) {
         super();
-        if (!(config && typeof config === 'object'))
-            throw new TypeError('Configuration object required');
-
-        this._adapter = adapters[config.driver];
-        if (!this._adapter)
-            throw new Error(`No connection adapter registered for "${config.driver}"`);
-        const cfg = this._config = {...config};
-        cfg.defaults = cfg.defaults || {};
-
-        cfg.pool = cfg.pool || {};
-        cfg.pool.acquireMaxRetries = coerceToInt(cfg.pool.acquireMaxRetries, 0);
-        cfg.pool.acquireRetryWait = coerceToInt(cfg.pool.acquireRetryWait, 2000);
-        cfg.pool.acquireTimeoutMillis = coerceToInt(cfg.pool.acquireTimeoutMillis, 0);
-        cfg.pool.idleTimeoutMillis = coerceToInt(cfg.pool.idleTimeoutMillis, 30000);
-        cfg.pool.max = coerceToInt(cfg.pool.max, 10);
-        cfg.pool.maxQueue = coerceToInt(cfg.pool.maxQueue, 1000);
-        cfg.pool.max = coerceToInt(cfg.pool.max, 10);
-        cfg.pool.min = coerceToInt(cfg.pool.min, 0);
-        cfg.pool.minIdle = coerceToInt(cfg.pool.minIdle, 0);
-        cfg.pool.validation = coerceToBoolean(cfg.pool.validation, false);
-
-        const poolFactory: IPoolFactory<Adapter.Session> = {
-            create: () => this._adapter.connect(cfg),
-            destroy: client => client.close(),
-            reset: client => client.reset(),
-            validate: client => client.ping()
-        };
-        const poolOptions: PoolOptions = {...config.pool};
-        poolOptions.resetOnReturn = true;
-        this._pool = createPool<Adapter.Session>(poolFactory, poolOptions);
-        this._pool.start();
-    }
-
-    get configuration(): ConnectionConfiguration {
-        return this._config;
+        this._intlcon = adapterConnection;
+        this._options = options || {};
     }
 
     /**
-     * Return dialect
+     * Returns session id
      */
-    get dialect() {
-        return this._adapter.dialect;
+    get sessionId(): string {
+        return this._intlcon && this._intlcon.sessionId;
     }
 
     /**
-     * Returns true if pool is closed
+     * Returns reference counter value
      */
-    get isClosed() {
-        return this._pool.state === PoolState.CLOSED;
+    get refCount(): number {
+        return this._refCount;
     }
 
-    async close(force: boolean): Promise<void> {
-        return this._pool.close(force);
+    /**
+     * Increases internal reference counter to keep session alive
+     */
+    retain(): void {
+        this._refCount++;
+        debug('[%s] retain | refCount: %s', this.sessionId, this._refCount);
+        this.emitSafe('acquire');
+    }
+
+    /**
+     * Decreases the internal reference counter.
+     * When reference count is 0, connection returns to the pool.
+     * Returns true if connection released.
+     */
+    release(): boolean {
+        if (!this._intlcon)
+            throw new Error('Session already released');
+        const ref = --this._refCount;
+        if (!ref) {
+            this.emitSafe('release');
+            const intlcon = this._intlcon;
+            this._intlcon = undefined;
+            this.client.pool.release(intlcon)
+                .catch(e => this.client.emitSafe('error', e));
+            debug('[%s] released', intlcon.sessionId);
+            return true;
+        } else
+            debug('[%s] release | refCount: %s', this.sessionId, ref);
+        return false;
     }
 
     async execute(query: string | classes.Query,
-                  options?: QueryExecuteOptions): Promise<QueryResult> {
-        debug('execute');
-        const client = await this._pool.acquire();
-        let session;
+                  options?: QueryExecuteOptions): Promise<any> {
+        if (!this._intlcon)
+            throw new Error(`Can't execute query, because connection is released`);
+        return this._tasks.enqueue(() => this._execute(query, options));
+    }
+
+    /**
+     * Executes a query
+     */
+    protected async _execute(query: string | classes.Query,
+                             options?: QueryExecuteOptions): Promise<any> {
+        if (!this._intlcon)
+            throw new Error(`Can't execute query, because connection is released`);
+        const intlcon = this._intlcon;
+        this.retain();
         try {
-            session = new Session(this, client);
-            return await session.execute(query, options);
+            debug('execute');
+            const startTime = Date.now();
+            const request = this._prepareQueryRequest(query, options);
+            if (process.env.DEBUG)
+                debug('[%s] execute | %o', this.sessionId, request);
+            this.emitSafe('execute', this, request);
+
+            // Call execute hooks
+            if (request.executeHooks) {
+                for (const fn of request.executeHooks) {
+                    await fn(this, request);
+                }
+            }
+
+            const response = await intlcon.execute(request);
+            if (!response)
+                throw new Error('Database adapter returned an empty response');
+
+            const result: QueryResult = {
+                executeTime: Date.now() - startTime
+            };
+            if (request.showSql)
+                result.query = request;
+
+            if (response.rows || response.cursor) {
+                if (!response.fields)
+                    throw new Error('Adapter did not returned fields info');
+                if (!response.rowType)
+                    throw new Error('Adapter did not returned rowType');
+                result.fields = normalizeFieldMap(response.fields, request.fieldNaming);
+                result.rowType = response.rowType;
+
+                if (response.rows) {
+                    result.rows = normalizeRows(result.fields, response.rowType, response.rows, request);
+                    callFetchHooks(result.rows, request);
+                } else if (response.cursor) {
+                    const cursor = result.cursor = new Cursor(this, result.fields, response.cursor, request);
+                    this._cursors.add(cursor);
+                    this.retain();
+                    cursor.on('close', () => {
+                        this._cursors.delete(cursor);
+                        this.release();
+                    });
+                }
+            }
+
+            if (response.rowsAffected)
+                result.rowsAffected = response.rowsAffected;
+
+            return result;
         } finally {
-            await (session as any)._onClose();
-            this._pool.release(client).catch(e => this.emitSafe('error', e));
+            this.release();
         }
     }
 
-    async acquire(fn: TransactionFunction, options?: AcquireSessionOptions): Promise<any> {
-        debug('acquire');
-        const client = await this._pool.acquire();
-        let session;
-        try {
-            if (options?.inTransaction)
-                await client.startTransaction();
-            session = new Session(this, client);
-            const result = await fn(session);
-            if (options?.inTransaction)
-                await client.commit();
-            return result;
-        } finally {
-            try {
-                if (options?.inTransaction)
-                    await client.rollback();
-            } catch (e) {
-                this.emit('error', e);
-            }
-            await (session as any)._onClose();
-            this._pool.release(client).catch(e => this.emitSafe('error', e));
+    async startTransaction(): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call startTransaction() on a released connection');
+        await this._intlcon.startTransaction();
+        this.emitSafe('start-transaction');
+    }
+
+    async commit(): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call commit() on a released connection');
+        await this._intlcon.commit();
+        this.emitSafe('commit');
+    }
+
+    async rollback(): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call rollback() on a released connection');
+        await this._intlcon.rollback();
+        this.emitSafe('rollback');
+    }
+
+    async test(): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call test() on a released connection');
+        await this._intlcon.test();
+    }
+
+    private _prepareQueryRequest(query: string | classes.Query,
+                          options: QueryExecuteOptions = {}): QueryRequest {
+        if (!this._intlcon)
+            throw new Error('Session released');
+        const defaults = this.client.defaults;
+
+        const request: QueryRequest = {
+            dialect: this.client.dialect,
+            sql: '',
+            autoCommit: coerceToBoolean(coalesce(options.autoCommit, defaults.autoCommit), false),
+            cursor: coerceToBoolean(coalesce(options.cursor, defaults.cursor), false),
+            objectRows: coerceToBoolean(coalesce(options.objectRows, defaults.objectRows), true),
+            ignoreNulls: coerceToBoolean(coalesce(options.ignoreNulls, defaults.ignoreNulls), false),
+            fetchRows: coerceToInt(coalesce(options.fetchRows, defaults.fetchRows), 100),
+            fieldNaming: coerceToString(coalesce(options.namingStrategy, defaults.fieldNaming)) as FieldNaming,
+            coercion: coalesce(options.coercion, defaults.coercion),
+            showSql: coerceToBoolean(coalesce(options.showSql, defaults.showSql), false),
+            action: coerceToString(options.action)
+        };
+        request.ignoreNulls = request.ignoreNulls && request.objectRows;
+
+        if (query instanceof classes.Query) {
+            if (this._intlcon.onGenerateQuery)
+                this._intlcon.onGenerateQuery(request, query);
+            const q = query
+                .generate({
+                    dialect: request.dialect,
+                    dialectVersion: request.dialectVersion,
+                    values: options.values,
+                });
+            request.sql = q.sql;
+            request.values = q.params;
+            if (query.listenerCount('execute'))
+                request.executeHooks = query.listeners('execute') as ExecuteHookFunction[];
+            if (query.listenerCount('fetch'))
+                request.fetchHooks = query.listeners('fetch') as FetchFunction[];
+        } else if (typeof query === 'string') {
+            request.sql = query;
+            request.values = options.values;
+            // request.returningParams = options.returningParams;
         }
+        // @ts-ignore
+        if (!request.sql)
+            throw new Error('No sql given');
+        return request;
     }
 
     emitSafe(event: string | symbol, ...args: any[]): boolean {
@@ -125,5 +235,6 @@ export class Connection extends EventEmitter {
             return false;
         }
     }
+
 
 }

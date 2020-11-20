@@ -1,0 +1,60 @@
+{
+  "name": "@sqb/oracle",
+  "description": "SQB serialization extension for Oracle database",
+  "version": "4.0.1-alpha.1",
+  "author": "Panates Ltd.",
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git"
+  },
+  "keywords": [
+    "javascript",
+    "sql",
+    "query",
+    "builder",
+    "dialect",
+    "oracle",
+    "database"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/oracledb": "^5.0.0"
+  },
+  "peerDependencies": {
+    "oracledb": "^5.0.0",
+    "@sqb/oracle-dialect": ">4.0.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">= 10.0"
+  },
+  "directories": {
+    "lib": "dist",
+    "test": "test"
+  },
+  "files": [
+    "LICENSE",
+    "README",
+    "dist/"
+  ],
+  "nyc": {
+    "temp-dir": "./coverage/.nyc_output"
+  },
+  "scripts": {
+    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
+    "clean": "npm run clean:src && npm run clean:test && npm run clean:dist",
+    "clean:dist": "ts-cleanup -d dist --remove-dirs --all",
+    "clean:src": "ts-cleanup -s src --all | ts-cleanup -s test",
+    "build": "npm run clean | tsc -b tsconfig-build.json",
+    "compile": "tsc -b tsconfig.json",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern",
+    "travis-cover": "nyc --reporter lcovonly npm run test"
+  }
+}

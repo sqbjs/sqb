@@ -4,7 +4,7 @@ import {
     ArrayRowset,
     CoercionFunction,
     FieldInfo, FieldNaming, ObjectRow, ObjectRowset,
-    PreparedQuery
+    QueryRequest
 } from './types';
 import {Adapter} from './Adapter';
 import {FieldInfoMap} from './FieldInfoMap';
@@ -35,12 +35,10 @@ export function normalizeFieldMap(oldFields: Record<string, Adapter.FieldInfo> |
                                   fieldNaming?: FieldNaming): FieldInfoMap {
 
     const mapFieldInfo = (f: Adapter.FieldInfo, index: number): FieldInfo => {
-        const n = applyNamingStrategy(f.name, fieldNaming);
-        const x: FieldInfo = {...f, fieldName: f.name, index};
-        if (n !== x.name) {
+        const n = applyNamingStrategy(f.fieldName, fieldNaming);
+        const x: FieldInfo = {...f, name: f.fieldName, index};
+        if (n !== x.name)
             x.name = n;
-            x.fieldName = f.name;
-        }
         return x;
     };
     const result = new FieldInfoMap();
@@ -52,7 +50,7 @@ export function normalizeFieldMap(oldFields: Record<string, Adapter.FieldInfo> |
     } else {
         let i = 0;
         for (const [k, f] of Object.entries(oldFields)) {
-            f.name = k;
+            f.fieldName = k;
             const x = mapFieldInfo(f, i++);
             result.add(x);
         }
@@ -62,7 +60,7 @@ export function normalizeFieldMap(oldFields: Record<string, Adapter.FieldInfo> |
 
 export function normalizeRows(fields: FieldInfoMap, rowType: 'array' | 'object',
                               oldRows: ObjectRowset | ArrayRowset,
-                              options: Pick<PreparedQuery, 'objectRows' | 'ignoreNulls' | 'coercion'>
+                              options: Pick<QueryRequest, 'objectRows' | 'ignoreNulls' | 'coercion'>
 ): Record<string, any>[] | any[][] {
 
     const ignoreNulls = options.ignoreNulls && options.objectRows;
@@ -141,13 +139,13 @@ export function normalizeRows(fields: FieldInfoMap, rowType: 'array' | 'object',
 
 }
 
-export function callFetchHooks(rows: ObjectRowset | ArrayRowset, prepared: PreparedQuery): void {
-    const fetchHooks = prepared.fetchHooks;
+export function callFetchHooks(rows: ObjectRowset | ArrayRowset, request: QueryRequest): void {
+    const fetchHooks = request.fetchHooks;
     if (!fetchHooks)
         return;
     for (const row of rows) {
         for (const fn of fetchHooks) {
-            fn(row, prepared);
+            fn(row, request);
         }
     }
 }

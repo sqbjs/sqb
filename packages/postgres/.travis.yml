@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+  - "10"
+  - "11"
+  - "12"
+  - "13"
+branches:
+  only:
+    - master
+cache:
+  directories:
+    - "$HOME/.npm"
+    - node_modules
+services:
+  - postgresql
+before_script:
+  - psql -c 'create database test;' -U postgres
+install:
+  - "npm install"
+script:
+  - "npm run-script travis-cover"
+after_script:
+  - "npm install coveralls && cat ./coverage/lcov.info | coveralls"

@@ -1,11 +1,10 @@
 import {
-    ParamType,
     SerializerExtension,
     SerializeContext,
     DefaultSerializeFunction,
     SerializationType,
     Maybe
-} from '@sqb/core';
+} from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
 
 const reservedWords = ['comment', 'dual'];
@@ -13,7 +12,6 @@ const reservedWords = ['comment', 'dual'];
 export class OracleSerializer implements SerializerExtension {
 
     dialect = 'oracle';
-    paramType = ParamType.COLON;
 
     isReservedWord(ctx, s) {
         return s && typeof s === 'string' &&
