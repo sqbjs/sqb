@@ -1,0 +1,25 @@
+{
+  "name": "regions",
+  "rows": [
+    {
+      "id": "FR",
+      "name": "FR Region"
+    },
+    {
+      "id": "TR",
+      "name": "TR Region"
+    },
+    {
+      "id": "GB",
+      "name": "GB Region"
+    },
+    {
+      "id": "US",
+      "name": "US Region"
+    },
+    {
+      "id": "CN",
+      "name": "CN Region"
+    }
+  ]
+}

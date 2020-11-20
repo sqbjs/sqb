@@ -2,10 +2,12 @@
 /node_modules
 packages/*/dist
 packages/*/node_modules
+packages/*/coverage
 
 # environment variables
 .env
-.development.env
+packages/postgres/test/_support/env-dev.ts
+env-dev.ts
 
 # Logs
 logs

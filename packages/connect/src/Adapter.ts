@@ -1,65 +1,53 @@
-import {ConnectionConfiguration, PreparedQuery, RowType} from './types';
-import {ParamType} from '@sqb/core';
+import {ClientConfiguration, Maybe, QueryRequest, RowType} from './types';
+import {classes} from '@sqb/builder';
 
 export interface Adapter {
+    driver: string;
     dialect: string;
-    paramType: ParamType;
-    connect: (config: ConnectionConfiguration) => Promise<Adapter.Session>;
+    connect: (config: ClientConfiguration) => Promise<Adapter.Connection>;
 }
 
 export namespace Adapter {
 
-    export type Response = SelectResponse | CursorResponse | UpdateResponse;
-
-    export interface Session {
+    export interface Connection {
         sessionId: any;
+        execute: (request: QueryRequest) => Promise<Response>;
         close: () => Promise<void>;
         reset: () => Promise<void>;
+        test: () => Promise<void>;
         startTransaction: () => Promise<void>;
         commit: () => Promise<void>;
         rollback: () => Promise<void>;
-        ping: () => Promise<void>;
-        execute: (prepared: PreparedQuery) => Promise<Response>;
+        onGenerateQuery?: (request: QueryRequest, query: classes.Query) => void;
     }
 
     export interface Cursor {
+        readonly isClosed: boolean;
+        readonly rowType: RowType;
         close: () => Promise<void>;
-        fetch: (rows: number) => Promise<any>;
+        fetch: (rows: number) => Promise<Maybe<any[]>>;
     }
 
-    export interface SelectResponse {
-        fields: Record<string, FieldInfo> | FieldInfo[];
-        rows: Record<string, any>[] | any[][];
-        rowType: RowType;
-    }
-
-    export interface CursorResponse {
-        fields: Record<string, FieldInfo> | FieldInfo[];
-        cursor: Adapter.Cursor;
-    }
-
-    export interface UpdateResponse {
-        returns?: any;
+    export interface Response {
+        fields?: Record<string, FieldInfo> | FieldInfo[];
+        rows?: Record<string, any>[] | any[][];
+        rowType?: RowType;
+        cursor?: Adapter.Cursor;
         rowsAffected?: number;
     }
 
     export interface FieldInfo {
-        name: string;
-    }
-    
-    export function isSelectResponse(source: any): source is SelectResponse {
-        return typeof source.fields === 'object' &&
-            typeof source.rows === 'object' &&
-            (source.rowType === 'array' || source.rowType === 'object');
+        index: number;
+        fieldName: string;
+        dataType: string;
+        elementDataType?: string;
+        jsType: string;
+        isArray?: boolean;
+        nullable?: boolean;
+        fixedLength?: boolean;
+        size?: number;
+        precision?: number;
+        _inf: any;
     }
 
-    export function isUpdateResponse(source: any): source is UpdateResponse {
-        return typeof source.rowsAffected === 'number';
-    }
-
-    export function isCursorResponse(source: any): source is CursorResponse {
-        return typeof source.fields === 'object' &&
-            typeof source.cursor === 'object';
-    }
-    
 }

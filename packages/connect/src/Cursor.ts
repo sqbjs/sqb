@@ -1,25 +1,25 @@
 import {EventEmitter} from "events";
 import {Adapter} from './Adapter';
-import {Session} from './Session';
+import {Connection} from './Connection';
 import {FieldInfoMap} from './FieldInfoMap';
 import DoublyLinked from 'doublylinked';
 import TaskQueue from 'putil-taskqueue';
 import _debug from 'debug';
 import {coerceToInt} from 'putil-varhelpers';
 import {callFetchHooks, normalizeRows} from './helpers';
-import {ObjectRow, PreparedQuery} from './types';
+import {ObjectRow, QueryRequest} from './types';
 import {CursorStream, CursorStreamOptions} from './CursorStream';
 
 const debug = _debug('sqb:cursor');
 
 export class Cursor extends EventEmitter {
 
-    private readonly _session: Session;
+    private readonly _session: Connection;
     private readonly _fields: FieldInfoMap;
     private readonly _prefetchRows: number;
-    private readonly _prepared: PreparedQuery;
+    private readonly _request: QueryRequest;
 
-    private _adapterCursor?: Adapter.Cursor;
+    private _intlcur?: Adapter.Cursor;
     private _taskQueue = new TaskQueue();
     private _fetchCache = new DoublyLinked();
     private _rowNum = 0;
@@ -28,15 +28,15 @@ export class Cursor extends EventEmitter {
     private _row: any;
     private _cache?: DoublyLinked;
 
-    constructor(session: Session, fields: FieldInfoMap,
+    constructor(session: Connection, fields: FieldInfoMap,
                 adapterCursor: Adapter.Cursor,
-                prepared: PreparedQuery) {
+                request: QueryRequest) {
         super();
         this._session = session;
-        this._adapterCursor = adapterCursor;
+        this._intlcur = adapterCursor;
         this._fields = fields;
-        this._prepared = prepared;
-        this._prefetchRows = prepared?.fetchRows || 100;
+        this._request = request;
+        this._prefetchRows = request?.fetchRows || 100;
     }
 
     /**
@@ -58,7 +58,7 @@ export class Cursor extends EventEmitter {
      * Returns if cursor is closed.
      */
     get isClosed(): boolean {
-        return !this._adapterCursor;
+        return !this._intlcur;
     }
 
     /**
@@ -109,11 +109,11 @@ export class Cursor extends EventEmitter {
      * Closes cursor
      */
     async close(): Promise<void> {
-        if (!this._adapterCursor)
+        if (!this._intlcur)
             return;
         try {
-            await this._adapterCursor.close();
-            this._adapterCursor = undefined;
+            await this._intlcur.close();
+            this._intlcur = undefined;
             debug('close');
             this.emitSafe('close');
         } catch (err) {
@@ -211,49 +211,38 @@ export class Cursor extends EventEmitter {
         if (step < 0 && !this._cache)
             throw new Error('To move cursor back, it needs cache to be enabled');
 
-        await this._taskQueue.enqueue((done) => {
+        const _this = this;
+        await this._taskQueue.enqueue(async function () {
 
             /* If moving backward */
             if (step < 0) {
                 /* Seek cache */
-                while (step < 0 && this._cache?.cursor) {
-                    this._row = this._cache.prev();
-                    this._rowNum--;
+                while (step < 0 && _this._cache?.cursor) {
+                    _this._row = _this._cache.prev();
+                    _this._rowNum--;
                     step++;
                 }
-                return done();
+                return;
             }
 
-            /* If moving forward */
-            const moveForward = () => {
+            while (step > 0) {
                 /* Seek cache */
-                if (this._cache) {
-                    while (step > 0 && (this._row = this._cache.next())) {
-                        this._rowNum++;
-                        step--;
-                    }
-                }
-                /* Fetch from prefetch cache */
-                while (step > 0 && (this._row = this._fetchCache.shift())) {
-                    this._rowNum++;
+                while (step > 0 && _this._cache && (_this._row = _this._cache.next())) {
+                    _this._rowNum++;
                     step--;
                 }
-                if (!step || this._fetchedAll)
-                    return done();
-                /* Fetch records from db */
-                this._fetchRows().then(() => {
-                    if (this._fetchedAll) {
-                        this._row = null;
-                        this._rowNum++;
-                        if (this._cache)
-                            this._cache.next();
-                        return done();
-                    }
-                    setImmediate(() => moveForward());
-                }).catch(e => done(e));
-            };
 
-            moveForward();
+                /* Fetch from prefetch cache */
+                while (step > 0 && (_this._row = _this._fetchCache.shift())) {
+                    _this._rowNum++;
+                    step--;
+                }
+
+                if (!step || _this._fetchedAll)
+                    return;
+
+                await _this._fetchRows();
+            }
         });
         if (!silent)
             this.emitSafe('move', this._rowNum, this.row);
@@ -264,17 +253,17 @@ export class Cursor extends EventEmitter {
      *
      */
     async _fetchRows(): Promise<void> {
-        if (!this._adapterCursor)
+        if (!this._intlcur)
             throw new Error('Cursor is closed');
-        const rows = await this._adapterCursor.fetch(this._prefetchRows)
+        const rows = await this._intlcur.fetch(this._prefetchRows)
         if (rows && rows.length) {
             debug('Fetched %d rows from database', rows.length);
             // Normalize rows
-            normalizeRows(this._fields, 'object', rows, {
-                objectRows: this._prepared.objectRows,
-                ignoreNulls: this._prepared.ignoreNulls
+            normalizeRows(this._fields, this._intlcur.rowType, rows, {
+                objectRows: this._request.objectRows,
+                ignoreNulls: this._request.ignoreNulls,
             });
-            callFetchHooks(rows, this._prepared);
+            callFetchHooks(rows, this._request);
             for (const [idx, row] of rows.entries()) {
                 this.emitSafe('fetch', row, (this._rowNum + idx + 1));
             }

@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig-base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "paths": {
+      "@sqb/builder": ["../builder"],
+      "@sqb/connect": ["../connect"],
+      "@sqb/postgres-dialect": ["../postgres-dialect"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test"]
+}

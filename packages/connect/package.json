@@ -22,19 +22,18 @@
   ],
   "dependencies": {
     "debug": "^4.2.0",
-    "doublylinked": "^2.3.0",
-    "lightning-pool": "^2.2.0",
-    "putil-isplainobject": "^1.1.2",
+    "lightning-pool": "^3.0.1",
+    "putil-isplainobject": "^1.1.3",
     "putil-merge": "^3.6.2",
-    "putil-promisify": "^1.7.2",
-    "putil-taskqueue": "^2.2.1",
+    "putil-promisify": "^1.8.2",
+    "putil-taskqueue": "^2.5.1",
     "putil-varhelpers": "^1.2.2"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5"
   },
   "peerDependencies": {
-    "@sqb/core": ">4.0.0"
+    "@sqb/builder": ">4.0.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -56,9 +55,9 @@
     "clean": "npm run clean:src && npm run clean:test && npm run clean:dist",
     "clean:dist": "ts-cleanup -d dist --remove-dirs --all",
     "clean:src": "ts-cleanup -s src --all | ts-cleanup -s test",
-    "build": "tsc -b tsconfig-build.json",
+    "build": "npm run clean | tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
-    "lint": "eslint src/** --fix --no-error-on-unmatched-pattern",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern",
     "travis-cover": "nyc --reporter lcovonly npm run test"
   }
 }

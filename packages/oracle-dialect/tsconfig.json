@@ -7,7 +7,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/core": ["../core"]
+      "@sqb/builder": ["../builder"]
     }
   },
   "include": ["src/**/*.ts"],

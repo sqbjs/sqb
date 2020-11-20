@@ -1,17 +1,13 @@
 import {Adapter} from './Adapter';
 
-export const adapters: Record<string, Adapter> = {};
+export let adapters: Adapter[] = [];
 
-export function registerAdapter(driver: string, adapter: Adapter): void {
-    if (!driver)
+export function registerAdapter(adapter: Adapter): void {
+    if (!adapter.driver)
         throw new TypeError('A DatabaseAdapter must contain "driver" property');
-    if (!adapter.dialect)
-        throw new TypeError('A DatabaseAdapter must contain "dialect" property');
-    adapters[driver] = adapter;
+    adapters.push(adapter);
 }
 
-export function unRegisterAdapter(...driver: string[]) {
-    for (const x of driver) {
-        delete adapters[x];
-    }
+export function unRegisterAdapter(...adapter: Adapter[]) {
+    adapters = adapters.filter(x => !adapter.includes(x));
 }
