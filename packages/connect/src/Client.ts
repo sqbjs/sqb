@@ -1,4 +1,3 @@
-import {EventEmitter} from 'events';
 import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolState} from 'lightning-pool';
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
 import _debug from 'debug';
@@ -11,11 +10,12 @@ import {
 import {Adapter} from './Adapter';
 import {Connection} from './Connection';
 import {adapters} from './extensions';
+import {SafeEventEmitter} from './SafeEventEmitter';
 
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
 
-export class DbClient extends EventEmitter {
+export class Client extends SafeEventEmitter {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
@@ -25,9 +25,19 @@ export class DbClient extends EventEmitter {
         if (!(config && typeof config === 'object'))
             throw new TypeError('Configuration object required');
 
-        const adapter = adapters.find(x => x.driver === config.driver);
+        let adapter;
+        if (config.driver) {
+            adapter = adapters.find(x => x.driver === config.driver);
+            if (!adapter)
+                throw new Error(`No database adapter registered for "${config.driver}" driver`);
+        } else if (config.dialect) {
+            adapter = adapters.find(x => x.dialect === config.dialect);
+            if (!adapter)
+                throw new Error(`No database adapter registered for "${config.dialect}" dialect`);
+        }
         if (!adapter)
-            throw new Error(`No database adapter registered for "${config.driver}"`);
+            throw new Error(`You must provide one of "driver" or "dialect" properties`);
+
         this._adapter = adapter;
 
         this._defaults = config.defaults || {};
@@ -54,7 +64,6 @@ export class DbClient extends EventEmitter {
         };
 
         this._pool = createPool<Adapter.Connection>(poolFactory, poolOptions);
-        this._pool.start();
     }
 
     get defaults(): ClientDefaults {
@@ -87,14 +96,29 @@ export class DbClient extends EventEmitter {
     }
 
     /**
+     * Obtains a connection from the connection pool and executes the callback
+     */
+    async acquire(fn: TransactionFunction, options?: ConnectionOptions): Promise<any>;
+    /**
      * Obtains a connection from the connection pool.
      */
-    async acquire(options?: ConnectionOptions): Promise<Connection> {
+    async acquire(options?: ConnectionOptions): Promise<Connection>
+    async acquire(arg0?: any, arg1?: any): Promise<any> {
         debug('acquire');
+        if (typeof arg0 === 'function') {
+            const connection = await this.acquire(arg1 as ConnectionOptions);
+            try {
+                return await arg0(connection);
+            } finally {
+                connection.release();
+            }
+        }
+        const options = arg1 as ConnectionOptions;
         const adapterConnection = await this._pool.acquire();
         const opts = {autoCommit: this.defaults.autoCommit, ...options}
         const connection = new Connection(this, adapterConnection, opts);
-        connection.on('execute', (...args) => this.emitSafe('execute', ...args));
+        connection.on('execute', (...args) => this.emit('execute', connection, ...args));
+        connection.on('error', (...args) => this.emit('error', connection, ...args));
         return connection;
     }
 
@@ -102,21 +126,24 @@ export class DbClient extends EventEmitter {
      * Shuts down the pool and destroys all resources.
      */
     async close(terminateWait?: number): Promise<void> {
-        const ms = terminateWait == null ? Infinity: 0;
+        const ms = terminateWait == null ? Infinity : 0;
         return this._pool.close(ms);
     }
 
     /**
      * Executes a query or callback with a new acquired connection.
      */
-    async execute(query: string | classes.Query | TransactionFunction,
+    async execute(query: string | classes.Query,
                   options?: QueryExecuteOptions): Promise<QueryResult> {
         debug('execute');
         const connection = await this.acquire();
         try {
-            if (typeof query === 'function')
-                return await query(connection);
-            return await connection.execute(query, options);
+            const qr = await connection.execute(query, options);
+            if (qr && qr.cursor) {
+                connection.retain();
+                qr.cursor.once('close', () => connection.release());
+            }
+            return qr;
         } finally {
             connection.release();
         }
@@ -141,17 +168,6 @@ export class DbClient extends EventEmitter {
 
     [inspect]() {
         return this.toString();
-    }
-
-    emitSafe(event: string | symbol, ...args: any[]): boolean {
-        try {
-            if (event === 'error' && !this.listenerCount('error'))
-                return false;
-            return this.emit(event, ...args);
-        } catch (ignored) {
-            debug('emit-error', ignored);
-            return false;
-        }
     }
 
 }

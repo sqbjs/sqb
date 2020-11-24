@@ -1,5 +1,17 @@
 {
   "name": "regions",
+  "fields": [
+    {
+      "fieldName": "id",
+      "dataType": "varchar",
+      "jsType": "string"
+    },
+    {
+      "fieldName": "name",
+      "dataType": "varchar",
+      "jsType": "string"
+    }
+  ],
   "rows": [
     {
       "id": "FR",

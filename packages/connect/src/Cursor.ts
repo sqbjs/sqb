@@ -1,4 +1,3 @@
-import {EventEmitter} from "events";
 import {Adapter} from './Adapter';
 import {Connection} from './Connection';
 import {FieldInfoMap} from './FieldInfoMap';
@@ -9,12 +8,13 @@ import {coerceToInt} from 'putil-varhelpers';
 import {callFetchHooks, normalizeRows} from './helpers';
 import {ObjectRow, QueryRequest} from './types';
 import {CursorStream, CursorStreamOptions} from './CursorStream';
+import {SafeEventEmitter} from './SafeEventEmitter';
 
 const debug = _debug('sqb:cursor');
 
-export class Cursor extends EventEmitter {
+export class Cursor extends SafeEventEmitter {
 
-    private readonly _session: Connection;
+    private readonly _connection: Connection;
     private readonly _fields: FieldInfoMap;
     private readonly _prefetchRows: number;
     private readonly _request: QueryRequest;
@@ -28,11 +28,11 @@ export class Cursor extends EventEmitter {
     private _row: any;
     private _cache?: DoublyLinked;
 
-    constructor(session: Connection, fields: FieldInfoMap,
+    constructor(connection: Connection, fields: FieldInfoMap,
                 adapterCursor: Adapter.Cursor,
                 request: QueryRequest) {
         super();
-        this._session = session;
+        this._connection = connection;
         this._intlcur = adapterCursor;
         this._fields = fields;
         this._request = request;
@@ -40,10 +40,10 @@ export class Cursor extends EventEmitter {
     }
 
     /**
-     * Returns the Session instance
+     * Returns the Connection instance
      */
-    get session() {
-        return this._session;
+    get connection() {
+        return this._connection;
     }
 
 
@@ -115,10 +115,10 @@ export class Cursor extends EventEmitter {
             await this._intlcur.close();
             this._intlcur = undefined;
             debug('close');
-            this.emitSafe('close');
+            this.emit('close');
         } catch (err) {
             debug('close-error:', err);
-            this.emitSafe('error', err);
+            this.emit('error', err);
             throw err;
         }
     }
@@ -153,6 +153,7 @@ export class Cursor extends EventEmitter {
      * And also it allows iterating over rows easily.
      */
     async next(): Promise<ObjectRow> {
+        debug('next');
         await this._seek(1);
         return this.row;
     }
@@ -226,6 +227,8 @@ export class Cursor extends EventEmitter {
             }
 
             while (step > 0) {
+                if (_this.isEof)
+                    return;
                 /* Seek cache */
                 while (step > 0 && _this._cache && (_this._row = _this._cache.next())) {
                     _this._rowNum++;
@@ -237,6 +240,11 @@ export class Cursor extends EventEmitter {
                     _this._rowNum++;
                     step--;
                 }
+                if (_this._fetchedAll) {
+                    _this._rowNum++;
+                    _this.emit('eof');
+                    return;
+                }
 
                 if (!step || _this._fetchedAll)
                     return;
@@ -245,7 +253,7 @@ export class Cursor extends EventEmitter {
             }
         });
         if (!silent)
-            this.emitSafe('move', this._rowNum, this.row);
+            this.emit('move', this._rowNum, this.row);
         return this._rowNum;
     }
 
@@ -265,7 +273,7 @@ export class Cursor extends EventEmitter {
             });
             callFetchHooks(rows, this._request);
             for (const [idx, row] of rows.entries()) {
-                this.emitSafe('fetch', row, (this._rowNum + idx + 1));
+                this.emit('fetch', row, (this._rowNum + idx + 1));
             }
             /* Add rows to cache */
             if (this._cache) {
@@ -277,19 +285,7 @@ export class Cursor extends EventEmitter {
             return;
         }
         this._fetchedAll = true;
-        this.emitSafe('eof');
         return this.close();
-    }
-
-    emitSafe(event: string | symbol, ...args: any[]): boolean {
-        try {
-            if (event === 'error' && !this.listenerCount('error'))
-                return false;
-            return this.emit(event, ...args);
-        } catch (ignored) {
-            debug('emit-error', ignored);
-            return false;
-        }
     }
 
 }

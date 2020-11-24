@@ -1,6 +1,10 @@
-const {createRunAllScriptsTask} = require('../package');
+/* eslint-disable no-console */
+const {packages} = require('../package');
 
-const tasks = {};
-module.exports = {tasks};
-
-createRunAllScriptsTask('cover', tasks);
+module.exports = {
+  ...packages.createTasks('cover', async (pkg) => {
+        console.log(`cover "${pkg.name}"`);
+        await pkg.execSh('nyc --reporter=cobertura --reporter html --reporter text npm run test');
+      }
+  )
+};

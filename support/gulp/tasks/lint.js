@@ -1,6 +1,12 @@
-const {createRunAllScriptsTask} = require('../package');
+/* eslint-disable no-console */
+const {packages} = require('../package');
 
-const tasks = {};
-module.exports = {tasks};
-
-createRunAllScriptsTask('lint', tasks);
+module.exports = {
+  ...packages.createTasks('lint', async (pkg) => {
+        if (pkg.hasScript('lint')) {
+          console.log(`lint "${pkg.name}"`);
+          await pkg.execScript('lint');
+        }
+      }
+  )
+};

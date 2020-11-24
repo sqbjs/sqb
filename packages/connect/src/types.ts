@@ -19,10 +19,16 @@ export type ObjectRowset = ObjectRow[];
 export type ArrayRowset = ArrayRow[];
 
 export interface ClientConfiguration {
+
+    /**
+     * Dialect to be used
+     */
+    dialect?: string;
+
     /**
      * Database connection driver to be used
      */
-    driver: string;
+    driver?: string;
 
     /**
      * Connection name

@@ -3,7 +3,7 @@ import path from "path";
 import assert from "assert";
 import {Insert, Select, Update} from '@sqb/builder';
 import {
-    Adapter, ClientConfiguration, DbClient,
+    Adapter, ClientConfiguration, Client,
     registerAdapter, unRegisterAdapter
 } from '@sqb/connect';
 
@@ -46,7 +46,7 @@ export function stringifyValueForSQL(v: any): string {
 
 export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfiguration>) {
 
-    let client: DbClient;
+    let client: Client;
     before(() => registerAdapter(adapter));
     after(async () => {
         if (client)
@@ -70,7 +70,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
                 autoCommit: false
             }
         }
-        client = new DbClient(cfg);
+        client = new Client(cfg);
         assert(client.dialect, adapter.dialect);
     });
 
@@ -123,7 +123,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     it('should return cursor and field info', async function () {
         const result = await client.execute(
             Select().from('airports').orderBy('id'),
-            {cursor: true, fetchRows: 100});
+            {cursor: true, fetchRows: 100, objectRows: true});
         assert(result.fields);
         assert(result.fields.get('id'));
         assert(result.fields.get('id').fieldName, 'ID');
@@ -197,7 +197,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
         const oldCatalog = r.rows[0].catalog;
         let newCatalog = null;
 
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             await connection.startTransaction();
             newCatalog = Math.floor(Math.random() * 10000);
             await connection.execute(
@@ -235,7 +235,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
         assert.strictEqual(r.rows[0].id, 'LFBA');
         const oldCatalog = r.rows[0].catalog;
 
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             await connection.startTransaction();
             const catalog = Math.floor(Math.random() * 10000);
             await connection.execute(
@@ -272,7 +272,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
         assert.strictEqual(r.rows[0].id, 'LFBA');
         const oldCatalog = r.rows[0].catalog;
 
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             const catalog = Math.floor(Math.random() * 10000);
             await connection.execute(
                 Update('airports', {
@@ -310,7 +310,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
         const oldCatalog = r.rows[0].catalog;
         let newCatalog = null;
 
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             newCatalog = Math.floor(Math.random() * 10000);
             await connection.execute(
                 Update('airports', {
@@ -340,14 +340,14 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     });
 
     it('should call startTransaction() more than one', async function () {
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             await connection.startTransaction();
             await connection.startTransaction();
         });
     });
 
     it('should call commit() more than one', async function () {
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             await connection.startTransaction();
             await connection.commit();
             await connection.commit();
@@ -355,7 +355,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     });
 
     it('should call rollback() more than one', async function () {
-        await client.execute(async (connection) => {
+        await client.acquire(async (connection) => {
             await connection.startTransaction();
             await connection.rollback();
             await connection.rollback();

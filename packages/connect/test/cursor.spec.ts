@@ -1,21 +1,21 @@
 import './_support/env';
 import assert from 'assert';
 import {Select} from '@sqb/builder';
-import {registerAdapter, unRegisterAdapter, DbClient, Cursor} from '../src';
+import {registerAdapter, unRegisterAdapter, Client, Cursor} from '../src';
 import {TestAdapter, data} from './_support/test_adapter';
 import {Connection} from '../src/Connection';
 
 describe('Cursor', function () {
 
-    let connection: DbClient;
+    let client: Client;
     let cursor: Cursor;
     const testAdapter = new TestAdapter();
     const airports = data.airports;
 
     before(() => registerAdapter(testAdapter));
     before(() => {
-        if (!connection)
-            connection = new DbClient({
+        if (!client)
+            client = new Client({
                 driver: testAdapter.driver,
                 defaults: {
                     cursor: true,
@@ -26,24 +26,24 @@ describe('Cursor', function () {
 
     after(() => unRegisterAdapter(testAdapter));
     after(async () => {
-        if (connection)
-            await connection.close(true);
-        connection = undefined;
+        if (client)
+            await client.close(0);
+        client = undefined;
     });
 
     it('should return Cursor for select queries', async function () {
-        const result = await connection.execute(Select().from('airports'));
+        const result = await client.execute(Select().from('airports'));
         cursor = result && result.cursor;
         assert(cursor);
         assert.strictEqual(cursor.isBof, true);
         assert.strictEqual(cursor.inspect(), '[object Cursor]');
-        assert(cursor.session);
+        assert(cursor.connection);
         return cursor.close();
     });
 
     it('should iterate rows', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             let i = 0;
@@ -56,25 +56,46 @@ describe('Cursor', function () {
                 assert.strictEqual(cursor.rowNum, i);
             }
             assert.strictEqual(cursor.isBof, false);
+            await cursor.next();
             assert.strictEqual(cursor.isEof, true);
         });
     });
 
-    it('should automatically close cursor on session close', function (done) {
-        connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+    it('should automatically close cursor when connection closed (manuel)', function (done) {
+        Promise.resolve().then(async () => {
+            const connection = await client.acquire();
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
-            assert(cursor);
             cursor.on('close', done);
+            connection.release();
+        }).catch(done);
+    });
+
+    it('should automatically close cursor when after acquire block', function (done) {
+        Promise.resolve().then(async () =>
+            client.acquire(async connection => {
+                const result = await connection.execute(Select().from('airports'));
+                cursor = result && result.cursor;
+                cursor.on('close', done);
+            })
+        ).catch(done);
+    });
+
+    it('should automatically connection when cursor closed', function (done) {
+        Promise.resolve().then(async () => {
+            const result = await client.execute(Select().from('airports'));
+            cursor = result && result.cursor;
+            cursor.connection.once('close', done);
+            await cursor.close();
         }).catch(done);
     });
 
     it('should seek() move cursor', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
-            let curRow: number;
+            let curRow = NaN;
             cursor.on('move', (rowNum) => {
                 curRow = rowNum;
             });
@@ -87,8 +108,8 @@ describe('Cursor', function () {
     });
 
     it('should seek(big number) move cursor to eof', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             await cursor.seek(10000);
@@ -100,8 +121,8 @@ describe('Cursor', function () {
     });
 
     it('should seek(big number) move cursor to eof (cached)', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -115,8 +136,8 @@ describe('Cursor', function () {
     });
 
     it('should cache rows', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -126,8 +147,8 @@ describe('Cursor', function () {
     });
 
     it('should move cursor back if cached', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -144,8 +165,8 @@ describe('Cursor', function () {
     });
 
     it('should seek(0) do nothing', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -160,8 +181,8 @@ describe('Cursor', function () {
 
 
     it('should reset cursor in cached mode', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -173,8 +194,8 @@ describe('Cursor', function () {
     });
 
     it('should not reset cursor in non cached mode', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             assert.throws(() => cursor.reset(),
@@ -183,8 +204,8 @@ describe('Cursor', function () {
     });
 
     it('should fetchAll() emit eof', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             cursor.cached();
@@ -196,8 +217,8 @@ describe('Cursor', function () {
     });
 
     it('should fetchAll() does not emit "move" event', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             cursor.cached();
             assert(cursor);
@@ -211,8 +232,8 @@ describe('Cursor', function () {
     });
 
     it('should close cursor after fetched all rows', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             let closeCalled = false;
@@ -227,8 +248,8 @@ describe('Cursor', function () {
     });
 
     it('should not fetch rows if closed', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             await cursor.close();
@@ -238,8 +259,8 @@ describe('Cursor', function () {
     });
 
     it('should cache can not be enabled after fetch', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
             await cursor.next();
@@ -250,22 +271,22 @@ describe('Cursor', function () {
     });
 
     it('should handle close error', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
-            (cursor as any)._adapterCursor.close = () => Promise.reject(new Error('Any error'));
+            (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
             await assert.rejects(() => cursor.close(),
                 /Any error/);
         });
     });
 
     it('should handle adapter errors', async function () {
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(Select().from('airports'));
             cursor = result && result.cursor;
             assert(cursor);
-            (cursor as any)._adapterCursor.fetch = () => Promise.reject(new Error('Any error'));
+            (cursor as any)._intlcur.fetch = () => Promise.reject(new Error('Any error'));
             await assert.rejects(() => cursor.next(),
                 /Any error/);
         });
@@ -275,8 +296,8 @@ describe('Cursor', function () {
         let l = 0;
         const query = Select().from('airports')
             .onFetch((row) => row.customField = ++l);
-        await connection.acquire(async (session: Connection) => {
-            const result = await session.execute(query);
+        await client.acquire(async (connection: Connection) => {
+            const result = await connection.execute(query);
             cursor = result && result.cursor;
             assert(cursor);
             await cursor.seek(10);

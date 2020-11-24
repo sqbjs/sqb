@@ -2,49 +2,79 @@
   "name": "airports",
   "fields": [
     {
-      "name": "ID"
+      "fieldName": "ID",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "ShortName"
+      "fieldName": "ShortName",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "Name"
+      "fieldName": "Name",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "Region"
+      "fieldName": "Region",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "ICAO"
+      "fieldName": "ICAO",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "Flags"
+      "fieldName": "Flags",
+      "dataType": "number",
+      "jsType": "number"
     },
     {
-      "name": "Catalog"
+      "fieldName": "Catalog",
+      "dataType": "number",
+      "jsType": "number"
     },
     {
-      "name": "Length"
+      "fieldName": "Length",
+      "dataType": "number",
+      "jsType": "number"
     },
     {
-      "name": "Elevation"
+      "fieldName": "Elevation",
+      "dataType": "number",
+      "jsType": "number"
     },
     {
-      "name": "Runway"
+      "fieldName": "Runway",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "Frequency"
+      "fieldName": "Frequency",
+      "dataType": "number",
+      "jsType": "number"
     },
     {
-      "name": "Latitude"
+      "fieldName": "Latitude",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "Longitude"
+      "fieldName": "Longitude",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "datevalue"
+      "fieldName": "datevalue",
+      "dataType": "varchar",
+      "jsType": "string"
     },
     {
-      "name": "TestNoValue"
+      "fieldName": "TestNoValue",
+      "dataType": "varchar",
+      "jsType": "string"
     }
   ],
   "rows": [

@@ -103,7 +103,7 @@ export class CursorStream extends Readable {
         try {
             if (event === 'error' && !this.listenerCount('error'))
                 return false;
-            return this.emit(event, ...args);
+            return super.emit(event, ...args);
         } catch (ignored) {
             debug('emit-error', ignored);
             return false;

@@ -1,9 +1,8 @@
-import {EventEmitter} from 'events';
 import {classes} from '@sqb/builder';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
-import {DbClient} from './DbClient';
+import {Client} from './Client';
 import {
     ConnectionOptions,
     ExecuteHookFunction,
@@ -15,18 +14,18 @@ import {
 import {callFetchHooks, normalizeFieldMap, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
+import {SafeEventEmitter} from './SafeEventEmitter';
 
 const debug = _debug('sqb:connection');
 
-export class Connection extends EventEmitter {
+export class Connection extends SafeEventEmitter {
 
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
-    private readonly _cursors: Set<Cursor> = new Set();
     private readonly _options?: ConnectionOptions;
     private _refCount = 1;
 
-    constructor(public readonly client: DbClient,
+    constructor(public readonly client: Client,
                 adapterConnection: Adapter.Connection,
                 options?: ConnectionOptions) {
         super();
@@ -54,7 +53,7 @@ export class Connection extends EventEmitter {
     retain(): void {
         this._refCount++;
         debug('[%s] retain | refCount: %s', this.sessionId, this._refCount);
-        this.emitSafe('acquire');
+        this.emit('acquire');
     }
 
     /**
@@ -64,19 +63,32 @@ export class Connection extends EventEmitter {
      */
     release(): boolean {
         if (!this._intlcon)
-            throw new Error('Session already released');
-        const ref = --this._refCount;
-        if (!ref) {
-            this.emitSafe('release');
-            const intlcon = this._intlcon;
-            this._intlcon = undefined;
-            this.client.pool.release(intlcon)
-                .catch(e => this.client.emitSafe('error', e));
-            debug('[%s] released', intlcon.sessionId);
             return true;
-        } else
-            debug('[%s] release | refCount: %s', this.sessionId, ref);
+        const ref = --this._refCount;
+        debug('[%s] release | refCount: %s', this.sessionId, ref);
+        if (!ref) {
+            this.close().catch(() => 0);
+            return true;
+        }
         return false;
+    }
+
+    /**
+     * Immediately releases the connection.
+     */
+    async close(): Promise<void> {
+        if (!this._intlcon)
+            return;
+        this.emit('close');
+        const intlcon = this._intlcon;
+        void this.emitAsync('close-async')
+            .catch(() => 0)
+            .then(() => {
+                this._intlcon = undefined;
+                this.client.pool.release(intlcon)
+                    .catch(e => this.client.emit('error', e));
+                debug('[%s] closed', intlcon.sessionId);
+            });
     }
 
     async execute(query: string | classes.Query,
@@ -96,11 +108,9 @@ export class Connection extends EventEmitter {
         const intlcon = this._intlcon;
         this.retain();
         try {
-            debug('execute');
             const startTime = Date.now();
             const request = this._prepareQueryRequest(query, options);
-            if (process.env.DEBUG)
-                debug('[%s] execute | %o', this.sessionId, request);
+            debug('[%s] execute | %o', this.sessionId, request);
             this.emitSafe('execute', this, request);
 
             // Call execute hooks
@@ -133,12 +143,9 @@ export class Connection extends EventEmitter {
                     callFetchHooks(result.rows, request);
                 } else if (response.cursor) {
                     const cursor = result.cursor = new Cursor(this, result.fields, response.cursor, request);
-                    this._cursors.add(cursor);
-                    this.retain();
-                    cursor.on('close', () => {
-                        this._cursors.delete(cursor);
-                        this.release();
-                    });
+                    this.on('close-async', () => {
+                        cursor.close().catch(() => 0);
+                    })
                 }
             }
 
@@ -179,7 +186,7 @@ export class Connection extends EventEmitter {
     }
 
     private _prepareQueryRequest(query: string | classes.Query,
-                          options: QueryExecuteOptions = {}): QueryRequest {
+                                 options: QueryExecuteOptions = {}): QueryRequest {
         if (!this._intlcon)
             throw new Error('Session released');
         const defaults = this.client.defaults;

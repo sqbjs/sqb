@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {Readable} from 'stream';
 import {Select} from '@sqb/builder';
-import {registerAdapter, unRegisterAdapter, DbClient, Cursor} from '../src';
+import {registerAdapter, unRegisterAdapter, Client, Cursor} from '../src';
 import {data, TestAdapter} from './_support/test_adapter';
 import {Connection} from '../src/Connection';
 
@@ -40,7 +40,7 @@ function readObjectStream(stream: Readable): Promise<any> {
 
 describe('CursorStream', function () {
 
-    let connection: DbClient;
+    let connection: Client;
     let cursor: Cursor;
     const testAdapter = new TestAdapter();
     const airports = data.airports;
@@ -48,7 +48,7 @@ describe('CursorStream', function () {
     before(() => registerAdapter(testAdapter));
     before(() => {
         if (!connection)
-            connection = new DbClient({
+            connection = new Client({
                 driver: testAdapter.driver,
                 defaults: {
                     cursor: true,
@@ -60,7 +60,7 @@ describe('CursorStream', function () {
     after(() => unRegisterAdapter(testAdapter));
     after(async () => {
         if (connection)
-            await connection.close(true);
+            await connection.close(0);
         connection = undefined;
     });
 
@@ -104,10 +104,10 @@ describe('CursorStream', function () {
         connection.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
-            (cursor as any)._adapterCursor.close = () => Promise.reject(new Error('Any error'));
+            (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
             const stream = cursor.toStream();
             stream.on('error', () => {
-                delete result.cursor._adapterCursor.close;
+                delete result.cursor._intlcur.close;
                 stream.close().then(done).catch(done);
             });
             stream.close().catch(() => 0);
