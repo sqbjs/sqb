@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const gulp = require('gulp');
 const {argv, execSh} = require('./common');
+const {camelCase} = require('putil-varhelpers');
 
 const projectDir = path.resolve(__dirname, '../..');
 const packagesDir = path.join(projectDir, 'packages');
@@ -69,24 +70,51 @@ function createRunAllScriptsTask(scriptName, target) {
   }
 }
 
-let packages;
-(function preparePackages() {
-  const arr = [];
-  for (const f of fs.readdirSync(packagesDir, {})) {
-    if (fs.statSync(path.join(packagesDir, f)).isDirectory()) {
-      arr.push(f);
+class PackageList {
+  constructor() {
+    const arr = [];
+    for (const f of fs.readdirSync(packagesDir, {})) {
+      if (fs.statSync(path.join(packagesDir, f)).isDirectory()) {
+        arr.push(f);
+      }
+    }
+    if (pkgjson.gulp && pkgjson.gulp['package-order']) {
+      const order = pkgjson.gulp['package-order'];
+      arr.sort((a, b) => {
+        if (!order.includes(a))
+          return 1;
+        return order.indexOf(a) - order.indexOf(b);
+      });
+    }
+    this.items = arr.map(x => new Package(x));
+  }
+
+  async everyAsync(fn) {
+    for (const pkg of this.items) {
+      await fn(pkg);
     }
   }
-  if (pkgjson.gulp && pkgjson.gulp['package-order']) {
-    const order = pkgjson.gulp['package-order'];
-    arr.sort((a, b) => {
-      if (!order.includes(a))
-        return 1;
-      return order.indexOf(a) - order.indexOf(b);
-    });
+
+  createTasks(displayName, fn) {
+    const tasks = {};
+    let task = async () => {
+      for (const pkg of this.items) {
+        await fn(pkg);
+      }
+    };
+    task.displayName = displayName;
+    tasks[camelCase(task.displayName)] = task;
+    for (const pkg of this.items) {
+      task = async () => fn(pkg);
+      task.displayName = displayName + '@' + pkg.name;
+      tasks[camelCase(task.displayName)] = task;
+    }
+    return tasks;
   }
-  packages = arr.map(x => new Package(x));
-})();
+
+}
+
+const packages = new PackageList();
 
 module.exports = {
   Package,

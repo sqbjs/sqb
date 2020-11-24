@@ -1,6 +1,12 @@
-const {createRunAllScriptsTask} = require('../package');
+/* eslint-disable no-console */
+const {packages} = require('../package');
 
-const tasks = {};
-module.exports = {tasks};
-
-createRunAllScriptsTask('test', tasks);
+module.exports = {
+  ...packages.createTasks('test', async (pkg) => {
+        if (pkg.hasScript('test')) {
+          console.log(`test "${pkg.name}"`);
+          await pkg.execScript('test');
+        }
+      }
+  )
+};

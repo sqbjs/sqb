@@ -1,17 +1,21 @@
 const clean = require('./tasks/clean');
 const lint = require('./tasks/lint');
-const build = require('./tasks/build');
 const compile = require('./tasks/compile');
+const build = require('./tasks/build');
+const cover = require('./tasks/cover');
 const test = require('./tasks/test');
+const update = require('./tasks/update');
 const version = require('./tasks/version');
 
 const tasks = {
-  ...clean.tasks,
-  ...lint.tasks,
-  ...compile.tasks,
-  ...build.tasks,
-  ...test.tasks,
-  ...version.tasks
+  ...clean,
+  ...lint,
+  ...compile,
+  ...build,
+  ...cover,
+  ...test,
+  ...update,
+  ...version
 };
 
 const keys = Object.keys(tasks).sort();

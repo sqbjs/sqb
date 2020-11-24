@@ -8,9 +8,9 @@ describe('Helpers', function () {
     const arrFields = {
         rowType: 'array' as RowType,
         fields: [
-            {name: 'field_name1'},
-            {name: 'field_name2'},
-            {name: 'field_name3'},
+            {fieldName: 'field_name1'},
+            {fieldName: 'field_name2'},
+            {fieldName: 'field_name3'},
         ] as Adapter.FieldInfo[],
         rows: [['a', 'b', null], ['c', 'd', null]] as ArrayRowset
     };

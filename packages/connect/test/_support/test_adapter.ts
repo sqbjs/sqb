@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 // import {TestMetaOperator} from  require('./test_metaoperator');
-
 import {
     Adapter,
     ClientConfiguration,
@@ -20,7 +19,7 @@ fillTable('foreign_keys');
 fillTable('airports');
 
 function fillTable(tableName) {
-    const obj = require('./db/' + tableName + '.json');
+    const obj = require('../../../../support/test-data/' + tableName + '.json');
     data[tableName] = {
         fields: obj.fields,
         rows: obj.rows
@@ -47,7 +46,7 @@ export class TestAdapter implements Adapter {
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         if (module.exports.errorCreateConnection)
             throw new Error('Any error');
-        return new TestSession(this, config);
+        return new TestConnection(this, config);
     }
 
     recordCount(table: string): number {
@@ -55,7 +54,7 @@ export class TestAdapter implements Adapter {
     }
 }
 
-class TestSession implements Adapter.Connection {
+class TestConnection implements Adapter.Connection {
 
     sessionId: number;
     _closed: boolean;
@@ -63,7 +62,7 @@ class TestSession implements Adapter.Connection {
     _data: any;
     _transactionCounter = 0;
 
-    constructor(public adapter: TestAdapter, config: ClientConfiguration) {
+    constructor(public adapter: TestAdapter, public config: ClientConfiguration) {
         this.sessionId = ++sessionId;
         this._data = adapter._data;
     }
@@ -104,18 +103,18 @@ class TestSession implements Adapter.Connection {
             if (!tableName)
                 throw new Error('Invalid query');
 
-            const o = data[tableName];
-            if (!o)
+            const table = data[tableName];
+            if (!table)
                 throw new Error(`Table unknown (${tableName}`);
-            const out: any = {fields: [...o.fields]};
+            const out: any = {fields: [...table.fields]};
             // Clone records
             let i;
-            let len = query.cursor ? o.rows.length :
-                Math.min(o.rows.length, query.fetchRows ? query.fetchRows : o.rows.length);
+            let len = query.cursor ? table.rows.length :
+                Math.min(table.rows.length, query.fetchRows ? query.fetchRows : table.rows.length);
             const rows = [];
             out.rowType = 'object';
             for (i = 0; i < len; i++)
-                rows.push({...o.rows[i]});
+                rows.push({...table.rows[i]});
 
             if (query.cursor) {
                 out.cursor = new TestCursor(this, rows);
@@ -125,9 +124,17 @@ class TestSession implements Adapter.Connection {
         if (sql.substring(0, 6) === 'insert') {
             const m = sql.match(/\binto (\w+)\b/i);
             const tableName = m && m[1];
+            const table = data[tableName];
+            if (!table)
+                throw new Error(`Table unknown (${tableName}`);
             this._data[tableName].rows.push(query.values);
             if (sql.includes('returning'))
-                return {rows: [query.values], rowsAffected: 1};
+                return {
+                    fields: [...table.fields],
+                    rows: [query.values],
+                    rowsAffected: 1,
+                    rowType: 'object'
+                };
             return {rowsAffected: 1};
         }
 
@@ -175,7 +182,7 @@ class TestCursor implements Adapter.Cursor {
     public isClosed = false;
     readonly rowType: 'object';
 
-    constructor(public session: TestSession, private _rows: any) {
+    constructor(public session: TestConnection, private _rows: any) {
     }
 
     async close() {

@@ -24,11 +24,10 @@ function execSh(command, options) {
     let rejected;
     try {
       const cp = process.platform === 'win32' ?
-          spawn('cmd', ['/C', command], opts)
-          : spawn('sh', ['-c', command], opts);
+          spawn('cmd', ['/C', command], opts) : spawn('sh', ['-c', command], opts);
       cp.on('error', (e) => {
         rejected = true;
-        return reject(new Error(colors.red(`Command failed with code (${code})`) +
+        return reject(new Error(colors.red(`Command failed with code (${e.code})`) +
             `\n  ${colors.gray(command)}\n  ` + e.message));
       });
       cp.on('close', (code) => {

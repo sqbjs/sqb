@@ -47,10 +47,7 @@
   "scripts": {
     "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
     "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
-    "clean": "npm run clean:src && npm run clean:test && npm run clean:dist",
-    "clean:dist": "ts-cleanup -d dist --remove-dirs --all",
-    "clean:src": "ts-cleanup -s src --all | ts-cleanup -s test",
-    "build": "npm run clean | tsc -b tsconfig-build.json",
+    "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
     "lint": "eslint src/** --no-error-on-unmatched-pattern",
     "travis-cover": "nyc --reporter lcovonly npm run test"

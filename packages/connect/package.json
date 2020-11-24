@@ -1,6 +1,6 @@
 {
   "name": "@sqb/connect",
-  "description": "Extensible, multi-dialect SQL query builder and Database connection framework for TypeScript and JavaScript",
+  "description": "Multi-dialect database connection framework written with TypeScript",
   "version": "4.0.1-alpha.1",
   "author": "Panates Ltd.",
   "contributors": [
@@ -13,15 +13,23 @@
   },
   "keywords": [
     "javascript",
+    "typescript",
+    "sqb",
+    "rdbms",
     "sql",
-    "query",
-    "builder",
+    "client",
     "dialect",
     "multi-dialect",
-    "database"
+    "database",
+    "oracle",
+    "postgres",
+    "pg",
+    "mssql",
+    "sqlite",
+    "mysql"
   ],
   "dependencies": {
-    "debug": "^4.2.0",
+    "debug": "^4.3.1",
     "lightning-pool": "^3.0.1",
     "putil-isplainobject": "^1.1.3",
     "putil-merge": "^3.6.2",
@@ -33,7 +41,7 @@
     "@types/debug": "^4.1.5"
   },
   "peerDependencies": {
-    "@sqb/builder": ">4.0.0"
+    "@sqb/builder": "^4.0.1-alpha.1"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -52,10 +60,7 @@
   "scripts": {
     "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
     "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
-    "clean": "npm run clean:src && npm run clean:test && npm run clean:dist",
-    "clean:dist": "ts-cleanup -d dist --remove-dirs --all",
-    "clean:src": "ts-cleanup -s src --all | ts-cleanup -s test",
-    "build": "npm run clean | tsc -b tsconfig-build.json",
+    "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
     "lint": "eslint src/** --no-error-on-unmatched-pattern",
     "travis-cover": "nyc --reporter lcovonly npm run test"
