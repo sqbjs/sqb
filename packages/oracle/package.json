@@ -13,6 +13,7 @@
   },
   "keywords": [
     "javascript",
+    "typescript",
     "sql",
     "query",
     "builder",
@@ -22,7 +23,8 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/oracledb": "^5.0.0"
+    "@types/oracledb": "^5.0.0",
+    "oracledb": "^5.0.0"
   },
   "peerDependencies": {
     "oracledb": "^5.0.0",

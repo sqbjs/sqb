@@ -13,6 +13,7 @@
   },
   "keywords": [
     "javascript",
+    "typescript",
     "sql",
     "query",
     "builder",
@@ -26,7 +27,7 @@
     "putil-promisify": "^1.8.2"
   },
   "devDependencies": {
-    "postgresql-client": "^1.9.1"
+    "postgresql-client": "^1.9.2"
   },
   "peerDependencies": {
     "@sqb/postgres-dialect": "^4.0.1-alpha.1",

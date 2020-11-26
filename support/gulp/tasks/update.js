@@ -9,7 +9,7 @@ module.exports = {
   ),
   ...packages.createTasks('outdated', async (pkg) => {
         console.log(`outdated "${pkg.name}"`);
-        await pkg.execSh('npm outdated');
+        await pkg.execSh('npm outdated').catch(() => 0);
       }
   )
 };
