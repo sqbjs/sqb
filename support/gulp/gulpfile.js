@@ -6,6 +6,7 @@ const cover = require('./tasks/cover');
 const test = require('./tasks/test');
 const update = require('./tasks/update');
 const version = require('./tasks/version');
+const link = require('./tasks/link');
 
 const tasks = {
   ...clean,
@@ -15,7 +16,8 @@ const tasks = {
   ...cover,
   ...test,
   ...update,
-  ...version
+  ...version,
+  ...link
 };
 
 const keys = Object.keys(tasks).sort();

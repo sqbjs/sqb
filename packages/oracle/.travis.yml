@@ -1,10 +1,10 @@
 language: node_js
 node_js:
   - "10"
-  - "13"
 branches:
   only:
     - master
+    - v4
 dist: xenial
 cache:
   directories:
