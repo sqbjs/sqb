@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const {spawn} = require('child_process');
 const npmRunPath = require('npm-run-path');
 const minimist = require('minimist');
@@ -24,10 +26,16 @@ function execSh(command, options) {
     let rejected;
     try {
       const cp = process.platform === 'win32' ?
-          spawn('cmd', ['/C', command], opts) : spawn('sh', ['-c',
-            command], opts);
+          spawn('cmd', ['/C', command], opts) :
+          spawn('sh', ['-c', command], opts);
+      cp.on('message', msg => {
+        if (opts.onMessage)
+          opts.onMessage(msg);
+      });
       cp.on('error', (e) => {
         rejected = true;
+        if (opts.onError)
+          opts.onError(e);
         return reject(new Error(colors.red(`Command failed with code (${e.code})`) +
             `\n  ${colors.gray(command)}\n  ` + e.message));
       });
@@ -46,7 +54,22 @@ function execSh(command, options) {
   });
 }
 
+function deleteFolderRecursive(dir) {
+  if (fs.existsSync(dir)) {
+    fs.readdirSync(dir).forEach((file) => {
+      const curPath = path.join(dir, file);
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(dir);
+  }
+}
+
 module.exports = {
   argv,
-  execSh
+  execSh,
+  deleteFolderRecursive
 };

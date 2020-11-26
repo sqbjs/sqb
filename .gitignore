@@ -3,6 +3,7 @@
 packages/*/dist
 packages/*/node_modules
 packages/*/coverage
+coverage
 
 # environment variables
 .env

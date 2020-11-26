@@ -6,6 +6,7 @@ import {serializers} from '../src/extensions';
 describe('Serializer Extensions', function () {
 
     it('should register serialization extension', () => {
+        const oldLen = serializers.length;
         const extension1: SerializerExtension = {
             dialect: 'any-dialect',
             serialize: () => ''
@@ -15,9 +16,9 @@ describe('Serializer Extensions', function () {
             isReservedWord: () => true
         }
         registerSerializer(extension1, extension2);
-        assert.strictEqual(serializers.length, 2);
-        assert.strictEqual(serializers[0], extension1);
-        assert.strictEqual(serializers[1], extension2);
+        assert.strictEqual(serializers.length, oldLen + 2);
+        assert.strictEqual(serializers[oldLen], extension1);
+        assert.strictEqual(serializers[oldLen + 1], extension2);
         unRegisterSerializer(extension1, extension2);
     });
 
