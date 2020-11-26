@@ -106,7 +106,7 @@ describe('CursorStream', function () {
             cursor = result && result.cursor;
             (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
             const stream = cursor.toStream();
-            stream.on('error', () => {
+            stream.once('error', () => {
                 delete result.cursor._intlcur.close;
                 stream.close().then(done).catch(done);
             });
