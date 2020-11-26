@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
+const colors = require('colors');
 const {packages} = require('../package');
 const path = require('path');
 const fs = require('fs');
-const colors = require('colors');
 const semver = require('semver');
 
 function versionPackage(pkg, version) {
-  console.log(`version "${pkg.name}"`);
+  console.log(`version '${colors.cyan(pkg.name)}'`);
   pkg.json.version = version;
   ['dependencies', 'devDependencies', 'peerDependencies'].forEach((n) => {
     if (!pkg.json[n])
@@ -28,7 +28,7 @@ function version(option) {
       json.version = semver.inc(json.version, option);
       fs.writeFileSync(p, JSON.stringify(json, null, 2), 'utf-8');
     }
-    console.log(`Updating version to "${colors.magenta(json.version)}"`);
+    console.log(`Updating version to '${colors.magenta(json.version)}'`);
     for (const pkg of packages.items) {
       versionPackage(pkg, json.version);
     }
