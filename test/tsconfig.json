@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig-base.json",
+  "include": ["**/*.ts"],
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictNullChecks": false,
+    "strict": false,
+    "noEmit": true,
+    "sourceMap": true,
+    "baseUrl": "./",
+    "paths": {
+      "@sqb/builder": ["../packages/builder/src"],
+      "@sqb/connect": ["../packages/connect/src"],
+      "@sqb/mssql-dialect": ["../packages/mssql-dialect/src"],
+      "@sqb/oracle-dialect": ["../packages/oracle-dialect/src"],
+      "@sqb/postgres-dialect": ["../packages/postgres-dialect/src"]
+    }
+  }
+}

@@ -55,7 +55,6 @@
     "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
     "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
-    "lint": "eslint src/** --no-error-on-unmatched-pattern",
-    "travis-cover": "nyc --reporter lcovonly npm run test"
+    "lint": "eslint src/** --no-error-on-unmatched-pattern"
   }
 }

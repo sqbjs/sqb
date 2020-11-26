@@ -3,6 +3,11 @@ const colors = require('colors');
 const {packages} = require('../package');
 
 module.exports = {
+  ...packages.createTasks('install', async (pkg) => {
+        console.log(`install '${colors.cyan(pkg.name)}'`);
+        await pkg.execSh('npm install');
+      }
+  ),
   ...packages.createTasks('update', async (pkg) => {
         console.log(`update '${colors.cyan(pkg.name)}'`);
         await pkg.execSh('npm update --save');

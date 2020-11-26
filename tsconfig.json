@@ -1,9 +1,12 @@
 {
   "include": [
-    "./packages"
+    "./packages",
+    "./test"
   ],
   "exclude": [
     "node_modules",
-    "lib"
+    "dist",
+    "coverage",
+    "docs"
   ]
 }
