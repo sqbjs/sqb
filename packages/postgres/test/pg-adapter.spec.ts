@@ -3,6 +3,8 @@ import {Connection, stringifyValueForSQL} from 'postgresql-client';
 import {PgAdapter} from '../src/PgAdapter';
 import {getInsertSQLsForTestData, initAdapterTests} from '../../connect/test/shared/adapter-tests';
 
+process.env.PGSCHEMA = process.env.PGSCHEMA || 'test';
+
 describe('PgAdapter', function () {
     const adapter = new PgAdapter();
     const _createDatabase = true;
@@ -34,8 +36,9 @@ describe('PgAdapter', function () {
 });
 
 async function createTestSchema(connection: Connection) {
-    const structureScript = (await import('./_support/db_schema')).sql;
-    await connection.execute(structureScript);
+    await connection.execute(
+        (await import('./_support/db_schema')).sql
+    );
     const dataFiles = getInsertSQLsForTestData({stringifyValueForSQL});
     for (const table of dataFiles)
         await connection.execute(table.scripts.join(';\n'));
