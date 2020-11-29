@@ -14,7 +14,9 @@
       "@sqb/connect": ["../packages/connect/src"],
       "@sqb/mssql-dialect": ["../packages/mssql-dialect/src"],
       "@sqb/oracle-dialect": ["../packages/oracle-dialect/src"],
-      "@sqb/postgres-dialect": ["../packages/postgres-dialect/src"]
+      "@sqb/postgres": ["../packages/postgres/src"],
+      "@sqb/postgres-dialect": ["../packages/postgres-dialect/src"],
+      "@sqb/nestjs": ["../packages/nestjs/src"]
     }
   }
 }
