@@ -47,7 +47,8 @@
       "oracle-dialect",
       "mssql-dialect",
       "postgres",
-      "oracle"
+      "oracle",
+      "nestjs"
     ]
   }
 }

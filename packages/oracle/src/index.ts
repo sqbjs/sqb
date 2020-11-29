@@ -1,7 +1,5 @@
 import {registerAdapter} from '@sqb/connect'
 import {OraAdapter} from './OraAdapter';
-
-// eslint-disable-next-line no-console
-console.log(OraAdapter);
+import '@sqb/oracle-dialect';
 
 registerAdapter(new OraAdapter());
