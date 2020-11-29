@@ -60,8 +60,8 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "scripts": {
-    "_test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
-    "_cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
+    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
     "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
     "lint": "eslint src/** --no-error-on-unmatched-pattern"
