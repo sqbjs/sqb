@@ -23,6 +23,7 @@ export class Connection extends SafeEventEmitter {
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
     private readonly _options?: ConnectionOptions;
+    private _inTransaction = false;
     private _refCount = 1;
 
     constructor(public readonly client: Client,
@@ -45,6 +46,13 @@ export class Connection extends SafeEventEmitter {
      */
     get refCount(): number {
         return this._refCount;
+    }
+
+    /**
+     * Returns true if transaction started
+     */
+    get inTransaction(): boolean {
+        return this._inTransaction;
     }
 
     /**
@@ -162,6 +170,7 @@ export class Connection extends SafeEventEmitter {
         if (!this._intlcon)
             throw new Error('Can not call startTransaction() on a released connection');
         await this._intlcon.startTransaction();
+        this._inTransaction = true;
         this.emitSafe('start-transaction');
     }
 
@@ -169,6 +178,7 @@ export class Connection extends SafeEventEmitter {
         if (!this._intlcon)
             throw new Error('Can not call commit() on a released connection');
         await this._intlcon.commit();
+        this._inTransaction = false;
         this.emitSafe('commit');
     }
 
@@ -176,6 +186,7 @@ export class Connection extends SafeEventEmitter {
         if (!this._intlcon)
             throw new Error('Can not call rollback() on a released connection');
         await this._intlcon.rollback();
+        this._inTransaction = false;
         this.emitSafe('rollback');
     }
 
@@ -194,7 +205,8 @@ export class Connection extends SafeEventEmitter {
         const request: QueryRequest = {
             dialect: this.client.dialect,
             sql: '',
-            autoCommit: coerceToBoolean(coalesce(options.autoCommit, defaults.autoCommit), false),
+            autoCommit: this.inTransaction ? false :
+                coerceToBoolean(coalesce(options.autoCommit, this._options?.autoCommit, defaults.autoCommit), true),
             cursor: coerceToBoolean(coalesce(options.cursor, defaults.cursor), false),
             objectRows: coerceToBoolean(coalesce(options.objectRows, defaults.objectRows), true),
             ignoreNulls: coerceToBoolean(coalesce(options.ignoreNulls, defaults.ignoreNulls), false),

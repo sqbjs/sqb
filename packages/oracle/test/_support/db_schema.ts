@@ -7,7 +7,7 @@ EXCEPTION
       IF SQLCODE != -942 THEN
          RAISE;
       END IF;
-END`,
+END;`,
 
 `BEGIN
    EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.regions';
@@ -16,9 +16,9 @@ EXCEPTION
       IF SQLCODE != -942 THEN
          RAISE;
       END IF;
-END`,
+END;`,
 
-`CREATE TABLE ${process.env.ORASCHEMA}.regions(
+`CREATE TABLE ${process.env.ORASCHEMA}.regions (
   id    VARCHAR2(5),
   name  VARCHAR2(16)
 )`,

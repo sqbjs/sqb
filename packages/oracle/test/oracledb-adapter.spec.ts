@@ -3,7 +3,7 @@ import {OraAdapter} from '../src/OraAdapter';
 import oracledb from 'oracledb';
 import {ClientConfiguration} from '@sqb/connect';
 import {
-    getInsertSQLsForTestData, stringifyValueForSQL,
+    getInsertSQLsForTestData,
     initAdapterTests
 } from '../../connect/test/shared/adapter-tests';
 import {clientConfigurationToDriver} from '../src/helpers';
@@ -27,9 +27,14 @@ describe('OraAdapter', function () {
         before(async () => {
             this.timeout(30000);
             this.slow(1000);
-            const connection = await oracledb.getConnection(clientConfigurationToDriver(config));
+            const cfg = clientConfigurationToDriver(config);
+            const connection = await oracledb.getConnection(cfg);
             try {
                 await createTestSchema(connection);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+                throw e;
             } finally {
                 await connection.close();
             }
@@ -40,19 +45,27 @@ describe('OraAdapter', function () {
 });
 
 async function createTestSchema(connection: oracledb.Connection) {
-    const sqls = (await import('./_support/db_schema')).sqls;
-    for (const s of sqls) {
+    const x = (await import('./_support/db_schema'));
+    for (const s of x.sqls) {
         await connection.execute(s);
     }
-    const dataFiles = getInsertSQLsForTestData();
+    const dataFiles = getInsertSQLsForTestData({
+        schema: process.env.ORASCHEMA || 'test',
+        stringifyValueForSQL
+    });
     for (const table of dataFiles) {
-        let sql = 'begin\n' +
-            '     execute immediate\n';
+        let sql = 'begin\n';
         for (const s of table.scripts) {
-            sql += stringifyValueForSQL(s) + ';\n';
+            sql += '     execute immediate ' + stringifyValueForSQL(s) + ';\n';
         }
-        sql += 'end;'
+        sql += 'execute immediate \'commit\';\n end;'
         await connection.execute(sql);
     }
 
+}
+
+export function stringifyValueForSQL(v: any): string {
+    if (typeof v === 'string')
+        return "'" + v.replace(/'/g, "''") + "'";
+    return '' + v;
 }

@@ -8,6 +8,7 @@ import {
 } from '@sqb/connect';
 
 export function getInsertSQLsForTestData(opts?: {
+    schema?: string,
     stringifyValueForSQL?: (v: any) => string;
 }) {
     const result: { table: string, scripts: string[] }[] = [];
@@ -19,6 +20,7 @@ export function getInsertSQLsForTestData(opts?: {
     ];
 
     const stringify = opts?.stringifyValueForSQL || stringifyValueForSQL;
+    const schema = opts?.schema ? opts?.schema + '.' : '';
 
     for (const table of dataFiles) {
         const file = {table, scripts: []};
@@ -28,7 +30,7 @@ export function getInsertSQLsForTestData(opts?: {
 
         for (const row of table.rows) {
             const values = keys.map(x => stringify(row[x]));
-            const insertSql = 'insert into test.' + table.name +
+            const insertSql = 'insert into ' + schema + table.name +
                 ' (' + fields.join(',') + ') values (' + values.join(',') + ')';
             file.scripts.push(insertSql);
         }
@@ -67,7 +69,8 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
             },
             defaults: {
                 objectRows: true,
-                autoCommit: false
+                autoCommit: false,
+                fieldNaming: 'lowercase'
             }
         }
         client = new Client(cfg);
@@ -82,7 +85,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
 
     it('should execute a raw select query', async function () {
         const result = await client.execute('select * from airports order by id');
-        assert(result && result.rows);
+        assert(result && result.rows && result.rows.length);
         assert(result.rows[0].id === 'AIGRE');
     });
 

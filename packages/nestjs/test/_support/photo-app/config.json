@@ -1,0 +1,7 @@
+{
+  "name": "db1",
+  "dialect": "postgres",
+  "schema": "test",
+  "retryAttempts": 2,
+  "retryDelay": 1000
+}

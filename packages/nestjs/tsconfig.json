@@ -6,10 +6,11 @@
     "declaration": true,
     "sourceMap": true,
     "baseUrl": "./",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@sqb/builder": ["../builder"],
-      "@sqb/connect": ["../connect"],
-      "@sqb/post": ["../oracle-dialect"]
+      "@sqb/connect": ["../connect"]
     }
   },
   "include": ["src/**/*.ts"],
