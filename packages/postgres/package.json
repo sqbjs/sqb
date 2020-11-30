@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.0.1-alpha.1",
+  "version": "4.0.1-alpha.2",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -25,7 +25,7 @@
   ],
   "dependencies": {
     "putil-promisify": "^1.8.2",
-    "@sqb/postgres-dialect": "^4.0.1-alpha.1"
+    "@sqb/postgres-dialect": "^4.0.1-alpha.2"
   },
   "devDependencies": {
     "postgresql-client": "^1.9.2"

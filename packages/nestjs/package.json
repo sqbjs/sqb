@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.0.1-alpha.1",
+  "version": "4.0.1-alpha.2",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -39,8 +39,8 @@
     "@nestjs/core": "^7.5.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3",
-    "@sqb/builder": "^4.0.1-alpha.1",
-    "@sqb/connect": "^4.0.1-alpha.1"
+    "@sqb/builder": "^4.0.1-alpha.2",
+    "@sqb/connect": "^4.0.1-alpha.2"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
