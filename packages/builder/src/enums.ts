@@ -24,6 +24,7 @@ export enum SerializationType {
     SELECT_COLUMN = 'select_column',
     GROUP_COLUMN = 'group_column',
     ORDER_COLUMN = 'order_column',
+    RETURNING_COLUMN = 'returning_column',
     TABLE_NAME = 'table_name',
     JOIN = 'join',
     JOIN_CONDITIONS = 'join_conditions',

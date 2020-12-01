@@ -3,58 +3,44 @@ import {
     ArrayRow,
     ArrayRowset,
     CoercionFunction,
-    FieldInfo, FieldNaming, ObjectRow, ObjectRowset,
-    QueryRequest
+    FieldInfo, FieldNaming, ObjectRow, ObjectRowset, QueryRequest
 } from './types';
-import {Adapter} from './Adapter';
 import {FieldInfoMap} from './FieldInfoMap';
+import {Adapter} from './Adapter';
 
-export function applyNamingStrategy(fieldName: string, namingStrategy?: FieldNaming): string {
+export function applyNamingStrategy(value: string, namingStrategy?: FieldNaming): string {
     if (typeof namingStrategy === 'string') {
         switch (namingStrategy.toLowerCase()) {
             case 'lowercase':
-                return fieldName.toLowerCase();
+                return value.toLowerCase();
             case 'uppercase':
-                return fieldName.toUpperCase();
+                return value.toUpperCase();
             case 'camelcase':
-                if (!fieldName.match(/[a-z]/))
-                    return camelCase(fieldName.toLowerCase());
-                fieldName = camelCase(fieldName);
-                return fieldName[0].toLowerCase() + fieldName.substring(1);
+                if (!value.match(/[a-z]/))
+                    return camelCase(value.toLowerCase());
+                value = camelCase(value);
+                return value[0].toLowerCase() + value.substring(1);
             case 'pascalcase':
-                if (!fieldName.match(/[a-z]/))
-                    return pascalCase(fieldName.toLowerCase());
-                return pascalCase(fieldName);
+                if (!value.match(/[a-z]/))
+                    return pascalCase(value.toLowerCase());
+                return pascalCase(value);
         }
     } else if (typeof namingStrategy === 'function')
-        return namingStrategy(fieldName);
-    return fieldName;
+        return namingStrategy(value);
+    return value;
 }
 
-export function normalizeFieldMap(oldFields: Record<string, Adapter.FieldInfo> | Adapter.FieldInfo[],
+export function wrapAdapterFields(oldFields: Adapter.Field[],
                                   fieldNaming?: FieldNaming): FieldInfoMap {
-
-    const mapFieldInfo = (f: Adapter.FieldInfo, index: number): FieldInfo => {
-        const n = applyNamingStrategy(f.fieldName, fieldNaming);
-        const x: FieldInfo = {...f, name: f.fieldName, index};
-        if (n !== x.name)
-            x.name = n;
-        return x;
+    const mapFieldInfo = (f: Adapter.Field, index: number): FieldInfo => {
+        const name = applyNamingStrategy(f.fieldName, fieldNaming);
+        return {...f, name, index} as FieldInfo;
     };
     const result = new FieldInfoMap();
-    if (Array.isArray(oldFields)) {
-        oldFields.forEach((f, index) => {
-            const x = mapFieldInfo(f, index);
-            result.add(x);
-        });
-    } else {
-        let i = 0;
-        for (const [k, f] of Object.entries(oldFields)) {
-            f.fieldName = k;
-            const x = mapFieldInfo(f, i++);
-            result.add(x);
-        }
-    }
+    oldFields.forEach((f, index) => {
+        const x = mapFieldInfo(f, index);
+        result.add(x);
+    });
     return result;
 }
 

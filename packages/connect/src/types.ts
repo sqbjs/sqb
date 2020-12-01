@@ -1,14 +1,15 @@
-import {Connection} from './Connection';
-import {FieldInfoMap} from './FieldInfoMap';
-import {Cursor} from './Cursor';
-import {PoolConfiguration} from 'lightning-pool';
+import type {Connection} from './Connection';
+import type {FieldInfoMap} from './FieldInfoMap';
+import type {Cursor} from './Cursor';
+import type {PoolConfiguration} from 'lightning-pool';
+import {Adapter} from './Adapter';
 
 export type Maybe<T> = T | void | null;
 
+export type ExecuteHookFunction = (connection: Connection, request: QueryRequest) => Promise<void>;
+export type FetchFunction = (row: any, request: QueryRequest) => void;
 export type CoercionFunction = (value: any, fieldInfo?: FieldInfo) => any;
 export type TransactionFunction = (session: Connection) => Promise<any>;
-export type ExecuteHookFunction = (session: Connection, request: QueryRequest) => Promise<void>;
-export type FetchFunction = (row: any, request: QueryRequest) => void;
 
 export type RowType = 'array' | 'object';
 export type FieldNaming = 'lowercase' | 'uppercase' | 'camelcase' |
@@ -36,12 +37,7 @@ export interface ClientConfiguration {
     name?: string;
 
     /**
-     * Connection string
-     */
-    connectString?: string;
-
-    /**
-     * Database  host address
+     * Database server address or url
      */
     host?: string;
 
@@ -172,25 +168,8 @@ export interface QueryExecuteOptions {
 
     action?: string;
 
-}
+    returningFields?: Record<string, string>;
 
-export interface QueryRequest {
-    dialect?: string;
-    dialectVersion?: string;
-    sql: string;
-    values?: any;
-    autoCommit?: boolean;
-    cursor?: boolean;
-    objectRows?: boolean;
-    ignoreNulls?: boolean;
-    fetchRows?: number;
-    fieldNaming?: FieldNaming;
-    coercion?: CoercionFunction;
-    showSql?: boolean;
-    action?: string;
-    executeHooks?: ExecuteHookFunction[];
-    fetchHooks?: FetchFunction[];
-    // returningParams?: any;
 }
 
 export interface QueryResult {
@@ -204,8 +183,26 @@ export interface QueryResult {
     cursor?: Cursor;
 }
 
-export interface FieldInfo {
-    name: string;
-    fieldName: string;
+export type FieldInfo = {
     index: number;
+    name: string;
+} & Adapter.Field;
+
+export interface QueryRequest {
+    dialect?: string;
+    dialectVersion?: string;
+    sql: string;
+    values?: any;
+    returningFields?: Record<string, string>;
+    autoCommit?: boolean;
+    cursor?: boolean;
+    objectRows?: boolean;
+    ignoreNulls?: boolean;
+    fetchRows?: number;
+    fieldNaming?: FieldNaming;
+    coercion?: CoercionFunction;
+    showSql?: boolean;
+    action?: string;
+    executeHooks?: ExecuteHookFunction[];
+    fetchHooks?: FetchFunction[];
 }

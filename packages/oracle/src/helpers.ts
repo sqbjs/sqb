@@ -1,23 +1,37 @@
 import {ConnectionAttributes} from 'oracledb';
 import {ClientConfiguration} from '@sqb/connect';
+import url from "url";
 
 export function clientConfigurationToDriver(config: ClientConfiguration): ConnectionAttributes {
-    // Sql injection check
-    if (config.schema && !config.schema.match(/^\w+$/))
-        throw new Error('Invalid schema name');
-    const cfg: ConnectionAttributes = {};
-    // Authentication options
-    if (config.driverOptions?.externalAuth)
-        cfg.externalAuth = config.driverOptions?.externalAuth;
-    else {
-        cfg.user = config.user;
-        cfg.password = config.password;
+
+    const cfg: ConnectionAttributes = {
+        user: config.user,
+        password: config.password,
+        ...config.driverOptions
+    };
+
+    if (config.host) {
+        let hostUrl = config.host || 'localhost';
+        if (!hostUrl.includes('://'))
+            hostUrl = 'oracle://' + hostUrl;
+
+        const parsed = url.parse(hostUrl, true);
+        const host = decodeURI(parsed.hostname || '');
+        const port = config.port ||
+            (parsed.port && parseInt(parsed.port, 10)) || 1521;
+        const database = config.database ||
+            (parsed.pathname && decodeURI(parsed.pathname.substring(1)));
+        cfg.connectString = `${host}:${port}${(database ? '/' + database : '')}`;
+        if (!cfg.externalAuth) {
+            if (parsed.auth) {
+                const a = parsed.auth.split(':');
+                if (!cfg.user && a[0])
+                    cfg.user = a[0];
+                if (!cfg.password && a[1])
+                    cfg.password = a[1];
+            }
+        }
     }
-    // Connection options
-    if (config.connectString)
-        cfg.connectString = config.connectString;
-    else if (config.host)
-        cfg.connectString = `${config.host}:${config.port || '1521'}` +
-            (config.database ? '/' + config.database : '');
+
     return cfg;
 }

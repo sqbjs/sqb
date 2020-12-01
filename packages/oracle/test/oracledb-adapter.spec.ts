@@ -12,7 +12,7 @@ describe('OraAdapter', function () {
 
     const adapter = new OraAdapter();
     const env = process.env;
-    const _createDatabase = true;
+    const _createDatabase = false;
     const config: ClientConfiguration = {
         driver: 'oracledb',
         host: env.ORAHOST,
@@ -20,13 +20,15 @@ describe('OraAdapter', function () {
         database: env.ORADATABASE,
         user: env.ORAUSER,
         password: env.ORAPASSWORD,
-        schema: env.ORASCHEMA || 'test'
+        schema: env.ORASCHEMA || 'test',
+        defaults: {
+            fieldNaming: 'lowercase'
+        }
     };
 
     if (_createDatabase) {
-        before(async () => {
+        before(async function () {
             this.timeout(30000);
-            this.slow(1000);
             const cfg = clientConfigurationToDriver(config);
             const connection = await oracledb.getConnection(cfg);
             try {

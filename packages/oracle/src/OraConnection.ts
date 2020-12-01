@@ -1,5 +1,34 @@
 import oracledb from 'oracledb';
 import {Adapter, QueryRequest} from '@sqb/connect';
+import {OraCursor} from './OraCursor';
+
+const dataTypeNames = {
+    [oracledb.DB_TYPE_BFILE]: 'BFILE',
+    [oracledb.DB_TYPE_BINARY_DOUBLE]: 'BINARY_DOUBLE',
+    [oracledb.DB_TYPE_BINARY_FLOAT]: 'BINARY_FLOAT',
+    [oracledb.DB_TYPE_BINARY_INTEGER]: 'BINARY_INTEGER',
+    [oracledb.DB_TYPE_BLOB]: 'BLOB',
+    [oracledb.DB_TYPE_BOOLEAN]: 'BOOLEAN',
+    [oracledb.DB_TYPE_CHAR]: 'CHAR',
+    [oracledb.DB_TYPE_CLOB]: 'CLOB',
+    [oracledb.DB_TYPE_CURSOR]: 'CURSOR',
+    [oracledb.DB_TYPE_DATE]: 'DATE',
+    [oracledb.DB_TYPE_INTERVAL_DS]: 'INTERVAL_DS',
+    [oracledb.DB_TYPE_INTERVAL_YM]: 'INTERVAL_YM',
+    [oracledb.DB_TYPE_LONG]: 'LONG',
+    [oracledb.DB_TYPE_LONG_RAW]: 'LONG_RAW',
+    [oracledb.DB_TYPE_NCHAR]: 'NCHAR',
+    [oracledb.DB_TYPE_NCLOB]: 'NCLOB',
+    [oracledb.DB_TYPE_NUMBER]: 'NUMBER',
+    [oracledb.DB_TYPE_NVARCHAR]: 'NVARCHAR',
+    [oracledb.DB_TYPE_OBJECT]: 'OBJECT',
+    [oracledb.DB_TYPE_RAW]: 'RAW',
+    [oracledb.DB_TYPE_ROWID]: 'ROWID',
+    [oracledb.DB_TYPE_TIMESTAMP]: 'TIMESTAMP',
+    [oracledb.DB_TYPE_TIMESTAMP_LTZ]: 'TIMESTAMP_LTZ',
+    [oracledb.DB_TYPE_TIMESTAMP_TZ]: 'TIMESTAMP_TZ',
+    [oracledb.DB_TYPE_VARCHAR]: 'VARCHAR'
+};
 
 const fetchTypeMap = {
     [oracledb.DB_TYPE_BFILE]: 'object',
@@ -93,16 +122,18 @@ export class OraConnection implements Adapter.Connection {
             oraOptions.fetchArraySize = request.fetchRows;
         else
             oraOptions.maxRows = request.fetchRows;
-        const params = request.values;
+        let params = request.values;
 
-        /*
-        if (prepared.returningFields) {
-            const rprms = query.returningFields;
+        const out: Adapter.Response = {}
+
+        if (request.returningFields) {
+            out.fields = [];
+            const rprms = request.returningFields;
             if (Array.isArray(params))
                 params = params.slice();
             else params = Object.assign({}, params);
             for (const n of Object.keys(rprms)) {
-                const o = {dir: oracledb.BIND_OUT};
+                const o = {type: oracledb.STRING, dir: oracledb.BIND_OUT};
                 switch (rprms[n]) {
                     case 'string':
                         o.type = oracledb.STRING;
@@ -126,46 +157,49 @@ export class OraConnection implements Adapter.Connection {
                 if (Array.isArray(params))
                     params.push(o);
                 else params[n] = o;
+                const fieldName = n.replace('returning$', '');
+
+                out.fields.push({
+                    fieldName,
+                    dataType: dataTypeNames[o.type],
+                    jsType: fetchTypeMap[o.type]
+                } as Adapter.Field)
             }
-        }*/
+        }
 
         this.intlcon.action = request.action || '';
         const response = await this.intlcon.execute<any>(request.sql, params || [], oraOptions);
 
-        if (response.rows) {
-            const out: Adapter.Response = {
-                fields: undefined,
-                rowType: request.objectRows ? 'object' : 'array',
-                rows: response.rows
-            };
-            const fields = out.fields = {};
-            // Create fields metadata
-            let rowNumberIdx = -1;
-            let rowNumberName = '';
-            if (response.metaData) {
-                for (const [idx, v] of response.metaData.entries()) {
-                    if (v.name.toLowerCase() === 'row$number') {
-                        rowNumberIdx = idx;
-                        rowNumberName = v.name;
-                        continue;
-                    }
-                    const fieldInfo: Adapter.FieldInfo = {
-                        _inf: v,
-                        index: idx,
-                        fieldName: v.name,
-                        dataType: v.dbTypeName || 'UNKNOWN',
-                        jsType: fetchTypeMap[v.fetchType || 2001]
-                    };
-                    if (v.dbTypeName === 'CHAR')
-                        fieldInfo.fixedLength = true;
-                    // others
-                    if (v.byteSize) fieldInfo.size = v.byteSize;
-                    if (v.nullable) fieldInfo.nullable = v.nullable;
-                    if (v.precision) fieldInfo.precision = v.precision;
-                    fields[v.name] = fieldInfo;
+        let fields;
+        let rowNumberIdx = -1;
+        let rowNumberName = '';
+        if (response.metaData) {
+            fields = out.fields = [];
+            for (const [idx, v] of response.metaData.entries()) {
+                if (v.name.toLowerCase() === 'row$number') {
+                    rowNumberIdx = idx;
+                    rowNumberName = v.name;
+                    continue;
                 }
+                const fieldInfo: Adapter.Field = {
+                    _inf: v,
+                    fieldName: v.name,
+                    dataType: v.dbTypeName || 'UNKNOWN',
+                    jsType: fetchTypeMap[v.fetchType || 2001]
+                };
+                if (v.dbTypeName === 'CHAR')
+                    fieldInfo.fixedLength = true;
+                // others
+                if (v.byteSize) fieldInfo.size = v.byteSize;
+                if (v.nullable) fieldInfo.nullable = v.nullable;
+                if (v.precision) fieldInfo.precision = v.precision;
+                fields.push(fieldInfo);
             }
+        }
 
+        if (response.rows) {
+            out.rowType = request.objectRows ? 'object' : 'array';
+            out.rows = response.rows;
             // remove row$number fields
             if (out.rows && rowNumberIdx >= 0) {
                 for (const row of out.rows) {
@@ -176,9 +210,28 @@ export class OraConnection implements Adapter.Connection {
                 }
             }
             return out;
+        } else if (response.resultSet) {
+            out.rowType = request.objectRows ? 'object' : 'array';
+            out.cursor =
+                new OraCursor(response.resultSet, {
+                    rowType: request.objectRows ? 'object' : 'array',
+                    rowNumberIdx, rowNumberName
+                });
+        } else if (response.outBinds) {
+            out.rows = [{}];
+            out.rowType = 'object';
+            const row = out.rows[0];
+            for (const n of Object.keys(response.outBinds)) {
+                const v = response.outBinds[n];
+                row[n.replace('returning$', '')] =
+                    v.length === 1 ? v[0] : v;
+            }
         }
 
-        return {};
+        if (response.rowsAffected)
+            out.rowsAffected = response.rowsAffected;
+
+        return out;
     }
 
 }

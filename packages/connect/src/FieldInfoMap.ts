@@ -20,6 +20,10 @@ export class FieldInfoMap {
         return this._obj[k];
     }
 
+    entries(): [string, FieldInfo][] {
+        return Object.entries(this._obj);
+    }
+
     keys(): string[] {
         return Object.keys(this._obj);
     }

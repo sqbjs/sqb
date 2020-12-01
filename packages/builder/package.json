@@ -3,6 +3,7 @@
   "description": "Extensible multi-dialect SQL query builder written with TypeScript",
   "version": "4.0.1-alpha.2",
   "author": "Panates Ltd.",
+  "private": false,
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],

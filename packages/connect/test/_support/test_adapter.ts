@@ -94,7 +94,7 @@ class TestConnection implements Adapter.Connection {
             if (sql === 'select 1')
                 return {
                     rowType: 'array',
-                    fields: [{fieldName: 'field1'}] as Adapter.FieldInfo[],
+                    fields: [{fieldName: 'field1'}] as Adapter.Field[],
                     rows: [['1']],
                 };
 

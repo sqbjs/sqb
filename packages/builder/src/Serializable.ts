@@ -134,7 +134,7 @@ export function printArray(arr: string[], sep?: string, lfLen?: number): string 
 /**
  * Check if a string value is a reserved word
  */
-export function isReservedWord(ctx: SerializeContext, s: string): boolean {
+export function isReservedWord(ctx: SerializeContext, s: string | undefined | null): boolean {
     if (!s)
         return false;
     if (ReservedWords.includes(s.toLowerCase()))
@@ -146,4 +146,12 @@ export function isReservedWord(ctx: SerializeContext, s: string): boolean {
         }
     }
     return false;
+}
+
+export function escapeReserved(ctx: SerializeContext, s: string | undefined | null): string {
+    if (!s)
+        return '';
+    if (isReservedWord(ctx, s))
+        return '"' + s + '"';
+    return s;
 }

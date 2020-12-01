@@ -89,32 +89,20 @@ describe('Serialize insert query', function () {
 
     it('should serialize insert with returning', function () {
         const query = Insert('table1', {id: 1, name: 'aaa'})
-            .returning({'sch1.tbl1.id': 'number', 'update u1': 'string'});
+            .returning('id::number', 'update as u1::string');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'insert into table1 (id, name) values (1, \'aaa\') returning sch1.tbl1.id, "update" u1');
+        assert.strictEqual(result.sql,
+            'insert into table1 (id, name) values (1, \'aaa\') ' +
+            'returning id, "update" as u1');
     });
 
     it('should validate returning() arguments', function () {
         Insert('table1', {id: 1, name: 'aaa'})
             .returning(null);
-        assert.throws(() => Insert('table1', {id: 1, name: 'aaa'})
-                .returning(
-                    // @ts-ignore
-                    1234),
-            /Object argument required/);
         assert.throws(() =>
                 Insert('table1', {id: 1, name: 'aaa'})
-                    .returning({'123': 'string'}),
-            /does not match column format/);
-    });
-
-    it('should validate returning() data types', function () {
-        assert.throws(() =>
-                Insert('table1', {id: 1, name: 'aaa'})
-                    .returning({id: 'invalid'}),
-            /Unknown data type/);
-        Insert('table1', {id: 1, name: 'aaa'})
-            .returning({id: 'string'});
+                    .returning('123'),
+            /does not match/);
     });
 
 });

@@ -27,15 +27,7 @@ export interface SerializeContext extends GenerateOptions {
 export interface GenerateResult {
     sql: string;
     params?: any;
-    returningFields?: Record<string, any>;
-}
-
-export interface ReturningData {
-    field: string;
-    dataType: string;
-    table?: string;
-    schema?: string;
-    alias?: string;
+    returningFields?: Record<string, string>;
 }
 
 export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,

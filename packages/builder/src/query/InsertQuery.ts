@@ -40,7 +40,7 @@ export class InsertQuery extends ReturningQuery {
         let out = 'insert into ' + o.table + '\n\t(' +
             o.columns + ')\n\bvalues\n\t(' + o.values + ')\b';
         if (o.returning)
-            out += '\nreturning ' + o.returning;
+            out += '\n' + o.returning;
         return out;
     }
 
