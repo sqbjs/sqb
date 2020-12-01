@@ -159,7 +159,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
                 'ID': id,
                 'ShortName': 'TEST',
                 'Name': 'Test1'
-            }).returning({ID: 'string'})
+            }).returning('id::string')
         );
         assert(result);
         assert(result.rows);
@@ -173,7 +173,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
             Update('airports', {
                 Catalog: catalog
             }).where({id: 'LFOI'})
-                .returning({ID: 'string', catalog: 'number'})
+                .returning('id::string', 'catalog::number')
         );
         assert(result);
         assert(result.rows);
