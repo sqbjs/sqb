@@ -16,9 +16,10 @@ const argv = minimist(process.argv.slice(2), {
 
 function execSh(command, options) {
   const opts = {
+    onSpawn: undefined,
+    stdio: 'inherit',
     ...options,
     env: npmRunPath.env(),
-    stdio: 'inherit',
     windowsHide: true
   };
 
@@ -28,10 +29,6 @@ function execSh(command, options) {
       const cp = process.platform === 'win32' ?
           spawn('cmd', ['/C', command], opts) :
           spawn('sh', ['-c', command], opts);
-      cp.on('message', msg => {
-        if (opts.onMessage)
-          opts.onMessage(msg);
-      });
       cp.on('error', (e) => {
         rejected = true;
         if (opts.onError)
@@ -47,6 +44,8 @@ function execSh(command, options) {
               `\n  ${colors.gray(command)}`));
         }
       });
+      if (opts.onSpawn)
+        opts.onSpawn(cp, command, opts);
     } catch (e) {
       reject(e);
     }

@@ -98,14 +98,26 @@ class PackageList {
   createTasks(displayName, fn) {
     const tasks = {};
     let task = async () => {
-      for (const pkg of this.items) {
-        await fn(pkg);
+      try {
+        for (const pkg of this.items) {
+          await fn(pkg);
+        }
+      } catch (e) {
+        // eslint-disable-next-line
+        console.error(e.message);
       }
     };
     task.displayName = displayName;
     tasks[camelCase(task.displayName)] = task;
     for (const pkg of this.items) {
-      task = async () => fn(pkg);
+      task = async () => {
+        try {
+          await fn(pkg);
+        } catch (e) {
+          // eslint-disable-next-line
+          console.error(e.message);
+        }
+      };
       task.displayName = displayName + '@' + pkg.name;
       tasks[camelCase(task.displayName)] = task;
     }
