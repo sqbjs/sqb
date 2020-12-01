@@ -1,44 +1,22 @@
 import {Query} from './Query';
-import {ReturningData, SerializeContext} from '../types';
-import {isReservedWord, printArray, serializeFallback} from '../Serializable';
+import {SerializeContext} from '../types';
+import {printArray, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
-
-const RETURNING_COLUMN_PATTERN = /^((?:[a-zA-Z]\w*\.){0,2}) *([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;
+import {ReturningColumn} from '../sql-objects/ReturningColumn';
 
 export abstract class ReturningQuery extends Query {
 
-    _returning?: ReturningData[];
+    _returningColumns?: ReturningColumn[];
 
     /**
      *
      */
-    returning(values: Record<string, string>): this {
-        if (values) {
-            const arr: ReturningData[] = [];
-            if (typeof values !== 'object')
-                throw new TypeError('Object argument required');
-            for (const n of Object.getOwnPropertyNames(values)) {
-                if (['string', 'number', 'date', 'blob', 'clob']
-                    .indexOf(values[n]) < 0)
-                    throw new TypeError(`Unknown data type "${values[n]}"`);
-                const m = n.match(RETURNING_COLUMN_PATTERN);
-                if (!m)
-                    throw new TypeError(`(${n}) does not match column format`);
-                const o: ReturningData = {field: m[2], dataType: values[n]};
-                o.field = m[2];
-                if (m[1]) {
-                    const a = m[1].split(/\./g);
-                    a.pop();
-                    o.table = a.pop();
-                    o.schema = a.pop();
-                }
-                if (m[3])
-                    o.alias = m[3];
-                arr.push(o);
-            }
-            this._returning = arr;
-        } else
-            this._returning = undefined;
+    returning(...columns: string[]): this {
+        this._returningColumns = columns.reduce((a, c) => {
+            if (c)
+                a.push(new ReturningColumn(c));
+            return a;
+        }, [] as ReturningColumn[]);
         return this;
     }
 
@@ -46,24 +24,18 @@ export abstract class ReturningQuery extends Query {
      *
      */
     protected __serializeReturning(ctx: SerializeContext): string {
-        if (!this._returning)
+        if (!(this._returningColumns && this._returningColumns.length))
             return '';
-
-        const arr: any[] = [];
-        for (const t of this._returning) {
-            const o: any = Object.assign({}, t);
-            o.isReservedWord = isReservedWord(ctx, t.field);
-            arr.push(o);
+        const arr: string[] = [];
+        for (const t of this._returningColumns) {
+            const s = t._serialize(ctx);
+            /* istanbul ignore else */
+            if (s)
+                arr.push(s);
         }
         return serializeFallback(ctx, SerializationType.RETURNING_BLOCK, arr, () => {
-            const a: string[] = [];
-            for (const o of arr) {
-                a.push((o.schema ? o.schema + '.' : '') +
-                    (o.table ? o.table + '.' : '') +
-                    (o.isReservedWord ? '"' + o.field + '"' : o.field) +
-                    (o.alias ? ' ' + o.alias : ''));
-            }
-            return printArray(a);
+            const s = printArray(arr);
+            return s ? 'returning ' + s : '';
         });
     }
 

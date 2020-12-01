@@ -263,11 +263,11 @@ export class Cursor extends SafeEventEmitter {
     async _fetchRows(): Promise<void> {
         if (!this._intlcur)
             throw new Error('Cursor is closed');
-        const rows = await this._intlcur.fetch(this._prefetchRows)
+        let rows = await this._intlcur.fetch(this._prefetchRows)
         if (rows && rows.length) {
             debug('Fetched %d rows from database', rows.length);
             // Normalize rows
-            normalizeRows(this._fields, this._intlcur.rowType, rows, {
+            rows = normalizeRows(this._fields, this._intlcur.rowType, rows, {
                 objectRows: this._request.objectRows,
                 ignoreNulls: this._request.ignoreNulls,
             });

@@ -4,14 +4,12 @@ import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varh
 import TaskQueue from 'putil-taskqueue';
 import {Client} from './Client';
 import {
-    ConnectionOptions,
-    ExecuteHookFunction,
-    FetchFunction, FieldNaming,
-    QueryRequest,
-    QueryExecuteOptions,
+    ConnectionOptions, ExecuteHookFunction, FetchFunction,
+    FieldNaming,
+    QueryExecuteOptions, QueryRequest,
     QueryResult
 } from './types';
-import {callFetchHooks, normalizeFieldMap, normalizeRows} from './helpers';
+import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {SafeEventEmitter} from './SafeEventEmitter';
@@ -143,7 +141,7 @@ export class Connection extends SafeEventEmitter {
                     throw new Error('Adapter did not returned fields info');
                 if (!response.rowType)
                     throw new Error('Adapter did not returned rowType');
-                result.fields = normalizeFieldMap(response.fields, request.fieldNaming);
+                result.fields = wrapAdapterFields(response.fields, request.fieldNaming);
                 result.rowType = response.rowType;
 
                 if (response.rows) {
@@ -229,6 +227,8 @@ export class Connection extends SafeEventEmitter {
                 });
             request.sql = q.sql;
             request.values = q.params;
+            if (q.returningFields)
+                request.returningFields = q.returningFields;
             if (query.listenerCount('execute'))
                 request.executeHooks = query.listeners('execute') as ExecuteHookFunction[];
             if (query.listenerCount('fetch'))
@@ -236,7 +236,7 @@ export class Connection extends SafeEventEmitter {
         } else if (typeof query === 'string') {
             request.sql = query;
             request.values = options.values;
-            // request.returningParams = options.returningParams;
+            request.returningFields = options.returningFields;
         }
         // @ts-ignore
         if (!request.sql)

@@ -10,22 +10,18 @@ export class PgAdapter implements Adapter {
 
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         const cfg: ConnectionConfiguration = {...config.driverOptions};
-        if (config.connectString)
-            cfg.host = config.connectString;
-        else {
-            if (config.user)
-                cfg.user = config.user;
-            if (config.password)
-                cfg.password = config.password;
-            if (config.host)
-                cfg.host = config.host;
-            if (config.port)
-                cfg.port = config.port;
-            if (config.database)
-                cfg.database = config.database;
-            if (config.schema)
-                cfg.schema = config.schema;
-        }
+        if (config.user)
+            cfg.user = config.user;
+        if (config.password)
+            cfg.password = config.password;
+        if (config.host)
+            cfg.host = config.host;
+        if (config.port)
+            cfg.port = config.port;
+        if (config.database)
+            cfg.database = config.database;
+        if (config.schema)
+            cfg.schema = config.schema;
 
         const connection = new Connection(cfg);
         try {

@@ -1,5 +1,9 @@
-import {ClientConfiguration, Maybe, QueryRequest, RowType} from './types';
 import {classes} from '@sqb/builder';
+import {
+    ClientConfiguration,
+    Maybe, QueryRequest,
+    RowType
+} from './types';
 
 export interface Adapter {
     driver: string;
@@ -29,20 +33,19 @@ export namespace Adapter {
     }
 
     export interface Response {
-        fields?: Record<string, FieldInfo> | FieldInfo[];
+        fields?: Field[];
         rows?: Record<string, any>[] | any[][];
         rowType?: RowType;
         cursor?: Adapter.Cursor;
         rowsAffected?: number;
     }
 
-    export interface FieldInfo {
-        index: number;
+    export interface Field {
         fieldName: string;
         dataType: string;
-        elementDataType?: string;
         jsType: string;
         isArray?: boolean;
+        elementDataType?: string;
         nullable?: boolean;
         fixedLength?: boolean;
         size?: number;

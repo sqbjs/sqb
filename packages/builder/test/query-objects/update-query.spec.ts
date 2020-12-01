@@ -81,28 +81,10 @@ describe('Serialize update query', function () {
 
     it('should serialize update with returning', function () {
         const query = Update('table1', {id: 1, name: 'aaa'})
-            .returning({'id': 'number', name: 'string'});
+            .returning('id::number', 'name as n');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'update table1 set id = 1, name = \'aaa\' returning id, name');
-    });
-
-    it('should validate returning() arguments', function () {
-
-        assert.throws(() =>
-                // @ts-ignore
-                Update('table1', {id: 1, name: 'aaa'}).returning(1234),
-            /Object argument required/);
-        Update('table1', {id: 1, name: 'aaa'})
-            .returning(null);
-    });
-
-    it('should validate returning() data types', function () {
-        assert.throws(() =>
-                Update('table1', {id: 1, name: 'aaa'})
-                    .returning({id: 'invalid'}),
-            /Unknown data type/);
-        Update('table1', {id: 1, name: 'aaa'})
-            .returning({id: 'string'});
+        assert.strictEqual(result.sql,
+            'update table1 set id = 1, name = \'aaa\' returning id, name as n');
     });
 
 });

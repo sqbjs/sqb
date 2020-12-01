@@ -68,8 +68,7 @@ export class PgConnection implements Adapter.Connection {
         const result: any[] = [];
         for (let i = 0; i < fields.length; i++) {
             const v = fields[i];
-            const o: Adapter.FieldInfo = {
-                index: i,
+            const o: Adapter.Field = {
                 fieldName: v.fieldName,
                 dataType: v.dataTypeName,
                 elementDataType: v.elementDataTypeName,

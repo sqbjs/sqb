@@ -56,7 +56,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     });
     after(() => unRegisterAdapter(adapter));
 
-    it('should create connection instance with postgres driver', function () {
+    it('should create connection instance with ' + adapter.driver + ' driver', function () {
         const cfg: ClientConfiguration = {
             ...config,
             driver: adapter.driver,

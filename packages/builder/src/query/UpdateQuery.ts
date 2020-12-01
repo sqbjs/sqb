@@ -51,7 +51,7 @@ export class UpdateQuery extends ReturningQuery {
         if (o.where)
             out += '\n' + o.where;
         if (o.returning)
-            out += '\nreturning ' + o.returning;
+            out += '\n' + o.returning;
         return out;
     }
 
