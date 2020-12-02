@@ -24,7 +24,7 @@ CREATE TABLE ${process.env.PGSCHEMA}.airports
     frequency float,
     latitude character varying(10),
     longitude character varying(10),
-    temp integer,
+    temp1 integer,
     CONSTRAINT airports_pkey PRIMARY KEY (id),
     CONSTRAINT fk_airports_region FOREIGN KEY (region)
         REFERENCES ${process.env.PGSCHEMA}.regions (id) MATCH SIMPLE

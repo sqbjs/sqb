@@ -6,7 +6,7 @@ import {getInsertSQLsForTestData, initAdapterTests} from '../../connect/test/sha
 describe('PgAdapter', function () {
     const adapter = new PgAdapter();
 
-    if (process.env.SKIP_CREATE_DB) {
+    if (!process.env.SKIP_CREATE_DB) {
         before(async () => {
             this.timeout(30000);
             this.slow(1000);
