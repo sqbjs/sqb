@@ -67,31 +67,15 @@ describe('OracleSerializer', function () {
 
         it('Should serialize returning', function () {
             const query = Insert('table1', {'id': 1})
-                .returning({id: 'number', name: 'string'});
+                .returning('id::number', 'name::string');
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql,
                 'insert into table1 (id) values (1) returning id into :returning$id, name into :returning$name')
         });
 
-        it('Should serialize returning - table.field', function () {
-            const query = Insert('table1', {'id': 1})
-                .returning({'table1.id': 'number', 'table1.name': 'string'});
-            const result = query.generate({dialect: 'oracle'});
-            assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning table1.id into :returning$id, table1.name into :returning$name')
-        });
-
-        it('Should serialize returning - schema.table.field', function () {
-            const query = Insert('table1', {'id': 1})
-                .returning({'table1.id': 'number', 'schema1.table1.name': 'string'});
-            const result = query.generate({dialect: 'oracle'});
-            assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning table1.id into :returning$id, schema1.table1.name into :returning$name');
-        });
-
         it('Should serialize returning - reserved word', function () {
             const query = Insert('table1', {'id': 1})
-                .returning({id: 'number', 'with w1': 'string'});
+                .returning('id::number', 'with w1::string');
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql,
                 'insert into table1 (id) values (1) returning id into :returning$id, "with" into :returning$w1')

@@ -3,7 +3,8 @@ import {
     SerializeContext,
     DefaultSerializeFunction,
     SerializationType,
-    Maybe
+    Maybe,
+    escapeReserved
 } from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
 
@@ -29,8 +30,8 @@ export class OracleSerializer implements SerializerExtension {
                 return this._serializeComparison(ctx, o, defFn);
             case SerializationType.DATE_VALUE:
                 return this._serializeDateValue(ctx, o, defFn);
-            case SerializationType.RETURNING_BLOCK:
-                return this._serializeReturning(ctx, o);
+            case SerializationType.RETURNING_COLUMN:
+                return this._serializeReturningColumn(ctx, o, defFn);
         }
     }
 
@@ -86,18 +87,9 @@ export class OracleSerializer implements SerializerExtension {
             'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')');
     }
 
-    private _serializeReturning(ctx: SerializeContext, arr: any[]): Maybe<string> {
-        const returningFields = ctx.returningFields = {};
-        let out = '';
-        for (const [i, o] of arr.entries()) {
-            const n = (o.alias || o.field);
-            out += (i ? ', ' : '') +
-                (o.schema ? o.schema + '.' : '') +
-                (o.table ? o.table + '.' : '') +
-                (o.isReservedWord ? '"' + o.field + '"' : o.field) +
-                ' into :returning$' + n;
-            returningFields['returning$' + n] = o.dataType;
-        }
-        return out;
+    private _serializeReturningColumn(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+        o.alias = 'returning$' + (o.alias || o.field);
+        defFn(ctx, o);
+        return escapeReserved(ctx, o.field) + ' into :' + o.alias;
     }
 }
