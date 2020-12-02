@@ -3,6 +3,7 @@
   "description": "Modern ORM framework written in TypeScript",
   "version": "4.0.1-alpha.2",
   "author": "Panates Ltd.",
+  "private": true,
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],
@@ -48,10 +49,10 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "scripts": {
-    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
-    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
-    "build": "tsc -b tsconfig-build.json",
-    "compile": "tsc -b tsconfig.json",
+    "_test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "_cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
+    "_build": "tsc -b tsconfig-build.json",
+    "_compile": "tsc -b tsconfig.json",
     "lint": "eslint src/** --no-error-on-unmatched-pattern"
   }
 }

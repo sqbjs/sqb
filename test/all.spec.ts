@@ -11,7 +11,7 @@ function importTests(p: string): void {
         require(f);
 }
 
-for (const p of pkgJson.gulp['package-order']) {
+for (const p of pkgJson.gulp['compile-order']) {
     describe(p, function () {
         if (p !== 'oracle')
             importTests(p);

@@ -1,5 +1,5 @@
 import {EntityOptions} from '../types';
-import {Schema} from '../schema/Schema';
+import {Schema} from '../database-model/Schema';
 
 export function Entity(options?: EntityOptions): ClassDecorator;
 export function Entity(name?: string, options?: EntityOptions): ClassDecorator;
