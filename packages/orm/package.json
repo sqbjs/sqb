@@ -1,6 +1,6 @@
 {
-  "name": "@sqb/nestjs",
-  "description": "Nestjs module for data connection using SQB",
+  "name": "@sqb/orm",
+  "description": "Modern ORM framework written in TypeScript",
   "version": "4.0.1-alpha.2",
   "author": "Panates Ltd.",
   "contributors": [
@@ -14,30 +14,19 @@
   "keywords": [
     "javascript",
     "typescript",
+    "orm",
     "sqb",
-    "database",
-    "nestjs",
-    "nest",
-    "sql"
+    "sql",
+    "query",
+    "builder",
+    "dialect",
+    "database"
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/supertest": "^2.0.10",
-    "@nestjs/common": "7.5.5",
-    "@nestjs/core": "7.5.5",
-    "@nestjs/testing": "^7.5.5",
-    "@nestjs/platform-express": "^7.5.5",
-    "postgresql-client": "^1.9.2",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.6.3",
-    "rxjs-compat": "^6.6.3",
-    "supertest": "^6.0.1"
+    "postgresql-client": "^1.9.2"
   },
   "peerDependencies": {
-    "@nestjs/common": "^7.5.5",
-    "@nestjs/core": "^7.5.5",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.6.3",
     "@sqb/builder": "^4.0.1-alpha.2",
     "@sqb/connect": "^4.0.1-alpha.2"
   },

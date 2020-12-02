@@ -113,7 +113,7 @@ export class OraConnection implements Adapter.Connection {
             throw new Error('Can not execute while db session is closed');
 
         const oraOptions: oracledb.ExecuteOptions = {
-            autoCommit: request.autoCommit || !this._inTransaction,
+            autoCommit: request.autoCommit,
             extendedMetaData: true,
             resultSet: request.cursor,
             outFormat: request.objectRows ? oracledb.OUT_FORMAT_OBJECT : oracledb.OUT_FORMAT_ARRAY

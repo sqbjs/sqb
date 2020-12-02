@@ -40,9 +40,10 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "gulp": {
-    "package-order": [
+    "compile-order": [
       "builder",
       "connect",
+      "orm",
       "postgres-dialect",
       "oracle-dialect",
       "mssql-dialect",

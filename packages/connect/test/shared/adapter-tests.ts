@@ -184,7 +184,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
 
     it('should return updated record count', async function () {
         const result = await client.execute(
-            Update('airports', {temp: 1})
+            Update('airports', {temp1: 1})
         );
         assert(result);
         assert(result.rowsAffected > 1000);

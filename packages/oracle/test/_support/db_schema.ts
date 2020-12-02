@@ -42,7 +42,8 @@ END;`,
   runway  VARCHAR2(5),
   frequency  number(12,4),
   latitude  VARCHAR2(10),
-  longitude  VARCHAR2(10)
+  longitude  VARCHAR2(10),
+  temp1 number(12,4)
 )`,
 
 `ALTER TABLE ${process.env.ORASCHEMA}.airports ADD (

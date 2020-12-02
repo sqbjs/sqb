@@ -32,10 +32,8 @@ export class ReturningColumn extends Column {
         };
         return serializeFallback(ctx, this._type, o, () => {
             const f = o.alias || o.field;
-            if (!f)
-                return '';
-            ctx.returningFields = ctx.returningFields || {};
-            ctx.returningFields[f] = o;
+            // @ts-ignore
+            ctx.returningFields[f] = o.dataType || 'any';
             return escapeReserved(ctx, o.field) +
                 (o.alias ? ' as ' + escapeReserved(ctx, o.alias) : '');
         });

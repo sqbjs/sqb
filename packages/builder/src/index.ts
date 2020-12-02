@@ -1,4 +1,5 @@
 export {registerSerializer, unRegisterSerializer} from './extensions';
+export {escapeReserved, isReservedWord, printArray} from './Serializable';
 export * as classes from './classes';
 export * from './types';
 export * from './enums';
