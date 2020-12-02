@@ -70,7 +70,7 @@ describe('OracleSerializer', function () {
                 .returning('id::number', 'name::string');
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning id into :returning$id, name into :returning$name')
+                'insert into table1 (id) values (1) returning id, name into :returning$id, :returning$name')
         });
 
         it('Should serialize returning - reserved word', function () {
@@ -78,7 +78,7 @@ describe('OracleSerializer', function () {
                 .returning('id::number', 'with w1::string');
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning id into :returning$id, "with" into :returning$w1')
+                'insert into table1 (id) values (1) returning id, "with" into :returning$id, :returning$w1')
         });
     });
 

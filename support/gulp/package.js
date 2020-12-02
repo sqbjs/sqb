@@ -78,8 +78,8 @@ class PackageList {
         arr.push(f);
       }
     }
-    if (pkgjson.gulp && pkgjson.gulp['package-order']) {
-      const order = pkgjson.gulp['package-order'];
+    if (pkgjson.gulp && pkgjson.gulp['compile-order']) {
+      const order = pkgjson.gulp['compile-order'];
       arr.sort((a, b) => {
         if (!order.includes(a))
           return 1;

@@ -27,6 +27,7 @@ export abstract class ReturningQuery extends Query {
         if (!(this._returningColumns && this._returningColumns.length))
             return '';
         const arr: string[] = [];
+        ctx.returningFields = ctx.returningFields || {};
         for (const t of this._returningColumns) {
             const s = t._serialize(ctx);
             /* istanbul ignore else */

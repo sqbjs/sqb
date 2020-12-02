@@ -12,7 +12,7 @@ describe('OraAdapter', function () {
 
     const adapter = new OraAdapter();
     const env = process.env;
-    const _createDatabase = false;
+
     const config: ClientConfiguration = {
         driver: 'oracledb',
         host: env.ORAHOST,
@@ -26,7 +26,7 @@ describe('OraAdapter', function () {
         }
     };
 
-    if (_createDatabase) {
+    if (!process.env.SKIP_CREATE_DB) {
         before(async function () {
             this.timeout(30000);
             const cfg = clientConfigurationToDriver(config);
