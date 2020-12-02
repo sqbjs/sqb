@@ -4,6 +4,8 @@ const {packages} = require('../package');
 
 module.exports = {
   ...packages.createTasks('publish', async (pkg) => {
+        if (pkg.json.private)
+          return;
         console.log(`publish '${colors.cyan(pkg.name)}'`);
         let ignoreError = false;
         let errMsg = '';
