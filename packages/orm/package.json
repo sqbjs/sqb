@@ -1,7 +1,7 @@
 {
   "name": "@sqb/orm",
   "description": "Modern ORM framework written in TypeScript",
-  "version": "4.0.1-alpha.2",
+  "version": "4.0.1-alpha.4",
   "author": "Panates Ltd.",
   "private": true,
   "contributors": [
@@ -28,8 +28,8 @@
     "postgresql-client": "^1.9.2"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.0.1-alpha.2",
-    "@sqb/connect": "^4.0.1-alpha.2"
+    "@sqb/builder": "^4.0.1-alpha.4",
+    "@sqb/connect": "^4.0.1-alpha.4"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
