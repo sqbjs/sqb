@@ -4,7 +4,7 @@ import type {Cursor} from './Cursor';
 import type {PoolConfiguration} from 'lightning-pool';
 import {Adapter} from './Adapter';
 
-export type Maybe<T> = T | void | null;
+export type Maybe<T> = T | undefined | null;
 
 export type ExecuteHookFunction = (connection: Connection, request: QueryRequest) => Promise<void>;
 export type FetchFunction = (row: any, request: QueryRequest) => void;

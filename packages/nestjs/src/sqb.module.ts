@@ -10,14 +10,14 @@ export class SqbModule {
     static forRoot(options?: SqbModuleOptions): DynamicModule {
         return {
             module: SqbModule,
-            imports: [SqbCoreModule.forRoot(options)],
+            imports: [SqbCoreModule.forRoot(options)]
         };
     }
 
     static forRootAsync(options: SqbModuleAsyncOptions): DynamicModule {
         return {
             module: SqbModule,
-            imports: [SqbCoreModule.forRootAsync(options)],
+            imports: [SqbCoreModule.forRootAsync(options)]
         };
     }
 }

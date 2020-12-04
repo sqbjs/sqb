@@ -1,8 +1,9 @@
-import { Type } from '@nestjs/common';
-import { ModuleMetadata } from '@nestjs/common/interfaces';
-import { ClientConfiguration } from '@sqb/connect';
+import {Type} from '@nestjs/common';
+import {ModuleMetadata} from '@nestjs/common/interfaces';
+import {ClientConfiguration} from '@sqb/connect';
 
 export type SqbModuleOptions = {
+
     /**
      * Connection name
      */
@@ -51,8 +52,6 @@ export interface SqbModuleAsyncOptions
     name?: string;
     useExisting?: Type<SqbOptionsFactory>;
     useClass?: Type<SqbOptionsFactory>;
-    useFactory?: (
-        ...args: any[]
-    ) => Promise<SqbModuleOptions> | SqbModuleOptions;
+    useFactory?: (...args: any[]) => Promise<SqbModuleOptions> | SqbModuleOptions;
     inject?: any[];
 }
