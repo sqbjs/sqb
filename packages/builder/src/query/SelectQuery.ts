@@ -11,6 +11,7 @@ import {OrderColumn} from '../sql-objects/OrderColumn';
 import {printArray, Serializable, serializeFallback} from '../Serializable';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
 import {SerializeContext} from '../types';
+import {Operator} from '../sql-objects/Operator';
 
 export class SelectQuery extends Query {
 
@@ -79,7 +80,7 @@ export class SelectQuery extends Query {
     /**
      * Defines "where" part of query
      */
-    where(...operator): this {
+    where(...operator: Operator[]): this {
         this._where = this._where || new OpAnd();
         this._where.add(...operator);
         return this;
