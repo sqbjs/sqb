@@ -129,7 +129,9 @@ export class SqbCoreModule implements OnApplicationShutdown {
     ): Promise<Client> {
         const connectionToken = options.name || DEFAULT_CONNECTION_NAME;
         return await defer(async () => {
-            return new Client(options);
+            const client = new Client(options);
+            await client.test();
+            return client;
         })
             .pipe(
                 handleRetry(
