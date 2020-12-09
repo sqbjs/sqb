@@ -1,0 +1,59 @@
+{
+  "name": "@sqb/sqljs",
+  "description": "SQB serialization extension for sql.js driver",
+  "version": "4.0.1-alpha.4",
+  "author": "Panates Ltd.",
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git"
+  },
+  "keywords": [
+    "javascript",
+    "typescript",
+    "sql",
+    "query",
+    "builder",
+    "dialect",
+    "sqlite",
+    "sql.js",
+    "database"
+  ],
+  "dependencies": {
+    "putil-promisify": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/sql.js": "^1.0.3",
+    "sql.js": "^1.4.0"
+  },
+  "peerDependencies": {
+    "sql.js": "^1.4.0"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">= 10.0"
+  },
+  "directories": {
+    "lib": "dist",
+    "test": "test"
+  },
+  "files": [
+    "LICENSE",
+    "README",
+    "dist/"
+  ],
+  "nyc": {
+    "temp-dir": "./coverage/.nyc_output"
+  },
+  "scripts": {
+    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
+    "build": "tsc -b tsconfig-build.json",
+    "compile": "tsc -b tsconfig.json",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern"
+  }
+}
