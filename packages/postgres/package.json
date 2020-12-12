@@ -27,10 +27,10 @@
     "putil-promisify": "^1.8.2"
   },
   "devDependencies": {
-    "postgresql-client": "^1.9.2"
+    "postgresql-client": "^1.11.1"
   },
   "peerDependencies": {
-    "postgresql-client": "^1.9.2",
+    "postgresql-client": "^1.11.1",
     "@sqb/postgres-dialect": "^4.0.1-alpha.4"
   },
   "main": "dist/index.js",

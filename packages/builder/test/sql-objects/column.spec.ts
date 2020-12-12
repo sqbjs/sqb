@@ -18,7 +18,7 @@ describe('serialize "SelectColumn"', function () {
     it('should serialize (field alias)', function () {
         const query = Select('field1 f1').from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select field1 f1 from table1');
+        assert.strictEqual(result.sql, 'select field1 as f1 from table1');
     });
 
     it('should serialize (table.field)', function () {
@@ -30,7 +30,7 @@ describe('serialize "SelectColumn"', function () {
     it('should serialize (table.field alias)', function () {
         const query = Select('table1.field1 f1').from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select table1.field1 f1 from table1');
+        assert.strictEqual(result.sql, 'select table1.field1 as f1 from table1');
     });
 
     it('should serialize (schema.table.field)', function () {
@@ -42,19 +42,19 @@ describe('serialize "SelectColumn"', function () {
     it('should serialize (schema.table.field alias)', function () {
         const query = Select('schema1.table1.field1 f1').from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select schema1.table1.field1 f1 from table1');
+        assert.strictEqual(result.sql, 'select schema1.table1.field1 as f1 from table1');
     });
 
     it('should table and column start with "_" character', function () {
         const query = Select('_table1._field1 _f1').from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select _table1._field1 _f1 from table1');
+        assert.strictEqual(result.sql, 'select _table1._field1 as _f1 from table1');
     });
 
     it('should "$" character can be used for table and column names', function () {
         const query = Select('table1$.field1$ f1$').from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select table1$.field1$ f1$ from table1');
+        assert.strictEqual(result.sql, 'select table1$.field1$ as f1$ from table1');
     });
 
     it('should not table name start with "$" character', function () {

@@ -23,16 +23,16 @@ export abstract class LogicalOperator extends Operator {
     /**
      * Adds operator(s) to item list
      */
-    add(...operator: Serializable[]): this {
+    add(...operator: (Serializable | Object)[]): this {
         for (const arg of operator) {
             if (!arg) continue;
             if (isPlainObject(arg)) {
                 this.add(...this._wrapObject(arg));
                 continue;
             }
-            if (!(arg instanceof Operator || arg._type === SerializationType.RAW))
+            if (!(arg instanceof Operator || (arg as Serializable)._type === SerializationType.RAW))
                 throw new TypeError('Operator or Raw type required');
-            this._items.push(arg);
+            this._items.push(arg as Serializable);
         }
         return this;
     }

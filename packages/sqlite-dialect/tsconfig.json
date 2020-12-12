@@ -5,8 +5,6 @@
     "rootDir": "src",
     "declaration": true,
     "sourceMap": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
       "@sqb/builder": ["../builder"]

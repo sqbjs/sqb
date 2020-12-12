@@ -40,7 +40,7 @@ export class SelectColumn extends Column {
             return (this._schema ? this._schema + '.' : '') +
                 (this._table ? this._table + '.' : '') +
                 (o.isReservedWord ? '"' + this._field + '"' : this._field) +
-                (this._alias ? ' ' + this._alias : '');
+                (this._alias ? ' as ' + this._alias : '');
         });
     }
 
