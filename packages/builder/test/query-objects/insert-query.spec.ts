@@ -84,7 +84,7 @@ describe('Serialize insert query', function () {
         const query = Insert('table1',
             Select('id', 'the_name name').from('table2'));
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'insert into table1 (id, name) values (select id, the_name name from table2)');
+        assert.strictEqual(result.sql, 'insert into table1 (id, name) values (select id, the_name as name from table2)');
     });
 
     it('should serialize insert with returning', function () {

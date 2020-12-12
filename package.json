@@ -46,10 +46,11 @@
       "postgres-dialect",
       "oracle-dialect",
       "mssql-dialect",
+      "sqlite-dialect",
       "postgres",
       "oracle",
-      "nestjs",
-      "orm"
+      "sqljs",
+      "nestjs"
     ]
   }
 }

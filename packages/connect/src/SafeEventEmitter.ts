@@ -12,13 +12,4 @@ export class SafeEventEmitter extends EventEmitter {
         }
     }
 
-    async emitAsync(event: string | symbol, ...args: any[]): Promise<boolean> {
-        const listeners = this.listeners(event);
-        for (const fn of listeners) {
-            if (!(await fn(...args)))
-                return false;
-        }
-        return true;
-    }
-
 }

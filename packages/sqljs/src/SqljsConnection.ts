@@ -1,6 +1,7 @@
 import {Adapter, QueryRequest} from '@sqb/connect';
 import {SqlJs} from 'sql.js/module';
 import {SqljsCursor} from './SqljsCursor';
+import Statement = SqlJs.Statement;
 
 export class SqljsConnection implements Adapter.Connection {
     private readonly intlcon: SqlJs.Database;
@@ -59,16 +60,28 @@ export class SqljsConnection implements Adapter.Connection {
         if (!query.autoCommit)
             await this.startTransaction();
         const out: Adapter.Response = {};
+        let params;
+        if (query.values) {
+            params = Object.keys(query.values).reduce((obj, k) => {
+                obj[':' + k] = query.values[k];
+                return obj;
+            }, {})
+        }
+
         const m = query.sql.match(/\b(insert into|update|delete from)\b (\w+)/i);
         if (m) {
-            this.intlcon.run(query.sql);
+            const stmt = this.intlcon.prepare(query.sql);
+            stmt.run(params);
+            stmt.free();
             out.rowsAffected = this.intlcon.getRowsModified();
+            if (query.autoCommit)
+                await this.commit();
             if (out.rowsAffected && query.returningFields) {
                 // Emulate insert into ... returning
                 if (m[1].toLowerCase() === 'insert into') {
                     const fields = Object.keys(query.returningFields);
-                    const sql = 'select ' + fields.join(',') +
-                        ' from ' + m[2] + ' where rowid=last_insert_rowid();'
+                    const sql = `select ${fields.join(',')} from ${m[2]}` +
+                        ' where rowid=last_insert_rowid();'
                     const r: any[] = this.intlcon.exec(sql);
                     if (r.length) {
                         out.fields = this._convertFields(r[0].columns);
@@ -82,30 +95,31 @@ export class SqljsConnection implements Adapter.Connection {
                     const m2 = query.sql.match(/where (.+)/);
                     const fields = Object.keys(query.returningFields);
                     query = {...query};
-                    query.sql = 'select ' + fields.join(',') +
-                        ' from ' + m[2] +
+                    query.sql = `select ${fields.join(',')} from ${m[2]}` +
                         (m2 ? ' where ' + m2[1] : '');
                 } else return out;
             }
+        }
 
-        }
-        const stmt = this.intlcon.prepare(query.sql, query.values);
-        const colNames = stmt.getColumnNames();
-        if (colNames && colNames.length) {
-            out.fields = this._convertFields(colNames);
-            const rowType = query.objectRows ? 'object' : 'array';
-            out.rowType = rowType;
-            const cursor = new SqljsCursor(stmt, {rowType});
-            if (query.cursor)
-                out.cursor = cursor;
-            else {
-                out.rows = await cursor.fetch(query.fetchRows || 100);
-                stmt.free();
+        let stmt: Statement | undefined = this.intlcon.prepare(query.sql, query.values);
+        try {
+            const colNames = stmt.getColumnNames();
+            if (colNames && colNames.length) {
+                out.fields = this._convertFields(colNames);
+                const rowType = query.objectRows ? 'object' : 'array';
+                out.rowType = rowType;
+                const cursor = new SqljsCursor(stmt, {rowType});
+                if (query.cursor) {
+                    out.cursor = cursor;
+                    stmt = undefined;
+                } else
+                    out.rows = await cursor.fetch(query.fetchRows || 100);
             }
+            return out;
+        } finally {
+            if (stmt)
+                stmt.free();
         }
-        if (query.autoCommit)
-            await this.commit();
-        return out;
     }
 
     _convertFields(fields: string[]) {

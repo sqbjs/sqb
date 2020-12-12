@@ -5,7 +5,7 @@ import {ClientConfiguration} from '@sqb/connect';
 import {
     getInsertSQLsForTestData,
     initAdapterTests
-} from '../../connect/test/shared/adapter-tests';
+} from '../../connect/test/_shared/adapter-tests';
 import {clientConfigurationToDriver} from '../src/helpers';
 
 describe('OraAdapter', function () {

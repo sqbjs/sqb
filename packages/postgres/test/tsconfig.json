@@ -13,7 +13,7 @@
       "@sqb/builder": ["../../builder"],
       "@sqb/connect": ["../../connect"],
       "@sqb/postgres-dialect": ["../../postgres-dialect"],
-      "@sqb/oracledb": ["../src"]
+      "@sqb/postgres": ["../src"]
     }
   }
 }

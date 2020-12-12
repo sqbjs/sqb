@@ -1,6 +1,6 @@
 {
-  "name": "@sqb/postgres-dialect",
-  "description": "SQB serialization extension for PostgreSQL database",
+  "name": "@sqb/sqlite-dialect",
+  "description": "SQB serialization extension for SQLite database",
   "version": "4.0.1-alpha.4",
   "author": "Panates Ltd.",
   "contributors": [
@@ -18,16 +18,12 @@
     "query",
     "builder",
     "dialect",
-    "postgres",
-    "postgresql",
-    "pg",
+    "sqlite",
     "database"
   ],
   "dependencies": {
-    "compare-versions": "^3.6.0"
   },
   "devDependencies": {
-    "@types/compare-versions": "^3.3.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
