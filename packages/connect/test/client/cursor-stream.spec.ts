@@ -61,6 +61,7 @@ describe('CursorStream', function () {
     });
 
     it('should stream string buffer', async function () {
+        this.slow(1000);
         await client.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
