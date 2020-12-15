@@ -4,7 +4,7 @@ import {Readable} from 'stream';
 import {Select} from '@sqb/builder';
 import {Client, Cursor} from '@sqb/connect';
 import {Connection} from '../../src/client/Connection';
-import {createTestSchema} from '../../../postgres/test/_support/create-test-db';
+import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
 function readStream(stream: Readable): Promise<string> {
     return new Promise((resolve, reject) => {

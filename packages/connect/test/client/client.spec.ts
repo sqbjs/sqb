@@ -3,7 +3,7 @@ import assert from 'assert';
 import {Insert, Param, Select} from '@sqb/builder';
 import '@sqb/postgres';
 import {Client} from '@sqb/connect';
-import {createTestSchema} from '../../../postgres/test/_support/create-test-db';
+import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
 describe('Client', function () {
 

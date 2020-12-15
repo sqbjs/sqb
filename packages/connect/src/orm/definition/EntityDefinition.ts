@@ -1,8 +1,11 @@
-import {ColumnDefinition} from './ColumnDefinition';
-import {IndexOptions} from '../types';
+import {
+    ColumnDefinition,
+    DataColumnDefinition, isDataColumn, isRelationColumn,
+    RelationColumnDefinition
+} from './ColumnDefinition';
+import {RelationColumnConfig, IndexConfig} from '../types';
 import {Maybe} from '../../types';
-
-export const ENTITY_METADATA_PROPERTY = Symbol.for('sqb.entity-metadata');
+import {ENTITY_DEFINITION_PROPERTY} from '../consts';
 
 export interface IndexDefinition {
     name?: string;
@@ -39,17 +42,47 @@ export class EntityDefinition {
         return this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
     }
 
-    addColumn(name: string): ColumnDefinition {
-        let col = this.getColumn(name);
-        if (!col) {
-            col = new ColumnDefinition(this, name);
-            this.columns.set(this.columnsCaseSensitive ? name : name.toUpperCase(), col);
-            this.columnKeys.push(col.name);
-        }
-        return col;
+    getDataColumn(name: string): Maybe<DataColumnDefinition> {
+        if (!name)
+            return;
+        const col = this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
+        return isDataColumn(col) ? col : undefined;
     }
 
-    definePrimaryIndex(column: string | string[], options?: IndexOptions): void {
+    getRelationColumn(name: string): Maybe<RelationColumnDefinition> {
+        if (!name)
+            return;
+        const col = this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
+        return isRelationColumn(col) ? col : undefined;
+    }
+
+    addDataColumn(column: string): DataColumnDefinition {
+        let col = this.getColumn(column);
+        if (col && col.kind !== 'data')
+            throw new Error(`A ${col.kind} column for "${column}" already defined`);
+        if (!col) {
+            col = new DataColumnDefinition(this, column);
+            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columnKeys.push(col.name);
+        }
+        return col as DataColumnDefinition;
+    }
+
+    addOne2OneRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+        let col = this.getColumn(column);
+        if (col && col.kind !== 'relation')
+            throw new Error(`A ${col.kind} column for "${column}" already defined`);
+        if (typeof cfg.target !== 'function')
+            throw new Error('You must provide Entity constructor of a function that return Entity constructor');
+        if (!col) {
+            col = new RelationColumnDefinition(this, column, false, cfg);
+            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columnKeys.push(col.name);
+        }
+        return col as RelationColumnDefinition;
+    }
+
+    definePrimaryIndex(column: string | string[], options?: IndexConfig): void {
         if (!(typeof column === 'string' || Array.isArray(column)))
             throw new Error('You must specify primary index field(s)');
         if (Array.isArray(column) && column.length === 1)
@@ -59,7 +92,7 @@ export class EntityDefinition {
             def.name = options.name;
     }
 
-    defineIndex(column: string | string[], options?: IndexOptions): void {
+    defineIndex(column: string | string[], options?: IndexConfig): void {
         if (!(typeof column === 'string' || Array.isArray(column)))
             throw new Error('You must specify index field(s)');
         if (Array.isArray(column) && column.length === 1)
@@ -97,14 +130,14 @@ export class EntityDefinition {
     }
 
     static get(ctor: Function): EntityDefinition {
-        return ctor[ENTITY_METADATA_PROPERTY];
+        return ctor[ENTITY_DEFINITION_PROPERTY];
     }
 
     static attach(ctor: Function): EntityDefinition {
         let entity: EntityDefinition = EntityDefinition.get(ctor);
         if (entity)
             return entity;
-        ctor[ENTITY_METADATA_PROPERTY] = entity = new EntityDefinition(ctor.name);
+        ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor.name);
         return entity;
     }
 

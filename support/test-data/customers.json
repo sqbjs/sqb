@@ -27,7 +27,7 @@
       "jsType": "string"
     },
     {
-      "fieldName": "country",
+      "fieldName": "country_code",
       "dataType": "varchar",
       "jsType": "string"
     }
@@ -39,7 +39,7 @@
       "family_name": "Silva",
       "birth_date": "1976-08-13T00:08:37-07:00",
       "city": "Norman",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 2,
@@ -47,7 +47,7 @@
       "family_name": "Fowler",
       "birth_date": "2018-06-18T00:01:49-07:00",
       "city": "Diyarbakır",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 3,
@@ -55,7 +55,7 @@
       "family_name": "Marsh",
       "birth_date": "1996-02-06T04:20:46-08:00",
       "city": "Erciş",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 4,
@@ -63,7 +63,7 @@
       "family_name": "Kidd",
       "birth_date": "2006-04-22T17:01:02-07:00",
       "city": "Dallas",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 5,
@@ -71,7 +71,7 @@
       "family_name": "Collier",
       "birth_date": "2009-11-09T12:33:57-08:00",
       "city": "Balıkesir",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 6,
@@ -79,7 +79,7 @@
       "family_name": "Mcfarland",
       "birth_date": "1994-10-11T10:09:54-07:00",
       "city": "Butte",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 7,
@@ -87,7 +87,7 @@
       "family_name": "Miles",
       "birth_date": "1980-05-18T09:37:40-07:00",
       "city": "Smoky Lake",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 8,
@@ -95,7 +95,7 @@
       "family_name": "Crosby",
       "birth_date": "2002-12-22T19:33:45-08:00",
       "city": "Marystown",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 9,
@@ -103,7 +103,7 @@
       "family_name": "Wolf",
       "birth_date": "1970-01-20T02:34:32-08:00",
       "city": "Owensboro",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 10,
@@ -111,7 +111,7 @@
       "family_name": "Mack",
       "birth_date": "1962-06-24T21:31:40-07:00",
       "city": "Cincinnati",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 11,
@@ -119,7 +119,7 @@
       "family_name": "Pacheco",
       "birth_date": "1996-01-10T11:31:01-08:00",
       "city": "Lüneburg",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 12,
@@ -127,7 +127,7 @@
       "family_name": "Bennett",
       "birth_date": "1970-05-29T06:58:03-07:00",
       "city": "Pointe-au-Pic",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 13,
@@ -135,7 +135,7 @@
       "family_name": "Compton",
       "birth_date": "1996-05-07T09:41:29-07:00",
       "city": "San Antonio",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 14,
@@ -143,7 +143,7 @@
       "family_name": "Mercer",
       "birth_date": "1977-10-01T19:35:16-07:00",
       "city": "Springfield",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 15,
@@ -151,7 +151,7 @@
       "family_name": "Gill",
       "birth_date": "1988-06-19T09:55:29-07:00",
       "city": "Bandırma",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 16,
@@ -159,7 +159,7 @@
       "family_name": "Duran",
       "birth_date": "2013-03-30T05:14:00-07:00",
       "city": "Miami",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 17,
@@ -167,7 +167,7 @@
       "family_name": "Compton",
       "birth_date": "1970-05-12T02:38:08-07:00",
       "city": "Grand Island",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 18,
@@ -175,7 +175,7 @@
       "family_name": "Frank",
       "birth_date": "2014-04-01T02:12:20-07:00",
       "city": "West Jordan",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 19,
@@ -183,7 +183,7 @@
       "family_name": "Pierce",
       "birth_date": "1998-04-23T17:22:51-07:00",
       "city": "Valley East",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 20,
@@ -191,7 +191,7 @@
       "family_name": "Russell",
       "birth_date": "1967-02-01T12:50:21-08:00",
       "city": "Auburn",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 21,
@@ -199,7 +199,7 @@
       "family_name": "Johnston",
       "birth_date": "1986-11-13T06:39:45-08:00",
       "city": "Rae-Edzo",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 22,
@@ -207,7 +207,7 @@
       "family_name": "Mercado",
       "birth_date": "1961-09-13T04:37:00-07:00",
       "city": "Great Falls",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 23,
@@ -215,7 +215,7 @@
       "family_name": "Cantrell",
       "birth_date": "2002-08-17T14:19:33-07:00",
       "city": "Honolulu",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 24,
@@ -223,7 +223,7 @@
       "family_name": "Moody",
       "birth_date": "2016-03-11T02:40:47-08:00",
       "city": "Bellevue",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 25,
@@ -231,7 +231,7 @@
       "family_name": "Mccall",
       "birth_date": "2018-01-05T17:47:46-08:00",
       "city": "Anchorage",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 26,
@@ -239,7 +239,7 @@
       "family_name": "Suarez",
       "birth_date": "1989-02-06T21:34:41-08:00",
       "city": "Germersheim",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 27,
@@ -247,7 +247,7 @@
       "family_name": "Lindsay",
       "birth_date": "1986-07-12T21:04:21-07:00",
       "city": "Bad Oldesloe",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 28,
@@ -255,7 +255,7 @@
       "family_name": "Lang",
       "birth_date": "2016-05-27T15:27:31-07:00",
       "city": "Merritt",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 29,
@@ -263,7 +263,7 @@
       "family_name": "Gilliam",
       "birth_date": "2017-10-29T21:12:39-07:00",
       "city": "Falkensee",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 30,
@@ -271,7 +271,7 @@
       "family_name": "Langley",
       "birth_date": "1987-07-03T05:09:14-07:00",
       "city": "New Sarepta",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 31,
@@ -279,7 +279,7 @@
       "family_name": "Johnson",
       "birth_date": "1962-12-11T00:27:03-08:00",
       "city": "Pictou",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 32,
@@ -287,7 +287,7 @@
       "family_name": "Calhoun",
       "birth_date": "1962-06-09T01:12:07-07:00",
       "city": "Bathurst",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 33,
@@ -295,7 +295,7 @@
       "family_name": "Davidson",
       "birth_date": "1999-07-19T23:09:50-07:00",
       "city": "Karapınar",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 34,
@@ -303,7 +303,7 @@
       "family_name": "Rutledge",
       "birth_date": "1964-03-23T04:54:11-08:00",
       "city": "Gravelbourg",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 35,
@@ -311,7 +311,7 @@
       "family_name": "Mckenzie",
       "birth_date": "1963-11-22T07:01:23-08:00",
       "city": "Bremen",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 36,
@@ -319,7 +319,7 @@
       "family_name": "Murphy",
       "birth_date": "1997-07-27T06:31:17-07:00",
       "city": "West Jordan",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 37,
@@ -327,7 +327,7 @@
       "family_name": "Gibbs",
       "birth_date": "1988-09-05T20:49:27-07:00",
       "city": "Saarlouis",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 38,
@@ -335,7 +335,7 @@
       "family_name": "Glover",
       "birth_date": "1983-03-25T13:14:11-08:00",
       "city": "Pemberton",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 39,
@@ -343,7 +343,7 @@
       "family_name": "Dennis",
       "birth_date": "1977-04-10T16:49:08-08:00",
       "city": "Cuxhaven",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 40,
@@ -351,7 +351,7 @@
       "family_name": "Olsen",
       "birth_date": "2020-03-19T00:39:59-07:00",
       "city": "Hamburg",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 41,
@@ -359,7 +359,7 @@
       "family_name": "Gaines",
       "birth_date": "1994-02-01T16:02:02-08:00",
       "city": "Birecik",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 42,
@@ -367,7 +367,7 @@
       "family_name": "Holloway",
       "birth_date": "2007-10-15T14:17:49-07:00",
       "city": "Kuşadası",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 43,
@@ -375,7 +375,7 @@
       "family_name": "Cherry",
       "birth_date": "1968-07-02T02:59:10-07:00",
       "city": "Mersin",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 44,
@@ -383,7 +383,7 @@
       "family_name": "Bridges",
       "birth_date": "1975-03-13T07:10:53-07:00",
       "city": "Akhisar",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 45,
@@ -391,7 +391,7 @@
       "family_name": "Farrell",
       "birth_date": "1966-02-02T21:41:40-08:00",
       "city": "Kiel",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 46,
@@ -399,7 +399,7 @@
       "family_name": "Mills",
       "birth_date": "1978-01-07T07:57:34-08:00",
       "city": "Gölcük",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 47,
@@ -407,7 +407,7 @@
       "family_name": "Franco",
       "birth_date": "1975-12-08T19:14:32-08:00",
       "city": "Inuvik",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 48,
@@ -415,7 +415,7 @@
       "family_name": "Webster",
       "birth_date": "2019-01-07T09:37:45-08:00",
       "city": "Bear",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 49,
@@ -423,7 +423,7 @@
       "family_name": "Mcintosh",
       "birth_date": "1994-11-08T09:27:51-08:00",
       "city": "Şereflikoçhisar",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 50,
@@ -431,7 +431,7 @@
       "family_name": "Carrillo",
       "birth_date": "2007-03-21T19:13:19-07:00",
       "city": "Husum",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 51,
@@ -439,7 +439,7 @@
       "family_name": "Blake",
       "birth_date": "2005-01-07T03:03:07-08:00",
       "city": "Halberstadt",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 52,
@@ -447,7 +447,7 @@
       "family_name": "Obrien",
       "birth_date": "1962-08-04T04:10:01-07:00",
       "city": "Lourdes",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 53,
@@ -455,7 +455,7 @@
       "family_name": "Glenn",
       "birth_date": "2006-02-26T13:04:39-08:00",
       "city": "Werder",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 54,
@@ -463,7 +463,7 @@
       "family_name": "Castro",
       "birth_date": "1970-11-02T16:53:58-08:00",
       "city": "South Portland",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 55,
@@ -471,7 +471,7 @@
       "family_name": "Finley",
       "birth_date": "1986-01-27T16:59:57-08:00",
       "city": "Akron",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 56,
@@ -479,7 +479,7 @@
       "family_name": "Britt",
       "birth_date": "1983-06-23T17:16:46-07:00",
       "city": "Şereflikoçhisar",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 57,
@@ -487,7 +487,7 @@
       "family_name": "Gentry",
       "birth_date": "2016-05-18T05:43:08-07:00",
       "city": "Juneau",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 58,
@@ -495,7 +495,7 @@
       "family_name": "Cantu",
       "birth_date": "1995-06-16T02:18:45-07:00",
       "city": "Beausejour",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 59,
@@ -503,7 +503,7 @@
       "family_name": "Hill",
       "birth_date": "1963-02-22T21:40:41-08:00",
       "city": "Balıkesir",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 60,
@@ -511,7 +511,7 @@
       "family_name": "Acosta",
       "birth_date": "1982-07-12T19:43:59-07:00",
       "city": "Orhangazi",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 61,
@@ -519,7 +519,7 @@
       "family_name": "Tate",
       "birth_date": "1987-02-21T03:53:34-08:00",
       "city": "Flin Flon",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 62,
@@ -527,7 +527,7 @@
       "family_name": "Reid",
       "birth_date": "1976-10-04T19:49:37-07:00",
       "city": "Memphis",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 63,
@@ -535,7 +535,7 @@
       "family_name": "Morris",
       "birth_date": "2019-01-17T06:55:21-08:00",
       "city": "Campbellton",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 64,
@@ -543,7 +543,7 @@
       "family_name": "Avila",
       "birth_date": "2015-12-19T14:37:34-08:00",
       "city": "Bremerhaven",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 65,
@@ -551,7 +551,7 @@
       "family_name": "Rios",
       "birth_date": "1978-06-29T14:12:08-07:00",
       "city": "Dallas",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 66,
@@ -559,7 +559,7 @@
       "family_name": "Sheppard",
       "birth_date": "2009-07-31T17:32:48-07:00",
       "city": "Gulfport",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 67,
@@ -567,7 +567,7 @@
       "family_name": "Velasquez",
       "birth_date": "2020-01-02T04:34:23-08:00",
       "city": "Fort Smith",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 68,
@@ -575,7 +575,7 @@
       "family_name": "Frazier",
       "birth_date": "2012-11-13T17:30:32-08:00",
       "city": "Augusta",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 69,
@@ -583,7 +583,7 @@
       "family_name": "Shepard",
       "birth_date": "1968-03-05T09:33:13-08:00",
       "city": "Siverek",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 70,
@@ -591,7 +591,7 @@
       "family_name": "Clayton",
       "birth_date": "2005-07-26T10:50:38-07:00",
       "city": "Pangnirtung",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 71,
@@ -599,7 +599,7 @@
       "family_name": "Williams",
       "birth_date": "1999-06-28T10:39:13-07:00",
       "city": "Istanbul",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 72,
@@ -607,7 +607,7 @@
       "family_name": "Schwartz",
       "birth_date": "1992-08-03T20:21:58-07:00",
       "city": "Iqaluit",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 73,
@@ -615,7 +615,7 @@
       "family_name": "Hancock",
       "birth_date": "1972-04-24T03:47:08-08:00",
       "city": "Bremen",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 74,
@@ -623,7 +623,7 @@
       "family_name": "Stephens",
       "birth_date": "1965-06-19T09:01:03-07:00",
       "city": "Kumluca",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 75,
@@ -631,7 +631,7 @@
       "family_name": "Berg",
       "birth_date": "1963-07-12T13:46:13-07:00",
       "city": "Bergama",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 76,
@@ -639,7 +639,7 @@
       "family_name": "Oconnor",
       "birth_date": "1992-07-01T23:08:11-07:00",
       "city": "Worcester",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 77,
@@ -647,7 +647,7 @@
       "family_name": "Tanner",
       "birth_date": "1969-05-10T21:45:57-07:00",
       "city": "Aklavik",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 78,
@@ -655,7 +655,7 @@
       "family_name": "Hopper",
       "birth_date": "1966-10-26T16:51:46-07:00",
       "city": "Naumburg",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 79,
@@ -663,7 +663,7 @@
       "family_name": "Durham",
       "birth_date": "2019-09-28T10:21:23-07:00",
       "city": "Lörrach",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 80,
@@ -671,7 +671,7 @@
       "family_name": "Drake",
       "birth_date": "1962-09-18T05:42:07-07:00",
       "city": "Wilmont",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 81,
@@ -679,7 +679,7 @@
       "family_name": "Hooper",
       "birth_date": "2018-01-12T18:26:23-08:00",
       "city": "Butte",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 82,
@@ -687,7 +687,7 @@
       "family_name": "Fitzpatrick",
       "birth_date": "1998-09-07T00:28:13-07:00",
       "city": "Haßloch",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 83,
@@ -695,7 +695,7 @@
       "family_name": "Austin",
       "birth_date": "1965-11-19T22:53:36-08:00",
       "city": "Montague",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 84,
@@ -703,7 +703,7 @@
       "family_name": "Moreno",
       "birth_date": "1979-12-13T22:07:10-08:00",
       "city": "Bergen",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 85,
@@ -711,7 +711,7 @@
       "family_name": "Macdonald",
       "birth_date": "1976-06-25T19:51:37-07:00",
       "city": "Rendsburg",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 86,
@@ -719,7 +719,7 @@
       "family_name": "Terry",
       "birth_date": "1974-09-21T14:49:39-07:00",
       "city": "Clarksville",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 87,
@@ -727,7 +727,7 @@
       "family_name": "Ayers",
       "birth_date": "2013-06-15T19:23:43-07:00",
       "city": "Langenhagen",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 88,
@@ -735,7 +735,7 @@
       "family_name": "Fowler",
       "birth_date": "2014-11-08T20:45:07-08:00",
       "city": "Kahramanmaraş",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 89,
@@ -743,7 +743,7 @@
       "family_name": "Lynn",
       "birth_date": "2000-06-06T21:03:35-07:00",
       "city": "Lebach",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 90,
@@ -751,7 +751,7 @@
       "family_name": "Garner",
       "birth_date": "2002-07-22T07:41:32-07:00",
       "city": "Bensheim",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 91,
@@ -759,7 +759,7 @@
       "family_name": "Perkins",
       "birth_date": "1962-10-11T05:00:26-07:00",
       "city": "Ergani",
-      "country": "Turkey"
+      "country_code": "TR"
     },
     {
       "ID": 92,
@@ -767,7 +767,7 @@
       "family_name": "Potts",
       "birth_date": "1992-12-28T11:06:33-08:00",
       "city": "Duluth",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 93,
@@ -775,7 +775,7 @@
       "family_name": "Monroe",
       "birth_date": "2008-11-06T03:08:12-08:00",
       "city": "Montague",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 94,
@@ -783,7 +783,7 @@
       "family_name": "Tyson",
       "birth_date": "2011-06-09T20:28:50-07:00",
       "city": "Charlottetown",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 95,
@@ -791,7 +791,7 @@
       "family_name": "Mccray",
       "birth_date": "2014-04-17T02:55:53-07:00",
       "city": "Riesa",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 96,
@@ -799,7 +799,7 @@
       "family_name": "Kirk",
       "birth_date": "1977-04-16T22:45:24-08:00",
       "city": "Rock Springs",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 97,
@@ -807,7 +807,7 @@
       "family_name": "Mclean",
       "birth_date": "2013-12-24T15:59:02-08:00",
       "city": "Watson Lake",
-      "country": "Canada"
+      "country_code": "CA"
     },
     {
       "ID": 98,
@@ -815,7 +815,7 @@
       "family_name": "Frye",
       "birth_date": "1976-03-10T04:14:37-08:00",
       "city": "Minneapolis",
-      "country": "United States"
+      "country_code": "US"
     },
     {
       "ID": 99,
@@ -823,7 +823,7 @@
       "family_name": "Ratliff",
       "birth_date": "1960-08-29T08:09:22-07:00",
       "city": "Zwickau",
-      "country": "Germany"
+      "country_code": "DE"
     },
     {
       "ID": 100,
@@ -831,7 +831,7 @@
       "family_name": "Gilliam",
       "birth_date": "1989-10-02T20:12:46-07:00",
       "city": "Baunatal",
-      "country": "Germany"
+      "country_code": "DE"
     }
   ]
 }

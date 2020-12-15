@@ -1,7 +1,7 @@
 export const sqls = [
 
-`BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.airports';
+    `BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.CUSTOMERS';
 EXCEPTION
    WHEN OTHERS THEN
       IF SQLCODE != -942 THEN
@@ -9,8 +9,8 @@ EXCEPTION
       END IF;
 END;`,
 
-`BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.regions';
+    `BEGIN
+   EXECUTE IMMEDIATE 'DROP SEQUENCE ${process.env.ORASCHEMA}.customers_id_seq';
 EXCEPTION
    WHEN OTHERS THEN
       IF SQLCODE != -942 THEN
@@ -18,44 +18,60 @@ EXCEPTION
       END IF;
 END;`,
 
-`CREATE TABLE ${process.env.ORASCHEMA}.regions (
-  id    VARCHAR2(5),
-  name  VARCHAR2(16)
+    `BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.COUNTRIES';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -942 THEN
+         RAISE;
+      END IF;
+END;`,
+
+
+    `CREATE TABLE ${process.env.ORASCHEMA}.countries (
+  code    VARCHAR2(5),
+  name  VARCHAR2(16),
+  phone_code VARCHAR2(8)
 )`,
 
-`ALTER TABLE ${process.env.ORASCHEMA}.regions ADD (
-  CONSTRAINT regions_PK
-  PRIMARY KEY (id)
+    `ALTER TABLE ${process.env.ORASCHEMA}.countries ADD (
+  CONSTRAINT countries_PK
+  PRIMARY KEY
+  (code)
   ENABLE VALIDATE)`,
 
-`CREATE TABLE ${process.env.ORASCHEMA}.airports
+    `CREATE TABLE ${process.env.ORASCHEMA}.customers
 (
-  id    VARCHAR2(10),
-  shortname  VARCHAR2(10),
-  name  VARCHAR2(32),
-  region  VARCHAR2(5),
-  icao  VARCHAR2(10),
-  flags  INTEGER,
-  catalog  INTEGER,
-  length  INTEGER,
-  elevation  INTEGER,
-  runway  VARCHAR2(5),
-  frequency  number(12,4),
-  latitude  VARCHAR2(10),
-  longitude  VARCHAR2(10),
-  temp1 number(12,4)
+  id    INTEGER,
+  given_name  VARCHAR2(64),
+  family_name  VARCHAR2(64),
+  birth_date  DATE,
+  city  VARCHAR2(32),
+  country_code  VARCHAR2(5)
 )`,
 
-`ALTER TABLE ${process.env.ORASCHEMA}.airports ADD (
-  CONSTRAINT airports_PK
+    `ALTER TABLE ${process.env.ORASCHEMA}.customers ADD (
+  CONSTRAINT customers_PK
   PRIMARY KEY
   (id)
   ENABLE VALIDATE)`,
 
-`ALTER TABLE ${process.env.ORASCHEMA}.AIRPORTS ADD
-CONSTRAINT FK_AIRPORTS_REGION
- FOREIGN KEY (REGION)
- REFERENCES ${process.env.ORASCHEMA}.REGIONS (ID)
+    `ALTER TABLE ${process.env.ORASCHEMA}.customers ADD
+CONSTRAINT FK_CUSTOMERS_COUNTRY_CODE
+ FOREIGN KEY (country_code)
+ REFERENCES ${process.env.ORASCHEMA}.COUNTRIES (code)
  ENABLE
- VALIDATE`
- ];
+ VALIDATE`,
+
+
+    `CREATE SEQUENCE ${process.env.ORASCHEMA}.customers_id_seq START WITH 10000`,
+
+    `CREATE OR REPLACE TRIGGER ${process.env.ORASCHEMA}.customers_bi 
+BEFORE INSERT ON ${process.env.ORASCHEMA}.customers 
+FOR EACH ROW
+BEGIN
+  if :new.id is null then
+      select ${process.env.ORASCHEMA}.customers_id_seq.nextval into :new.id from dual;
+  end if;
+END;`,
+];

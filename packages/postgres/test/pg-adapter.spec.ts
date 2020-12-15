@@ -1,7 +1,7 @@
 import './_support/env';
 import {PgAdapter} from '../src/PgAdapter';
 import {initAdapterTests} from '../../connect/test/_shared/adapter-tests';
-import {createTestSchema} from './_support/create-test-db';
+import {createTestSchema} from './_support/create-db';
 
 describe('PgAdapter', function () {
     const adapter = new PgAdapter();

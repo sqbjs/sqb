@@ -1,7 +1,9 @@
 import {Column, Entity, PrimaryKey, SortAscending, SortDescending} from '@sqb/connect';
+import {Country} from './countries.entity';
+import {HasOne} from '../../src/orm/decorators/relations.decorator';
 
-@Entity()
-export class Customers {
+@Entity('customers')
+export class Customer {
     @PrimaryKey()
     @Column({fieldName: 'ID'})
     @SortDescending()
@@ -26,7 +28,14 @@ export class Customers {
     @Column({fieldName: 'city'})
     city: string;
 
-    @Column({fieldName: 'country'})
-    country: string;
+    @Column({fieldName: 'country_code'})
+    countryCode: string;
+
+    @HasOne({
+        target: Country,
+        column: 'countryCode',
+        targetColumn: 'code'
+    })
+    country: Country
 
 }

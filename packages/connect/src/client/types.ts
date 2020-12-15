@@ -2,9 +2,9 @@ import type {Connection} from './Connection';
 import type {FieldInfoMap} from './FieldInfoMap';
 import type {Cursor} from './Cursor';
 import type {PoolConfiguration} from 'lightning-pool';
-import {Adapter} from './Adapter';
-import {classes} from '@sqb/builder';
-import {Maybe} from '../types';
+import type {Adapter} from './Adapter';
+import type {classes} from '@sqb/builder';
+import type {Maybe} from '../types';
 
 export type ExecuteHookFunction = (connection: Connection, request: QueryRequest) => Promise<void>;
 export type FetchFunction = (row: any, request: QueryRequest) => void;

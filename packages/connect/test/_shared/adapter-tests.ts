@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import fs from "fs";
 import path from "path";
 import assert from "assert";
@@ -11,6 +12,7 @@ export function initAdapterTests(adapter: Adapter,
                                  config?: Partial<ClientConfiguration>) {
 
     let connection: Adapter.Connection;
+    let lastInsertId;
     const clientConfig: ClientConfiguration = {
         ...config,
         driver: adapter.driver,
@@ -35,53 +37,53 @@ export function initAdapterTests(adapter: Adapter,
             autoCommit: !(opts?.autoCommit === false)
         });
         if (result.rows) {
-            if (result.rowType === 'array') {
-                result.objRows = result.rows.reduce((target, row) => {
-                    const r: any = {};
-                    for (const [i, f] of result.fields.entries()) {
-                        r[f.fieldName.toLowerCase()] = row[i];
-                    }
-                    target.push(r);
-                    return target;
-                }, []);
-
-            } else
-                result.objRows = result.rows;
+            result.objRows = result.rows.reduce((target, row) => {
+                const r: any = {};
+                for (const [i, f] of result.fields.entries()) {
+                    const v = result.rowType === 'array' ? row[i] :
+                        row[f.fieldName];
+                    r[f.fieldName.toLowerCase()] = v;
+                }
+                target.push(r);
+                return target;
+            }, []);
         }
 
         return result;
     }
 
     it('should create connection instance with ' + adapter.driver + ' driver', async function () {
+        this.timeout(10000);
+        this.slow(2000);
         connection = await adapter.connect(clientConfig);
         assert.ok(connection);
     });
 
     it('should execute a select query and return fields and rows (objectRows=false)', async function () {
         connection = await adapter.connect(clientConfig);
-        const query = Select('id').from('airports').orderBy('id');
+        const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {objectRows: false});
         assert.ok(result);
         assert.ok(result.rows && result.rows.length);
         assert.ok(result.rowType);
         assert.ok(result.fields);
-        assert.strictEqual(result.objRows[0].id, 'AIGRE');
+        assert.strictEqual(result.objRows[0].id, 1);
     });
 
     it('should execute a select query and return fields and rows (objectRows=true)', async function () {
         connection = await adapter.connect(clientConfig);
-        const query = Select('id').from('airports').orderBy('id');
+        const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {objectRows: true});
         assert.ok(result);
         assert.ok(result.rows && result.rows.length);
         assert.ok(result.rowType);
         assert.ok(result.fields);
-        assert.strictEqual(result.objRows[0].id, 'AIGRE');
+        assert.strictEqual(result.objRows[0].id, 1);
     });
 
     it('should return cursor', async function () {
         connection = await adapter.connect(clientConfig);
-        const query = Select('id').from('airports').orderBy('id');
+        const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {
             objectRows: false, cursor: true
         });
@@ -92,14 +94,14 @@ export function initAdapterTests(adapter: Adapter,
         const rows = await result.cursor.fetch(1);
         assert.strictEqual(rows.length, 1);
         if (result.rowType === 'array')
-            assert.strictEqual(rows[0][0], 'AIGRE');
+            assert.strictEqual(rows[0][0], 1);
         else
-            assert.strictEqual(rows[0][result.fields[0].fieldName], 'AIGRE');
+            assert.strictEqual(rows[0][result.fields[0].fieldName], 1);
     });
 
     it('should fetchRows option limit row count', async function () {
         connection = await adapter.connect(clientConfig);
-        const query = Select('id').from('airports').orderBy('id');
+        const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {
             objectRows: false,
             fetchRows: 5
@@ -116,12 +118,12 @@ export function initAdapterTests(adapter: Adapter,
 
     it('should insert record with returning', async function () {
         connection = await adapter.connect(clientConfig);
-        const id = 'X' + Math.floor(Math.random() * 10000);
-        const query = Insert('airports', {
-            id,
-            shortname: 'ShortName1',
-            name: 'Name1'
-        }).returning('id::string');
+        const givenName = 'X' + Math.floor(Math.random() * 1000000);
+        const familyName = 'X' + Math.floor(Math.random() * 1000000);
+        const query = Insert('customers', {
+            given_name: givenName,
+            family_name: familyName
+        }).returning('id::number');
         const result = await adapterExecute(query, {
             autoCommit: true,
             objectRows: false
@@ -129,36 +131,35 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(result);
         assert.ok(result.rows);
         assert.strictEqual(result.rowsAffected, 1);
-        assert.strictEqual(result.objRows[0].id, id);
+        assert.ok(result.objRows[0].id > 0);
+        lastInsertId = result.objRows[0].id;
     });
 
     it('should execute script with parameters', async function () {
         connection = await adapter.connect(clientConfig);
-        const id = 'X' + Math.floor(Math.random() * 10000);
-        const query = Insert('airports', {
-            id: Param('id'),
-            shortname: Param('shortname'),
-            name: 'Test1'
-        }).returning('id::string');
+        const givenName = 'X' + Math.floor(Math.random() * 1000000);
+        const familyName = 'X' + Math.floor(Math.random() * 1000000);
+        const query = Insert('customers', {
+            given_name: Param('givenName'),
+            family_name: Param('familyName')
+        }).returning('id::number', 'given_name::string', 'family_name::string');
         const result = await adapterExecute(query, {
             autoCommit: true,
-            values: {
-                id,
-                shortname: 'ShortName1',
-                name: 'Name1'
-            }
+            values: {givenName, familyName}
         });
         assert.ok(result);
         assert.ok(result.rows);
         assert.strictEqual(result.rowsAffected, 1);
-        assert.strictEqual(result.objRows[0].id, id);
+        assert.ok(result.objRows[0].id > 0);
+        assert.strictEqual(result.objRows[0].given_name, givenName);
+        assert.strictEqual(result.objRows[0].family_name, familyName);
     });
 
     it('should update record with returning', async function () {
         connection = await adapter.connect(clientConfig);
-        const catalog = Math.floor(Math.random() * 10000);
-        const query = Update('airports', {catalog})
-            .where({id: 'LFOI'}).returning('catalog::number');
+        const city = 'X' + Math.floor(Math.random() * 10000);
+        const query = Update('customers', {city})
+            .where({id: lastInsertId}).returning('city::string');
         const result = await adapterExecute(query, {
             autoCommit: true,
             objectRows: false
@@ -166,154 +167,152 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(result);
         assert.ok(result.rows);
         assert.strictEqual(result.rowsAffected, 1);
-        assert.strictEqual(result.objRows[0].catalog, catalog);
+        assert.strictEqual(result.objRows[0].city, city);
     });
 
     it('should commit a transaction', async function () {
         connection = await adapter.connect(clientConfig);
         let r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        const oldCatalog = r.objRows[0].catalog;
-        let newCatalog = null;
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        const oldCity = r.objRows[0].city;
+        let newCity = null;
 
         await connection.startTransaction();
 
-        newCatalog = Math.floor(Math.random() * 10000);
+        newCity = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
-            Update('airports', {Catalog: newCatalog}).where({id: 'LFBA'}),
+            Update('customers', {city: newCity}).where({id: lastInsertId}),
             {autoCommit: false}
         );
         const result = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'}),
+            Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
         assert.ok(result);
         assert.ok(result.rows);
-        assert.strictEqual(result.objRows[0].id, 'LFBA');
-        assert.strictEqual(result.objRows[0].catalog, newCatalog);
-        assert.notStrictEqual(result.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(result.objRows[0].id, lastInsertId);
+        assert.strictEqual(result.objRows[0].city, newCity);
+        assert.notStrictEqual(result.objRows[0].city, oldCity);
         await connection.commit();
 
         r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        assert.notStrictEqual(r.objRows[0].catalog, oldCatalog);
-        assert.strictEqual(r.objRows[0].catalog, newCatalog);
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        assert.notStrictEqual(r.objRows[0].city, oldCity);
+        assert.strictEqual(r.objRows[0].city, newCity);
     });
 
     it('should rollback a transaction', async function () {
         connection = await adapter.connect(clientConfig);
         let r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        const oldCatalog = r.objRows[0].catalog;
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        const oldCity = r.objRows[0].city;
 
 
         await connection.startTransaction();
-        const catalog = Math.floor(Math.random() * 10000);
+        const city = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
-            Update('airports', {Catalog: catalog}).where({id: 'LFBA'}),
+            Update('customers', {city}).where({id: lastInsertId}),
             {autoCommit: false}
         );
         const result = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'}),
+            Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
         assert.ok(result);
         assert.ok(result.objRows);
-        assert.strictEqual(result.objRows[0].id, 'LFBA');
-        assert.strictEqual(result.objRows[0].catalog, catalog);
-        assert.notStrictEqual(result.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(result.objRows[0].id, lastInsertId);
+        assert.strictEqual(result.objRows[0].city, city);
+        assert.notStrictEqual(result.objRows[0].city, oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        assert.strictEqual(r.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        assert.strictEqual(r.objRows[0].city, oldCity);
     });
 
     it('should start transaction when autoCommit is off', async function () {
         connection = await adapter.connect(clientConfig);
         let r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        const oldCatalog = r.objRows[0].catalog;
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        const oldCity = r.objRows[0].city;
 
-        const catalog = Math.floor(Math.random() * 10000);
+        const city = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
-            Update('airports', {Catalog: catalog}).where({id: 'LFBA'}),
+            Update('customers', {city}).where({id: lastInsertId}),
             {autoCommit: false}
         );
         const result = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'}),
+            Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
         assert.ok(result);
         assert.ok(result.rows);
-        assert.strictEqual(result.objRows[0].id, 'LFBA');
-        assert.strictEqual(result.objRows[0].catalog, catalog);
-        assert.notStrictEqual(result.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(result.objRows[0].id, lastInsertId);
+        assert.strictEqual(result.objRows[0].city, city);
+        assert.notStrictEqual(result.objRows[0].city, oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        assert.strictEqual(r.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        assert.strictEqual(r.objRows[0].city, oldCity);
     });
 
     it('should commit a transaction when autoCommit is on', async function () {
         connection = await adapter.connect(clientConfig);
         let r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        const oldCatalog = r.objRows[0].catalog;
-        let newCatalog = null;
-
-        newCatalog = Math.floor(Math.random() * 10000);
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        const oldCity = r.objRows[0].city;
+        const newCity = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
-            Update('airports', {Catalog: newCatalog}).where({id: 'LFBA'}),
+            Update('customers', {city: newCity}).where({id: lastInsertId}),
             {autoCommit: true}
         );
         const result = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(result);
         assert.ok(result.objRows);
-        assert.strictEqual(result.objRows[0].id, 'LFBA');
-        assert.strictEqual(result.objRows[0].catalog, newCatalog);
-        assert.notStrictEqual(result.objRows[0].catalog, oldCatalog);
+        assert.strictEqual(result.objRows[0].id, lastInsertId);
+        assert.strictEqual(result.objRows[0].city, newCity);
+        assert.notStrictEqual(result.objRows[0].city, oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
-            Select().from('airports').where({id: 'LFBA'})
+            Select().from('customers').where({id: lastInsertId})
         );
         assert.ok(r);
         assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, 'LFBA');
-        assert.notStrictEqual(r.objRows[0].catalog, oldCatalog);
-        assert.strictEqual(r.objRows[0].catalog, newCatalog);
+        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        assert.notStrictEqual(r.objRows[0].city, oldCity);
+        assert.strictEqual(r.objRows[0].city, newCity);
     });
 
     it('should call startTransaction() more than one', async function () {
@@ -345,11 +344,9 @@ export function getInsertSQLsForTestData(opts?: {
     const result: { table: string, scripts: string[] }[] = [];
     const repositoryRoot = path.resolve(__dirname, '../../../..');
 
-    const dataFiles: any[] = [
-        JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'support/test-data', 'regions.json'), 'utf8')),
-        JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'support/test-data', 'airports.json'), 'utf8')),
-        JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'support/test-data', 'customers.json'), 'utf8'))
-    ];
+    const dataFiles: any[] = ['countries', 'customers'].map(f =>
+        JSON.parse(fs.readFileSync(
+            path.join(repositoryRoot, 'support/test-data', f + '.json'), 'utf8')));
 
     const stringify = opts?.stringifyValueForSQL || stringifyValueForSQL;
     const schema = opts?.schema ? opts?.schema + '.' : '';
