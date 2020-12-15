@@ -4,7 +4,7 @@ import assert from 'assert';
 import {Select} from '@sqb/builder';
 import {Client, Cursor} from '@sqb/connect';
 import {Connection} from '../../src/client/Connection';
-import {createTestSchema} from '../../../postgres/test/_support/create-test-db';
+import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
 describe('Cursor', function () {
 

@@ -4,8 +4,9 @@ import {Connection} from '../client/Connection';
 import {Constructor, FindByPkOptions, FindOneOptions, FindOptions} from './types';
 import {EntityDefinition} from './definition/EntityDefinition';
 import {QueryExecutor} from '../client/types';
-import {FindOperation} from './FindOperation';
 import {Maybe} from '../types';
+import {isDataColumn} from './definition/ColumnDefinition';
+import {FindTask} from './FindTask';
 
 export class Repository<T> {
     private readonly _client: Client;
@@ -26,8 +27,8 @@ export class Repository<T> {
     }
 
     async find(options?: FindOptions): Promise<T[]> {
-        const findOperation = new FindOperation<T>(this._executor, this._ctor, options || {});
-        return findOperation.execute();
+        const task = new FindTask<T>(this._executor, this._ctor, options || {});
+        return task.execute();
     }
 
     async findByPk(keyValue: any | Record<string, any>, options?: FindByPkOptions): Promise<Maybe<T>> {
@@ -78,7 +79,7 @@ export class Repository<T> {
         }
 
         const col = entityDef.getColumn(primaryIndex.column as string);
-        if (!col)
+        if (!isDataColumn(col))
             throw new Error(`Primary column for "${entityDef.name}" entity not found`);
         return Eq(col.fieldName, keyValue);
     }

@@ -26,7 +26,7 @@ describe('OraAdapter', function () {
         }
     };
 
-    if (!process.env.SKIP_CREATE_DB) {
+    if (process.env.SKIP_CREATE_DB !== 'true') {
         before(async function () {
             this.timeout(30000);
             const cfg = clientConfigurationToDriver(config);
@@ -49,7 +49,12 @@ describe('OraAdapter', function () {
 async function createTestSchema(connection: oracledb.Connection) {
     const x = (await import('./_support/db_schema'));
     for (const s of x.sqls) {
-        await connection.execute(s);
+        try {
+            await connection.execute(s);
+        } catch (e) {
+            e.message += '\n' + s;
+            throw e;
+        }
     }
     const dataFiles = getInsertSQLsForTestData({
         schema: process.env.ORASCHEMA || 'test',
@@ -61,13 +66,22 @@ async function createTestSchema(connection: oracledb.Connection) {
             sql += '     execute immediate ' + stringifyValueForSQL(s) + ';\n';
         }
         sql += 'execute immediate \'commit\';\n end;'
-        await connection.execute(sql);
+        try {
+            await connection.execute(sql);
+        } catch (e) {
+            e.message += '\n' + sql;
+            throw e;
+        }
+
     }
 
 }
 
 export function stringifyValueForSQL(v: any): string {
-    if (typeof v === 'string')
+    if (typeof v === 'string') {
+        if (v.match(/^\d{4}-\d{2}-\d{2}T/))
+            return `TO_TIMESTAMP_TZ('${v}','YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')`;
         return "'" + v.replace(/'/g, "''") + "'";
+    }
     return '' + v;
 }

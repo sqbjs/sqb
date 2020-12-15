@@ -5,35 +5,30 @@ const schemaSql = `
 DROP SCHEMA IF EXISTS ${process.env.PGSCHEMA} CASCADE;
 CREATE SCHEMA ${process.env.PGSCHEMA} AUTHORIZATION postgres;
 
-CREATE TABLE ${process.env.PGSCHEMA}.regions
+CREATE TABLE ${process.env.PGSCHEMA}.countries
 (
-    id character varying(10) NOT NULL,
+    code character varying(5),
     name character varying(16),
-    CONSTRAINT regions_pkey PRIMARY KEY (id)
+    phone_code character varying(8),
+    CONSTRAINT countries_pkey PRIMARY KEY (code)
 );
 
-CREATE TABLE ${process.env.PGSCHEMA}.airports
+CREATE TABLE ${process.env.PGSCHEMA}.customers
 (
-    id character varying(10) NOT NULL,
-    shortname character varying(10),
-    name character varying(32),
-    region character varying(5),
-    icao character varying(10),
-    flags integer,
-    catalog integer,
-    length integer,
-    elevation integer,
-    runway character varying(5),
-    frequency float,
-    latitude character varying(10),
-    longitude character varying(10),
-    temp1 integer,
-    CONSTRAINT airports_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_airports_region FOREIGN KEY (region)
-        REFERENCES ${process.env.PGSCHEMA}.regions (id) MATCH SIMPLE
+    id SERIAL,
+    given_name character varying(64),
+    family_name character varying(64),
+    birth_date date,
+    city character varying(32),
+    country_code character varying(5),
+    CONSTRAINT customers_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_customers_country_code FOREIGN KEY (country_code)
+        REFERENCES ${process.env.PGSCHEMA}.countries (code) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
+
+ALTER SEQUENCE ${process.env.PGSCHEMA}.customers_id_seq RESTART WITH 10000;
 
 CREATE TABLE ${process.env.PGSCHEMA}.data_types
 (
@@ -60,35 +55,6 @@ CREATE TABLE ${process.env.PGSCHEMA}.data_types
     f_box box,
     CONSTRAINT data_types_pkey PRIMARY KEY (id)
 );
-
-CREATE TABLE ${process.env.PGSCHEMA}.countries
-(
-    name character varying(64),
-    region character varying(10),
-    CONSTRAINT countries_pkey PRIMARY KEY (name)
-);
-
-insert into ${process.env.PGSCHEMA}.countries (name, region) values ('United States', 'US');
-insert into ${process.env.PGSCHEMA}.countries (name, region) values ('Turkey', 'TR');
-insert into ${process.env.PGSCHEMA}.countries (name, region) values ('Canada', 'CA');
-insert into ${process.env.PGSCHEMA}.countries (name, region) values ('Germany', 'DE');
-
-CREATE TABLE ${process.env.PGSCHEMA}.customers
-(
-    id SERIAL,
-    given_name character varying(64),
-    family_name character varying(64),
-    birth_date date,
-    city character varying(32),
-    country character varying(32),
-    CONSTRAINT customers_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_customers_country FOREIGN KEY (country)
-        REFERENCES ${process.env.PGSCHEMA}.countries (name) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-);
-
-ALTER SEQUENCE ${process.env.PGSCHEMA}.customers_id_seq RESTART WITH 10000;
 
 insert into ${process.env.PGSCHEMA}.data_types
   (id, f_bool, f_int2, f_int4, f_int8, f_float4, f_float8, f_char, f_varchar,

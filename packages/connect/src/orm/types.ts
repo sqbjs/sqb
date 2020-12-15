@@ -1,15 +1,16 @@
-import {Operator} from '@sqb/builder';
+import type {Operator} from '@sqb/builder';
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
+export type ConstructorThunk = () => Constructor | Promise<Constructor>;
 
 export type AutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
 
 
-export interface EntityOptions {
+export interface EntityConfig {
     /**
      *  Name of the table name. Default: entity class name.
      */
-    name?: string;
+    tableName?: string;
 
     /**
      * Schema name which entity belongs to
@@ -20,10 +21,9 @@ export interface EntityOptions {
      * Table comment
      */
     comment?: string;
-
 }
 
-export interface IndexOptions {
+export interface IndexConfig {
     /**
      *  Name of the primary index
      */
@@ -35,7 +35,7 @@ export interface IndexOptions {
     unique?: boolean;
 }
 
-export interface ColumnOptions {
+export interface ColumnConfig {
     /**
      * Column data type
      */
@@ -89,7 +89,7 @@ export interface ColumnOptions {
     /**
      * Specifies if field is an array
      */
-    array?: boolean;
+    isArray?: boolean;
 
     /**
      * Specifies auto generation strategy
@@ -105,15 +105,20 @@ export interface ColumnOptions {
      * Specifies column can be sorted descending order
      */
     sortDescending?: boolean;
+}
 
+export interface RelationColumnConfig {
+    target: Constructor | ConstructorThunk;
+    column: string | string[];
+    targetColumn: string | string[];
 }
 
 export interface FindByPkOptions {
-    elements?: string[];
+    columns?: string[];
 }
 
 export interface FindOneOptions {
-    elements?: string[];
+    columns?: string[];
     filter?: Operator[];
     sort?: string[];
     offset?: number;

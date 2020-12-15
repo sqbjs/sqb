@@ -2,9 +2,9 @@ import '../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
 import {Client} from '@sqb/connect';
-import {createTestSchema} from '../../../postgres/test/_support/create-test-db';
-import {Customers} from '../_support/customers.entity';
-import {Gte} from '@sqb/builder';
+import {createTestSchema} from '../../../postgres/test/_support/create-db';
+import {Customer} from '../_support/customers.entity';
+import {Eq, Gte} from '@sqb/builder';
 
 describe('Repository', function () {
 
@@ -29,7 +29,7 @@ describe('Repository', function () {
 
     describe('find()', function () {
         it('should return instances', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find();
             assert.ok(rows);
             assert.ok(rows.length);
@@ -39,7 +39,7 @@ describe('Repository', function () {
         });
 
         it('should apply sorting', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({sort: ['-id']});
             const arr1 = rows.map(x => x.id);
             const arr2 = [...arr1];
@@ -48,7 +48,7 @@ describe('Repository', function () {
         });
 
         it('should return maximum number of instances specified in "limit" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 sort: ['id'],
                 limit: 5
@@ -60,7 +60,7 @@ describe('Repository', function () {
         });
 
         it('should return instances started from specified in "offset" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 sort: ['id'],
                 limit: 5,
@@ -73,7 +73,7 @@ describe('Repository', function () {
         });
 
         it('should apply filter specified in "filter" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 sort: ['id'],
                 limit: 5,
@@ -85,35 +85,69 @@ describe('Repository', function () {
             assert.strictEqual(rows[4].id, 14);
         });
 
-        it('should returned instances have only given properties given specified in "elements" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+        it('should returned instances have only given properties given specified in "columns" option', async function () {
+            const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 limit: 1,
-                elements: ['id', 'givenName']
+                columns: ['id', 'givenName']
             });
             assert.ok(rows);
             assert.deepStrictEqual(Object.keys(rows[0]), ['id', 'givenName']);
         });
 
-        it('should allow sorting for only specified columns', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+        it('should not allow sorting if not enabled', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            return assert.rejects(() =>
+                    repo.find({sort: ['countryCode']}),
+                /is not allowed/);
+        });
+
+        it('should not allow sorting if column is not a data column', async function () {
+            const repo = client.getRepository<Customer>(Customer);
             return assert.rejects(() =>
                     repo.find({sort: ['country']}),
-                /is not allowed/);
+                /Can not sort by/);
+        });
+
+        it('should return One2One relation column', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            const rows = await repo.find({filter: [Eq('id', 1)], columns: ['id', 'countryCode', 'country']});
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].id, 1);
+            assert.strictEqual(rows[0].countryCode, 'US');
+            assert.deepStrictEqual(rows[0].country, {
+                code: 'US',
+                name: 'United States',
+                phoneCode: '+1'
+            });
+        });
+
+        it('should return only required sub columns for One2One relation', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            const rows = await repo.find({
+                filter: [Eq('id', 1)],
+                columns: ['id', 'countryCode', 'country.code', 'country.phoneCode']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].id, 1);
+            assert.strictEqual(rows[0].countryCode, 'US');
+            assert.deepStrictEqual(rows[0].country, {code: 'US', phoneCode: '+1'});
         });
 
     });
 
     describe('findOne()', function () {
         it('should return single instance', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findOne({sort: ['id']});
             assert.ok(row);
             assert.strictEqual(row.id, 1);
         });
 
         it('should return single instance started from specified in "offset" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findOne({
                 sort: ['id'],
                 offset: 10
@@ -123,9 +157,9 @@ describe('Repository', function () {
         });
 
         it('should returned instances have only given properties given specified in "elements" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findOne({
-                elements: ['id', 'givenName']
+                columns: ['id', 'givenName']
             });
             assert.ok(row);
             assert.deepStrictEqual(Object.keys(row), ['id', 'givenName']);
@@ -135,7 +169,7 @@ describe('Repository', function () {
 
     describe('findByPk()', function () {
         it('should return single instance by key field', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findByPk(1);
             assert.ok(row);
             assert.strictEqual(row.id, 1);
@@ -144,9 +178,9 @@ describe('Repository', function () {
         });
 
         it('should returned instances have only given properties given specified in "elements" option', async function () {
-            const repo = client.getRepository<Customers>(Customers);
+            const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findByPk(1, {
-                elements: ['id', 'givenName']
+                columns: ['id', 'givenName']
             });
             assert.ok(row);
             assert.strictEqual(row.id, 1);
