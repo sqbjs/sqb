@@ -144,7 +144,7 @@ export class FindTask<T> {
                 if (!col.hasMany) {
                     this.joins = this.joins || [];
                     // Create the join statement
-                    let join = this.joins.find(j => j.relation = col);
+                    let join = this.joins.find(j => j.relation === col);
                     if (!join) {
                         const jointAlias = 'J' + (this.joins.length + 1);
                         join = {
@@ -163,13 +163,13 @@ export class FindTask<T> {
                                 throw new Error(`Relation column "${col.name}" definition error. ` +
                                     `${targetEntity.name} has no column "${col.targetColumn[i]}"`);
                             join.condition.push(
-                                Eq(jointAlias + '.' + targetCol.fieldName, Raw('T.' + curCol.fieldName))
+                                Eq(jointAlias + '.' + targetCol.fieldName, Raw(tableAlias + '.' + curCol.fieldName))
                             )
                         }
                         this.joins.push(join);
                     }
                     await this._precessColumns(join.targetEntity, join.tableAlias, queryColumns,
-                        pathDot + col.name);
+                        (parentPath ? parentPath + '.' : '') + col.name);
                 }
             }
         }

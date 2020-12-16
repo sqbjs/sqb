@@ -1,11 +1,18 @@
 export const sql = `
 
+CREATE TABLE continents
+(
+    code text PRIMARY KEY,
+    name text   
+);
+
 CREATE TABLE countries
 (
-    code text,
+    code text PRIMARY KEY,
     name text,
     phone_code text,
-    PRIMARY KEY (name)
+    continent_code text,
+    FOREIGN KEY (continent_code) REFERENCES continents (code)
 );
 
 CREATE TABLE customers
