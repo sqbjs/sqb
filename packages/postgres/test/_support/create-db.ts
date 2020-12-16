@@ -5,12 +5,24 @@ const schemaSql = `
 DROP SCHEMA IF EXISTS ${process.env.PGSCHEMA} CASCADE;
 CREATE SCHEMA ${process.env.PGSCHEMA} AUTHORIZATION postgres;
 
+CREATE TABLE ${process.env.PGSCHEMA}.continents
+(
+    code character varying(5),
+    name character varying(16),   
+    CONSTRAINT continents_pkey PRIMARY KEY (code)
+);
+
 CREATE TABLE ${process.env.PGSCHEMA}.countries
 (
     code character varying(5),
     name character varying(16),
     phone_code character varying(8),
-    CONSTRAINT countries_pkey PRIMARY KEY (code)
+    continent_code character varying(2),
+    CONSTRAINT countries_pkey PRIMARY KEY (code),
+    CONSTRAINT fk_countries_continent_code FOREIGN KEY (continent_code)
+        REFERENCES ${process.env.PGSCHEMA}.continents (code) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
 );
 
 CREATE TABLE ${process.env.PGSCHEMA}.customers

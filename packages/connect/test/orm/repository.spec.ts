@@ -109,9 +109,12 @@ describe('Repository', function () {
                 /Can not sort by/);
         });
 
-        it('should return One2One relation column', async function () {
+        it('should return nested object from One2One relation', async function () {
             const repo = client.getRepository<Customer>(Customer);
-            const rows = await repo.find({filter: [Eq('id', 1)], columns: ['id', 'countryCode', 'country']});
+            const rows = await repo.find({
+                filter: [Eq('id', 1)],
+                columns: ['id', 'countryCode', 'country']
+            });
             assert.ok(rows);
             assert.ok(rows.length);
             assert.strictEqual(rows[0].id, 1);
@@ -119,11 +122,12 @@ describe('Repository', function () {
             assert.deepStrictEqual(rows[0].country, {
                 code: 'US',
                 name: 'United States',
-                phoneCode: '+1'
+                phoneCode: '+1',
+                continentCode: 'AM'
             });
         });
 
-        it('should return only required sub columns for One2One relation', async function () {
+        it('should return required columns of nested object from One2One relation', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -134,6 +138,25 @@ describe('Repository', function () {
             assert.strictEqual(rows[0].id, 1);
             assert.strictEqual(rows[0].countryCode, 'US');
             assert.deepStrictEqual(rows[0].country, {code: 'US', phoneCode: '+1'});
+        });
+
+        it('should return nested of nested object from One2One relation', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            const rows = await repo.find({
+                filter: [Eq('id', 1)],
+                columns: ['id', 'country.code', 'country.continent']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].id, 1);
+            assert.deepStrictEqual(rows[0].country,
+                {
+                    code: 'US',
+                    continent: {
+                        code: 'AM',
+                        name: 'America'
+                    }
+                });
         });
 
     });
