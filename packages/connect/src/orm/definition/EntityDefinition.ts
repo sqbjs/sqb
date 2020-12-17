@@ -3,7 +3,7 @@ import {
     DataColumnDefinition, isDataColumn, isRelationColumn,
     RelationColumnDefinition
 } from './ColumnDefinition';
-import {RelationColumnConfig, IndexConfig} from '../types';
+import {RelationColumnConfig, IndexConfig, Constructor} from '../types';
 import {Maybe} from '../../types';
 import {ENTITY_DEFINITION_PROPERTY} from '../consts';
 
@@ -30,9 +30,9 @@ export class EntityDefinition {
     indexes: IndexDefinition[] = [];
     eventListeners: { event: string, fn: Function }[] = [];
 
-    constructor(name: string, options?: EntityDefinitionOptions) {
-        this.name = name;
-        this.tableName = name;
+    constructor(readonly ctor: Constructor, options?: EntityDefinitionOptions) {
+        this.name = ctor.name;
+        this.tableName = ctor.name;
         this.columnsCaseSensitive = !!(options && options.columnsCaseSensitive);
     }
 
@@ -68,14 +68,14 @@ export class EntityDefinition {
         return col as DataColumnDefinition;
     }
 
-    addOne2OneRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+    addRelationColumn(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
         let col = this.getColumn(column);
         if (col && col.kind !== 'relation')
             throw new Error(`A ${col.kind} column for "${column}" already defined`);
         if (typeof cfg.target !== 'function')
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
         if (!col) {
-            col = new RelationColumnDefinition(this, column, false, cfg);
+            col = new RelationColumnDefinition(this, column, !!cfg.hasMany, cfg);
             this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
@@ -137,7 +137,7 @@ export class EntityDefinition {
         let entity: EntityDefinition = EntityDefinition.get(ctor);
         if (entity)
             return entity;
-        ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor.name);
+        ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor as Constructor);
         return entity;
     }
 

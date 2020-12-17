@@ -5,6 +5,7 @@ import {Client} from '@sqb/connect';
 import {createTestSchema} from '../../../postgres/test/_support/create-db';
 import {Customer} from '../_support/customers.entity';
 import {Eq, Gte} from '@sqb/builder';
+import {Country} from '../_support/countries.entity';
 
 describe('Repository', function () {
 
@@ -157,6 +158,18 @@ describe('Repository', function () {
                         name: 'America'
                     }
                 });
+        });
+
+        it('should return values for One2Many relation', async function () {
+            const repo = client.getRepository<Country>(Country);
+            const rows = await repo.find({
+                filter: [Eq('code', 'DE')],
+                columns: ['code', 'customers']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].code, 'DE');
+            assert.ok(Array.isArray(rows[0].customers));
         });
 
     });

@@ -6,12 +6,20 @@ import {
     isRelationColumn,
     RelationColumnDefinition
 } from './definition/ColumnDefinition';
-import {Eq, LeftOuterJoin, Operator, Raw, Select} from '@sqb/builder';
+import {And, Eq, LeftOuterJoin, Operator, Or, Raw, Select} from '@sqb/builder';
 import {Maybe} from '../types';
 import {getEntityDefinition} from './helpers';
-import {QueryExecutor} from '../client/types';
+import {FieldInfo, QueryExecutor} from '../client/types';
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
+
+interface Context {
+    entityDef: EntityDefinition;
+    tableAlias: string;
+    queryColumns: ColumnInfo[];
+    parentPath: string;
+    joins?: JoinInfo[];
+}
 
 interface ColumnInfo {
     name: string;
@@ -21,6 +29,7 @@ interface ColumnInfo {
     alias: string;
     sqlClause: string;
     path?: string[];
+    eagerTask?: FindTask<any>;
 }
 
 interface JoinInfo {
@@ -30,64 +39,88 @@ interface JoinInfo {
     condition: Operator[]
 }
 
-export class FindTask<T> {
+export class FindTask<T> implements FindOptions {
     entityDef: EntityDefinition;
-    requestedColumns?: string[];
-    queryColumns: ColumnInfo[] = [];
-    joins?: JoinInfo[];
+    columns?: string[];
+    filter?: Operator[];
+    sort?: string[];
+    offset?: number;
+    limit?: number;
 
-    constructor(public executor: QueryExecutor, public ctor: Constructor, public options: FindOptions) {
+    constructor(public executor: QueryExecutor,
+                public ctor: Constructor,
+                options: FindOptions) {
         this.entityDef = getEntityDefinition(ctor);
-        if (options.columns)
-            this.requestedColumns = options.columns.map(x => x.toUpperCase());
+        this.columns = options.columns;
+        this.filter = options.filter;
+        this.sort = options.sort;
+        this.offset = options.offset;
+        this.limit = options.limit;
     }
 
     async execute(): Promise<T[]> {
-        await this._precessColumns(this.entityDef, 'T',
-            this.queryColumns);
+        const ctx: Context = {
+            entityDef: this.entityDef,
+            tableAlias: 'T',
+            queryColumns: [],
+            parentPath: ''
+        }
+        await this._prepare(ctx);
+        const {queryColumns} = ctx;
 
-        const queryColumns = this.queryColumns;
-        const columnSqls = queryColumns.map(x => x.sqlClause);
+        const columnSqls = queryColumns.reduce<string[]>((a, x) => {
+            if (x.sqlClause)
+                a.push(x.sqlClause);
+            return a;
+        }, []);
+
         const query = Select(...columnSqls).from(this.entityDef.tableName + ' T');
-        if (this.joins) {
-            for (const j of this.joins) {
+
+        if (ctx.joins) {
+            for (const j of ctx.joins) {
                 query.join(
                     LeftOuterJoin(j.targetEntity.tableName + ' as ' + j.tableAlias)
                         .on(...j.condition)
                 )
             }
         }
-        if (this.options.filter)
-            query.where(...this.options.filter);
-        if (this.options.offset)
-            query.offset(this.options.offset);
+        if (this.filter)
+            query.where(...this.filter);
+        if (this.offset)
+            query.offset(this.offset);
         const orderColumns = this._prepareSort();
         if (orderColumns)
             query.orderBy(...orderColumns);
 
         // Execute query
         const resp = await this.executor.execute(query, {
-            fetchRows: this.options.limit,
-            objectRows: true,
-            cursor: false,
-            ignoreNulls: false,
-            namingStrategy: 'uppercase'
+            fetchRows: this.limit,
+            objectRows: false,
+            cursor: false
         });
 
-        if (resp.rows) {
-            const srcRows = resp.rows;
+        if (resp.rows && resp.fields) {
+            const fields = resp.fields;
+            const srcRows = resp.rows as any[][];
             const rows: T[] = [];
             const rowLen = srcRows.length;
             const colLen = queryColumns.length;
 
+            // Create rows
             let cinfo: ColumnInfo;
             let o: any;
+            let f: FieldInfo;
             for (let rowIdx = 0; rowIdx < rowLen; rowIdx++) {
-                const src = srcRows[rowIdx];
-                const row = {};
+                const src = srcRows[rowIdx] as any[];
+                const trg = {};
                 for (let colIdx = 0; colIdx < colLen; colIdx++) {
                     cinfo = queryColumns[colIdx];
-                    o = row;
+                    if (!cinfo.alias)
+                        continue;
+                    f = fields.get(cinfo.alias);
+                    if (!f)
+                        continue;
+                    o = trg;
                     // One2One relation columns has path property
                     // We iterate over path to create sub objects to write value in
                     if (cinfo.path) {
@@ -95,58 +128,81 @@ export class FindTask<T> {
                             o = o[p] = (o[p] || {});
                         }
                     }
-                    o[cinfo.name] = src[cinfo.alias];
+                    o[cinfo.name] = src[f.index];
                 }
-                Object.setPrototypeOf(row, this.ctor.prototype);
-                rows.push(row as T);
+                Object.setPrototypeOf(trg, this.ctor.prototype);
+                rows.push(trg as T);
+            }
+            // Fetch eager relations
+            for (let colIdx = 0; colIdx < colLen; colIdx++) {
+                cinfo = queryColumns[colIdx];
+                if (isRelationColumn(cinfo.column) && cinfo.eagerTask) {
+                    const pks: Operator[] = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        if (cinfo.column.column.length > 1) {
+                            const or = pks[i] = And();
+                            for (const x of cinfo.column.column) {
+                                or.add(Eq(x, rows[i][x]));
+                            }
+                        } else pks[i] = Eq(cinfo.column.column[0], rows[i][cinfo.column.column[0]])
+                    }
+                    if (pks.length)
+                        continue;
+                    cinfo.eagerTask.filter =
+                        pks.length > 1 ? [Or(...pks)] : pks;
+                }
             }
             return rows;
         }
         return [];
     }
 
-    private async _precessColumns(entityDef: EntityDefinition,
-                                  tableAlias: string,
-                                  queryColumns: ColumnInfo[],
-                                  parentPath = ''): Promise<void> {
-        const pathDot = parentPath.toUpperCase() + (parentPath ? '.' : '');
-        const requestedColumns = this.requestedColumns;
-        // const opts = this.options;
-        for (const col of entityDef.columns.values()) {
+    private async _prepare(ctx: Context): Promise<void> {
+        const requestedColumns = this.columns ?
+            this.columns.map(x => x.toUpperCase()) : undefined;
+        const parentPathUpper = ctx.parentPath.toUpperCase();
+        const pathDot = parentPathUpper ? parentPathUpper + '.' : '';
+        const {queryColumns} = ctx;
+
+        for (const col of ctx.entityDef.columns.values()) {
             const colName = col.name.toUpperCase();
-            const alias = tableAlias + '_' + colName;
+            const alias = ctx.tableAlias + '_' + colName;
+
             if (isDataColumn(col)) {
                 if (requestedColumns && !requestedColumns.find(
-                    x => x === pathDot + colName || x === parentPath.toUpperCase()))
+                    x => x === pathDot + colName || x === parentPathUpper))
                     continue;
-                this.queryColumns.push({
+                queryColumns.push({
                     name: col.name,
-                    entity: entityDef,
+                    entity: ctx.entityDef,
                     column: col,
-                    tableAlias,
+                    tableAlias: ctx.tableAlias,
                     alias,
-                    path: parentPath ? parentPath.split('.') : undefined,
-                    sqlClause: `${tableAlias}.${col.fieldName} as ${alias}`
+                    path: ctx.parentPath ? ctx.parentPath.split('.') : undefined,
+                    sqlClause: `${ctx.tableAlias}.${col.fieldName} as ${alias}`
                 });
                 continue;
             }
+
             if (isRelationColumn(col)) {
                 // Relational columns must be explicitly requested.
                 if (!(requestedColumns && requestedColumns.find(x =>
                     x === pathDot + colName || x.startsWith(pathDot + colName + '.')
                 )))
                     continue;
+
                 const targetEntity = await col.resolveTarget();
                 if (!targetEntity)
                     throw new Error(`Relation column "${col.name}" definition error. ` +
                         `No valid target entity defined.`);
+
                 // If relation is One2One
                 if (!col.hasMany) {
-                    this.joins = this.joins || [];
+                    ctx.joins = ctx.joins || [];
                     // Create the join statement
-                    let join = this.joins.find(j => j.relation === col);
+                    let join = ctx.joins.find(j => j.relation === col);
                     if (!join) {
-                        const jointAlias = 'J' + (this.joins.length + 1);
+                        const jointAlias = 'J' + (ctx.joins.length + 1);
                         join = {
                             relation: col,
                             targetEntity,
@@ -154,32 +210,65 @@ export class FindTask<T> {
                             condition: []
                         }
                         for (let i = 0; i < col.column.length; i++) {
-                            const curCol = entityDef.getDataColumn(col.column[i]);
+                            const curCol = ctx.entityDef.getDataColumn(col.column[i]);
                             if (!curCol)
                                 throw new Error(`Relation column "${col.name}" definition error. ` +
-                                    ` ${entityDef.name} has no column "${col.column[i]}"`);
+                                    ` ${ctx.entityDef.name} has no column "${col.column[i]}"`);
                             const targetCol = targetEntity.getDataColumn(col.targetColumn[i]);
                             if (!targetCol)
                                 throw new Error(`Relation column "${col.name}" definition error. ` +
                                     `${targetEntity.name} has no column "${col.targetColumn[i]}"`);
                             join.condition.push(
-                                Eq(jointAlias + '.' + targetCol.fieldName, Raw(tableAlias + '.' + curCol.fieldName))
+                                Eq(jointAlias + '.' + targetCol.fieldName, Raw(ctx.tableAlias + '.' + curCol.fieldName))
                             )
                         }
-                        this.joins.push(join);
+                        ctx.joins.push(join);
                     }
-                    await this._precessColumns(join.targetEntity, join.tableAlias, queryColumns,
-                        (parentPath ? parentPath + '.' : '') + col.name);
+                    await this._prepare({
+                        ...ctx,
+                        entityDef: join.targetEntity,
+                        tableAlias: join.tableAlias,
+                        parentPath: (ctx.parentPath ? ctx.parentPath + '.' : '') + col.name
+                    });
+                    continue;
                 }
+
+                if (col.lazy) {
+                    queryColumns.push({
+                        name: col.name,
+                        entity: ctx.entityDef,
+                        column: col,
+                        path: ctx.parentPath ? ctx.parentPath.split('.') : undefined,
+                        tableAlias: '',
+                        alias: '',
+                        sqlClause: ''
+                    });
+                    continue;
+                }
+
+                // Eager relation
+                const eagerTask = new FindTask(this.executor, ctx.entityDef.ctor,
+                    {columns: this.columns});
+                queryColumns.push({
+                    name: col.name,
+                    entity: ctx.entityDef,
+                    column: col,
+                    path: ctx.parentPath ? ctx.parentPath.split('.') : undefined,
+                    tableAlias: '',
+                    alias: '',
+                    sqlClause: '',
+                    eagerTask
+                });
+
             }
         }
     }
 
     private _prepareSort(): Maybe<string[]> {
-        if (!this.options.sort)
+        if (!this.sort)
             return;
         const orderColumns: string[] = [];
-        for (const item of this.options.sort) {
+        for (const item of this.sort) {
             const m = item.match(SORT_ORDER_PATTERN);
             if (!m)
                 throw new Error(`"${item}" is not a valid order expression`);

@@ -1,10 +1,11 @@
 import type {Operator} from '@sqb/builder';
 
-export type Constructor<T = {}> = new (...args: any[]) => T;
+export type Constructor = new (...args: any[]) => any;
 export type ConstructorThunk = () => Constructor | Promise<Constructor>;
 
 export type AutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
 
+export type LazyResolver<T> = () => Promise<T>;
 
 export interface EntityConfig {
     /**
@@ -111,11 +112,14 @@ export interface RelationColumnConfig {
     target: Constructor | ConstructorThunk;
     column: string | string[];
     targetColumn: string | string[];
+    hasMany?: boolean;
+    lazy?: boolean;
 }
 
 export interface FindByPkOptions {
     columns?: string[];
 }
+
 
 export interface FindOneOptions {
     columns?: string[];

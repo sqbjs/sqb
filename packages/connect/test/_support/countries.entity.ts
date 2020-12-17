@@ -1,6 +1,6 @@
-import {Column, Entity, PrimaryKey} from '@sqb/connect';
-import {HasOne} from '../../src/orm/decorators/relations.decorator';
+import {Column, Entity, PrimaryKey, RelationColumn, LazyResolver} from '@sqb/connect';
 import {Continent} from './continents.entity';
+import type {Customer} from './customers.entity';
 
 @Entity({tableName: 'countries'})
 export class Country {
@@ -17,11 +17,28 @@ export class Country {
     @Column({fieldName: 'continent_code'})
     continentCode: string;
 
-    @HasOne({
+    @RelationColumn({
         target: Continent,
         column: 'continentCode',
         targetColumn: 'code'
     })
-    continent: Continent
+    readonly continent: Continent;
+
+    @RelationColumn({
+        target: async () => (await import('./customers.entity')).Customer,
+        column: 'code',
+        targetColumn: 'countryCode',
+        hasMany: true
+    })
+    readonly customers: Customer[]
+
+    @RelationColumn({
+        target: async () => (await import('./customers.entity')).Customer,
+        column: 'code',
+        targetColumn: 'countryCode',
+        hasMany: true,
+        lazy: true
+    })
+    readonly customersLazy: LazyResolver<Customer[]>;
 
 }

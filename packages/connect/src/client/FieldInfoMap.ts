@@ -9,7 +9,7 @@ export class FieldInfoMap {
         this._arr[idx] = field;
         field.index = idx;
         this._obj = this._arr.reduce((a, f) => {
-            a[f.name] = f;
+            a[f.name.toUpperCase()] = f;
             return a;
         }, {});
     }
@@ -17,7 +17,7 @@ export class FieldInfoMap {
     get(k: string | number): FieldInfo {
         if (typeof k === 'number')
             return this._arr[k];
-        return this._obj[k];
+        return this._obj[k.toUpperCase()];
     }
 
     entries(): [string, FieldInfo][] {

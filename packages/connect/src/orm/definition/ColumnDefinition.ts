@@ -58,18 +58,20 @@ export class DataColumnDefinition extends BaseColumnDefinition {
 
 export class RelationColumnDefinition extends BaseColumnDefinition {
     kind: ColumnKind = 'relation';
-    hasMany: boolean;
     target: Constructor | ConstructorThunk;
     column: string[];
     targetColumn: string[];
+    hasMany: boolean;
+    lazy: boolean;
 
     constructor(entity: EntityDefinition, name: string,
                 hasMany: boolean,
                 cfg: RelationColumnConfig) {
         super(entity, name);
-        this.hasMany = hasMany;
         this.target = cfg.target;
         this.column = Array.isArray(cfg.column) ? cfg.column : [cfg.column];
+        this.hasMany = hasMany;
+        this.lazy = !!cfg.lazy;
         this.targetColumn = Array.isArray(cfg.targetColumn) ? cfg.targetColumn : [cfg.targetColumn];
         if (this.column.length !== this.targetColumn.length)
             throw new Error(`"column" and "targetColumn" must contain same number of columns`);

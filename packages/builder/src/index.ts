@@ -1,7 +1,9 @@
 export {registerSerializer, unRegisterSerializer} from './extensions';
 export {escapeReserved, isReservedWord, printArray} from './Serializable';
-export * from './query/Query'
-export * from './sql-objects/Operator'
+export * from './query/Query';
+export * from './sql-objects/Operator';
+export * from './sql-objects/operators/LogicalOperator';
+export * from './sql-objects/operators/CompOperator';
 export * as classes from './classes';
 export * from './types';
 export * from './enums';
