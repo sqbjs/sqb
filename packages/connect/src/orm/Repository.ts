@@ -71,7 +71,7 @@ export class Repository<T> {
                 const i = valueKeysLower.indexOf(k);
                 if (i < 0)
                     throw new Error(`Value of key field "${this._entityDef.name}.${k}" required to perform this operation`);
-                const col = entityDef.getColumn(k);
+                // const col = entityDef.getColumn(k);
                 // eslint-disable-next-line
                 console.log(k);
             }

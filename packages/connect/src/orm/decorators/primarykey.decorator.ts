@@ -1,4 +1,4 @@
-import {IndexConfig} from '../types';
+import { IndexConfig} from '../types';
 import {EntityDefinition} from '../definition/EntityDefinition';
 
 export function PrimaryKey(options?: IndexConfig): PropertyDecorator

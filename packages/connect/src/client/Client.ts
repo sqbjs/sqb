@@ -165,7 +165,7 @@ export class Client extends SafeEventEmitter implements QueryExecutor {
         }
     }
 
-    getRepository<T>(entity: Constructor<T> | string): Repository<T> {
+    getRepository<T>(entity: Constructor | string): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
             ctor = this._entities[entity];

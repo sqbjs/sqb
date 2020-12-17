@@ -6,7 +6,7 @@ export function Entity(options?: EntityConfig | string): ClassDecorator {
     return function (target: Function) {
         const opts: EntityConfig = typeof options === 'object' ? options : {};
         const tableName = typeof options === 'string' ? options : opts.tableName;
-        const entity = EntityDefinition.attach(target);
+        const entity = EntityDefinition.attach(target as Function);
         if (tableName)
             entity.tableName = tableName;
         if (opts.schema)
