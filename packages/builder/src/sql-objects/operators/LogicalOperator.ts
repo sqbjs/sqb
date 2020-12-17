@@ -1,19 +1,19 @@
 import {Operator} from '../Operator';
 import isPlainObject from 'putil-isplainobject';
-import {RawStatement} from '../RawStatement';
 import {SerializationType} from '../../enums';
 import {printArray, Serializable, serializeFallback} from '../../Serializable';
 import {SerializeContext} from '../../types';
+import {isCompOperator, isLogicalOperator, isRawStatement} from '../../typeguards';
 
 export const WrapOps = {};
 
 export abstract class LogicalOperator extends Operator {
 
-    protected _items: Serializable[] = [];
+    _items: Serializable[] = [];
 
-    constructor(...operator: (Operator | RawStatement)[]) {
+    constructor(...expressions: any[]) {
         super();
-        this.add(...operator);
+        this.add(...expressions);
     }
 
     get _type(): SerializationType {
@@ -23,16 +23,17 @@ export abstract class LogicalOperator extends Operator {
     /**
      * Adds operator(s) to item list
      */
-    add(...operator: (Serializable | Object)[]): this {
-        for (const arg of operator) {
-            if (!arg) continue;
-            if (isPlainObject(arg)) {
-                this.add(...this._wrapObject(arg));
-                continue;
-            }
-            if (!(arg instanceof Operator || (arg as Serializable)._type === SerializationType.RAW))
+    add(...expressions: (LogicalOperator | any)[]): this {
+        for (const item of expressions) {
+            if (!item) continue;
+            if (isLogicalOperator(item)) {
+                this._items.push(item);
+            } else if (isRawStatement(item) || isCompOperator(item)) {
+                this._items.push(item);
+            } else if (isPlainObject(item)) {
+                this.add(...this._wrapObject(item));
+            } else
                 throw new TypeError('Operator or Raw type required');
-            this._items.push(arg as Serializable);
         }
         return this;
     }
@@ -42,9 +43,8 @@ export abstract class LogicalOperator extends Operator {
         for (const t of this._items) {
             const s: string = t._serialize(ctx);
             /* istanbul ignore else */
-            if (s) {
-                arr.push(t._type === SerializationType.LOGICAL_EXPRESSION ? '(' + s + ')' : s);
-            }
+            if (s)
+                arr.push(isLogicalOperator(t) ? '(' + s + ')' : s);
         }
         return serializeFallback(ctx, SerializationType.LOGICAL_EXPRESSION, arr, () => {
             const s = printArray(arr, ' ' + String(this._operatorType));

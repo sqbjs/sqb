@@ -6,6 +6,7 @@ import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
 import {SerializeContext} from '../types';
 import {serializeFallback} from '../Serializable';
+import {isRawStatement} from '../typeguards';
 
 export class DeleteQuery extends Query {
 
@@ -14,7 +15,7 @@ export class DeleteQuery extends Query {
 
     constructor(tableName: string | RawStatement) {
         super();
-        if (!tableName || !(typeof tableName === 'string' || (tableName as RawStatement)._type === SerializationType.RAW))
+        if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
             throw new TypeError('String or Raw instance required as first argument (tableName) for UpdateQuery');
         this._table = typeof tableName === 'string' ? new TableName(tableName) : tableName;
     }

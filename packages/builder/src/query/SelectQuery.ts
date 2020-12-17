@@ -11,6 +11,7 @@ import {OrderColumn} from '../sql-objects/OrderColumn';
 import {printArray, Serializable, serializeFallback} from '../Serializable';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
 import {SerializeContext} from '../types';
+import {isJoinStatement, isSerializable} from '../typeguards';
 
 export class SelectQuery extends Query {
 
@@ -45,7 +46,7 @@ export class SelectQuery extends Query {
             if (Array.isArray(arg))
                 self.addColumn(...arg);
             else
-                this._columns.push(arg instanceof Serializable ? arg : new SelectColumn(arg));
+                this._columns.push(isSerializable(arg) ? arg : new SelectColumn(arg));
         }
         return this;
     }
@@ -69,8 +70,8 @@ export class SelectQuery extends Query {
         this._joins = this._joins || [];
         for (const arg of join) {
             if (!arg) continue;
-            if (arg._type !== SerializationType.JOIN)
-                throw new TypeError('Join instance required');
+            if (!isJoinStatement(arg))
+                throw new TypeError('Join statement required');
             this._joins.push(arg);
         }
         return this;

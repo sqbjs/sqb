@@ -1,6 +1,6 @@
 import {CompOperator} from './CompOperator';
 import {OperatorType} from '../../enums';
-import {Serializable} from '../../Serializable';
+import {isSerializable} from '../../typeguards';
 
 export class OpIn extends CompOperator {
 
@@ -8,8 +8,8 @@ export class OpIn extends CompOperator {
     _symbol = 'in';
 
     constructor(expression, value) {
-        super(expression, Array.isArray(value) || value instanceof Serializable ?
-            value : [value]);
+        super(expression,
+            Array.isArray(value) || isSerializable(value) ? value : [value]);
     }
 
     protected __serialize(ctx, o) {

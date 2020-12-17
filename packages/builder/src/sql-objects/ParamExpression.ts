@@ -2,7 +2,7 @@ import {Serializable, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {SerializeContext} from '../types';
 
-export class ParamStatement extends Serializable {
+export class ParamExpression extends Serializable {
 
     constructor(public _name: string) {
         super();

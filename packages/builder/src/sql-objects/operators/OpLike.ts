@@ -2,6 +2,7 @@ import {CompOperator} from './CompOperator';
 import {OperatorType} from '../../enums';
 import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
 import {SerializeContext} from '../../types';
+import {isSerializable} from '../../typeguards';
 
 export class OpLike extends CompOperator {
 
@@ -13,7 +14,7 @@ export class OpLike extends CompOperator {
     }
 
     protected __serialize(ctx: SerializeContext, o: any): string {
-        if (o.value && typeof o.value !== 'string' && !(o.value instanceof Serializable))
+        if (o.value && typeof o.value !== 'string' && !isSerializable(o.value))
             o.value = serializeObject(ctx, o.value);
         if (!o.value)
             return '';

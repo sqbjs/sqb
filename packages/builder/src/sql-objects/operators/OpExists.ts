@@ -1,7 +1,8 @@
-import {OperatorType, SerializationType} from '../../enums';
+import {OperatorType} from '../../enums';
 import {SelectQuery} from '../../query/SelectQuery';
 import {CompOperator} from './CompOperator';
 import {SerializeContext} from '../../types';
+import {isSelectQuery} from '../../typeguards';
 
 export class OpExists extends CompOperator {
 
@@ -10,7 +11,7 @@ export class OpExists extends CompOperator {
 
     constructor(query: SelectQuery) {
         super(query);
-        if (!(typeof query === 'object' && query._type === SerializationType.SELECT_QUERY))
+        if (!(typeof query === 'object' && isSelectQuery(query)))
             throw new TypeError('You must provide a SelectQuery in `exists()`');
     }
 
