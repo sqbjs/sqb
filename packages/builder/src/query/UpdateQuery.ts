@@ -6,6 +6,7 @@ import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
 import {SerializeContext} from '../types';
 import {printArray, serializeFallback, serializeObject} from '../Serializable';
+import {isRawStatement} from '../typeguards';
 
 export class UpdateQuery extends ReturningQuery {
 
@@ -15,7 +16,7 @@ export class UpdateQuery extends ReturningQuery {
 
     constructor(tableName: string | RawStatement, input: any) {
         super();
-        if (!tableName || !(typeof tableName === 'string' || (tableName as RawStatement)._type === SerializationType.RAW))
+        if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
             throw new TypeError('String or Raw instance required as first argument (tableName) for UpdateQuery');
         if (!input || !((typeof input === 'object' && !Array.isArray(input)) ||
             input.isSelect))

@@ -29,7 +29,7 @@ export enum SerializationType {
     JOIN = 'join',
     JOIN_CONDITIONS = 'join_conditions',
     RAW = 'raw',
-    CASE_EXPRESSION = 'case_expression',
+    CASE_STATEMENT = 'case_expression',
     CONDITIONS_BLOCK = 'conditions_block',
     COMPARISON_EXPRESSION = 'comparison_expression',
     LOGICAL_EXPRESSION = 'logical_expression',

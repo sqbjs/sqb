@@ -1,8 +1,8 @@
 import {Operator} from '../Operator';
 import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
-import {Query} from '../../query/Query';
 import {SerializeContext} from '../../types';
 import {SerializationType} from '../../enums';
+import {isSelectQuery} from '../../typeguards';
 
 export abstract class CompOperator extends Operator {
 
@@ -25,7 +25,7 @@ export abstract class CompOperator extends Operator {
             this._expression._serialize(ctx) : this._expression;
         const o: any = {
             operatorType: this._operatorType,
-            expression: this._expression instanceof Query ?
+            expression: isSelectQuery(this._expression) ?
                 '(' + expression + ')' : expression,
             symbol: this._symbol,
             value: this._value
@@ -36,7 +36,7 @@ export abstract class CompOperator extends Operator {
 
     protected __serialize(ctx: SerializeContext, o: any): string {
         let value = serializeObject(ctx, o.value);
-        if (o.value as unknown instanceof Query)
+        if (isSelectQuery(o.value))
             value = '(' + value + ')';
         o.value = value;
         return serializeFallback(ctx, this._type, o,

@@ -1,10 +1,10 @@
 import {ReturningQuery} from './ReturningQuery';
 import {SerializationType} from '../enums';
 import {TableName} from '../sql-objects/TableName';
-import {printArray, Serializable, serializeFallback, serializeObject} from '../Serializable';
+import {printArray, serializeFallback, serializeObject} from '../Serializable';
 import type {RawStatement} from '../sql-objects/RawStatement';
 import type {SerializeContext} from '../types';
-import type {SelectQuery} from './SelectQuery';
+import {isRawStatement, isSelectQuery, isSerializable} from '../typeguards';
 
 export class InsertQuery extends ReturningQuery {
 
@@ -13,7 +13,7 @@ export class InsertQuery extends ReturningQuery {
 
     constructor(tableName: string | RawStatement, input) {
         super();
-        if (!tableName || !(typeof tableName === 'string' || (tableName as RawStatement)._type === SerializationType.RAW))
+        if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
             throw new TypeError('String or Raw instance required as first argument (tableName) for InsertQuery');
         if (!input || !((typeof input === 'object' && !Array.isArray(input)) ||
             input.isSelect))
@@ -49,9 +49,9 @@ export class InsertQuery extends ReturningQuery {
      */
     protected __serializeColumns(ctx: SerializeContext): string {
         let arr: string[];
-        if (this._input instanceof Serializable && this._input._type === SerializationType.SELECT_QUERY) {
+        if (isSelectQuery(this._input)) {
             arr = [];
-            const cols = (this._input as SelectQuery)._columns;
+            const cols = this._input._columns;
             if (cols) {
                 for (const col of cols) {
                     if ((col as any)._alias)
@@ -70,7 +70,7 @@ export class InsertQuery extends ReturningQuery {
      *
      */
     protected __serializeValues(ctx: SerializeContext): string {
-        if (this._input instanceof Serializable)
+        if (isSerializable(this._input))
             return this._input._serialize(ctx);
 
         const arr: string[] = [];

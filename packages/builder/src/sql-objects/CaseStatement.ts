@@ -19,7 +19,7 @@ export class CaseStatement extends Serializable {
     }
 
     get _type(): SerializationType {
-        return SerializationType.CASE_EXPRESSION;
+        return SerializationType.CASE_STATEMENT;
     }
 
     /**

@@ -6,6 +6,7 @@ import {RawStatement} from './RawStatement';
 import {OpAnd} from './operators/OpAnd';
 import {SerializeContext} from '../types';
 import {LogicalOperator} from './operators/LogicalOperator';
+import {isRawStatement, isSelectQuery, isTableName} from '../typeguards';
 
 export class JoinStatement extends Serializable {
 
@@ -15,11 +16,9 @@ export class JoinStatement extends Serializable {
 
     constructor(joinType: JoinType, table: string | TableName | SelectQuery | RawStatement) {
         super();
-        if (!table ||
-            !(typeof table === 'string' ||
-                table._type === SerializationType.TABLE_NAME ||
-                table._type === SerializationType.SELECT_QUERY ||
-                table._type === SerializationType.RAW)
+        // noinspection SuspiciousTypeOfGuard
+        if (!(isSelectQuery(table) || isRawStatement(table) || isTableName(table) ||
+            typeof table === 'string')
         )
             throw new TypeError('Table name, select query or raw object required for Join');
         this._joinType = joinType;
@@ -68,7 +67,7 @@ export class JoinStatement extends Serializable {
                     break;
             }
             const lf = o.table.length > 40;
-            if (this._table._type === SerializationType.SELECT_QUERY) {
+            if (isSelectQuery(this._table)) {
                 const alias = (this._table as SelectQuery)._alias;
                 if (!alias)
                     throw new Error('Alias required for sub-select in Join');
