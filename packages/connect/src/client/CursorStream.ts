@@ -29,8 +29,8 @@ export class CursorStream extends Readable {
             this.close().catch(() => false);
         });
 
-        cursor.once('close', () => this.emitSafe('close'));
-        cursor.on('error', (err) => this.emitSafe('error', err));
+        cursor.once('close', () => this.emit('close'));
+        cursor.on('error', (err) => this.emit('error', err));
     }
 
     /**
@@ -61,7 +61,7 @@ export class CursorStream extends Readable {
         if (this._rowNum >= this._limit) {
             this.pause();
             this.unpipe();
-            this.emitSafe('end');
+            this.emit('end');
             return;
         }
         this._cursor.next().then(row => {
@@ -94,12 +94,12 @@ export class CursorStream extends Readable {
             if (typeof this.destroy == 'function')
                 this.destroy(err);
             else
-                this.emitSafe('error', err);
+                this.emit('error', err);
             this.close().catch(() => 0);
         });
     }
 
-    emitSafe(event: string | symbol, ...args: any[]): boolean {
+    emit(event: string | symbol, ...args: any[]): boolean {
         try {
             if (event === 'error' && !this.listenerCount('error'))
                 return false;

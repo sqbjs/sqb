@@ -65,8 +65,8 @@ export class RelationColumnDefinition extends BaseColumnDefinition {
     lazy: boolean;
 
     constructor(entity: EntityDefinition, name: string,
-                hasMany: boolean,
-                cfg: RelationColumnConfig) {
+                cfg: RelationColumnConfig,
+                hasMany = false) {
         super(entity, name);
         this.target = cfg.target;
         this.column = Array.isArray(cfg.column) ? cfg.column : [cfg.column];
@@ -81,7 +81,32 @@ export class RelationColumnDefinition extends BaseColumnDefinition {
         if (isEntityClass(this.target))
             return getEntityDefinition(this.target);
         const ctor = await (this.target as ConstructorThunk)();
-        return getEntityDefinition(ctor);
+        const entity = getEntityDefinition(ctor);
+        if (!entity)
+            throw new Error(`Relation column "${this.name}" definition error. ` +
+                `No valid target entity defined.`);
+        return entity;
+    }
+
+    getColumns(): DataColumnDefinition[] {
+        return this.column.map(c => {
+            const col = this.entity.getDataColumn(c);
+            if (!col)
+                throw new Error(`Relation column "${this.name}" definition error. ` +
+                    ` ${this.entity.name} has no data column named "${c}"`);
+            return col;
+        });
+    }
+
+    async resolveTargetColumns(): Promise<DataColumnDefinition[]> {
+        const targetEntity = await this.resolveTarget();
+        return this.targetColumn.map(c => {
+            const col = targetEntity.getDataColumn(c);
+            if (!col)
+                throw new Error(`Relation column "${this.name}" definition error. ` +
+                    ` ${targetEntity.name} has no data column named "${c}"`);
+            return col;
+        });
     }
 
 }

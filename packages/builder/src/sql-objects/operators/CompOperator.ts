@@ -21,32 +21,32 @@ export abstract class CompOperator extends Operator {
     }
 
     _serialize(ctx: SerializeContext): string {
-        const expression = this._expression instanceof Serializable ?
+        const left = this._expression instanceof Serializable ?
             this._expression._serialize(ctx) : this._expression;
         const o: any = {
             operatorType: this._operatorType,
-            expression: isSelectQuery(this._expression) ?
-                '(' + expression + ')' : expression,
+            left: isSelectQuery(this._expression) ?
+                '(' + left + ')' : left,
             symbol: this._symbol,
-            value: this._value
+            right: this._value
         };
 
         return this.__serialize(ctx, o);
     }
 
     protected __serialize(ctx: SerializeContext, o: any): string {
-        let value = serializeObject(ctx, o.value);
-        if (isSelectQuery(o.value))
+        let value = serializeObject(ctx, o.right);
+        if (isSelectQuery(o.right))
             value = '(' + value + ')';
-        o.value = value;
+        o.right = value;
         return serializeFallback(ctx, this._type, o,
             (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
     }
 
     protected __defaultSerialize(ctx: SerializeContext, o: any): string {
         return (Array.isArray(o.expression) ?
-            '(' + o.expression.join(',') + ')' : o.expression) +
-            ' ' + o.symbol + ' ' + o.value;
+            '(' + o.left.join(',') + ')' : o.left) +
+            ' ' + o.symbol + ' ' + o.right;
     }
 
 }

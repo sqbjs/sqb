@@ -60,7 +60,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
     retain(): void {
         this._refCount++;
         debug('[%s] retain | refCount: %s', this.sessionId, this._refCount);
-        this.emit('acquire');
+        this.emit('retain', this._refCount);
     }
 
     /**
@@ -72,6 +72,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
         if (!this._intlcon)
             return true;
         const ref = --this._refCount;
+        this.emit('release', this._refCount);
         debug('[%s] release | refCount: %s', this.sessionId, ref);
         if (!ref) {
             this.close().catch(() => 0);
@@ -121,7 +122,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
             const startTime = Date.now();
             const request = this._prepareQueryRequest(query, options);
             debug('[%s] execute | %o', this.sessionId, request);
-            this.emit('execute', this, request);
+            this.emit('execute', request);
 
             // Call execute hooks
             if (request.executeHooks) {
@@ -246,6 +247,150 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
         if (!request.sql)
             throw new Error('No sql given');
         return request;
+    }
+
+    emit(event: 'close'): boolean;
+    emit(event: 'execute', request: QueryRequest): boolean;
+    emit(event: 'error', error: Error): boolean;
+    emit(event: 'retain', refCount: number): boolean;
+    emit(event: 'release', refCount: number): boolean;
+    emit(event: 'start-transaction'): boolean;
+    emit(event: 'commit'): boolean;
+    emit(event: 'rollback'): boolean;
+    emit(event: string | symbol, ...args: any[]): boolean {
+        return super.emit(event, ...args);
+    }
+
+    on(event: 'close', listener: () => void): this;
+    on(event: 'execute', listener: (request: QueryRequest) => void): this;
+    on(event: 'error', listener: (error: Error) => void): this;
+    on(event: 'retain', listener: (refCount: number) => void): this;
+    on(event: 'release', listener: (refCount: number) => void): this;
+    on(event: 'start-transaction', listener: () => void): this;
+    on(event: 'commit', listener: () => void): this;
+    on(event: 'rollback', listener: () => void): this;
+    on(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.on(event, listener);
+    }
+
+    once(event: 'close', listener: () => void): this;
+    once(event: 'execute', listener: (request: QueryRequest) => void): this;
+    once(event: 'error', listener: (error: Error) => void): this;
+    once(event: 'retain', listener: (refCount: number) => void): this;
+    once(event: 'release', listener: (refCount: number) => void): this;
+    once(event: 'start-transaction', listener: () => void): this;
+    once(event: 'commit', listener: () => void): this;
+    once(event: 'rollback', listener: () => void): this;
+    once(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.once(event, listener);
+    }
+
+    off(event: 'close', listener: () => void): this;
+    off(event: 'execute', listener: (request: QueryRequest) => void): this;
+    off(event: 'error', listener: (error: Error) => void): this;
+    off(event: 'retain', listener: (refCount: number) => void): this;
+    off(event: 'release', listener: (refCount: number) => void): this;
+    off(event: 'start-transaction', listener: () => void): this;
+    off(event: 'commit', listener: () => void): this;
+    off(event: 'rollback', listener: () => void): this;
+    off(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.off(event, listener);
+    }
+
+    addListener(event: 'close', listener: () => void): this;
+    addListener(event: 'execute', listener: (request: QueryRequest) => void): this;
+    addListener(event: 'error', listener: (error: Error) => void): this;
+    addListener(event: 'retain', listener: (refCount: number) => void): this;
+    addListener(event: 'release', listener: (refCount: number) => void): this;
+    addListener(event: 'start-transaction', listener: () => void): this;
+    addListener(event: 'commit', listener: () => void): this;
+    addListener(event: 'rollback', listener: () => void): this;
+    addListener(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.addListener(event, listener);
+    }
+
+    removeListener(event: 'close', listener: () => void): this;
+    removeListener(event: 'execute', listener: (request: QueryRequest) => void): this;
+    removeListener(event: 'error', listener: (error: Error) => void): this;
+    removeListener(event: 'retain', listener: (refCount: number) => void): this;
+    removeListener(event: 'release', listener: (refCount: number) => void): this;
+    removeListener(event: 'start-transaction', listener: () => void): this;
+    removeListener(event: 'commit', listener: () => void): this;
+    removeListener(event: 'rollback', listener: () => void): this;
+    removeListener(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.removeListener(event, listener);
+    }
+
+    removeAllListeners(event: 'close'): this;
+    removeAllListeners(event: 'execute'): this;
+    removeAllListeners(event: 'error'): this;
+    removeAllListeners(event: 'retain'): this;
+    removeAllListeners(event: 'release'): this;
+    removeAllListeners(event: 'start-transaction'): this;
+    removeAllListeners(event: 'commit'): this;
+    removeAllListeners(event: 'rollback'): this;
+    removeAllListeners(event: string | symbol): this {
+        return super.removeAllListeners(event);
+    }
+
+    listeners(event: 'close'): Function[];
+    listeners(event: 'execute'): Function[];
+    listeners(event: 'error'): Function[];
+    listeners(event: 'retain'): Function[];
+    listeners(event: 'release'): Function[];
+    listeners(event: 'start-transaction'): Function[];
+    listeners(event: 'commit'): Function[];
+    listeners(event: 'rollback'): Function[];
+    listeners(event: string | symbol): Function[] {
+        return super.listeners(event);
+    }
+
+    rawListeners(event: 'close'): Function[];
+    rawListeners(event: 'execute'): Function[];
+    rawListeners(event: 'error'): Function[];
+    rawListeners(event: 'retain'): Function[];
+    rawListeners(event: 'release'): Function[];
+    rawListeners(event: 'start-transaction'): Function[];
+    rawListeners(event: 'commit'): Function[];
+    rawListeners(event: 'rollback'): Function[];
+    rawListeners(event: string | symbol): Function[] {
+        return super.rawListeners(event);
+    }
+
+    listenerCount(event: 'close'): number;
+    listenerCount(event: 'execute'): number;
+    listenerCount(event: 'error'): number;
+    listenerCount(event: 'retain'): number;
+    listenerCount(event: 'release'): number;
+    listenerCount(event: 'start-transaction'): number;
+    listenerCount(event: 'commit'): number;
+    listenerCount(event: 'rollback'): number;
+    listenerCount(event: string | symbol): number {
+        return super.listenerCount(event);
+    }
+
+    prependListener(event: 'close', listener: () => void): this;
+    prependListener(event: 'execute', listener: (request: QueryRequest) => void): this;
+    prependListener(event: 'error', listener: (error: Error) => void): this;
+    prependListener(event: 'retain', listener: (refCount: number) => void): this;
+    prependListener(event: 'release', listener: (refCount: number) => void): this;
+    prependListener(event: 'start-transaction', listener: () => void): this;
+    prependListener(event: 'commit', listener: () => void): this;
+    prependListener(event: 'rollback', listener: () => void): this;
+    prependListener(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.prependListener(event, listener);
+    }
+
+    prependOnceListener(event: 'close', listener: () => void): this;
+    prependOnceListener(event: 'execute', listener: (request: QueryRequest) => void): this;
+    prependOnceListener(event: 'error', listener: (error: Error) => void): this;
+    prependOnceListener(event: 'retain', listener: (refCount: number) => void): this;
+    prependOnceListener(event: 'release', listener: (refCount: number) => void): this;
+    prependOnceListener(event: 'start-transaction', listener: () => void): this;
+    prependOnceListener(event: 'commit', listener: () => void): this;
+    prependOnceListener(event: 'rollback', listener: () => void): this;
+    prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this {
+        return super.prependOnceListener(event, listener);
     }
 
 }

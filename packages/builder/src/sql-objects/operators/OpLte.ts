@@ -7,8 +7,8 @@ export class OpLte extends CompOperator {
     _operatorType = OperatorType.lte;
     _symbol = '<=';
 
-    constructor(expression: string | Serializable, value?: any) {
-        super(expression, value);
+    constructor(left: string | Serializable, right?: any) {
+        super(left, right);
     }
 
 }

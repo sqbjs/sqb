@@ -68,14 +68,28 @@ export class EntityDefinition {
         return col as DataColumnDefinition;
     }
 
-    addRelationColumn(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+    addOne2OneRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
         let col = this.getColumn(column);
         if (col && col.kind !== 'relation')
             throw new Error(`A ${col.kind} column for "${column}" already defined`);
         if (typeof cfg.target !== 'function')
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
         if (!col) {
-            col = new RelationColumnDefinition(this, column, !!cfg.hasMany, cfg);
+            col = new RelationColumnDefinition(this, column, cfg);
+            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columnKeys.push(col.name);
+        }
+        return col as RelationColumnDefinition;
+    }
+
+    addOne2ManyRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+        let col = this.getColumn(column);
+        if (col && col.kind !== 'relation')
+            throw new Error(`A ${col.kind} column for "${column}" already defined`);
+        if (typeof cfg.target !== 'function')
+            throw new Error('You must provide Entity constructor of a function that return Entity constructor');
+        if (!col) {
+            col = new RelationColumnDefinition(this, column, cfg, true);
             this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }

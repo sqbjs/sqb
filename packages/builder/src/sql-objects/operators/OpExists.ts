@@ -16,7 +16,7 @@ export class OpExists extends CompOperator {
     }
 
     protected __defaultSerialize(ctx: SerializeContext, o) {
-        return o.expression ? o.symbol + ' ' + o.expression : '';
+        return o.left ? o.symbol + ' ' + o.left : '';
     }
 
 }

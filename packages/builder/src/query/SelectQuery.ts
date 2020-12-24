@@ -80,9 +80,9 @@ export class SelectQuery extends Query {
     /**
      * Defines "where" part of query
      */
-    where(...operator: (Serializable | Object)[]): this {
+    where(...condition: (Serializable | Object)[]): this {
         this._where = this._where || new OpAnd();
-        this._where.add(...operator);
+        this._where.add(...condition);
         return this;
     }
 
@@ -90,7 +90,7 @@ export class SelectQuery extends Query {
      * Defines "where" part of query
      */
     groupBy(...field: (string | RawStatement)[]): this {
-        this._groupby = [];
+        this._groupby = this._groupby || [];
         for (const arg of field) {
             if (!arg) continue;
             this._groupby.push(typeof arg === 'string' ? new GroupColumn(arg) : arg);
@@ -102,7 +102,7 @@ export class SelectQuery extends Query {
      * Defines "order by" part of query.
      */
     orderBy(...field: (string | RawStatement)[]): this {
-        this._orderby = [];
+        this._orderby = this._orderby || [];
         for (const arg of field) {
             if (!arg) continue;
             this._orderby.push(typeof arg === 'string' ? new OrderColumn(arg) : arg);

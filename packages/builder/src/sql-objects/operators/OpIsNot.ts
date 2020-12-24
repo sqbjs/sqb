@@ -7,8 +7,8 @@ export class OpIsNot extends CompOperator {
     _operatorType = OperatorType.isNot;
     _symbol = 'is not';
 
-    constructor(expression: string | Serializable, value?: any) {
-        super(expression, value);
+    constructor(left: string | Serializable, right?: any) {
+        super(left, right);
     }
 
 }

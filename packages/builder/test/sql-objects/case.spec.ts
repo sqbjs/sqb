@@ -10,7 +10,7 @@ describe('serialize "Case"', function () {
     };
 
     it('should initialize Case', function () {
-        assert.strictEqual(Case()._type, SerializationType.CASE_EXPRESSION);
+        assert.strictEqual(Case()._type, SerializationType.CASE_STATEMENT);
     });
 
     it('should serialize single condition in "when"', function () {

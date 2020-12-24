@@ -41,21 +41,21 @@ export class PostgresSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
-        if (typeof o.value === 'string') {
-            if (o.value.startsWith('(')) {
+        if (typeof o.right === 'string') {
+            if (o.right.startsWith('(')) {
                 if (o.operatorType === 'eq')
                     o.symbol = 'in';
                 if (o.operatorType === 'ne')
                     o.symbol = 'not in';
             } else {
-                if (o.value.substring(0, 1) === '$') {
+                if (o.right.substring(0, 1) === '$') {
                     if (o.operatorType === 'in') {
                         o.symbol = '=';
-                        o.value = 'ANY(' + o.value + ')';
+                        o.right = 'ANY(' + o.right + ')';
                     }
                     if (o.operatorType === 'notIn') {
                         o.symbol = '!=';
-                        o.value = 'ANY(' + o.value + ')';
+                        o.right = 'ANY(' + o.right + ')';
                     }
                 }
             }

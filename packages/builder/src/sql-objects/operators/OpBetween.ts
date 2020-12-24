@@ -8,20 +8,20 @@ export class OpBetween extends CompOperator {
     _operatorType = OperatorType.between;
     _symbol = 'between'
 
-    constructor(expression: string | Serializable, values: any[]) {
-        super(expression, values);
-        if (values && values[1] == null)
-            values[1] = values[0];
+    constructor(left: string | Serializable, right: any[]) {
+        super(left, right);
+        if (right && right[1] == null)
+            right[1] = right[0];
     }
 
     protected __serialize(ctx: SerializeContext, o: any): string {
-        o.value = o.value.map(x => serializeObject(ctx, x));
+        o.right = o.right.map(x => serializeObject(ctx, x));
         return serializeFallback(ctx, this._type, o,
             (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
     }
 
     __defaultSerialize(ctx, o) {
-        return o.expression + ' ' + o.symbol + ' ' + o.value[0] + ' and ' + o.value[1];
+        return o.left + ' ' + o.symbol + ' ' + o.right[0] + ' and ' + o.right[1];
     }
 
 }

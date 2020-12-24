@@ -2,9 +2,9 @@ import '../_support/env';
 import assert from 'assert';
 import {Readable} from 'stream';
 import {Select} from '@sqb/builder';
-import {Client, Cursor} from '@sqb/connect';
+import {Cursor} from '@sqb/connect';
 import {Connection} from '../../src/client/Connection';
-import {createTestSchema} from '../../../postgres/test/_support/create-db';
+import {initClient} from '../_support/init-client';
 
 function readStream(stream: Readable): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -26,7 +26,7 @@ function readObjectStream(stream: Readable): Promise<any> {
     return new Promise((resolve, reject) => {
         const arr = [];
         stream.on('data', (chunk): void => {
-           arr.push(chunk);
+            arr.push(chunk);
         });
         stream.on('end', () => {
             try {
@@ -40,25 +40,8 @@ function readObjectStream(stream: Readable): Promise<any> {
 
 describe('CursorStream', function () {
 
-    let client: Client;
+    const client = initClient();
     let cursor: Cursor;
-
-    if (process.env.SKIP_CREATE_DB !== 'true') {
-        before(async () => {
-            this.timeout(30000);
-            await createTestSchema();
-        })
-    }
-
-    before(() => {
-        if (!client)
-            client = new Client({dialect: 'postgres', defaults: {cursor: true, objectRows: true}});
-    });
-    after(async () => {
-        if (client)
-            await client.close(0);
-        client = undefined;
-    });
 
     it('should stream string buffer', async function () {
         this.slow(1000);
@@ -85,7 +68,7 @@ describe('CursorStream', function () {
         });
     });
 
-    it('should cursor.close() also close the stream', function(done) {
+    it('should cursor.close() also close the stream', function (done) {
         client.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
@@ -95,7 +78,7 @@ describe('CursorStream', function () {
         }).catch(done);
     });
 
-    it('should handle cursor errors', function(done) {
+    it('should handle cursor errors', function (done) {
         client.acquire(async (session: Connection) => {
             const result = await session.execute(Select().from('airports'));
             cursor = result && result.cursor;
