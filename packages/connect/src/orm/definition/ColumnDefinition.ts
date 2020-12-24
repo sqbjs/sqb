@@ -1,6 +1,6 @@
 import type {EntityDefinition} from './EntityDefinition';
 import {
-    AutoGenerationStrategy,
+    AutoGenerationStrategy, ColumnTransform,
     Constructor,
     ConstructorThunk,
     RelationColumnConfig
@@ -48,6 +48,11 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     autoGenerate?: AutoGenerationStrategy;
     sortAscending?: boolean;
     sortDescending?: boolean;
+    readOnly?: boolean;
+    hidden?: boolean;
+    update?: boolean;
+    insert?: boolean;
+    transform?: ColumnTransform;
 
     constructor(entity: EntityDefinition, name: string) {
         super(entity, name);
