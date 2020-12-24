@@ -14,26 +14,34 @@ export function Column(options?: string | ColumnConfig): PropertyDecorator {
                 col.fieldName = opts.fieldName || entity.name;
             if (opts.type)
                 col.type = opts.type;
-            if (opts.defaultValue !== undefined)
+            if (opts.defaultValue != null)
                 col.defaultValue = opts.defaultValue;
-            if (opts.isArray !== undefined)
+            if (opts.isArray != null)
                 col.isArray = opts.isArray;
-            if (opts.comment !== undefined)
+            if (opts.comment != null)
                 col.comment = opts.comment;
-            if (opts.collation !== undefined)
-                col.collation = opts?.collation;
-            if (opts.nullable !== undefined)
-                col.nullable = opts?.nullable;
-            if (opts.enum !== undefined)
-                col.enum = opts?.enum;
-            if (opts.length !== undefined)
-                col.length = opts?.length;
-            if (opts.precision !== undefined)
-                col.precision = opts?.precision;
-            if (opts.scale !== undefined)
-                col.scale = opts?.scale;
-            if (opts.autoGenerate !== undefined)
-                col.autoGenerate = opts?.autoGenerate;
+            if (opts.collation != null)
+                col.collation = opts.collation;
+            if (opts.nullable != null)
+                col.nullable = opts.nullable;
+            if (opts.enum != null)
+                col.enum = opts.enum;
+            if (opts.length != null)
+                col.length = opts.length;
+            if (opts.precision != null)
+                col.precision = opts.precision;
+            if (opts.scale != null)
+                col.scale = opts.scale;
+            if (opts.autoGenerate != null)
+                col.autoGenerate = opts.autoGenerate;
+            if (opts.readOnly != null)
+                col.readOnly = opts.readOnly;
+            if (opts.hidden != null)
+                col.hidden = opts.hidden;
+            if (opts.update != null)
+                col.update = opts.update;
+            if (opts.insert != null)
+                col.insert = opts.insert;
         }
     }
 }

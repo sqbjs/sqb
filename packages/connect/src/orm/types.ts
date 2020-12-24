@@ -4,7 +4,7 @@ export type Constructor<T = {}> = new (...args: any[]) => T;
 export type ConstructorThunk<T = {}> = () => Constructor<T> | Promise<Constructor<T>>;
 
 export type AutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
-
+export type ColumnTransform = (value: any, row?: any) => any;
 export type LazyResolver<T> = (options?: FindOptions) => Promise<T>;
 
 export interface EntityConfig {
@@ -43,7 +43,7 @@ export interface ColumnConfig {
     type?: string
 
     /**
-     * Field name in the database table. Default: property nam
+     * Field name in the database table. Default: property name
      */
     fieldName?: string;
 
@@ -53,17 +53,17 @@ export interface ColumnConfig {
     comment?: string;
 
     /**
-     * Character or byte length of field
+     * Character or byte length of column
      */
     length?: number;
 
     /**
-     * Specifies if field can be NULL
+     * Indicates if column can be NULL
      */
     nullable?: boolean;
 
     /**
-     * Specifies field's default value
+     * Column's default value
      */
     defaultValue?: any;
 
@@ -78,34 +78,54 @@ export interface ColumnConfig {
     scale?: number;
 
     /**
-     * Specifies fields's collation.
+     * Fields's collation.
      */
     collation?: string;
 
     /**
-     * Specifies enum values
+     * Indicates enum values
      */
     enum?: (string | number)[] | Object;
 
     /**
-     * Specifies if field is an array
+     * Indicates if column data is an array
      */
     isArray?: boolean;
 
     /**
-     * Specifies auto generation strategy
+     * Indicates auto generation strategy
      */
     autoGenerate?: AutoGenerationStrategy;
 
     /**
-     * Specifies column can be sorted ascending order
+     * Indicates column can be sorted ascending order
      */
     sortAscending?: boolean;
 
     /**
-     * Specifies column can be sorted descending order
+     * Indicates column can be sorted descending order
      */
     sortDescending?: boolean;
+
+    /**
+     * Indicates if column is read only
+     */
+    readOnly?: boolean;
+
+    /**
+     * Indicates whether or not to hide this column by default when making queries.
+     */
+    hidden?: boolean;
+
+    /**
+     * Indicates if updating column value is permitted.
+     */
+    update?: boolean;
+
+    /**
+     * Indicates if column value is used when inserting
+     */
+    insert?: boolean;
 }
 
 export interface RelationColumnConfig {
