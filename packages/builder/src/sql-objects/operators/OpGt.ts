@@ -7,8 +7,8 @@ export class OpGt extends CompOperator {
     _operatorType = OperatorType.gt;
     _symbol = '>';
 
-    constructor(expression: string | Serializable, value?: any) {
-        super(expression, value);
+    constructor(left: string | Serializable, right?: any) {
+        super(left, right);
     }
 
 }

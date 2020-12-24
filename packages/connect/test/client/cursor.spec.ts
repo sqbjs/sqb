@@ -2,31 +2,14 @@ import '../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
 import {Select} from '@sqb/builder';
-import {Client, Cursor} from '@sqb/connect';
+import { Cursor} from '@sqb/connect';
 import {Connection} from '../../src/client/Connection';
-import {createTestSchema} from '../../../postgres/test/_support/create-db';
+import {initClient} from '../_support/init-client';
 
 describe('Cursor', function () {
 
-    let client: Client;
+    const client = initClient();
     let cursor: Cursor;
-
-    if (process.env.SKIP_CREATE_DB !== 'true') {
-        before(async () => {
-            this.timeout(30000);
-            await createTestSchema();
-        })
-    }
-
-    before(() => {
-        if (!client)
-            client = new Client({dialect: 'postgres', defaults: {cursor: true, objectRows: true}});
-    });
-    after(async () => {
-        if (client)
-            await client.close(0);
-        client = undefined;
-    });
 
     it('should return Cursor for select queries', async function () {
         const result = await client.execute(Select().from('airports'));
@@ -95,7 +78,7 @@ describe('Cursor', function () {
             cursor = result && result.cursor;
             assert(cursor);
             let curRow = NaN;
-            cursor.on('move', (rowNum) => {
+            cursor.on('move', (row, rowNum) => {
                 curRow = rowNum;
             });
             await cursor.seek(10);

@@ -1,18 +1,20 @@
 import {Connection, stringifyValueForSQL} from 'postgresql-client';
 import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
 
-const schemaSql = `
-DROP SCHEMA IF EXISTS ${process.env.PGSCHEMA} CASCADE;
-CREATE SCHEMA ${process.env.PGSCHEMA} AUTHORIZATION postgres;
+const schema = process.env.PGSCHEMA || 'test';
 
-CREATE TABLE ${process.env.PGSCHEMA}.continents
+const schemaSql = `
+DROP SCHEMA IF EXISTS ${schema} CASCADE;
+CREATE SCHEMA ${schema} AUTHORIZATION postgres;
+
+CREATE TABLE ${schema}.continents
 (
     code character varying(5),
     name character varying(16),   
     CONSTRAINT continents_pkey PRIMARY KEY (code)
 );
 
-CREATE TABLE ${process.env.PGSCHEMA}.countries
+CREATE TABLE ${schema}.countries
 (
     code character varying(5),
     name character varying(16),
@@ -20,12 +22,12 @@ CREATE TABLE ${process.env.PGSCHEMA}.countries
     continent_code character varying(2),
     CONSTRAINT countries_pkey PRIMARY KEY (code),
     CONSTRAINT fk_countries_continent_code FOREIGN KEY (continent_code)
-        REFERENCES ${process.env.PGSCHEMA}.continents (code) MATCH SIMPLE
+        REFERENCES ${schema}.continents (code) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
 
-CREATE TABLE ${process.env.PGSCHEMA}.customers
+CREATE TABLE ${schema}.customers
 (
     id SERIAL,
     given_name character varying(64),
@@ -35,14 +37,14 @@ CREATE TABLE ${process.env.PGSCHEMA}.customers
     country_code character varying(5),
     CONSTRAINT customers_pkey PRIMARY KEY (id),
     CONSTRAINT fk_customers_country_code FOREIGN KEY (country_code)
-        REFERENCES ${process.env.PGSCHEMA}.countries (code) MATCH SIMPLE
+        REFERENCES ${schema}.countries (code) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
 
-ALTER SEQUENCE ${process.env.PGSCHEMA}.customers_id_seq RESTART WITH 10000;
+ALTER SEQUENCE ${schema}.customers_id_seq RESTART WITH 10000;
 
-CREATE TABLE ${process.env.PGSCHEMA}.data_types
+CREATE TABLE ${schema}.data_types
 (
     id SERIAL NOT NULL,
     f_bool bool,
@@ -68,12 +70,12 @@ CREATE TABLE ${process.env.PGSCHEMA}.data_types
     CONSTRAINT data_types_pkey PRIMARY KEY (id)
 );
 
-insert into ${process.env.PGSCHEMA}.data_types
+insert into ${schema}.data_types
   (id, f_bool, f_int2, f_int4, f_int8, f_float4, f_float8, f_char, f_varchar,
    f_text, f_bpchar, f_json, f_xml, f_date, f_timestamp, f_timestamptz,
    f_bytea, f_point, f_circle, f_lseg, f_box)
 values
-  (1, true, 1, 12345, 1234567890123, 1.2, 5.12345, 'a', 'abcd', 'abcde', 'abcdef',
+  (1, true, 1, 12345, 9007199254740995, 1.2, 5.12345, 'a', 'abcd', 'abcde', 'abcdef',
    '{"a": 1}', '<tag1>123</tag1>', '2010-03-22', '2020-01-10 15:45:12.123',
     '2005-07-01 01:21:11.123+03:00', 'ABCDE', '(-1.2, 3.5)', '<(-1.2, 3.5), 4.6>',
     '[(1.2, 3.5), (4.6, 5.2)]', '((-1.6, 3.0), (4.6, 0.1))');
@@ -85,7 +87,7 @@ export async function createTestSchema() {
     try {
         await connection.execute(schemaSql);
         const dataFiles = getInsertSQLsForTestData({
-            schema: process.env.PGSCHEMA || 'test',
+            schema,
             stringifyValueForSQL
         });
         for (const table of dataFiles)

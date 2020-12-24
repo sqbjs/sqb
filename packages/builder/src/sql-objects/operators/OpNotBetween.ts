@@ -7,8 +7,8 @@ export class OpNotBetween extends OpBetween {
     _operatorType = OperatorType.notBetween;
     _symbol = 'not between';
 
-    constructor(expression: string | Serializable, values: any[]) {
-        super(expression, values);
+    constructor(left: string | Serializable, right: any[]) {
+        super(left, right);
     }
 
 }

@@ -3,29 +3,12 @@ import assert from 'assert';
 import {Insert, Param, Select} from '@sqb/builder';
 import '@sqb/postgres';
 import {Client} from '@sqb/connect';
-import {createTestSchema} from '../../../postgres/test/_support/create-db';
+import {initClient} from '../_support/init-client';
 
 describe('Client', function () {
 
-    let client: Client;
+    const client = initClient();
     const dialect = 'postgres';
-
-    if (process.env.SKIP_CREATE_DB !== 'true') {
-        before(async () => {
-            this.timeout(30000);
-            await createTestSchema();
-        })
-    }
-
-    before(() => {
-        if (!client)
-            client = new Client({dialect: 'postgres'});
-    });
-    after(async () => {
-        if (client)
-            await client.close(0);
-        client = undefined;
-    });
 
     it('should throw if no configuration argument given', function () {
         assert.throws(() => new Client(undefined),
@@ -39,20 +22,20 @@ describe('Client', function () {
     });
 
     it('should initialize client with driver name', function () {
-        client = new Client({driver: 'postgresql-client'});
-        assert.strictEqual(client.dialect, dialect);
-        assert.strictEqual(client.driver, 'postgresql-client');
+        const _client = new Client({driver: 'postgresql-client'});
+        assert.strictEqual(_client.dialect, dialect);
+        assert.strictEqual(_client.driver, 'postgresql-client');
     });
 
     it('should initialize client with dialect name', function () {
-        client = new Client({dialect});
-        assert.strictEqual(client.dialect, dialect);
-        assert.strictEqual(client.driver, 'postgresql-client');
+        const _client = new Client({dialect});
+        assert.strictEqual(_client.dialect, dialect);
+        assert.strictEqual(_client.driver, 'postgresql-client');
     });
 
     it('should initialize default options', function () {
-        client = new Client({dialect});
-        const opts = client.pool.options;
+        const _client = new Client({dialect});
+        const opts = _client.pool.options;
         assert.strictEqual(opts.acquireMaxRetries, 0);
         assert.strictEqual(opts.acquireRetryWait, 2000);
         assert.strictEqual(opts.acquireTimeoutMillis, 0);

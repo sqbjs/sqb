@@ -27,8 +27,8 @@ export class Repository<T> {
     }
 
     async find(options?: FindOptions): Promise<T[]> {
-        const task = new FindTask<T>(this._executor, this._ctor, options || {});
-        return task.execute();
+        const task = new FindTask<T>(this._executor, this._ctor);
+        return task.execute(options);
     }
 
     async findByPk(keyValue: any | Record<string, any>, options?: FindByPkOptions): Promise<Maybe<T>> {

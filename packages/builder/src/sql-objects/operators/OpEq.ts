@@ -7,8 +7,8 @@ export class OpEq extends CompOperator {
     _operatorType = OperatorType.eq;
     _symbol = '='
 
-    constructor(expression: string | Serializable, value: any) {
-        super(expression, value);
+    constructor(left: string | Serializable, right: any) {
+        super(left, right);
     }
 
 }

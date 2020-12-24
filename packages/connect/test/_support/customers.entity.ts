@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryKey, SortAscending, SortDescending, RelationColumn} from '@sqb/connect';
+import {Column, Entity, HasOne, LazyResolver, PrimaryKey, SortAscending, SortDescending} from '@sqb/connect';
 import {Country} from './countries.entity';
 
 @Entity('customers')
@@ -30,11 +30,19 @@ export class Customer {
     @Column({fieldName: 'country_code'})
     countryCode: string;
 
-    @RelationColumn({
+    @HasOne({
         target: Country,
         column: 'countryCode',
         targetColumn: 'code'
     })
     readonly country: Country;
+
+    @HasOne({
+        target: Country,
+        column: 'countryCode',
+        targetColumn: 'code',
+        lazy: true
+    })
+    readonly countryLazy: LazyResolver<Country>;
 
 }

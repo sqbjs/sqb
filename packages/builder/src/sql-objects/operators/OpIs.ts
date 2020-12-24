@@ -7,8 +7,8 @@ export class OpIs extends CompOperator {
     _operatorType = OperatorType.is;
     _symbol = 'is';
 
-    constructor(expression: string | Serializable, value?: any) {
-        super(expression, value);
+    constructor(left: string | Serializable, right?: any) {
+        super(left, right);
     }
 
 }

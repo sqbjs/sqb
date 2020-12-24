@@ -7,13 +7,13 @@ export class OpIn extends CompOperator {
     _operatorType = OperatorType.in;
     _symbol = 'in';
 
-    constructor(expression, value) {
-        super(expression,
-            Array.isArray(value) || isSerializable(value) ? value : [value]);
+    constructor(left, right) {
+        super(left,
+            Array.isArray(right) || isSerializable(right) ? right : [right]);
     }
 
     protected __serialize(ctx, o) {
-        if (Array.isArray(o.value) && !o.value.length)
+        if (Array.isArray(o.right) && !o.right.length)
             return '';
         return super.__serialize(ctx, o);
     }

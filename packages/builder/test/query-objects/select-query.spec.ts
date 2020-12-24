@@ -162,7 +162,7 @@ describe('serialize "SelectQuery"', function () {
         assert.throws(() =>
                 // @ts-ignore
                 Select().from('table1').join('dfd'),
-            /Join instance required/);
+            /Join statement required/);
     });
 
     it('should validate alias for sub-select in columns', function () {

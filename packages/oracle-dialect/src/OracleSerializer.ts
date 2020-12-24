@@ -74,7 +74,7 @@ export class OracleSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
-        if (o.value === 'null') {
+        if (o.right === 'null') {
             if (o.operatorType === 'eq')
                 o.symbol = 'is';
             if (o.operatorType === 'ne')
