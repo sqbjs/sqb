@@ -1,12 +1,12 @@
-import {EntityDefinition} from './definition/EntityDefinition';
-import {Constructor} from './types';
+import {EntityDefinition} from './model/EntityDefinition';
+import {Constructor} from './orm.types';
 import {ENTITY_DEFINITION_PROPERTY} from './consts';
 
-export function isClass(fn: Function): fn is Constructor {
+export function isClass(fn: any): fn is Constructor {
     return typeof fn === 'function' && /^\s*class/.test(fn.toString());
 }
 
-export function isEntityClass(fn: Function): fn is Constructor {
+export function isEntityClass(fn: any): fn is Constructor {
     return !!(isClass(fn) && fn[ENTITY_DEFINITION_PROPERTY]);
 }
 

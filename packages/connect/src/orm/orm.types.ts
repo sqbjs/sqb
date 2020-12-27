@@ -1,11 +1,13 @@
+import type {ColumnDefinition} from './model/ColumnDefinition';
 import type {Operator} from '@sqb/builder';
 
-export type Constructor<T = {}> = new (...args: any[]) => T;
-export type ConstructorThunk<T = {}> = () => Constructor<T> | Promise<Constructor<T>>;
+/* Model related */
 
-export type AutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
-export type ColumnTransform = (value: any, row?: any) => any;
-export type LazyResolver<T> = (options?: FindOptions) => Promise<T>;
+export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
+export type ColumnTransformFunction = (value: any, col: ColumnDefinition, row: any) => any;
+export type Constructor<T = {}> = new (...args: any[]) => T;
+export type ConstructorResolver<T> = () => Constructor<T> | Promise<Constructor<T>>;
+export type ConstructorThunk<T = {}> = Constructor<T> | ConstructorResolver<T>;
 
 export interface EntityConfig {
     /**
@@ -95,7 +97,7 @@ export interface ColumnConfig {
     /**
      * Indicates auto generation strategy
      */
-    autoGenerate?: AutoGenerationStrategy;
+    autoGenerate?: ColumnAutoGenerationStrategy;
 
     /**
      * Indicates column can be sorted ascending order
@@ -108,9 +110,9 @@ export interface ColumnConfig {
     sortDescending?: boolean;
 
     /**
-     * Indicates if column is read only
+     * Indicates if column is required
      */
-    readOnly?: boolean;
+    required?: boolean;
 
     /**
      * Indicates whether or not to hide this column by default when making queries.
@@ -135,11 +137,25 @@ export interface RelationColumnConfig {
     lazy?: boolean;
 }
 
-export interface FindByPkOptions {
-    columns?: string[];
-}
+/* Repository related */
 
 export type SearchFilter = object | Operator | (object | Operator)[];
+export type LazyResolver<T> = (options?: FindOptions) => Promise<T>;
+
+type IfEquals<X, Y, A = X, B = never> =
+    (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
+
+export type WritableKeys<T> = {
+    [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, P>
+}[keyof T];
+
+export type ReadonlyKeys<T> = {
+    [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
+}[keyof T];
+
+export interface GetOptions {
+    columns?: string[];
+}
 
 export interface FindOneOptions {
     columns?: string[];
@@ -151,4 +167,12 @@ export interface FindOneOptions {
 export interface FindOptions extends FindOneOptions {
     limit?: number;
     maxEagerFetch?: number;
+}
+
+export interface InsertOptions {
+    /**
+     *  If this property is true, the transaction committed at the end of query execution.
+     *  Default = false
+     */
+    autoCommit?: boolean;
 }

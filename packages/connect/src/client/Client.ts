@@ -16,9 +16,9 @@ import {Adapter} from './Adapter';
 import {Connection} from './Connection';
 import {adapters} from './extensions';
 import {SafeEventEmitter} from '../SafeEventEmitter';
-import {Constructor} from '../orm/types';
-import {Repository} from '../orm/Repository';
-import {EntityDefinition} from '../orm/definition/EntityDefinition';
+import {Constructor} from '../orm/orm.types';
+import {Repository} from '../orm/repository/Repository';
+import {EntityDefinition} from '../orm/model/EntityDefinition';
 
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');

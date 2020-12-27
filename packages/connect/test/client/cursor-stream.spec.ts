@@ -40,13 +40,13 @@ function readObjectStream(stream: Readable): Promise<any> {
 
 describe('CursorStream', function () {
 
-    const client = initClient();
+    const client = initClient({defaults: {cursor: true, objectRows: true}});
     let cursor: Cursor;
 
     it('should stream string buffer', async function () {
         this.slow(1000);
         await client.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+            const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
             const buf = await readStream(stream);
@@ -59,7 +59,7 @@ describe('CursorStream', function () {
 
     it('should stream row object if objectMode enabled', async function () {
         await client.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+            const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream({objectMode: true});
             const arr = await readObjectStream(stream);
@@ -70,7 +70,7 @@ describe('CursorStream', function () {
 
     it('should cursor.close() also close the stream', function (done) {
         client.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+            const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
             stream.on('close', () => done());
@@ -80,7 +80,7 @@ describe('CursorStream', function () {
 
     it('should handle cursor errors', function (done) {
         client.acquire(async (session: Connection) => {
-            const result = await session.execute(Select().from('airports'));
+            const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
             const stream = cursor.toStream();

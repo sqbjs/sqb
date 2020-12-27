@@ -8,7 +8,7 @@ import type {Maybe} from '../types';
 
 export type ExecuteHookFunction = (connection: Connection, request: QueryRequest) => Promise<void>;
 export type FetchFunction = (row: any, request: QueryRequest) => void;
-export type CoercionFunction = (value: any, fieldInfo?: FieldInfo) => any;
+export type ValueTransformFunction = (value: any, fieldInfo?: FieldInfo) => any;
 export type TransactionFunction = (session: Connection) => Promise<any>;
 
 export type RowType = 'array' | 'object';
@@ -102,7 +102,7 @@ export interface ClientDefaults {
      */
     fetchRows?: number;
 
-    coercion?: CoercionFunction;
+    transform?: ValueTransformFunction;
 }
 
 export interface ConnectionOptions {
@@ -135,7 +135,7 @@ export interface QueryExecuteOptions {
     /**
      * Function for converting data before returning response.
      */
-    coercion?: CoercionFunction;
+    transform?: ValueTransformFunction;
 
     /**
      * In "cursor" mode; it provides an initial suggested number of rows to prefetch.
@@ -204,7 +204,7 @@ export interface QueryRequest {
     ignoreNulls?: boolean;
     fetchRows?: number;
     fieldNaming?: FieldNaming;
-    coercion?: CoercionFunction;
+    transform?: ValueTransformFunction;
     showSql?: boolean;
     action?: string;
     executeHooks?: ExecuteHookFunction[];

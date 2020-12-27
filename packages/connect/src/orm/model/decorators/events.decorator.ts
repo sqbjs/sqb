@@ -1,4 +1,4 @@
-import {EntityDefinition} from '../definition/EntityDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 
 export function BeforeInsert(): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

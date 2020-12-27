@@ -1,4 +1,4 @@
-import {Column, Entity, HasOne, LazyResolver, PrimaryKey, SortAscending, SortDescending} from '@sqb/connect';
+import {Column, Entity, HasOne, PrimaryKey, SortAscending, SortDescending, LazyResolver} from '@sqb/connect';
 import {Country} from './countries.entity';
 
 @Entity('customers')

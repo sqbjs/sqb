@@ -1,7 +1,7 @@
-import {EntityDefinition} from '../definition/EntityDefinition';
-import {ColumnTransform} from '../types';
+import {EntityDefinition} from '../EntityDefinition';
+import {ColumnTransformFunction} from '../../orm.types';
 
-export function Transform(fn: ColumnTransform): PropertyDecorator {
+export function Transform(fn: ColumnTransformFunction): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');

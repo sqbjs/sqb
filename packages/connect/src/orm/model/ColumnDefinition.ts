@@ -1,10 +1,11 @@
 import type {EntityDefinition} from './EntityDefinition';
 import {
-    AutoGenerationStrategy, ColumnTransform,
-    Constructor,
+    ColumnAutoGenerationStrategy,
     ConstructorThunk,
-    RelationColumnConfig
-} from '../types';
+    ColumnTransformFunction,
+    RelationColumnConfig,
+    ConstructorResolver
+} from '../orm.types';
 import {Maybe} from '../../types';
 import {getEntityDefinition, isEntityClass} from '../helpers';
 
@@ -45,25 +46,29 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     precision?: number;
     scale?: number;
     collation?: string;
-    autoGenerate?: AutoGenerationStrategy;
+    autoGenerate?: ColumnAutoGenerationStrategy;
     sortAscending?: boolean;
     sortDescending?: boolean;
-    readOnly?: boolean;
+    required?: boolean;
     hidden?: boolean;
     update?: boolean;
     insert?: boolean;
-    transform?: ColumnTransform;
+    transform?: ColumnTransformFunction;
 
     constructor(entity: EntityDefinition, name: string) {
         super(entity, name);
         this.fieldName = name;
         this.type = 'string';
     }
+
+    get dataType(): string {
+        return 'string';
+    }
 }
 
 export class RelationColumnDefinition extends BaseColumnDefinition {
     kind: ColumnKind = 'relation';
-    target: Constructor | ConstructorThunk;
+    target: ConstructorThunk;
     column: string[];
     targetColumn: string[];
     hasMany: boolean;
@@ -85,7 +90,7 @@ export class RelationColumnDefinition extends BaseColumnDefinition {
     async resolveTarget(): Promise<EntityDefinition> {
         if (isEntityClass(this.target))
             return getEntityDefinition(this.target);
-        const ctor = await (this.target as ConstructorThunk)();
+        const ctor = await (this.target as ConstructorResolver<any>)();
         const entity = getEntityDefinition(ctor);
         if (!entity)
             throw new Error(`Relation column "${this.name}" definition error. ` +
