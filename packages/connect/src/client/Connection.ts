@@ -215,7 +215,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
             ignoreNulls: coerceToBoolean(coalesce(options.ignoreNulls, defaults.ignoreNulls), false),
             fetchRows: coerceToInt(coalesce(options.fetchRows, defaults.fetchRows), 100),
             fieldNaming: coalesce(options.namingStrategy, defaults.fieldNaming) as FieldNaming,
-            coercion: coalesce(options.coercion, defaults.coercion),
+            transform: coalesce(options.transform, defaults.transform),
             showSql: coerceToBoolean(coalesce(options.showSql, defaults.showSql), false),
             action: coerceToString(options.action)
         };

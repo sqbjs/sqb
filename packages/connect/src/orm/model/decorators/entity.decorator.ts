@@ -1,6 +1,6 @@
-import {EntityDefinition} from '../definition/EntityDefinition';
-import {EntityConfig} from '../types';
-import {getEntityDefinition} from '../helpers';
+import {EntityDefinition} from '../EntityDefinition';
+import {EntityConfig} from '../../orm.types';
+import {getEntityDefinition} from '../../helpers';
 
 export function Entity(options?: EntityConfig | string): ClassDecorator {
     return function (target: Function) {

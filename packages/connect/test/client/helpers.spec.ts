@@ -159,10 +159,10 @@ describe('Helpers', function () {
             assert.strictEqual(rows[0].fieldName3, undefined);
         });
 
-        it('should apply coercion ', function () {
+        it('should apply value transform ', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
             const rows = normalizeRows(fields, 'object', objectRows, {
-                objectRows: true, coercion: x => '$' + x
+                objectRows: true, transform: x => '$' + x
             });
             assert.strictEqual(rows[0].fieldName1, '$a');
             assert.strictEqual(rows[0].fieldName2, '$b');

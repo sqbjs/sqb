@@ -1,5 +1,5 @@
-import {RelationColumnConfig} from '../types';
-import {EntityDefinition} from '../definition/EntityDefinition';
+import {RelationColumnConfig} from '../../orm.types';
+import {EntityDefinition} from '../EntityDefinition';
 
 export function HasOne(cfg: RelationColumnConfig): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

@@ -3,7 +3,7 @@ import {
     DataColumnDefinition, isDataColumn, isRelationColumn,
     RelationColumnDefinition
 } from './ColumnDefinition';
-import {RelationColumnConfig, IndexConfig, Constructor} from '../types';
+import {Constructor, RelationColumnConfig, IndexConfig} from '../orm.types';
 import {Maybe} from '../../types';
 import {ENTITY_DEFINITION_PROPERTY} from '../consts';
 

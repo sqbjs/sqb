@@ -142,7 +142,7 @@ describe('Repository find operations', function () {
 
         it('return single instance by key field', async function () {
             const repo = client.getRepository<Customer>(Customer);
-            const row = await repo.findByPk(1);
+            const row = await repo.get(1);
             assert.ok(row);
             assert.strictEqual(row.id, 1);
             assert.strictEqual(row.givenName, 'Wynne');

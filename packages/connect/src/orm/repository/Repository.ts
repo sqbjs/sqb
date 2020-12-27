@@ -1,12 +1,20 @@
 import {Operator, Eq, And} from '@sqb/builder';
-import {Client} from '../client/Client';
-import {Connection} from '../client/Connection';
-import {Constructor, FindByPkOptions, FindOneOptions, FindOptions} from './types';
-import {EntityDefinition} from './definition/EntityDefinition';
-import {QueryExecutor} from '../client/types';
-import {Maybe} from '../types';
-import {isDataColumn} from './definition/ColumnDefinition';
-import {FindTask} from './FindTask';
+import {Client} from '../../client/Client';
+import {Connection} from '../../client/Connection';
+import {
+    Constructor,
+    FindOneOptions,
+    FindOptions,
+    GetOptions,
+    InsertOptions,
+    WritableKeys
+} from '../orm.types';
+import {EntityDefinition} from '../model/EntityDefinition';
+import {QueryExecutor} from '../../client/types';
+import {Maybe} from '../../types';
+import {isDataColumn} from '../model/ColumnDefinition';
+import {FindTask} from './tasks/FindTask';
+import {InsertTask} from './tasks/InsertTask';
 
 export class Repository<T> {
     private readonly _client: Client;
@@ -31,7 +39,14 @@ export class Repository<T> {
         return task.execute(options);
     }
 
-    async findByPk(keyValue: any | Record<string, any>, options?: FindByPkOptions): Promise<Maybe<T>> {
+    async findOne(options?: FindOneOptions): Promise<Maybe<T>> {
+        const opts: FindOptions = {...options};
+        opts.limit = 1;
+        const rows = await this.find(opts);
+        return rows && rows[0];
+    }
+
+    async get(keyValue: any | Record<string, any>, options?: GetOptions): Promise<Maybe<T>> {
         const opts: FindOptions = {...options};
         opts.filter = [this._getPrimaryKeyConditions(keyValue)];
         opts.limit = 1;
@@ -40,11 +55,14 @@ export class Repository<T> {
         return rows && rows[0];
     }
 
-    async findOne(options?: FindOneOptions): Promise<Maybe<T>> {
-        const opts: FindOptions = {...options};
-        opts.limit = 1;
-        const rows = await this.find(opts);
-        return rows && rows[0];
+    async insert(instance: WritableKeys<T>, options?: InsertOptions): Promise<Maybe<T>> {
+        const task = new InsertTask<T>(this._executor, this._ctor);
+        return task.execute(instance, options);
+    }
+
+    async insertGet(instance: WritableKeys<T>, options?: InsertOptions): Promise<T> {
+        const task = new InsertTask<T>(this._executor, this._ctor);
+        return (await task.execute(instance, options)) as T;
     }
 
     private _getPrimaryKeyConditions(keyValue: any | Record<string, any>): Operator {

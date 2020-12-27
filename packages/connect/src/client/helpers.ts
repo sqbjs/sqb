@@ -2,7 +2,7 @@ import {camelCase, pascalCase} from "putil-varhelpers";
 import {
     ArrayRow,
     ArrayRowset,
-    CoercionFunction,
+    ValueTransformFunction,
     FieldInfo, FieldNaming, ObjectRow, ObjectRowset, QueryRequest
 } from './types';
 import {FieldInfoMap} from './FieldInfoMap';
@@ -52,16 +52,16 @@ export function wrapAdapterFields(oldFields: Adapter.Field[],
 
 export function normalizeRows(fields: FieldInfoMap, rowType: 'array' | 'object',
                               oldRows: ObjectRowset | ArrayRowset,
-                              options: Pick<QueryRequest, 'objectRows' | 'ignoreNulls' | 'coercion'>
+                              options: Pick<QueryRequest, 'objectRows' | 'ignoreNulls' | 'transform'>
 ): Record<string, any>[] | any[][] {
 
     const ignoreNulls = options.ignoreNulls && options.objectRows;
-    const coercion = options.coercion;
-    const coerceValue: CoercionFunction = (v: any, f?: FieldInfo): any => {
+    const transform = options.transform;
+    const coerceValue: ValueTransformFunction = (v: any, f?: FieldInfo): any => {
         if (v === undefined)
             return;
-        if (coercion)
-            v = coercion(v, f);
+        if (transform)
+            v = transform(v, f);
         if (v === null && ignoreNulls)
             return;
         return v;
@@ -88,7 +88,7 @@ export function normalizeRows(fields: FieldInfoMap, rowType: 'array' | 'object',
             }
         }
 
-        if (hasFieldNaming || coercion) {
+        if (hasFieldNaming || transform) {
             return (oldRows as ObjectRowset).map((row: ObjectRow) => {
                 const r = {};
                 for (const f of fields.values()) {

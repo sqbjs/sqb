@@ -1,5 +1,5 @@
-import {ColumnConfig} from '../types';
-import {EntityDefinition} from '../definition/EntityDefinition';
+import {ColumnConfig} from '../../orm.types';
+import {EntityDefinition} from '../EntityDefinition';
 
 export function Column(options?: string | ColumnConfig): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
@@ -34,8 +34,14 @@ export function Column(options?: string | ColumnConfig): PropertyDecorator {
                 col.scale = opts.scale;
             if (opts.autoGenerate != null)
                 col.autoGenerate = opts.autoGenerate;
-            if (opts.readOnly != null)
-                col.readOnly = opts.readOnly;
+            if (opts.sortAscending != null)
+                col.sortAscending = opts.sortAscending;
+            if (opts.sortDescending != null)
+                col.sortDescending = opts.sortDescending;
+            if (opts.required != null)
+                col.required = opts.required;
+            if (opts.required != null)
+                col.required = opts.required;
             if (opts.hidden != null)
                 col.hidden = opts.hidden;
             if (opts.update != null)

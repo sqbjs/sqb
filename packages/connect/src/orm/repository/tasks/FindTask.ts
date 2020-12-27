@@ -1,16 +1,18 @@
 import type {LogicalOperator} from '@sqb/builder';
-import {And, Eq, Exists, In, isCompOperator, isLogicalOperator, LeftOuterJoin, Param, Raw, Select} from '@sqb/builder';
-import {Constructor, FindOptions, LazyResolver} from './types';
-import {EntityDefinition} from './definition/EntityDefinition';
 import {
+    And, Eq, Exists, In, isCompOperator,
+    isLogicalOperator, LeftOuterJoin, Param, Raw, Select
+} from '@sqb/builder';
+import type {Constructor, FindOptions, LazyResolver} from '../../orm.types';
+import type {EntityDefinition} from '../../model/EntityDefinition';
+import type {
     ColumnDefinition,
     DataColumnDefinition,
-    isDataColumn,
-    isRelationColumn,
     RelationColumnDefinition
-} from './definition/ColumnDefinition';
-import {getEntityDefinition} from './helpers';
-import {FieldInfo, QueryExecutor} from '../client/types';
+} from '../../model/ColumnDefinition';
+import {getEntityDefinition} from '../../helpers';
+import {isDataColumn, isRelationColumn} from '../../model/ColumnDefinition';
+import type {FieldInfo, QueryExecutor} from '../../../client/types';
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 
