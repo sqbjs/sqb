@@ -1,5 +1,5 @@
 import type {ColumnDefinition} from './model/ColumnDefinition';
-import type {Operator} from '@sqb/builder';
+import type {Repository} from './Repository';
 
 /* Model related */
 
@@ -139,8 +139,7 @@ export interface RelationColumnConfig {
 
 /* Repository related */
 
-export type SearchFilter = object | Operator | (object | Operator)[];
-export type LazyResolver<T> = (options?: FindOptions) => Promise<T>;
+export type LazyResolver<T> = (options?: Repository.FindOperationOptions) => Promise<T>;
 
 type IfEquals<X, Y, A = X, B = never> =
     (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;
@@ -153,26 +152,4 @@ export type ReadonlyKeys<T> = {
     [P in keyof T]-?: IfEquals<{ [Q in P]: T[P] }, { -readonly [Q in P]: T[P] }, never, P>
 }[keyof T];
 
-export interface GetOptions {
-    columns?: string[];
-}
-
-export interface FindOneOptions {
-    columns?: string[];
-    filter?: SearchFilter;
-    sort?: string[];
-    offset?: number;
-}
-
-export interface FindOptions extends FindOneOptions {
-    limit?: number;
-    maxEagerFetch?: number;
-}
-
-export interface InsertOptions {
-    /**
-     *  If this property is true, the transaction committed at the end of query execution.
-     *  Default = false
-     */
-    autoCommit?: boolean;
-}
+export type PickWritable<T> = Pick<T, WritableKeys<T>>;

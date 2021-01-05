@@ -1,11 +1,11 @@
 export enum JoinType {
-    INNER,
-    LEFT,
-    LEFT_OUTER,
-    RIGHT,
-    RIGHT_OUTER,
-    OUTER,
-    FULL_OUTER
+    INNER = 'inner',
+    LEFT = 'left',
+    LEFT_OUTER = 'left outer',
+    RIGHT = 'right',
+    RIGHT_OUTER = 'right outer',
+    OUTER = 'outer',
+    FULL_OUTER = 'full outer'
 }
 
 export enum SerializationType {
@@ -30,6 +30,7 @@ export enum SerializationType {
     JOIN_CONDITIONS = 'join_conditions',
     RAW = 'raw',
     CASE_STATEMENT = 'case_expression',
+    COUNT_STATEMENT = 'count_expression',
     CONDITIONS_BLOCK = 'conditions_block',
     COMPARISON_EXPRESSION = 'comparison_expression',
     LOGICAL_EXPRESSION = 'logical_expression',
@@ -37,7 +38,6 @@ export enum SerializationType {
     DATE_VALUE = 'date_value',
     STRING_VALUE = 'string_value',
     EXTERNAL_PARAMETER = 'external_parameter'
-
 }
 
 export enum OperatorType {
@@ -61,4 +61,37 @@ export enum OperatorType {
     isNot = 'isNot',
     exists = 'exists',
     notExists = 'notExists'
+}
+
+export enum DataType {
+    Bool = 'boolean',
+    Char = 'char',
+    Varchar = 'varchar',
+    Number = 'number',
+    SmallInt = 'smallint',
+    Integer = 'integer',
+    BigInt = 'bigint',
+    Float = 'float',
+    Double = 'double',
+    Date = 'date',
+    Time = 'time',
+    TimeStamp = 'timestamp',
+    TimeStampTz = 'timestamptz',
+    Binary = 'binary',
+
+    BoolArray = 'boolean[]',
+    CharArray = 'char[]',
+    VarcharArray = 'varchar[]',
+    NumberArray = 'number[]',
+    SmallIntArray = 'smallint[]',
+    IntegerArray = 'integer[]',
+    BigIntArray = 'bigint[]',
+    FloatArray = 'float[]',
+    DoubleArray = 'double[]',
+    DateArray = 'date[]',
+    TimeArray = 'time[]',
+    TimeStampArray = 'timestamp[]',
+    TimeStampTzArray = 'timestamptz[]',
+    BinaryArray = 'binary[]',
+
 }

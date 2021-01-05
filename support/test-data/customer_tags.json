@@ -1,0 +1,45 @@
+{
+  "name": "customer_tags",
+  "fields": [
+    {
+      "fieldName": "customer_id",
+      "dataType": "integer",
+      "jsType": "number"
+    },
+    {
+      "fieldName": "tag",
+      "dataType": "varchar",
+      "jsType": "string"
+    }
+  ],
+  "rows": [
+    {
+      "customer_id": 1,
+      "tag": "red"
+    },
+    {
+      "customer_id": 1,
+      "tag": "blue"
+    },
+    {
+      "customer_id": 2,
+      "tag": "red"
+    },
+    {
+      "customer_id": 2,
+      "tag": "yellow"
+    },
+    {
+      "customer_id": 2,
+      "tag": "green"
+    },
+    {
+      "customer_id": 2,
+      "tag": "white"
+    },
+    {
+      "customer_id": 3,
+      "tag": "yellow"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ import {Country} from '../_support/countries.entity';
 import {initClient} from '../_support/init-client';
 import {Continent} from '../_support/continents.entity';
 
-describe('Repository find operations', function () {
+describe('Repository "find" operations', function () {
 
     const client = initClient();
 
@@ -131,22 +131,6 @@ describe('Repository find operations', function () {
             });
             assert.ok(row);
             assert.strictEqual(row.id, 11);
-        });
-
-    });
-
-    /**
-     *
-     */
-    describe('findByPk()', function () {
-
-        it('return single instance by key field', async function () {
-            const repo = client.getRepository<Customer>(Customer);
-            const row = await repo.get(1);
-            assert.ok(row);
-            assert.strictEqual(row.id, 1);
-            assert.strictEqual(row.givenName, 'Wynne');
-            assert.strictEqual(row.familyName, 'Silva');
         });
 
     });

@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Param,
+    Select, Param, Update, DataType,
 } from '@sqb/builder';
 import {PostgresSerializer} from '../src/PostgresSerializer';
 
@@ -12,25 +12,25 @@ describe('PostgresSerializer', function () {
     before(() => registerSerializer(postgresSerializer))
     after(() => unRegisterSerializer(postgresSerializer))
 
-    it('should serialize reserved word', function() {
+    it('should serialize reserved word', function () {
         const query = Select('comment').from('table1');
         const result = query.generate({dialect: 'postgres'});
         assert.strictEqual(result.sql, 'select "comment" from table1');
     });
 
-    it('should serialize "limit"', function() {
+    it('should serialize "limit"', function () {
         const query = Select().from('table1').limit(10);
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 LIMIT 10');
     });
 
-    it('should serialize "offset"', function() {
+    it('should serialize "offset"', function () {
         const query = Select().from('table1').offset(4);
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 OFFSET 4');
     });
 
-    it('should serialize "limit" pretty print', function() {
+    it('should serialize "limit" pretty print', function () {
         const query = Select().from('table1').limit(10);
         const result = query.generate({
             dialect: 'postgres',
@@ -41,7 +41,7 @@ describe('PostgresSerializer', function () {
             'LIMIT 10');
     });
 
-    it('should serialize "offset" pretty print', function() {
+    it('should serialize "offset" pretty print', function () {
         const query = Select().from('table1').offset(10);
         const result = query.generate({
             dialect: 'postgres',
@@ -52,7 +52,7 @@ describe('PostgresSerializer', function () {
             'OFFSET 10');
     });
 
-    it('should serialize "limit/offset"', function() {
+    it('should serialize "limit/offset"', function () {
         const query = Select()
             .from('table1')
             .offset(4)
@@ -61,7 +61,7 @@ describe('PostgresSerializer', function () {
         assert.strictEqual(result.sql, 'select * from table1 LIMIT 10 OFFSET 4');
     });
 
-    it('should serialize "limit/offset" pretty print', function() {
+    it('should serialize "limit/offset" pretty print', function () {
         const query = Select()
             .from('table1')
             .offset(4)
@@ -75,7 +75,7 @@ describe('PostgresSerializer', function () {
             'LIMIT 10 OFFSET 4');
     });
 
-    it('Should serialize params', function() {
+    it('Should serialize params', function () {
         const query = Select().from('table1').where({ID: Param('ID')});
         const result = query.generate({
             dialect: 'postgres',
@@ -85,7 +85,7 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [5]);
     });
 
-    it('Should serialize array params for "in" operator', function() {
+    it('Should serialize array params for "in" operator', function () {
         const query = Select().from('table1')
             .where({'ID in': Param('id')})
             .values({id: [1, 2, 3]});
@@ -94,7 +94,7 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
-    it('Should serialize array for "in" operator', function() {
+    it('Should serialize array for "in" operator', function () {
         const query = Select().from('table1')
             .where({'ID in': [1, 2, 3]});
         const result = query.generate({
@@ -104,7 +104,7 @@ describe('PostgresSerializer', function () {
         assert.strictEqual(result.sql, 'select * from table1 where ID in (1,2,3)');
     });
 
-    it('Should serialize array params for "not in" operator', function() {
+    it('Should serialize array params for "not in" operator', function () {
         const query = Select().from('table1')
             .where({'ID !in': Param('id')})
             .values({id: [1, 2, 3]});
@@ -113,18 +113,26 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
-    it('Should serialize array for "not in" operator', function() {
+    it('Should serialize array for "not in" operator', function () {
         const query = Select().from('table1')
             .where({'ID !in': [1, 2, 3]});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID not in (1,2,3)');
     });
 
-    it('Should serialize "ne" operator as !=', function() {
+    it('Should serialize "ne" operator as !=', function () {
         const query = Select().from('table1')
             .where({'ID ne': 0});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID != 0');
+    });
+
+    it('Should serialize update returning query', function () {
+        const query = Update('table1', {id: 1})
+            .returning('id');
+        const result = query.generate({dialect: 'postgres',});
+        assert.strictEqual(result.sql, 'update table1 set id = 1 returning id');
+        assert.deepStrictEqual(result.returningFields, [{field: 'id', alias: undefined}]);
     });
 
 });

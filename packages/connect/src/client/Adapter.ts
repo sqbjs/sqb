@@ -10,7 +10,6 @@ export interface Adapter {
     driver: string;
     dialect: string;
     connect: (config: ClientConfiguration) => Promise<Adapter.Connection>;
-
 }
 
 export namespace Adapter {

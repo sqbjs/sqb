@@ -6,4 +6,4 @@ export * from './client/Cursor';
 
 export * from './orm/orm.types';
 export * from './orm/model/decorators';
-export * from './orm/repository/Repository';
+export * from './orm/Repository';

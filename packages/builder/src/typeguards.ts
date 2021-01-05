@@ -15,6 +15,7 @@ import type {OrderColumn} from './sql-objects/OrderColumn';
 import type {GroupColumn} from './sql-objects/GroupColumn';
 import type {ReturningColumn} from './sql-objects/ReturningColumn';
 import type {TableName} from './sql-objects/TableName';
+import {CountStatement} from './sql-objects/CountStatement';
 
 export function isSerializable(value: any): value is Serializable {
     return value instanceof Serializable;
@@ -46,6 +47,10 @@ export function isJoinStatement(value: any): value is JoinStatement {
 
 export function isCaseStatement(value: any): value is CaseStatement {
     return isSerializable(value) && value._type === SerializationType.CASE_STATEMENT;
+}
+
+export function isCountStatement(value: any): value is CountStatement {
+    return isSerializable(value) && value._type === SerializationType.COUNT_STATEMENT;
 }
 
 export function isParamExpression(value: any): value is ParamExpression {

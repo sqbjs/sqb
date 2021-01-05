@@ -17,8 +17,9 @@ import {Connection} from './Connection';
 import {adapters} from './extensions';
 import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Constructor} from '../orm/orm.types';
-import {Repository} from '../orm/repository/Repository';
+import {Repository} from '../orm/Repository';
 import {EntityDefinition} from '../orm/model/EntityDefinition';
+import {Maybe} from '../types';
 
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
@@ -181,7 +182,7 @@ export class Client extends SafeEventEmitter implements QueryExecutor {
     getRepository<T>(entity: Constructor<T> | string): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
-            ctor = this._entities[entity];
+            ctor = this.getEntity<T>(entity);
             if (!ctor)
                 throw new Error(`Repository "${entity}" is not registered`);
         } else ctor = entity;
@@ -189,6 +190,10 @@ export class Client extends SafeEventEmitter implements QueryExecutor {
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
         return new Repository<T>(this, ctor);
+    }
+
+    getEntity<T>(name: string): Maybe<Constructor<T>> {
+        return this._entities[name] as Constructor<T>;
     }
 
     toString() {
