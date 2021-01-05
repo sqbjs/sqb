@@ -4,38 +4,38 @@ import {Country} from './countries.entity';
 @Entity('customers')
 export class Customer {
     @PrimaryKey()
-    @Column({fieldName: 'ID'})
+    @Column({fieldName: 'ID', autoGenerate: 'increment'})
     @SortDescending()
-    id: number;
+    id?: number;
 
     @Column({fieldName: 'given_name'})
     @SortAscending()
     @SortDescending()
-    givenName: string;
+    givenName?: string;
 
     @Column({
         fieldName: 'family_name',
         sortAscending: true,
         sortDescending: true
     })
-    familyName: string;
+    familyName?: string;
 
     @SortDescending()
     @Column({fieldName: 'birth_date'})
-    birthDate: Date;
+    birthDate?: Date;
 
     @Column({fieldName: 'city'})
-    city: string;
+    city?: string;
 
     @Column({fieldName: 'country_code'})
-    countryCode: string;
+    countryCode?: string;
 
     @HasOne({
         target: Country,
         column: 'countryCode',
         targetColumn: 'code'
     })
-    readonly country: Country;
+    readonly country?: Country;
 
     @HasOne({
         target: Country,
@@ -43,6 +43,6 @@ export class Customer {
         targetColumn: 'code',
         lazy: true
     })
-    readonly countryLazy: LazyResolver<Country>;
+    readonly countryLazy?: LazyResolver<Country>;
 
 }

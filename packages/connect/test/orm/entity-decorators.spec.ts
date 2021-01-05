@@ -67,7 +67,7 @@ describe('Entity decorators', function () {
 
     });
 
-    describe('PrimaryIndex()', function () {
+    describe('PrimaryKey()', function () {
 
         it(`should define primary index field with string argument`, () => {
             @PrimaryKey('id')

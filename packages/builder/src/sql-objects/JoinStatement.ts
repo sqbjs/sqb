@@ -44,22 +44,22 @@ export class JoinStatement extends Serializable {
         return serializeFallback(ctx, this._type, o, () => {
             let out;
             switch (this._joinType) {
-                case 1:
+                case JoinType.LEFT:
                     out = 'left join';
                     break;
-                case 2:
+                case JoinType.LEFT_OUTER:
                     out = 'left outer join';
                     break;
-                case 3:
+                case JoinType.RIGHT:
                     out = 'right join';
                     break;
-                case 4:
+                case JoinType.RIGHT_OUTER:
                     out = 'right outer join';
                     break;
-                case 5:
+                case JoinType.OUTER:
                     out = 'outer join';
                     break;
-                case 6:
+                case JoinType.FULL_OUTER:
                     out = 'full outer join';
                     break;
                 default:

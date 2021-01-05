@@ -44,6 +44,17 @@ CREATE TABLE ${schema}.customers
 
 ALTER SEQUENCE ${schema}.customers_id_seq RESTART WITH 10000;
 
+CREATE TABLE ${schema}.customer_tags
+(
+    customer_id int4,
+    tag character varying(16),   
+    CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag),
+    CONSTRAINT fk_customer_tags_customer_id FOREIGN KEY (customer_id)
+        REFERENCES ${schema}.customers (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
 CREATE TABLE ${schema}.data_types
 (
     id SERIAL NOT NULL,

@@ -1,4 +1,4 @@
-import {JoinType} from '../enums';
+import {DataType, JoinType} from '../enums';
 import {Serializable} from '../Serializable';
 import {SelectQuery} from '../query/SelectQuery';
 import {InsertQuery} from '../query/InsertQuery';
@@ -7,6 +7,7 @@ import {DeleteQuery} from '../query/DeleteQuery';
 import {RawStatement} from './RawStatement';
 import {JoinStatement} from './JoinStatement';
 import {CaseStatement} from './CaseStatement';
+import {CountStatement} from './CountStatement';
 import {ParamExpression} from './ParamExpression';
 
 export function Raw(text: string): RawStatement {
@@ -65,6 +66,10 @@ export function Case(): CaseStatement {
     return new CaseStatement();
 }
 
-export function Param(name: string): ParamExpression {
-    return new ParamExpression(name);
+export function Count(): CountStatement {
+    return new CountStatement();
+}
+
+export function Param(name: string, dataType?: DataType): ParamExpression {
+    return new ParamExpression(name, dataType);
 }

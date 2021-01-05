@@ -1,10 +1,10 @@
 import {Serializable, serializeFallback} from '../Serializable';
-import {SerializationType} from '../enums';
+import {DataType, SerializationType} from '../enums';
 import {SerializeContext} from '../types';
 
 export class ParamExpression extends Serializable {
 
-    constructor(public _name: string) {
+    constructor(public _name: string, public _dataType?: DataType) {
         super();
     }
 
@@ -16,15 +16,20 @@ export class ParamExpression extends Serializable {
      * Performs serialization
      */
     _serialize(ctx: SerializeContext): string {
-        return serializeFallback(ctx, this._type, this._name,
-            () => this.__defaultSerialize(ctx, this._name));
+        const o = {
+            name: this._name,
+            dataType: this._dataType
+        };
+        return serializeFallback(ctx, this._type, o,
+            () => this.__defaultSerialize(ctx, o));
     }
 
-    protected __defaultSerialize(ctx: SerializeContext, name: string): string {
-        const prmValue = ctx.values && ctx.values[name];
+    protected __defaultSerialize(ctx: SerializeContext,
+                                 o: { name: string, dataType?: DataType }): string {
+        const prmValue = ctx.values && ctx.values[o.name];
         ctx.queryParams = ctx.queryParams || {};
-        ctx.queryParams[name] = prmValue;
-        return ':' + name;
+        ctx.queryParams[o.name] = prmValue;
+        return ':' + o.name;
     }
 
 }

@@ -13,6 +13,9 @@ import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {SafeEventEmitter} from '../SafeEventEmitter';
+import {Constructor} from '../orm/orm.types';
+import {Repository} from '../orm/Repository';
+import {EntityDefinition} from '../orm/model/EntityDefinition';
 
 const debug = _debug('sqb:connection');
 
@@ -107,6 +110,19 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
         if (!this._intlcon)
             throw new Error(`Can't execute query, because connection is released`);
         return this._tasks.enqueue(() => this._execute(query, options));
+    }
+
+    getRepository<T>(entity: Constructor<T> | string): Repository<T> {
+        let ctor;
+        if (typeof entity === 'string') {
+            ctor = this.client.getEntity<T>(entity);
+            if (!ctor)
+                throw new Error(`Repository "${entity}" is not registered`);
+        } else ctor = entity;
+        const entityDef = EntityDefinition.get(ctor);
+        if (!entityDef)
+            throw new Error(`You must provide an @Entity annotated constructor`);
+        return new Repository<T>(this, ctor);
     }
 
     /**

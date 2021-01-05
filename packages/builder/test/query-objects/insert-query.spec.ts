@@ -1,6 +1,6 @@
 import '../_support/env';
 import assert from 'assert';
-import {Select, Insert, Raw, SerializationType, Param} from '@sqb/builder';
+import {DataType, Insert, Param, Raw, Select, SerializationType} from '@sqb/builder';
 
 describe('Serialize insert query', function () {
 
@@ -89,11 +89,14 @@ describe('Serialize insert query', function () {
 
     it('should serialize insert with returning', function () {
         const query = Insert('table1', {id: 1, name: 'aaa'})
-            .returning('id::number', 'update as u1::string');
+            .returning('id', 'update as u1');
         const result = query.generate(options);
         assert.strictEqual(result.sql,
             'insert into table1 (id, name) values (1, \'aaa\') ' +
             'returning id, "update" as u1');
+        assert.deepStrictEqual(result.returningFields,
+            [{field: 'id', alias: undefined},
+                {field: 'update', alias: 'u1'}]);
     });
 
     it('should validate returning() arguments', function () {
@@ -101,6 +104,7 @@ describe('Serialize insert query', function () {
             .returning(null);
         assert.throws(() =>
                 Insert('table1', {id: 1, name: 'aaa'})
+                    // @ts-ignore
                     .returning('123'),
             /does not match/);
     });

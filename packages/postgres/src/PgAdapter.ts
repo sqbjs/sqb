@@ -1,6 +1,9 @@
-import {Adapter, ClientConfiguration} from '@sqb/connect';
+import {Adapter, ClientConfiguration, DataType} from '@sqb/connect';
 import '@sqb/postgres-dialect';
-import {Connection, ConnectionConfiguration} from 'postgresql-client';
+import {
+    Connection, ConnectionConfiguration,
+    DataTypeNames, DataTypeOIDs
+} from 'postgresql-client';
 import {PgConnection} from './PgConnection';
 
 export class PgAdapter implements Adapter {

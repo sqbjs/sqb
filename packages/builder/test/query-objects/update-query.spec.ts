@@ -1,6 +1,6 @@
 import '../_support/env';
 import assert from 'assert';
-import {SerializationType, Update, Raw, Eq, Param} from '@sqb/builder';
+import {DataType, Eq, Param, Raw, SerializationType, Update} from '@sqb/builder';
 
 describe('Serialize update query', function () {
 
@@ -81,7 +81,7 @@ describe('Serialize update query', function () {
 
     it('should serialize update with returning', function () {
         const query = Update('table1', {id: 1, name: 'aaa'})
-            .returning('id::number', 'name as n');
+            .returning('id', 'name as n');
         const result = query.generate(options);
         assert.strictEqual(result.sql,
             'update table1 set id = 1, name = \'aaa\' returning id, name as n');

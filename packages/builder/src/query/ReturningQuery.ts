@@ -12,11 +12,15 @@ export abstract class ReturningQuery extends Query {
      *
      */
     returning(...columns: string[]): this {
-        this._returningColumns = columns.reduce((a, c) => {
-            if (c)
-                a.push(new ReturningColumn(c));
-            return a;
-        }, [] as ReturningColumn[]);
+        if (!columns)
+            return this;
+        // noinspection JSMismatchedCollectionQueryUpdate
+        this._returningColumns = columns.length ?
+            columns.reduce<ReturningColumn[]>((a, v) => {
+                if (v)
+                    a.push(new ReturningColumn(v));
+                return a;
+            }, []) : undefined;
         return this;
     }
 
@@ -27,7 +31,7 @@ export abstract class ReturningQuery extends Query {
         if (!(this._returningColumns && this._returningColumns.length))
             return '';
         const arr: string[] = [];
-        ctx.returningFields = ctx.returningFields || {};
+        ctx.returningFields = [];
         for (const t of this._returningColumns) {
             const s = t._serialize(ctx);
             /* istanbul ignore else */

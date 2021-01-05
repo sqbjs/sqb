@@ -13,6 +13,7 @@ export * from './sql-objects/Operator';
 export * from './sql-objects/CaseStatement';
 export * from './sql-objects/JoinStatement';
 export * from './sql-objects/RawStatement';
+export * from './sql-objects/CountStatement';
 export * from './sql-objects/operators/LogicalOperator';
 export * from './sql-objects/operators/OpAnd';
 export * from './sql-objects/operators/OpNotExists';
