@@ -3,7 +3,8 @@ import type {Repository} from './Repository';
 
 /* Model related */
 
-export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid';
+export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
+    'timestamp' | 'custom';
 export type ColumnTransformFunction = (value: any, col: ColumnDefinition, row: any) => any;
 export type Constructor<T = {}> = new (...args: any[]) => T;
 export type ConstructorResolver<T> = () => Constructor<T> | Promise<Constructor<T>>;

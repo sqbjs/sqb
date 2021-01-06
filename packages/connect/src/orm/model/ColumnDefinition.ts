@@ -64,6 +64,14 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     get dataType(): string {
         return 'string';
     }
+
+    get canUpdate(): boolean {
+        return this.update === undefined || this.update;
+    }
+
+    get canInsert(): boolean {
+        return this.insert === undefined || this.insert;
+    }
 }
 
 export class RelationColumnDefinition extends BaseColumnDefinition {

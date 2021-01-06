@@ -7,6 +7,14 @@ const schemaSql = `
 DROP SCHEMA IF EXISTS ${schema} CASCADE;
 CREATE SCHEMA ${schema} AUTHORIZATION postgres;
 
+CREATE OR REPLACE FUNCTION trigger_set_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE ${schema}.continents
 (
     code character varying(5),
@@ -35,6 +43,8 @@ CREATE TABLE ${schema}.customers
     birth_date date,
     city character varying(32),
     country_code character varying(5),
+    created_at timestamp default NOW(),
+    updated_at timestamp,
     CONSTRAINT customers_pkey PRIMARY KEY (id),
     CONSTRAINT fk_customers_country_code FOREIGN KEY (country_code)
         REFERENCES ${schema}.countries (code) MATCH SIMPLE
@@ -43,6 +53,12 @@ CREATE TABLE ${schema}.customers
 );
 
 ALTER SEQUENCE ${schema}.customers_id_seq RESTART WITH 10000;
+
+CREATE TRIGGER customers_set_updated_at
+BEFORE UPDATE ON customers
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_updated_at();
+
 
 CREATE TABLE ${schema}.customer_tags
 (
