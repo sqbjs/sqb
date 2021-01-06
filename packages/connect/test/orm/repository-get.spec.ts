@@ -27,10 +27,10 @@ describe('Repository "get" operations', function () {
 
     it('return instance from multi-key entities', async function () {
         const repo = client.getRepository<CustomerTags>(CustomerTags);
-        const row = await repo.get({customerId: 2, tag: 'blue'});
+        const row = await repo.get({customerId: 2, tag: 'green'});
         assert.ok(row);
         assert.strictEqual(row.customerId, 2);
-        assert.strictEqual(row.tag, 'blue');
+        assert.strictEqual(row.tag, 'green');
     });
 
 });

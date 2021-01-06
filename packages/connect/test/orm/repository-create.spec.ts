@@ -70,7 +70,7 @@ describe('Repository "create" operations', function () {
                     familyName: 'def'
                 };
                 const repo = connection.getRepository<Customer>(Customer);
-                let sql: string;
+                let sql = '';
                 connection.on('execute', req => {
                     sql = req.sql;
                 });
