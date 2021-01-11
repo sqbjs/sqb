@@ -13,7 +13,7 @@ describe('Repository "create" operations', function () {
      */
     describe('create()', function () {
 
-        it('create and return new instance', async function () {
+        it('should create and return new instance', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),

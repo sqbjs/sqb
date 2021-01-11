@@ -140,7 +140,7 @@ export interface RelationColumnConfig {
 
 /* Repository related */
 
-export type LazyResolver<T> = (options?: Repository.FindOperationOptions) => Promise<T>;
+export type LazyResolver<T> = (options?: Repository.FindOptions) => Promise<T>;
 
 type IfEquals<X, Y, A = X, B = never> =
     (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;

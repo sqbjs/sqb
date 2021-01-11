@@ -13,7 +13,7 @@ describe('Repository "remove" operations', function () {
      */
     describe('remove()', function () {
 
-        it('remove single instance (entity instance as argument)', async function () {
+        it('should remove single instance (entity instance as argument)', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -29,7 +29,7 @@ describe('Repository "remove" operations', function () {
             assert.strictEqual(c2, c);
         });
 
-        it('remove single instance (key value as argument)', async function () {
+        it('should remove single instance (key value as argument)', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),
