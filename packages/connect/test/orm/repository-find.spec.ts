@@ -16,7 +16,7 @@ describe('Repository "find" operations', function () {
      */
     describe('find()', function () {
 
-        it('return instances', async function () {
+        it('should return instances', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find();
             assert.ok(rows);
@@ -26,7 +26,7 @@ describe('Repository "find" operations', function () {
             assert.ok(rows[0].familyName);
         });
 
-        it('specify returning columns', async function () {
+        it('should specify returning columns', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 limit: 1,
@@ -36,7 +36,7 @@ describe('Repository "find" operations', function () {
             assert.deepStrictEqual(Object.keys(rows[0]), ['id', 'givenName']);
         });
 
-        it('return only data columns (if no columns specified)', async function () {
+        it('should return only data columns (if no columns specified)', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find();
             assert.ok(rows);
@@ -46,7 +46,7 @@ describe('Repository "find" operations', function () {
             assert.strictEqual(rows[0].country, undefined);
         });
 
-        it('filter with Operator', async function () {
+        it('should filter with Operator', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({filter: Eq('continentCode', 'AM')});
             assert.strictEqual(rows.length, 2);
@@ -54,7 +54,7 @@ describe('Repository "find" operations', function () {
             assert.strictEqual(rows[1].code, 'US');
         });
 
-        it('filter with plain object', async function () {
+        it('should filter with plain object', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({filter: {continentCode: 'AM'}});
             assert.strictEqual(rows.length, 2);
@@ -62,7 +62,7 @@ describe('Repository "find" operations', function () {
             assert.strictEqual(rows[1].code, 'US');
         });
 
-        it('limit', async function () {
+        it('should limit result rows', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 sort: ['id'],
@@ -74,7 +74,7 @@ describe('Repository "find" operations', function () {
             assert.strictEqual(rows[4].id, 5);
         });
 
-        it('offset', async function () {
+        it('should start from given offset', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 sort: ['id'],
@@ -87,7 +87,7 @@ describe('Repository "find" operations', function () {
             assert.strictEqual(rows[4].id, 15);
         });
 
-        it('sort', async function () {
+        it('should sort result rows', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({sort: ['-id']});
             const arr1 = rows.map(x => x.id);
@@ -96,14 +96,14 @@ describe('Repository "find" operations', function () {
             assert.deepStrictEqual(arr1, arr2);
         });
 
-        it('sort by sort-enabled columns only ', async function () {
+        it('should sort by sort-enabled columns only ', async function () {
             const repo = client.getRepository<Customer>(Customer);
             return assert.rejects(() =>
                     repo.find({sort: ['countryCode']}),
                 /is not allowed/);
         });
 
-        it('sort by data columns only ', async function () {
+        it('should sort by data columns only ', async function () {
             const repo = client.getRepository<Customer>(Customer);
             return assert.rejects(() =>
                     repo.find({sort: ['country']}),
@@ -116,14 +116,14 @@ describe('Repository "find" operations', function () {
      */
     describe('findOne()', function () {
 
-        it('return single instance', async function () {
+        it('should return single instance', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findOne({sort: ['id']});
             assert.ok(row);
             assert.strictEqual(row.id, 1);
         });
 
-        it('return single instance from given offset', async function () {
+        it('should return single instance from given offset', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const row = await repo.findOne({
                 sort: ['id'],
@@ -140,7 +140,7 @@ describe('Repository "find" operations', function () {
      */
     describe('One-2-One relation (eager)', function () {
 
-        it('return related instance', async function () {
+        it('should return related instance', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -158,7 +158,7 @@ describe('Repository "find" operations', function () {
             }));
         });
 
-        it('return sub o2o related instance', async function () {
+        it('should return sub o2o related instance', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -176,7 +176,7 @@ describe('Repository "find" operations', function () {
             }));
         });
 
-        it('filter by o2o relational column', async function () {
+        it('should filter by o2o relational column', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 columns: ['id', 'countryCode'],
@@ -187,7 +187,7 @@ describe('Repository "find" operations', function () {
             }
         });
 
-        it('use "exists" when filtering by o2o relational column', async function () {
+        it('should use "exists" when filtering by o2o relational column', async function () {
             const repo = client.getRepository<Customer>(Customer);
             let sql = '';
             client.once('execute', (request => {
@@ -202,7 +202,7 @@ describe('Repository "find" operations', function () {
                 'exists (select 1 from continents E2 where E2.code = E1.continent_code and E2.code = \'AM\'))');
         });
 
-        it('specify returning columns', async function () {
+        it('should specify returning columns', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -226,7 +226,7 @@ describe('Repository "find" operations', function () {
      */
     describe('One-2-One relation (lazy)', function () {
 
-        it('return instance async', async function () {
+        it('should return instance async', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -247,7 +247,7 @@ describe('Repository "find" operations', function () {
             }));
         });
 
-        it('specify returning columns', async function () {
+        it('should specify returning columns', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 filter: [Eq('id', 1)],
@@ -271,7 +271,7 @@ describe('Repository "find" operations', function () {
             }));
         });
 
-        it('filter by o2o relational column', async function () {
+        it('should filter by o2o relational column', async function () {
             const repo = client.getRepository<Customer>(Customer);
             const rows = await repo.find({
                 columns: ['id', 'countryCode'],
@@ -289,7 +289,7 @@ describe('Repository "find" operations', function () {
      */
     describe('One-2-Many relation (eager)', function () {
 
-        it('return instances', async function () {
+        it('should return instances', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [In('code', ['DE', 'TR'])],
@@ -306,7 +306,7 @@ describe('Repository "find" operations', function () {
             }
         });
 
-        it('specify returning columns', async function () {
+        it('should specify returning columns', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [In('code', ['DE', 'TR'])],
@@ -331,7 +331,7 @@ describe('Repository "find" operations', function () {
      */
     describe('One-2-Many relation (lazy)', function () {
 
-        it('one-2-many relation (lazy)', async function () {
+        it('should resolve one-2-many relation (lazy)', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [Eq('code', 'DE')],
@@ -349,7 +349,7 @@ describe('Repository "find" operations', function () {
             }
         });
 
-        it('sort one-2-many relation (lazy)', async function () {
+        it('should sort one-2-many relation (lazy)', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [Eq('code', 'DE')],
@@ -366,7 +366,7 @@ describe('Repository "find" operations', function () {
             assert.deepStrictEqual(arr1, arr2);
         });
 
-        it('limit one-2-many relation (lazy)', async function () {
+        it('should limit one-2-many relation (lazy)', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [Eq('code', 'DE')],
@@ -380,7 +380,7 @@ describe('Repository "find" operations', function () {
             assert.deepStrictEqual(customers.length, 2);
         });
 
-        it('offset one-2-many relation (lazy)', async function () {
+        it('should offset one-2-many relation (lazy)', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [Eq('code', 'DE')],
@@ -394,7 +394,7 @@ describe('Repository "find" operations', function () {
             assert.deepStrictEqual(customers.length, 2);
         });
 
-        it('specify returning columns of one-2-many relation (lazy)', async function () {
+        it('should specify returning columns of one-2-many relation (lazy)', async function () {
             const repo = client.getRepository<Country>(Country);
             const rows = await repo.find({
                 filter: [Eq('code', 'DE')],

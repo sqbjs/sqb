@@ -9,7 +9,7 @@ describe('Repository "get" operations', function () {
 
     const client = initClient();
 
-    it('return single instance by key value', async function () {
+    it('should return single instance by key value', async function () {
         const repo = client.getRepository<Country>(Country);
         const row = await repo.get('TR');
         assert.ok(row);
@@ -17,7 +17,7 @@ describe('Repository "get" operations', function () {
         assert.strictEqual(row.name, 'Turkey');
     });
 
-    it('return single instance by object instance', async function () {
+    it('should return single instance by object instance', async function () {
         const repo = client.getRepository<Country>(Country);
         const row = await repo.get({code: 'TR'});
         assert.ok(row);
@@ -25,7 +25,7 @@ describe('Repository "get" operations', function () {
         assert.strictEqual(row.name, 'Turkey');
     });
 
-    it('return instance from multi-key entities', async function () {
+    it('should return instance from multi-key entities', async function () {
         const repo = client.getRepository<CustomerTags>(CustomerTags);
         const row = await repo.get({customerId: 2, tag: 'green'});
         assert.ok(row);
