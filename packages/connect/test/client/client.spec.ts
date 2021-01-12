@@ -121,7 +121,7 @@ describe('Client', function () {
             given_name: given,
             family_name: family,
             city: null,
-        }).returning('id::number');
+        }).returning('id');
         const result = await client.execute(query);
         assert(result);
         assert.strictEqual(result.rowsAffected, 1);

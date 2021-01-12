@@ -1,10 +1,12 @@
-import type {ColumnDefinition} from './model/ColumnDefinition';
+import type {ColumnDefinition} from './ColumnDefinition';
 import type {Repository} from './Repository';
 
 /* Model related */
 
 export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
     'timestamp' | 'custom';
+export type SortDirection = 'ascending' | 'descending' | 'both';
+
 export type ColumnTransformFunction = (value: any, col: ColumnDefinition, row: any) => any;
 export type Constructor<T = {}> = new (...args: any[]) => T;
 export type ConstructorResolver<T> = () => Constructor<T> | Promise<Constructor<T>>;
@@ -140,7 +142,7 @@ export interface RelationColumnConfig {
 
 /* Repository related */
 
-export type LazyResolver<T> = (options?: Repository.FindOptions) => Promise<T>;
+export type LazyResolver<T> = (options?: Repository.FindAllOptions) => Promise<T>;
 
 type IfEquals<X, Y, A = X, B = never> =
     (<T>() => T extends X ? 1 : 2) extends (<T>() => T extends Y ? 1 : 2) ? A : B;

@@ -17,5 +17,10 @@ module.exports = {
         console.log(`outdated '${colors.cyan(pkg.name)}'`);
         await pkg.execSh('npm outdated').catch(() => 0);
       }
+  ),
+  ...packages.createTasks('audit', async (pkg) => {
+        console.log(`audit '${colors.cyan(pkg.name)}'`);
+        await pkg.execSh('npm audit').catch(() => 0);
+      }
   )
 };

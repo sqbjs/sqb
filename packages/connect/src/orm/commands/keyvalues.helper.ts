@@ -1,5 +1,5 @@
-import {EntityDefinition} from '../model/EntityDefinition';
-import {isDataColumn} from '../model/ColumnDefinition';
+import {EntityDefinition} from '../EntityDefinition';
+import {isDataColumn} from '../ColumnDefinition';
 
 export function extractKeyValues<T>(
     entityDef: EntityDefinition,

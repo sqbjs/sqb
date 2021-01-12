@@ -1,19 +1,19 @@
-import '../_support/env';
+import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {Customer} from '../_support/customers.entity';
-import {initClient} from '../_support/init-client';
+import {Customer} from '../../_support/customers.entity';
+import {initClient} from '../../_support/init-client';
 
-describe('Repository "remove" operations', function () {
+describe('Repository "destroy" operations', function () {
 
     const client = initClient();
 
     /**
      *
      */
-    describe('remove()', function () {
+    describe('destroy()', function () {
 
-        it('should remove single instance (entity instance as argument)', async function () {
+        it('should destroy single instance (entity instance as argument)', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -24,12 +24,12 @@ describe('Repository "remove" operations', function () {
             const customer = await repo.create(values);
             let c2 = await repo.count();
             assert.strictEqual(c2, c + 1);
-            await repo.remove(customer);
+            await repo.destroy(customer);
             c2 = await repo.count();
             assert.strictEqual(c2, c);
         });
 
-        it('should remove single instance (key value as argument)', async function () {
+        it('should destroy single instance (key value as argument)', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -40,7 +40,7 @@ describe('Repository "remove" operations', function () {
             const customer = await repo.create(values);
             let c2 = await repo.count();
             assert.strictEqual(c2, c + 1);
-            await repo.remove(customer.id);
+            await repo.destroy(customer.id);
             c2 = await repo.count();
             assert.strictEqual(c2, c);
         });
@@ -56,7 +56,7 @@ describe('Repository "remove" operations', function () {
                 const customer = await repo.create(values);
                 c = await repo.count();
                 await connection.startTransaction();
-                await repo.remove(customer);
+                await repo.destroy(customer);
                 let c2 = await repo.count();
                 assert.strictEqual(c2, c - 1);
                 await connection.rollback();
@@ -70,9 +70,9 @@ describe('Repository "remove" operations', function () {
     /**
      *
      */
-    describe('removeAll()', function () {
+    describe('destroyAll()', function () {
 
-        it('remove by filter', async function () {
+        it('destroy by filter', async function () {
             const values = {
                 givenName: 'G' + Math.trunc(Math.random() * 10000),
                 familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -86,7 +86,7 @@ describe('Repository "remove" operations', function () {
             await repo.createOnly(values);
             let c2 = await repo.count();
             assert.strictEqual(c2, c + 3);
-            await repo.removeAll({filter: {city: 'unknown'}});
+            await repo.destroyAll({filter: {city: 'unknown'}});
             c2 = await repo.count();
             assert.strictEqual(c2, c);
         });

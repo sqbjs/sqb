@@ -1,8 +1,8 @@
-import '../_support/env';
+import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {Customer} from '../_support/customers.entity';
-import {initClient} from '../_support/init-client';
+import {Customer} from '../../_support/customers.entity';
+import {initClient} from '../../_support/init-client';
 import {In} from '@sqb/builder';
 
 describe('Repository "update" operations', function () {
@@ -137,7 +137,7 @@ describe('Repository "update" operations', function () {
             const newCity = 'C' + Math.trunc(Math.random() * 10000);
             const count = await repo.updateAll({city: newCity}, {filter: In('id', ids)});
             assert.strictEqual(count, ids.length);
-            const rows = await repo.find({filter: In('id', ids)});
+            const rows = await repo.findAll({filter: In('id', ids)});
             for (const row of rows) {
                 assert.strictEqual(row.city, newCity);
             }

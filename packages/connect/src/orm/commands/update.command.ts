@@ -1,7 +1,7 @@
 import {Param, Update} from '@sqb/builder';
 import {QueryExecutor, QueryResult} from '../../client/types';
-import {isDataColumn} from '../model/ColumnDefinition';
-import {EntityDefinition} from '../model/EntityDefinition';
+import {isDataColumn} from '../ColumnDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 import {PickWritable} from '../orm.types';
 import {extractKeyValues} from './keyvalues.helper';
 import {wrapCreateResult} from './wrap-result.helper';

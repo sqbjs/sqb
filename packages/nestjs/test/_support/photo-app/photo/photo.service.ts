@@ -28,7 +28,7 @@ export class PhotoService {
         };
         const x = await this.client.execute(
             Insert('photos', photoEntity)
-                .returning('id::number'),
+                .returning('id'),
             {objectRows: true, autoCommit: true});
         if (!(x.rows && x.rows[0]))
             throw new Error('insert failed');

@@ -1,8 +1,8 @@
-import '../_support/env';
+import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {Customer} from '../_support/customers.entity';
-import {initClient} from '../_support/init-client';
+import {Customer} from '../../_support/customers.entity';
+import {initClient} from '../../_support/init-client';
 
 describe('Repository "create" operations', function () {
 

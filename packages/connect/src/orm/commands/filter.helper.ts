@@ -1,7 +1,7 @@
-import {EntityDefinition} from '../model/EntityDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 import {Repository} from '../Repository';
 import {And, Eq, Exists, isCompOperator, isLogicalOperator, LogicalOperator, Raw, Select} from '@sqb/builder';
-import {isDataColumn, isRelationColumn} from '../model/ColumnDefinition';
+import {isDataColumn, isRelationColumn} from '../ColumnDefinition';
 
 export async function prepareFilter(
     entityDef: EntityDefinition,

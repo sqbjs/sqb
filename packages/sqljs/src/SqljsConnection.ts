@@ -79,7 +79,8 @@ export class SqljsConnection implements Adapter.Connection {
             if (out.rowsAffected && query.returningFields) {
                 // Emulate insert into ... returning
                 if (m[1].toLowerCase() === 'insert into') {
-                    const fields = Object.keys(query.returningFields);
+                    const fields = query.returningFields.map(
+                        x => x.field + (x.alias ? ' as ' + x.alias : ''));
                     const sql = `select ${fields.join(',')} from ${m[2]}` +
                         ' where rowid=last_insert_rowid();'
                     const r: any[] = this.intlcon.exec(sql);
@@ -93,7 +94,8 @@ export class SqljsConnection implements Adapter.Connection {
                     // Emulate update ... returning
                 if (m[1].toLowerCase() === 'update') {
                     const m2 = query.sql.match(/where (.+)/);
-                    const fields = Object.keys(query.returningFields);
+                    const fields = query.returningFields.map(
+                        x => x.field + (x.alias ? ' as ' + x.alias : ''));
                     query = {...query};
                     query.sql = `select ${fields.join(',')} from ${m[2]}` +
                         (m2 ? ' where ' + m2[1] : '');

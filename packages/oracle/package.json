@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.0.1-alpha.4",
+  "version": "4.0.1-alpha.5",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -21,15 +21,14 @@
     "oracle",
     "database"
   ],
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/oracledb": "^5.0.0",
-    "oracledb": "^5.0.0"
+    "@types/oracledb": "^5.1.0",
+    "oracledb": "^5.1.0"
   },
   "peerDependencies": {
     "oracledb": "^5.0.0",
-    "@sqb/oracle-dialect": "^4.0.1-alpha.4"
+    "@sqb/oracle-dialect": "^4.0.1-alpha.5"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

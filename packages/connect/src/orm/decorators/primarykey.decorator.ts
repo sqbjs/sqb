@@ -1,13 +1,13 @@
-import {IndexConfig} from '../../orm.types';
+import {IndexConfig} from '../orm.types';
 import {EntityDefinition} from '../EntityDefinition';
 
-export function Index(options?: IndexConfig): PropertyDecorator
-export function Index(fields: string | string[], options?: IndexConfig): ClassDecorator
-export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator {
+export function PrimaryKey(fields: string | string[], options?: IndexConfig): ClassDecorator
+export function PrimaryKey(options?: IndexConfig): PropertyDecorator
+export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator {
     return function (target: Object | Function, propertyKey?: string): void {
         if (arguments.length === 1) {
             const entity = EntityDefinition.attach(target as Function);
-            entity.defineIndex(arg0, arg1);
+            entity.definePrimaryIndex(arg0, arg1);
             return;
         }
         if (!target.constructor)
@@ -15,7 +15,9 @@ export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
         const entity = EntityDefinition.attach(target.constructor);
-        entity.defineIndex(propertyKey, arg0);
+        const col = entity.addDataColumn(propertyKey);
+        col.sortAscending = true;
+        entity.definePrimaryIndex(propertyKey, arg0);
         return;
     };
 }

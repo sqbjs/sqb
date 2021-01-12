@@ -1,16 +1,15 @@
-import type {EntityDefinition} from '../model/EntityDefinition';
+import type {EntityDefinition} from '../EntityDefinition';
 import type {QueryResult} from '../../client/types';
-import {isDataColumn} from '../model/ColumnDefinition';
+import {isDataColumn} from '../ColumnDefinition';
 
 export function wrapCreateResult(
     entityDef: EntityDefinition,
     values: any,
     r?: QueryResult): any {
     const row = r && r.rows && r.rows[0];
-    if (!row)
-        return values;
+    let out;
     if (row && r && r.fields) {
-        const out = {};
+        out = {};
         for (const k of entityDef.columnKeys) {
             const col = entityDef.getColumn(k);
             if (!col)
@@ -21,7 +20,7 @@ export function wrapCreateResult(
             else if (values[k] !== undefined)
                 out[k] = values[k];
         }
-        return out;
-    }
-    throw new Error('Unexpected response returned from adapter');
+    } else out = {...values};
+    Object.setPrototypeOf(out, entityDef.ctor.prototype);
+    return out;
 }

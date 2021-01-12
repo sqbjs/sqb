@@ -40,9 +40,8 @@ export function initAdapterTests(adapter: Adapter,
             result.objRows = result.rows.reduce((target, row) => {
                 const r: any = {};
                 for (const [i, f] of result.fields.entries()) {
-                    const v = result.rowType === 'array' ? row[i] :
-                        row[f.fieldName];
-                    r[f.fieldName.toLowerCase()] = v;
+                    r[f.fieldName.toLowerCase()] = result.rowType === 'array' ?
+                        row[i] : row[f.fieldName];
                 }
                 target.push(r);
                 return target;
@@ -123,7 +122,7 @@ export function initAdapterTests(adapter: Adapter,
         const query = Insert('customers', {
             given_name: givenName,
             family_name: familyName
-        }).returning('id::number');
+        }).returning('id');
         const result = await adapterExecute(query, {
             autoCommit: true,
             objectRows: false
@@ -142,7 +141,7 @@ export function initAdapterTests(adapter: Adapter,
         const query = Insert('customers', {
             given_name: Param('givenName'),
             family_name: Param('familyName')
-        }).returning('id::number', 'given_name::string', 'family_name::string');
+        }).returning('id', 'given_name', 'family_name');
         const result = await adapterExecute(query, {
             autoCommit: true,
             values: {givenName, familyName}
@@ -159,7 +158,8 @@ export function initAdapterTests(adapter: Adapter,
         connection = await adapter.connect(clientConfig);
         const city = 'X' + Math.floor(Math.random() * 10000);
         const query = Update('customers', {city})
-            .where({id: lastInsertId}).returning('city::string');
+            .where({id: lastInsertId})
+            .returning('city');
         const result = await adapterExecute(query, {
             autoCommit: true,
             objectRows: false
@@ -179,11 +179,10 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(r.rows);
         assert.strictEqual(r.objRows[0].id, lastInsertId);
         const oldCity = r.objRows[0].city;
-        let newCity = null;
 
         await connection.startTransaction();
 
-        newCity = 'X' + Math.floor(Math.random() * 10000);
+        const newCity = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
             Update('customers', {city: newCity}).where({id: lastInsertId}),
             {autoCommit: false}

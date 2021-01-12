@@ -4,15 +4,15 @@ import {
 import {Client} from '../client/Client';
 import {Connection} from '../client/Connection';
 import {Constructor, PickWritable} from './orm.types';
-import {EntityDefinition} from './model/EntityDefinition';
+import {EntityDefinition} from './EntityDefinition';
 import {QueryExecutor} from '../client/types';
 import {Maybe} from '../types';
 
 import {extractKeyValues} from './commands/keyvalues.helper';
 import {count} from './commands/count.command';
 import {create, createRaw} from './commands/create.command';
-import {find} from './commands/find.command';
-import {remove} from './commands/remove.command';
+import {findAll} from './commands/find.command';
+import {destroyAll} from './commands/destroy.command';
 import {update, updateAllRaw} from './commands/update.command';
 
 
@@ -37,7 +37,7 @@ export namespace Repository {
         offset?: number;
     }
 
-    export interface FindOptions extends FindOneOptions {
+    export interface FindAllOptions extends FindOneOptions {
         limit?: number;
         maxEagerFetch?: number;
     }
@@ -102,8 +102,8 @@ export class Repository<T> {
         });
     }
 
-    find(options?: Repository.FindOptions): Promise<T[]> {
-        return find({
+    findAll(options?: Repository.FindAllOptions): Promise<T[]> {
+        return findAll({
             ...options,
             executor: this._executor,
             entityDef: this._entityDef
@@ -111,7 +111,7 @@ export class Repository<T> {
     }
 
     async findOne(options?: Repository.FindOneOptions): Promise<Maybe<T>> {
-        const rows = await find({
+        const rows = await findAll({
             ...options,
             limit: 1,
             executor: this._executor,
@@ -121,23 +121,23 @@ export class Repository<T> {
     }
 
     async get(keyValue: T | any | Record<string, any>, options?: Repository.GetOptions): Promise<Maybe<T>> {
-        const opts: Repository.FindOptions = {...options};
+        const opts: Repository.FindAllOptions = {...options};
         opts.filter = [extractKeyValues(this._entityDef, keyValue)];
         opts.limit = 1;
         delete opts.offset;
         return await this.findOne(opts);
     }
 
-    async remove(keyValue: T | any | Record<string, any>): Promise<boolean> {
-        return !!(await remove({
+    async destroy(keyValue: T | any | Record<string, any>): Promise<boolean> {
+        return !!(await destroyAll({
             executor: this._executor,
             entityDef: this._entityDef,
             filter: extractKeyValues(this._entityDef, keyValue)
         }));
     }
 
-    async removeAll(options?: Repository.RemoveOptions): Promise<number> {
-        return remove({
+    async destroyAll(options?: Repository.RemoveOptions): Promise<number> {
+        return destroyAll({
             executor: this._executor,
             entityDef: this._entityDef,
             filter: options?.filter,

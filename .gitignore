@@ -7,8 +7,6 @@ coverage
 
 # environment variables
 .env
-packages/postgres/test/_support/env-dev.ts
-env-dev.ts
 
 # Logs
 logs

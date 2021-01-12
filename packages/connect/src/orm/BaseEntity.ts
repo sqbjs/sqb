@@ -1,14 +1,14 @@
-import {BASE_ENTITY_REPOSITORY_KEY} from './consts';
-import {Repository} from './Repository';
+import {BASE_ENTITY_REPOSITORY_KEY, ENTITY_DEFINITION_PROPERTY} from './consts';
+import type {Repository} from './Repository';
+import type {EntityDefinition} from './EntityDefinition';
 
 export class BaseEntity {
+    static [ENTITY_DEFINITION_PROPERTY]: EntityDefinition;
     [BASE_ENTITY_REPOSITORY_KEY]: Repository<any>;
 
-    async remove(): Promise<boolean> {
+    async destroy(): Promise<boolean> {
         const repo = this[BASE_ENTITY_REPOSITORY_KEY];
-        // const keyValues = repo.getKeyValues(this);
-       //  return await this[BASE_ENTITY_REPOSITORY_KEY].remove(keyValues);
-        return false;
+        return repo.destroy(this);
     }
 
 }

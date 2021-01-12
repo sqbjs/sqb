@@ -23,7 +23,16 @@ CREATE TABLE customers
     birth_date date,
     city text,
     country_code text,
+    created_at text,
+    updated_at text,
     FOREIGN KEY (country_code) REFERENCES countries (code)
+);
+
+CREATE TABLE customer_tags
+(
+    customer_id INTEGER,
+    tag text,
+    PRIMARY KEY (customer_id, tag)
 );
 
 `

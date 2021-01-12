@@ -1,8 +1,8 @@
 import {Insert, Param} from '@sqb/builder';
 import {QueryExecutor, QueryResult} from '../../client/types';
-import {isDataColumn} from '../model/ColumnDefinition';
+import {isDataColumn} from '../ColumnDefinition';
 import {wrapCreateResult} from './wrap-result.helper';
-import {EntityDefinition} from '../model/EntityDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 import {PickWritable} from '../orm.types';
 
 export interface CreateCommandArgs<T> {
