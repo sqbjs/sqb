@@ -3,9 +3,9 @@ import {
     DataColumnDefinition, isDataColumn, isRelationColumn,
     RelationColumnDefinition
 } from './ColumnDefinition';
-import {Constructor, RelationColumnConfig, IndexConfig} from '../orm.types';
-import {Maybe} from '../../types';
-import {ENTITY_DEFINITION_PROPERTY} from '../consts';
+import {Constructor, RelationColumnConfig, IndexConfig} from './orm.types';
+import {Maybe} from '../types';
+import {ENTITY_DEFINITION_PROPERTY} from './consts';
 
 export interface IndexDefinition {
     name?: string;
@@ -13,46 +13,40 @@ export interface IndexDefinition {
     unique?: boolean;
 }
 
-export interface EntityDefinitionOptions {
-    columnsCaseSensitive?: boolean;
-}
-
 export class EntityDefinition {
 
-    readonly columnsCaseSensitive: boolean;
     name;
     tableName;
-    readonly columns = new Map<string, ColumnDefinition>();
-    readonly columnKeys: string[] = [];
+    columns = new Map<string, ColumnDefinition>();
+    columnKeys: string[] = [];
     schema?: string;
     comment?: string;
     primaryIndex?: IndexDefinition;
     indexes: IndexDefinition[] = [];
     eventListeners: { event: string, fn: Function }[] = [];
 
-    constructor(readonly ctor: Constructor, options?: EntityDefinitionOptions) {
+    constructor(readonly ctor: Constructor) {
         this.name = ctor.name;
         this.tableName = ctor.name;
-        this.columnsCaseSensitive = !!(options && options.columnsCaseSensitive);
     }
 
     getColumn(name: string): Maybe<ColumnDefinition> {
         if (!name)
             return;
-        return this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
+        return this.columns.get(name.toUpperCase());
     }
 
     getDataColumn(name: string): Maybe<DataColumnDefinition> {
         if (!name)
             return;
-        const col = this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
+        const col = this.columns.get(name.toUpperCase());
         return isDataColumn(col) ? col : undefined;
     }
 
     getRelationColumn(name: string): Maybe<RelationColumnDefinition> {
         if (!name)
             return;
-        const col = this.columns.get(this.columnsCaseSensitive ? name : name.toUpperCase());
+        const col = this.columns.get(name.toUpperCase());
         return isRelationColumn(col) ? col : undefined;
     }
 
@@ -62,7 +56,7 @@ export class EntityDefinition {
             throw new Error(`A ${col.kind} column for "${column}" already defined`);
         if (!col) {
             col = new DataColumnDefinition(this, column);
-            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columns.set(column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
         return col as DataColumnDefinition;
@@ -76,7 +70,7 @@ export class EntityDefinition {
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
         if (!col) {
             col = new RelationColumnDefinition(this, column, cfg);
-            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columns.set(column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
         return col as RelationColumnDefinition;
@@ -90,7 +84,7 @@ export class EntityDefinition {
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
         if (!col) {
             col = new RelationColumnDefinition(this, column, cfg, true);
-            this.columns.set(this.columnsCaseSensitive ? column : column.toUpperCase(), col);
+            this.columns.set(column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
         return col as RelationColumnDefinition;
@@ -120,31 +114,32 @@ export class EntityDefinition {
     }
 
     beforeInsert(fn: Function): void {
-        this.eventListeners.push({event: 'beforeinsert', fn});
+        this.eventListeners.push({event: 'before-insert', fn});
     }
 
     beforeUpdate(fn: Function): void {
-        this.eventListeners.push({event: 'beforeupdate', fn});
+        this.eventListeners.push({event: 'before-update', fn});
     }
 
-    beforeRemove(fn: Function): void {
-        this.eventListeners.push({event: 'beforeremove', fn});
+    beforeDestroy(fn: Function): void {
+        this.eventListeners.push({event: 'before-destroy', fn});
     }
 
     afterInsert(fn: Function): void {
-        this.eventListeners.push({event: 'afterinsert', fn});
+        this.eventListeners.push({event: 'after-insert', fn});
     }
 
     afterUpdate(fn: Function): void {
-        this.eventListeners.push({event: 'afterupdate', fn});
+        this.eventListeners.push({event: 'after-update', fn});
     }
 
-    afterRemove(fn: Function): void {
-        this.eventListeners.push({event: 'afterremove', fn});
+    afterDestroy(fn: Function): void {
+        this.eventListeners.push({event: 'after-destroy', fn});
     }
 
     static get(ctor: Function): EntityDefinition {
-        return ctor[ENTITY_DEFINITION_PROPERTY];
+        return ctor.hasOwnProperty(ENTITY_DEFINITION_PROPERTY) &&
+            ctor[ENTITY_DEFINITION_PROPERTY];
     }
 
     static attach(ctor: Function): EntityDefinition {
@@ -152,6 +147,24 @@ export class EntityDefinition {
         if (entity)
             return entity;
         ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor as Constructor);
+        // Merge base entity columns into this one
+        const baseCtor = Object.getPrototypeOf(ctor);
+        const baseDef = EntityDefinition.get(baseCtor);
+        if (baseDef) {
+            for (const k of baseDef.columnKeys) {
+                const colDef = baseDef.columns.get(k.toUpperCase());
+                if (colDef) {
+                    entity.columnKeys.push(k);
+                    entity.columns.set(k.toUpperCase(), colDef);
+                }
+            }
+        }
+        if (baseDef.primaryIndex) {
+            entity.primaryIndex = {
+                column: baseDef.primaryIndex.column,
+                unique: true
+            }
+        }
         return entity;
     }
 

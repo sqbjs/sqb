@@ -1,8 +1,8 @@
-import '../_support/env';
+import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {initClient} from '../_support/init-client';
-import {Country} from '../_support/countries.entity';
+import {initClient} from '../../_support/init-client';
+import {Country} from '../../_support/countries.entity';
 
 describe('Repository "count" operations', function () {
 

@@ -5,9 +5,9 @@ import {
     ColumnTransformFunction,
     RelationColumnConfig,
     ConstructorResolver
-} from '../orm.types';
-import {Maybe} from '../../types';
-import {getEntityDefinition, isEntityClass} from '../helpers';
+} from './orm.types';
+import {Maybe} from '../types';
+import {getEntityDefinition, isEntityClass} from './helpers';
 
 export type ColumnKind = 'data' | 'relation';
 export type ColumnDefinition = DataColumnDefinition | RelationColumnDefinition;

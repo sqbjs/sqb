@@ -18,7 +18,7 @@ import {adapters} from './extensions';
 import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Constructor} from '../orm/orm.types';
 import {Repository} from '../orm/Repository';
-import {EntityDefinition} from '../orm/model/EntityDefinition';
+import {EntityDefinition} from '../orm/EntityDefinition';
 import {Maybe} from '../types';
 
 const debug = _debug('sqb:client');

@@ -1,4 +1,4 @@
-import {ColumnConfig} from '../../orm.types';
+import {ColumnConfig} from '../orm.types';
 import {EntityDefinition} from '../EntityDefinition';
 
 export function Column(options?: string | ColumnConfig): PropertyDecorator {

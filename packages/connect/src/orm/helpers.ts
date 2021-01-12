@@ -1,4 +1,4 @@
-import {EntityDefinition} from './model/EntityDefinition';
+import {EntityDefinition} from './EntityDefinition';
 import {Constructor} from './orm.types';
 import {ENTITY_DEFINITION_PROPERTY} from './consts';
 

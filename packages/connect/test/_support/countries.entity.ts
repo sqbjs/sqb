@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryKey, LazyResolver, HasOne, HasMany} from '@sqb/connect';
+import {Column, Entity, PrimaryKey, LazyResolver, HasOne, HasMany, Sort} from '@sqb/connect';
 import {Continent} from './continents.entity';
 import type {Customer} from './customers.entity';
 
@@ -6,15 +6,18 @@ import type {Customer} from './customers.entity';
 export class Country {
     @PrimaryKey()
     @Column()
+    @Sort()
     code: string;
 
     @Column()
+    @Sort()
     name: string;
 
     @Column({fieldName: 'phone_code'})
     phoneCode: string;
 
     @Column({fieldName: 'continent_code'})
+    @Sort()
     continentCode: string;
 
     @HasOne({

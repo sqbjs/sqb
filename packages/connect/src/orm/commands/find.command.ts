@@ -6,10 +6,10 @@ import {
     isDataColumn,
     isRelationColumn,
     RelationColumnDefinition
-} from '../model/ColumnDefinition';
+} from '../ColumnDefinition';
 import {Repository} from '../Repository';
 import {LazyResolver} from '../orm.types';
-import {EntityDefinition} from '../model/EntityDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 import {prepareFilter} from './filter.helper';
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
@@ -17,7 +17,7 @@ const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 export type FindCommandArgs = {
     executor: QueryExecutor;
     entityDef: EntityDefinition;
-} & Repository.FindOptions;
+} & Repository.FindAllOptions;
 
 interface ColumnInfo {
     column: ColumnDefinition;
@@ -41,7 +41,7 @@ interface JoinInfo {
     condition: any[];
 }
 
-export async function find<T = any>(args: FindCommandArgs): Promise<T[]> {
+export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
     const {executor, entityDef} = args;
 
     const queryColumns: ColumnInfo[] = [];
@@ -116,7 +116,7 @@ export async function find<T = any>(args: FindCommandArgs): Promise<T[]> {
                             const f = fields.get(alias);
                             _params[alias] = f && src[f.index];
                         }
-                        trg[cinfo.name] = (async (options?: Repository.FindOptions) => {
+                        trg[cinfo.name] = (async (options?: Repository.FindAllOptions) => {
                             const _ctx = {
                                 ...options,
                                 executor,
@@ -128,7 +128,7 @@ export async function find<T = any>(args: FindCommandArgs): Promise<T[]> {
                                     [...subTask.filter, options.filter] : subTask.filter,
                                 params: _params
                             };
-                            const r = await find(_ctx);
+                            const r = await findAll(_ctx);
                             return hasMany ? r : r[0];
                         }) as LazyResolver<any>;
 
@@ -179,7 +179,7 @@ export async function find<T = any>(args: FindCommandArgs): Promise<T[]> {
                     params: cinfo.eagerParams,
                     limit: args.maxEagerFetch || 100000
                 };
-                const subRows = new Set(await find(_ctx));
+                const subRows = new Set(await findAll(_ctx));
                 const keyCols = cinfo.column.getColumns()
                     .map(c => c.name);
                 const keyColsLen = keyCols.length;
@@ -387,10 +387,10 @@ function prepareSort(entityDef: EntityDefinition, sort: string[]): string[] {
             throw new Error(`Unknown column (${colName}) declared in sort property`);
         if (!isDataColumn(col))
             throw new Error(`Can not sort by "${colName}", because it is not a data column`);
-        const dir = m[1];
-        if ((!dir || dir === '+') && !col.sortAscending)
+        const dir = m[1] || '+';
+        if (dir === '+' && !col.sortAscending)
             throw new Error(`Ascending sort on olumn "${colName}" is not allowed`);
-        if ((!dir || dir === '-') && !col.sortDescending)
+        if (dir === '-' && !col.sortDescending)
             throw new Error(`Descending sort on olumn "${colName}" is not allowed`);
         orderColumns.push((dir || '') + col.fieldName);
     }

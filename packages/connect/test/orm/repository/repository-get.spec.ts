@@ -1,9 +1,9 @@
-import '../_support/env';
+import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {Country} from '../_support/countries.entity';
-import {initClient} from '../_support/init-client';
-import {CustomerTags} from '../_support/customer-tags.entity';
+import {Country} from '../../_support/countries.entity';
+import {initClient} from '../../_support/init-client';
+import {CustomerTags} from '../../_support/customer-tags.entity';
 
 describe('Repository "get" operations', function () {
 

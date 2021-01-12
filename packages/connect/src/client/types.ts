@@ -174,7 +174,7 @@ export interface QueryExecuteOptions {
 
     action?: string;
 
-    returningFields?: Record<string, string>;
+    returningFields?: {field: string, alias?: string}[];
 
 }
 
@@ -199,7 +199,7 @@ export interface QueryRequest {
     dialectVersion?: string;
     sql: string;
     values?: any;
-    returningFields?: Record<string, string>;
+    returningFields?: {field: string, alias?: string}[];
     autoCommit?: boolean;
     cursor?: boolean;
     objectRows?: boolean;

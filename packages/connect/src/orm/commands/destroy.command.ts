@@ -1,11 +1,11 @@
 import {And, Delete, LogicalOperator} from '@sqb/builder';
 import {QueryExecutor} from '../../client/types';
-import {EntityDefinition} from '../model/EntityDefinition';
+import {EntityDefinition} from '../EntityDefinition';
 import {Repository} from '../Repository';
 import SearchFilter = Repository.SearchFilter;
 import {prepareFilter} from './filter.helper';
 
-export async function remove(args: {
+export async function destroyAll(args: {
     executor: QueryExecutor;
     entityDef: EntityDefinition;
     filter?: SearchFilter;

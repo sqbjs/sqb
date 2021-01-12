@@ -1,7 +1,7 @@
 {
   "name": "@sqb/sqlite-dialect",
   "description": "SQB serialization extension for SQLite database",
-  "version": "4.0.1-alpha.4",
+  "version": "4.0.1-alpha.5",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -21,10 +21,8 @@
     "sqlite",
     "database"
   ],
-  "dependencies": {
-  },
-  "devDependencies": {
-  },
+  "dependencies": {},
+  "devDependencies": {},
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {

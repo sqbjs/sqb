@@ -21,13 +21,13 @@ export interface GenerateOptions {
 export interface SerializeContext extends GenerateOptions {
     serializeHooks?: Function[];
     queryParams?: Record<string, any> | any[];
-    returningFields?: Record<string, any>;
+    returningFields?: {field: string, alias?: string}[];
 }
 
 export interface GenerateResult {
     sql: string;
     params?: any;
-    returningFields?: Record<string, string>;
+    returningFields?: {field: string, alias?: string}[];
 }
 
 export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,

@@ -3,7 +3,7 @@ import {
     SerializeContext,
     DefaultSerializeFunction,
     SerializationType,
-    Maybe, printArray
+    Maybe,
 } from '@sqb/builder';
 
 export class SqliteSerializer implements SerializerExtension {
@@ -33,11 +33,11 @@ export class SqliteSerializer implements SerializerExtension {
         return out;
     }
 
-    private _serializeParameter(ctx: SerializeContext, name: string): Maybe<string> {
-        const prmValue = ctx.values && ctx.values[name];
+    private _serializeParameter(ctx: SerializeContext, o: any): Maybe<string> {
+        const prmValue = ctx.values && ctx.values[o.name];
         ctx.queryParams = ctx.queryParams || {};
-        ctx.queryParams[name] = prmValue;
-        return ':' + name;
+        ctx.queryParams[o.name] = prmValue;
+        return ':' + o.name;
     }
 
     // noinspection JSUnusedLocalSymbols

@@ -24,7 +24,7 @@ export function BeforeUpdate(): PropertyDecorator {
     }
 }
 
-export function BeforeRemove(): PropertyDecorator {
+export function BeforeDestroy(): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
@@ -32,7 +32,7 @@ export function BeforeRemove(): PropertyDecorator {
         const fn = target.constructor.prototype[propertyKey]
         if (typeof fn !== 'function')
             throw new Error('Property must be a function');
-        entity.beforeRemove(fn);
+        entity.beforeDestroy(fn);
     }
 }
 
@@ -60,7 +60,7 @@ export function AfterUpdate(): PropertyDecorator {
     }
 }
 
-export function AfterRemove(): PropertyDecorator {
+export function AfterDestroy(): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
@@ -68,6 +68,6 @@ export function AfterRemove(): PropertyDecorator {
         const fn = target.constructor.prototype[propertyKey]
         if (typeof fn !== 'function')
             throw new Error('Property must be a function');
-        entity.afterRemove(fn);
+        entity.afterDestroy(fn);
     }
 }

@@ -14,8 +14,10 @@ cache:
     - node_modules
 services:
   - postgresql
+env:
+  - PGDATABASE=travis_ci_test
 before_script:
-  - psql -c 'create database test;' -U postgres
+  - psql -c 'create database travis_ci_test;' -U postgres
 install:
   - "npm install"
   - "gulp install"
