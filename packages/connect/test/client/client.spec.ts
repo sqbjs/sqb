@@ -133,7 +133,7 @@ describe('Client', function () {
         await client.acquire(async (connection) => {
             const result = await connection.execute('select * from customers', {
                 objectRows: false,
-                values: []
+                params: []
             })
             assert(result && result.rows);
             assert(Array.isArray(result.rows[0]));
@@ -147,7 +147,7 @@ describe('Client', function () {
             await client.acquire(async (connection) => {
                 await connection.startTransaction();
                 await connection.execute('insert into customers (given_name) values (:given)', {
-                    values: {
+                    params: {
                         given: 'John'
                     }
                 });
@@ -169,7 +169,7 @@ describe('Client', function () {
         await client.acquire(async (connection) => {
             await connection.execute(
                 Insert('customers', {given_name: Param('given')}),
-                {values: {given}});
+                {params: {given}});
             const c2 = (await connection.execute('select count(*) from customers')).rows[0].count;
             assert.strictEqual(c2, c + 1);
             await connection.commit();
@@ -185,7 +185,7 @@ describe('Client', function () {
             const given = 'X' + Math.floor(Math.random() * 10000);
             await connection.execute(
                 Insert('customers', {given_name: Param('given')}),
-                {values: {given}});
+                {params: {given}});
             await connection.rollback();
         });
         const c2 = (await client.execute('select count(*) from customers')).rows[0].count;

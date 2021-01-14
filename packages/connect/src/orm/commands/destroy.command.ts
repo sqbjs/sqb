@@ -23,7 +23,7 @@ export async function destroyAll(args: {
         query.where(...where._items);
     // Execute query
     const resp = await executor.execute(query, {
-        values: params,
+        params,
         objectRows: false,
         cursor: false,
     });

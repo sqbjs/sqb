@@ -41,7 +41,7 @@ export async function updateAllRaw<T>(args: UpdateAllCommandArgs<T>): Promise<Qu
     if (returning && returning.length)
         query.returning(...returning);
     return await executor.execute(query, {
-        values: _params,
+        params: _params,
         objectRows: false,
         cursor: false
     });

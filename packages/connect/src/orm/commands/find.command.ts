@@ -83,7 +83,7 @@ export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
 
     // Execute query
     const resp = await executor.execute(query, {
-        values: args.params,
+        params: args.params,
         fetchRows: args.limit,
         objectRows: false,
         cursor: false,

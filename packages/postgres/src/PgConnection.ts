@@ -45,7 +45,7 @@ export class PgConnection implements Adapter.Connection {
     async execute(query: QueryRequest): Promise<Adapter.Response> {
         const resp = await this.intlcon.query(query.sql, {
             autoCommit: query.autoCommit,
-            params: query.values,
+            params: query.params,
             cursor: query.cursor,
             fetchCount: query.fetchRows,
             objectRows: query.objectRows

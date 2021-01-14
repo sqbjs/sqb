@@ -3,9 +3,7 @@ import {
     SerializeContext,
     DefaultSerializeFunction,
     SerializationType,
-    Maybe,
-    escapeReserved,
-    printArray
+    Maybe
 } from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
 
@@ -32,9 +30,7 @@ export class OracleSerializer implements SerializerExtension {
             case SerializationType.DATE_VALUE:
                 return this._serializeDateValue(ctx, o, defFn);
             case SerializationType.RETURNING_BLOCK:
-                return this._serializeReturning(ctx, o);
-            case SerializationType.RETURNING_COLUMN:
-                return this._serializeReturningColumn(ctx, o);
+               return this._serializeReturning();
         }
     }
 
@@ -90,23 +86,8 @@ export class OracleSerializer implements SerializerExtension {
             'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')');
     }
 
-    // noinspection JSUnusedLocalSymbols
-    private _serializeReturning(ctx: SerializeContext, arr: any[]): Maybe<string> {
-        const arr1: string[] = [];
-        const arr2: string[] = [];
-        arr.forEach(x => {
-            const a = x.split(':');
-            arr1.push(a[0]);
-            arr2.push(':' + a[1]);
-        });
-        return 'returning ' + printArray(arr1) + ' into ' + printArray(arr2);
-    }
-
-    private _serializeReturningColumn(ctx: SerializeContext, o: any): Maybe<string> {
-        const alias = 'returning$' + (o.alias || o.field);
-        // @ts-ignore
-        ctx.returningFields[alias] = o.dataType || 'any';
-        return escapeReserved(ctx, o.field) + ':' + alias;
+    private _serializeReturning(): Maybe<string> {
+        return '';
     }
 
 }

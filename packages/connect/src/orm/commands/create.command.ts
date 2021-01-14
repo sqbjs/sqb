@@ -36,7 +36,7 @@ export async function createRaw<T>(args: CreateCommandArgs<T>): Promise<QueryRes
     if (returning && returning.length)
         query.returning(...returning);
     return await executor.execute(query, {
-        values: params,
+        params,
         objectRows: false,
         cursor: false
     });

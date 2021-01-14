@@ -244,10 +244,10 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
                 .generate({
                     dialect: request.dialect,
                     dialectVersion: request.dialectVersion,
-                    values: options.values,
+                    values: options.params,
                 });
             request.sql = q.sql;
-            request.values = q.params;
+            request.params = q.params;
             if (q.returningFields)
                 request.returningFields = q.returningFields;
             if (query.listenerCount('execute'))
@@ -256,7 +256,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
                 request.fetchHooks = query.listeners('fetch') as FetchFunction[];
         } else if (typeof query === 'string') {
             request.sql = query;
-            request.values = options.values;
+            request.params = options.params;
             request.returningFields = options.returningFields;
         }
         // @ts-ignore

@@ -21,7 +21,7 @@ export async function count(args: CountCommandArgs): Promise<number> {
         query.where(where);
     // Execute query
     const resp = await executor.execute(query, {
-        values: params,
+        params,
         objectRows: false,
         cursor: false,
     });
