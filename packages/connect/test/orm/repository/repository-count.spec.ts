@@ -4,9 +4,9 @@ import assert from 'assert';
 import {initClient} from '../../_support/init-client';
 import {Country} from '../../_support/countries.entity';
 
-describe('Repository "count" operations', function () {
+const client = initClient();
 
-    const client = initClient();
+describe('count() method', function () {
 
     it('should count number of rows', async function () {
         const repo = client.getRepository<Country>(Country);

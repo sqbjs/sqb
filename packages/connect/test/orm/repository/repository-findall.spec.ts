@@ -7,14 +7,14 @@ import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
 import {Continent} from '../../_support/continents.entity';
 
-describe('Repository "find" operations', function () {
+const client = initClient();
 
-    const client = initClient();
+describe('"findAll()" method', function () {
 
     /**
      *
      */
-    describe('find()', function () {
+    describe('Regular', function () {
 
         it('should return instances', async function () {
             const repo = client.getRepository<Customer>(Customer);
@@ -109,30 +109,6 @@ describe('Repository "find" operations', function () {
                     repo.findAll({sort: ['country']}),
                 /Can not sort by/);
         });
-    });
-
-    /**
-     *
-     */
-    describe('findOne()', function () {
-
-        it('should return single instance', async function () {
-            const repo = client.getRepository<Customer>(Customer);
-            const row = await repo.findOne({sort: ['id']});
-            assert.ok(row);
-            assert.strictEqual(row.id, 1);
-        });
-
-        it('should return single instance from given offset', async function () {
-            const repo = client.getRepository<Customer>(Customer);
-            const row = await repo.findOne({
-                sort: ['id'],
-                offset: 10
-            });
-            assert.ok(row);
-            assert.strictEqual(row.id, 11);
-        });
-
     });
 
     /**

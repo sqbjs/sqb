@@ -104,7 +104,7 @@ export class Repository<T> {
         return rows && rows[0];
     }
 
-    async get(keyValue: T | any | Record<string, any>, options?: Repository.GetOptions): Promise<Maybe<T>> {
+    async findByPk(keyValue: T | any | Record<string, any>, options?: Repository.GetOptions): Promise<Maybe<T>> {
         const opts: Repository.FindAllOptions = {...options};
         opts.filter = [extractKeyValues(this._entityDef, keyValue)];
         opts.limit = 1;
