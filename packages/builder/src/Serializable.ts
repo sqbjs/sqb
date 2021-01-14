@@ -1,4 +1,4 @@
-import {DefaultSerializeFunction, Maybe, SerializeContext} from './types';
+import {DefaultSerializeFunction, SerializeContext} from './types';
 import {SerializationType} from './enums';
 import {serializers} from './extensions';
 
@@ -49,7 +49,7 @@ export function serializeFallback(ctx: SerializeContext, type: string, o: any,
 /**
  * Serializes object
  */
-export function serializeObject(ctx, v): Maybe<string> {
+export function serializeObject(ctx, v): string {
     if (v == null)
         return 'null';
     if (Array.isArray(v)) {

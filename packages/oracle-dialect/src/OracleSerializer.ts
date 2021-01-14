@@ -2,8 +2,7 @@ import {
     SerializerExtension,
     SerializeContext,
     DefaultSerializeFunction,
-    SerializationType,
-    Maybe
+    SerializationType
 } from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
 
@@ -19,7 +18,7 @@ export class OracleSerializer implements SerializerExtension {
     }
 
     serialize(ctx: SerializeContext, type: SerializationType | string, o: any,
-              defFn: DefaultSerializeFunction): Maybe<string> {
+              defFn: DefaultSerializeFunction): string | undefined {
         switch (type) {
             case SerializationType.SELECT_QUERY:
                 return this._serializeSelect(ctx, o, defFn);
@@ -65,11 +64,11 @@ export class OracleSerializer implements SerializerExtension {
         return out;
     }
 
-    private _serializeFrom(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+    private _serializeFrom(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         return defFn(ctx, o) || 'from dual';
     }
 
-    private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+    private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         if (o.right === 'null') {
             if (o.operatorType === 'eq')
                 o.symbol = 'is';
@@ -79,14 +78,14 @@ export class OracleSerializer implements SerializerExtension {
         return defFn(ctx, o);
     }
 
-    private _serializeDateValue(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+    private _serializeDateValue(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         const s = defFn(ctx, o);
         return s && (s.length <= 12 ?
             'to_date(' + s + ', \'yyyy-mm-dd\')' :
             'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')');
     }
 
-    private _serializeReturning(): Maybe<string> {
+    private _serializeReturning(): string {
         return '';
     }
 
