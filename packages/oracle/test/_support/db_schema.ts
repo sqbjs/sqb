@@ -1,5 +1,17 @@
 export const sqls = [
 
+    /* Drop*/
+
+
+    `BEGIN
+   EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.CUSTOMER_TAGS';
+EXCEPTION
+   WHEN OTHERS THEN
+      IF SQLCODE != -942 THEN 
+        RAISE; 
+      END IF;
+END;`,
+
     `BEGIN
    EXECUTE IMMEDIATE 'DROP TABLE ${process.env.ORASCHEMA}.CUSTOMERS';
 EXCEPTION
@@ -30,6 +42,7 @@ EXCEPTION
       IF SQLCODE != -942 THEN RAISE; END IF;
 END;`,
 
+    //  Create continents table
 
     `CREATE TABLE ${process.env.ORASCHEMA}.continents (
   code    VARCHAR2(5),
@@ -39,6 +52,7 @@ END;`,
     `ALTER TABLE ${process.env.ORASCHEMA}.continents ADD (
   CONSTRAINT continents_PK PRIMARY KEY (code) ENABLE VALIDATE)`,
 
+    //  Create countries table
 
     `CREATE TABLE ${process.env.ORASCHEMA}.countries (
   code    VARCHAR2(5),
@@ -57,6 +71,7 @@ CONSTRAINT FK_countries_continent_CODE
  ENABLE
  VALIDATE`,
 
+    //  Create customers table
 
     `CREATE TABLE ${process.env.ORASCHEMA}.customers
 (
@@ -90,4 +105,23 @@ BEGIN
       select ${process.env.ORASCHEMA}.customers_id_seq.nextval into :new.id from dual;
   end if;
 END;`,
+
+
+    //  Create customer_tags table
+
+    `CREATE TABLE ${process.env.ORASCHEMA}.customer_tags (
+  customer_id    INTEGER,
+  tag  VARCHAR2(16)
+)`,
+
+    `ALTER TABLE ${process.env.ORASCHEMA}.customer_tags ADD (
+  CONSTRAINT customer_tags_PK PRIMARY KEY (customer_id, tag) ENABLE VALIDATE)`,
+
+    `ALTER TABLE ${process.env.ORASCHEMA}.customer_tags ADD
+CONSTRAINT FK_customer_tags_customer_id
+ FOREIGN KEY (customer_id)
+ REFERENCES ${process.env.ORASCHEMA}.customers (id)
+ ENABLE
+ VALIDATE`,
+
 ];

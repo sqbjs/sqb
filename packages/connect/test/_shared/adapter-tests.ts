@@ -28,11 +28,11 @@ export function initAdapterTests(adapter: Adapter,
 
     async function adapterExecute(query: Query,
                                   opts?: Partial<QueryRequest>): Promise<Adapter.Response & { objRows: any[] }> {
-        const q = query.generate({dialect: adapter.dialect, values: opts?.values});
+        const q = query.generate({dialect: adapter.dialect, values: opts?.params});
         const result: any = await connection.execute({
             ...opts,
             sql: q.sql,
-            values: q.params,
+            params: q.params,
             returningFields: q.returningFields,
             autoCommit: !(opts?.autoCommit === false)
         });
@@ -144,7 +144,7 @@ export function initAdapterTests(adapter: Adapter,
         }).returning('id', 'given_name', 'family_name');
         const result = await adapterExecute(query, {
             autoCommit: true,
-            values: {givenName, familyName}
+            params: {givenName, familyName}
         });
         assert.ok(result);
         assert.ok(result.rows);

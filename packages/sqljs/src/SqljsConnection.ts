@@ -61,14 +61,14 @@ export class SqljsConnection implements Adapter.Connection {
             await this.startTransaction();
         const out: Adapter.Response = {};
         let params;
-        if (query.values) {
-            params = Object.keys(query.values).reduce((obj, k) => {
-                obj[':' + k] = query.values[k];
+        if (query.params) {
+            params = Object.keys(query.params).reduce((obj, k) => {
+                obj[':' + k] = query.params[k];
                 return obj;
             }, {})
         }
 
-        const m = query.sql.match(/\b(insert into|update|delete from)\b (\w+)/i);
+        const m = query.sql.match(/\b(insert into|update|delete from)\b ("?\w+"?)/i);
         if (m) {
             const stmt = this.intlcon.prepare(query.sql);
             stmt.run(params);
@@ -76,13 +76,13 @@ export class SqljsConnection implements Adapter.Connection {
             out.rowsAffected = this.intlcon.getRowsModified();
             if (query.autoCommit)
                 await this.commit();
-            if (out.rowsAffected && query.returningFields) {
+            if (out.rowsAffected === 1 && query.returningFields) {
+                const selectFields = query.returningFields.map(
+                    x => x.field + (x.alias ? ' as ' + x.alias : ''));
+                let sql = `select ${selectFields.join(',')} from ${m[2]}\n`;
                 // Emulate insert into ... returning
                 if (m[1].toLowerCase() === 'insert into') {
-                    const fields = query.returningFields.map(
-                        x => x.field + (x.alias ? ' as ' + x.alias : ''));
-                    const sql = `select ${fields.join(',')} from ${m[2]}` +
-                        ' where rowid=last_insert_rowid();'
+                    sql += 'where rowid=last_insert_rowid();'
                     const r: any[] = this.intlcon.exec(sql);
                     if (r.length) {
                         out.fields = this._convertFields(r[0].columns);
@@ -94,16 +94,13 @@ export class SqljsConnection implements Adapter.Connection {
                     // Emulate update ... returning
                 if (m[1].toLowerCase() === 'update') {
                     const m2 = query.sql.match(/where (.+)/);
-                    const fields = query.returningFields.map(
-                        x => x.field + (x.alias ? ' as ' + x.alias : ''));
                     query = {...query};
-                    query.sql = `select ${fields.join(',')} from ${m[2]}` +
-                        (m2 ? ' where ' + m2[1] : '');
+                    query.sql = sql + (m2 ? ' where ' + m2[1] : '');
                 } else return out;
             }
         }
 
-        let stmt: Statement | undefined = this.intlcon.prepare(query.sql, query.values);
+        let stmt: Statement | undefined = this.intlcon.prepare(query.sql, query.params);
         try {
             const colNames = stmt.getColumnNames();
             if (colNames && colNames.length) {

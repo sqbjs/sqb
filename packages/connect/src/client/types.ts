@@ -119,7 +119,7 @@ export interface QueryExecuteOptions {
     /**
      * Array of values or object that contains param/value pairs.
      */
-    values?: Record<string, any> | any[];
+    params?: Record<string, any> | any[];
 
     /**
      *  If this property is true, the transaction committed at the end of query execution.
@@ -198,7 +198,7 @@ export interface QueryRequest {
     dialect?: string;
     dialectVersion?: string;
     sql: string;
-    values?: any;
+    params?: any;
     returningFields?: {field: string, alias?: string}[];
     autoCommit?: boolean;
     cursor?: boolean;

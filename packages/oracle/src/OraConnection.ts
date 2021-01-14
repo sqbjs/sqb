@@ -2,7 +2,7 @@ import oracledb from 'oracledb';
 import {Adapter, QueryRequest} from '@sqb/connect';
 import {OraCursor} from './OraCursor';
 
-const dataTypeNames = {
+export const dataTypeNames = {
     [oracledb.DB_TYPE_BFILE]: 'BFILE',
     [oracledb.DB_TYPE_BINARY_DOUBLE]: 'BINARY_DOUBLE',
     [oracledb.DB_TYPE_BINARY_FLOAT]: 'BINARY_FLOAT',
@@ -122,53 +122,34 @@ export class OraConnection implements Adapter.Connection {
             oraOptions.fetchArraySize = request.fetchRows;
         else
             oraOptions.maxRows = request.fetchRows;
-        let params = request.values;
 
         const out: Adapter.Response = {}
 
-        if (request.returningFields) {
-            out.fields = [];
-            const rprms = request.returningFields;
-            if (Array.isArray(params))
-                params = params.slice();
-            else params = Object.assign({}, params);
-            for (const n of Object.keys(rprms)) {
-                const o = {type: oracledb.STRING, dir: oracledb.BIND_OUT};
-                switch (rprms[n]) {
-                    case 'string':
-                        o.type = oracledb.STRING;
-                        break;
-                    case 'number':
-                        o.type = oracledb.NUMBER;
-                        break;
-                    case 'date':
-                        o.type = oracledb.DATE;
-                        break;
-                    case 'blob':
-                        o.type = oracledb.BLOB;
-                        break;
-                    case 'clob':
-                        o.type = oracledb.CLOB;
-                        break;
-                    case 'buffer':
-                        o.type = oracledb.BUFFER;
-                        break;
-                }
-                if (Array.isArray(params))
-                    params.push(o);
-                else params[n] = o;
-                const fieldName = n.replace('returning$', '');
-
-                out.fields.push({
-                    fieldName,
-                    dataType: dataTypeNames[o.type],
-                    jsType: fetchTypeMap[o.type]
-                } as Adapter.Field)
-            }
-        }
-
         this.intlcon.action = request.action || '';
-        const response = await this.intlcon.execute<any>(request.sql, params || [], oraOptions);
+        let response = await this.intlcon.execute<any>(request.sql, request.params || [], oraOptions);
+
+        if (response.rowsAffected)
+            out.rowsAffected = response.rowsAffected;
+
+        if (out.rowsAffected === 1 && request.returningFields) {
+            const m = request.sql.match(/\b(insert into|update)\b ("?\w+\.?\w+"?)/i);
+            if (m) {
+                const selectFields = request.returningFields.map(
+                    x => x.field + (x.alias ? ' as ' + x.alias : ''));
+                let sql = `select ${selectFields.join(',')} from ${m[2]}\n`;
+                if (m[1].toLowerCase() === 'insert into') {
+                    sql += 'where rowid=\'' + response.lastRowid + '\'';
+                    response = await this.intlcon.execute(sql);
+                } else
+                    // Emulate update ... returning
+                if (m[1].toLowerCase() === 'update') {
+                    const m2 = request.sql.match(/where (.+)/);
+                    sql += (m2 ? ' where ' + m2[1] : '');
+                    response = await this.intlcon.execute(sql, request.params || [], oraOptions);
+                }
+            }
+
+        }
 
         let fields;
         let rowNumberIdx = -1;
@@ -217,19 +198,8 @@ export class OraConnection implements Adapter.Connection {
                     rowType: request.objectRows ? 'object' : 'array',
                     rowNumberIdx, rowNumberName
                 });
-        } else if (response.outBinds) {
-            out.rows = [{}];
-            out.rowType = 'object';
-            const row = out.rows[0];
-            for (const n of Object.keys(response.outBinds)) {
-                const v = response.outBinds[n];
-                row[n.replace('returning$', '')] =
-                    v.length === 1 ? v[0] : v;
-            }
         }
 
-        if (response.rowsAffected)
-            out.rowsAffected = response.rowsAffected;
 
         return out;
     }

@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Eq, Insert, Param
+    Select, Eq, Param
 } from '@sqb/builder';
 import {OracleSerializer} from '../src/OracleSerializer';
 
@@ -63,22 +63,6 @@ describe('OracleSerializer', function () {
             });
             assert.strictEqual(result.sql, 'select * from table1 where ID = :ID');
             assert.deepStrictEqual(result.params, {ID: 5})
-        });
-
-        it('Should serialize returning', function () {
-            const query = Insert('table1', {'id': 1})
-                .returning('id', 'name');
-            const result = query.generate({dialect: 'oracle'});
-            assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning id, name into :returning$id, :returning$name')
-        });
-
-        it('Should serialize returning - reserved word', function () {
-            const query = Insert('table1', {'id': 1})
-                .returning('id', 'with w1');
-            const result = query.generate({dialect: 'oracle'});
-            assert.strictEqual(result.sql,
-                'insert into table1 (id) values (1) returning id, "with" into :returning$id, :returning$w1')
         });
     });
 
