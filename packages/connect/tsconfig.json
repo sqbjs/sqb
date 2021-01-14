@@ -9,7 +9,7 @@
     "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../builder"]
+      "@sqb/*": ["../*"]
     }
   },
   "include": ["src/**/*.ts"],

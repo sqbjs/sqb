@@ -10,10 +10,9 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../../builder"],
-      "@sqb/connect": ["../../connect"],
-      "@sqb/oracle-dialect": ["../../oracle-dialect"],
-      "@sqb/oracledb": ["../src"]
+      "@sqb/oracledb": ["../src"],
+      "@sqb/*": ["../../*"]
+
     }
   }
 }

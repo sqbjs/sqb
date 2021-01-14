@@ -10,10 +10,8 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../../builder"],
-      "@sqb/connect": ["../../connect"],
-      "@sqb/sqlite-dialect": ["../../sqlite-dialect"],
-      "@sqb/sqljs": ["../src"]
+      "@sqb/sqljs": ["../src"],
+      "@sqb/*": ["../../*"]
     }
   }
 }

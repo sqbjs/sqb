@@ -11,10 +11,7 @@
     "baseUrl": "./",
     "paths": {
       "@sqb/nestjs": ["../src"],
-      "@sqb/builder": ["../../builder"],
-      "@sqb/connect": ["../../connect"],
-      "@sqb/postgres": ["../../postgres"],
-      "@sqb/postgres-dialect": ["../../postgres-dialect"]
+      "@sqb/*": ["../../*"]
     }
   }
 }
