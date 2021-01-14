@@ -3,18 +3,16 @@ import {
 } from '@sqb/builder';
 import {Client} from '../client/Client';
 import {Connection} from '../client/Connection';
-import {Constructor, PickWritable} from './orm.types';
+import {PickWritable} from './orm.types';
 import {EntityDefinition} from './EntityDefinition';
 import {QueryExecutor} from '../client/types';
 import {Maybe} from '../types';
-
 import {extractKeyValues} from './commands/keyvalues.helper';
 import {count} from './commands/count.command';
 import {create, createRaw} from './commands/create.command';
 import {findAll} from './commands/find.command';
 import {destroyAll} from './commands/destroy.command';
 import {update, updateAllRaw} from './commands/update.command';
-
 
 export namespace Repository {
 
@@ -42,38 +40,24 @@ export namespace Repository {
         maxEagerFetch?: number;
     }
 
-    export interface RemoveOptions {
+    export interface DestroyAllOptions {
         filter?: SearchFilter;
         params?: any;
-    }
-
-    export interface UpdateOptions {
-
     }
 
     export interface UpdateAllOptions {
         filter?: SearchFilter;
         params?: any;
     }
-
 }
 
 export class Repository<T> {
-    private readonly _client: Client;
     private readonly _executor: QueryExecutor;
     private readonly _entityDef: EntityDefinition;
-    private readonly _ctor: Constructor;
 
-    constructor(client: Client | Connection, ctor: Constructor) {
-        if (client instanceof Client) {
-            this._client = client;
-            this._executor = client;
-        } else {
-            this._executor = client;
-            this._client = client.client;
-        }
-        this._ctor = ctor;
-        this._entityDef = EntityDefinition.get(ctor);
+    constructor(entityDef: EntityDefinition, executor: Client | Connection) {
+        this._executor = executor;
+        this._entityDef = entityDef;
     }
 
     async create(values: Partial<PickWritable<T>>): Promise<T> {
@@ -136,7 +120,7 @@ export class Repository<T> {
         }));
     }
 
-    async destroyAll(options?: Repository.RemoveOptions): Promise<number> {
+    async destroyAll(options?: Repository.DestroyAllOptions): Promise<number> {
         return destroyAll({
             executor: this._executor,
             entityDef: this._entityDef,

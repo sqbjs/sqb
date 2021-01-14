@@ -5,7 +5,7 @@ import {AsyncOptionsClassModule} from './_support/photo-app/async-class-options.
 import {Server} from 'http';
 import {createSchema} from './_support/create-schema';
 
-describe('Sqb-Nestjs (async configuration)', () => {
+describe('Sqb-Nestjs (async-class)', () => {
 
     let server: Server;
     let app: INestApplication;

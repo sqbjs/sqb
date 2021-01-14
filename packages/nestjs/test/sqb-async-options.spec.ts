@@ -5,7 +5,7 @@ import {AsyncOptionsFactoryModule} from './_support/photo-app/async-options.modu
 import {Server} from 'http';
 import {createSchema} from './_support/create-schema';
 
-describe('Sqb-Nestjs (async configuration)', () => {
+describe('Sqb-Nestjs (async-options)', () => {
 
     let server: Server;
     let app: INestApplication;
