@@ -9,8 +9,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@sqb/builder": ["../builder"],
-      "@sqb/connect": ["../connect"]
+      "@sqb/*": ["../*"]
     }
   },
   "include": ["src/**/*.ts"],

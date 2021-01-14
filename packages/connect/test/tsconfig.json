@@ -11,9 +11,7 @@
     "baseUrl": "./",
     "paths": {
       "@sqb/connect": ["../src"],
-      "@sqb/builder": ["../../builder"],
-      "@sqb/postgres": ["../../postgres"],
-      "@sqb/postgres-dialect": ["../../postgres-dialect"]
+      "@sqb/*": ["../../*"]
     }
   }
 }

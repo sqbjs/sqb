@@ -10,10 +10,8 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../../builder"],
-      "@sqb/connect": ["../../connect"],
-      "@sqb/postgres-dialect": ["../../postgres-dialect"],
-      "@sqb/postgres": ["../src"]
+      "@sqb/postgres": ["../src"],
+      "@sqb/*": ["../../*"]
     }
   }
 }

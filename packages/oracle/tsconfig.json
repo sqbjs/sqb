@@ -7,9 +7,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../builder"],
-      "@sqb/connect": ["../connect"],
-      "@sqb/post": ["../oracle-dialect"]
+      "@sqb/*": ["../*"]
     }
   },
   "include": ["src/**/*.ts"],
