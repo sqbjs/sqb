@@ -1,9 +1,9 @@
-import {Client, ClientConfiguration} from '@sqb/connect';
+import {SqbClient, ClientConfiguration} from '@sqb/connect';
 import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
-export function initClient(config?: ClientConfiguration): Client {
+export function initClient(config?: ClientConfiguration): SqbClient {
 
-    let client = new Client({
+    let client = new SqbClient({
         dialect: 'postgres',
         ...config
     })

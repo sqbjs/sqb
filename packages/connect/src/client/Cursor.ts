@@ -1,5 +1,5 @@
 import {Adapter} from './Adapter';
-import {Connection} from './Connection';
+import {SqbConnection} from './SqbConnection';
 import {FieldInfoMap} from './FieldInfoMap';
 import DoublyLinked from 'doublylinked';
 import TaskQueue from 'putil-taskqueue';
@@ -14,7 +14,7 @@ const debug = _debug('sqb:cursor');
 
 export class Cursor extends SafeEventEmitter {
 
-    private readonly _connection: Connection;
+    private readonly _connection: SqbConnection;
     private readonly _fields: FieldInfoMap;
     private readonly _prefetchRows: number;
     private readonly _request: QueryRequest;
@@ -28,7 +28,7 @@ export class Cursor extends SafeEventEmitter {
     private _row: any;
     private _cache?: DoublyLinked;
 
-    constructor(connection: Connection, fields: FieldInfoMap,
+    constructor(connection: SqbConnection, fields: FieldInfoMap,
                 adapterCursor: Adapter.Cursor,
                 request: QueryRequest) {
         super();

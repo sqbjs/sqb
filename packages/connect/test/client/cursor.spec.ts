@@ -3,7 +3,7 @@ import '@sqb/postgres';
 import assert from 'assert';
 import {Select} from '@sqb/builder';
 import { Cursor} from '@sqb/connect';
-import {Connection} from '../../src/client/Connection';
+import {SqbConnection} from '../../src/client/SqbConnection';
 import {initClient} from '../_support/init-client';
 
 describe('Cursor', function () {
@@ -22,7 +22,7 @@ describe('Cursor', function () {
     });
 
     it('should iterate rows', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -73,7 +73,7 @@ describe('Cursor', function () {
     });
 
     it('should seek() move cursor', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -89,7 +89,7 @@ describe('Cursor', function () {
         });
     });
     it('should seek(big number) move cursor to eof', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -102,7 +102,7 @@ describe('Cursor', function () {
     });
 
     it('should cache rows', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'),
                 {fetchRows: 100});
             cursor = result && result.cursor;
@@ -114,7 +114,7 @@ describe('Cursor', function () {
     });
 
     it('should seek(big number) move cursor to eof (cached)', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -129,7 +129,7 @@ describe('Cursor', function () {
     });
 
     it('should move cursor back if cached', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'), {objectRows: true});
             cursor = result && result.cursor;
             assert(cursor);
@@ -148,7 +148,7 @@ describe('Cursor', function () {
     });
 
     it('should seek(0) do nothing', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -161,7 +161,7 @@ describe('Cursor', function () {
     });
 
     it('should reset cursor in cached mode', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -174,7 +174,7 @@ describe('Cursor', function () {
     });
 
     it('should not reset cursor in non cached mode', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -184,7 +184,7 @@ describe('Cursor', function () {
     });
 
     it('should fetchAll() emit eof', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -198,7 +198,7 @@ describe('Cursor', function () {
 
 
     it('should fetchAll() does not emit "move" event', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             cursor.cached();
@@ -213,7 +213,7 @@ describe('Cursor', function () {
     });
 
     it('should close cursor after fetched all rows', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -229,7 +229,7 @@ describe('Cursor', function () {
     });
 
     it('should not fetch rows if closed', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -239,7 +239,7 @@ describe('Cursor', function () {
     });
 
     it('should cache can not be enabled after fetch', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -251,7 +251,7 @@ describe('Cursor', function () {
     });
 
     it('should handle close error', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -262,7 +262,7 @@ describe('Cursor', function () {
     });
 
     it('should handle adapter errors', async function () {
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
             assert(cursor);
@@ -276,7 +276,7 @@ describe('Cursor', function () {
         let l = 0;
         const query = Select().from('customers')
             .onFetch((row) => row.customField = ++l);
-        await client.acquire(async (connection: Connection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(query, {fetchRows: 100});
             cursor = result && result.cursor;
             assert(cursor);

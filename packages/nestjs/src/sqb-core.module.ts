@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
 import {defer} from 'rxjs';
-import {Client} from '@sqb/connect';
+import {SqbClient} from '@sqb/connect';
 import {
     generateString,
     getConnectionToken,
@@ -83,8 +83,8 @@ export class SqbCoreModule implements OnApplicationShutdown {
     }
 
     async onApplicationShutdown() {
-        const client = this.moduleRef.get<Client>(
-            getConnectionToken(this.options as SqbModuleOptions) as Type<Client>,
+        const client = this.moduleRef.get<SqbClient>(
+            getConnectionToken(this.options as SqbModuleOptions) as Type<SqbClient>,
         );
         if (client)
             await client.close(this.options.shutdownWaitMs);
@@ -126,10 +126,10 @@ export class SqbCoreModule implements OnApplicationShutdown {
 
     private static async createConnectionFactory(
         options: SqbModuleOptions,
-    ): Promise<Client> {
+    ): Promise<SqbClient> {
         const connectionToken = options.name || DEFAULT_CONNECTION_NAME;
         return await defer(async () => {
-            const client = new Client(options);
+            const client = new SqbClient(options);
             await client.test();
             return client;
         })
