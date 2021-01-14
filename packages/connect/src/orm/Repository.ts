@@ -1,8 +1,8 @@
 import {
     Operator
 } from '@sqb/builder';
-import {Client} from '../client/Client';
-import {Connection} from '../client/Connection';
+import {SqbClient} from '../client/SqbClient';
+import {SqbConnection} from '../client/SqbConnection';
 import {PickWritable} from './orm.types';
 import {EntityDefinition} from './EntityDefinition';
 import {QueryExecutor} from '../client/types';
@@ -55,7 +55,7 @@ export class Repository<T> {
     private readonly _executor: QueryExecutor;
     private readonly _entityDef: EntityDefinition;
 
-    constructor(entityDef: EntityDefinition, executor: Client | Connection) {
+    constructor(entityDef: EntityDefinition, executor: SqbClient | SqbConnection) {
         this._executor = executor;
         this._entityDef = entityDef;
     }

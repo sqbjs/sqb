@@ -3,7 +3,7 @@ import '../_support/env';
 import assert from 'assert';
 import {Insert, Param, Select} from '@sqb/builder';
 import '@sqb/postgres';
-import {Client} from '@sqb/connect';
+import {SqbClient} from '@sqb/connect';
 import {initClient} from '../_support/init-client';
 
 describe('Client', function () {
@@ -13,30 +13,30 @@ describe('Client', function () {
     const insertedIds: any[] = [];
 
     it('should throw if no configuration argument given', function () {
-        assert.throws(() => new Client(undefined),
+        assert.throws(() => new SqbClient(undefined),
             /Configuration object required/);
     });
 
     it('should throw if adapter for driver is not registered', function () {
         assert.throws(() =>
-                new Client({driver: 'unknown'}),
+                new SqbClient({driver: 'unknown'}),
             /No database adapter registered for/);
     });
 
     it('should initialize client with driver name', function () {
-        const _client = new Client({driver: 'postgresql-client'});
+        const _client = new SqbClient({driver: 'postgresql-client'});
         assert.strictEqual(_client.dialect, dialect);
         assert.strictEqual(_client.driver, 'postgresql-client');
     });
 
     it('should initialize client with dialect name', function () {
-        const _client = new Client({dialect});
+        const _client = new SqbClient({dialect});
         assert.strictEqual(_client.dialect, dialect);
         assert.strictEqual(_client.driver, 'postgresql-client');
     });
 
     it('should initialize default options', function () {
-        const _client = new Client({dialect});
+        const _client = new SqbClient({dialect});
         const opts = _client.pool.options;
         assert.strictEqual(opts.acquireMaxRetries, 0);
         assert.strictEqual(opts.acquireRetryWait, 2000);

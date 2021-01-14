@@ -2,7 +2,7 @@ import {classes} from '@sqb/builder';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
-import {Client} from './Client';
+import {SqbClient} from './SqbClient';
 import {
     ConnectionOptions, ExecuteHookFunction, FetchFunction,
     FieldNaming,
@@ -19,7 +19,7 @@ import {EntityDefinition} from '../orm/EntityDefinition';
 
 const debug = _debug('sqb:connection');
 
-export class Connection extends SafeEventEmitter implements QueryExecutor {
+export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
 
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
@@ -28,7 +28,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
     private _inTransaction = false;
     private _refCount = 1;
 
-    constructor(public readonly client: Client,
+    constructor(public readonly client: SqbClient,
                 adapterConnection: Adapter.Connection,
                 options?: ConnectionOptions) {
         super();

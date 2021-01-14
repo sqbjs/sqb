@@ -1,7 +1,7 @@
 import {Logger, Type} from '@nestjs/common';
 import {Observable} from 'rxjs';
 import {delay, retryWhen, scan} from 'rxjs/operators';
-import {Client} from '@sqb/connect';
+import {SqbClient} from '@sqb/connect';
 import {v4 as uuid} from 'uuid';
 import {DEFAULT_CONNECTION_NAME} from '../sqb.constants';
 // noinspection ES6PreferShortImport
@@ -17,10 +17,10 @@ const logger = new Logger('SqbModule');
  */
 export function getConnectionToken(
     client: SqbModuleOptions | string = DEFAULT_CONNECTION_NAME,
-): string | Type<Client> {
-    return DEFAULT_CONNECTION_NAME === client ? Client
+): string | Type<SqbClient> {
+    return DEFAULT_CONNECTION_NAME === client ? SqbClient
         : ('string' === typeof client ? `${client}Connection`
-            : (DEFAULT_CONNECTION_NAME === client.name || !client.name ? Client
+            : (DEFAULT_CONNECTION_NAME === client.name || !client.name ? SqbClient
                 : `${client.name}Connection`));
 }
 

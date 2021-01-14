@@ -3,7 +3,7 @@ import assert from 'assert';
 import {Readable} from 'stream';
 import {Select} from '@sqb/builder';
 import {Cursor} from '@sqb/connect';
-import {Connection} from '../../src/client/Connection';
+import {SqbConnection} from '../../src/client/SqbConnection';
 import {initClient} from '../_support/init-client';
 
 function readStream(stream: Readable): Promise<string> {
@@ -45,7 +45,7 @@ describe('CursorStream', function () {
 
     it('should stream string buffer', async function () {
         this.slow(1000);
-        await client.acquire(async (session: Connection) => {
+        await client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
@@ -58,7 +58,7 @@ describe('CursorStream', function () {
     });
 
     it('should stream row object if objectMode enabled', async function () {
-        await client.acquire(async (session: Connection) => {
+        await client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream({objectMode: true});
@@ -69,7 +69,7 @@ describe('CursorStream', function () {
     });
 
     it('should cursor.close() also close the stream', function (done) {
-        client.acquire(async (session: Connection) => {
+        client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
@@ -79,7 +79,7 @@ describe('CursorStream', function () {
     });
 
     it('should handle cursor errors', function (done) {
-        client.acquire(async (session: Connection) => {
+        client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
