@@ -2,8 +2,7 @@ import {
     SerializerExtension,
     SerializeContext,
     DefaultSerializeFunction,
-    SerializationType,
-    Maybe
+    SerializationType
 } from '@sqb/builder';
 
 const reservedWords = ['comment'];
@@ -18,7 +17,7 @@ export class PostgresSerializer implements SerializerExtension {
     }
 
     serialize(ctx: SerializeContext, type: SerializationType | string, o: any,
-              defFn: DefaultSerializeFunction): Maybe<string> {
+              defFn: DefaultSerializeFunction): string | undefined {
         switch (type) {
             case SerializationType.SELECT_QUERY:
                 return this._serializeSelect(ctx, o, defFn);
@@ -29,7 +28,7 @@ export class PostgresSerializer implements SerializerExtension {
         }
     }
 
-    private _serializeSelect(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+    private _serializeSelect(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         let out = defFn(ctx, o);
         const limit = o.limit || 0;
         const offset = Math.max((o.offset || 0), 0);
@@ -40,7 +39,7 @@ export class PostgresSerializer implements SerializerExtension {
         return out;
     }
 
-    private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): Maybe<string> {
+    private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         if (typeof o.right === 'string') {
             if (o.right.startsWith('(')) {
                 if (o.operatorType === 'eq')
@@ -63,7 +62,7 @@ export class PostgresSerializer implements SerializerExtension {
         return defFn(ctx, o);
     }
 
-    private _serializeParameter(ctx: SerializeContext, o: any): Maybe<string> {
+    private _serializeParameter(ctx: SerializeContext, o: any): string {
         const prmValue = ctx.values && ctx.values[o.name];
         ctx.queryParams = ctx.queryParams || [];
         ctx.queryParams.push(prmValue);

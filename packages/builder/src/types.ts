@@ -1,7 +1,5 @@
 import {SerializationType} from './enums';
 
-export type Maybe<T = any> = T | undefined | null;
-
 export interface SerializerExtension {
     dialect: string;
     serialize?: SerializeFunction;
@@ -21,16 +19,16 @@ export interface GenerateOptions {
 export interface SerializeContext extends GenerateOptions {
     serializeHooks?: Function[];
     queryParams?: Record<string, any> | any[];
-    returningFields?: {field: string, alias?: string}[];
+    returningFields?: { field: string, alias?: string }[];
 }
 
 export interface GenerateResult {
     sql: string;
     params?: any;
-    returningFields?: {field: string, alias?: string}[];
+    returningFields?: { field: string, alias?: string }[];
 }
 
 export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
-                                 defFn: DefaultSerializeFunction) => Maybe<string>;
+                                 defFn: DefaultSerializeFunction) => string | undefined;
 export type DefaultSerializeFunction = (ctx: SerializeContext, o: any) => string;
 export type IsReservedWordFunction = (ctx: SerializeContext, s: string) => boolean;
