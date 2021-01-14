@@ -122,7 +122,7 @@ export class Connection extends SafeEventEmitter implements QueryExecutor {
         const entityDef = EntityDefinition.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
-        return new Repository<T>(this, ctor);
+        return new Repository<T>(entityDef, this);
     }
 
     /**

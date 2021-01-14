@@ -1,7 +1,7 @@
 import {Connection, stringifyValueForSQL} from 'postgresql-client';
 import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
 
-const schema = process.env.PGSCHEMA || 'test';
+const schema = process.env.PGSCHEMA || 'postgres';
 
 const schemaSql = `
 DROP SCHEMA IF EXISTS ${schema} CASCADE;

@@ -14,7 +14,6 @@ export interface IndexDefinition {
 }
 
 export class EntityDefinition {
-
     name;
     tableName;
     columns = new Map<string, ColumnDefinition>();
