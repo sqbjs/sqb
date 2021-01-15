@@ -244,7 +244,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
                 .generate({
                     dialect: request.dialect,
                     dialectVersion: request.dialectVersion,
-                    values: options.params,
+                    params: options.params,
                 });
             request.sql = q.sql;
             request.params = q.params;

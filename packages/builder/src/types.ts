@@ -12,14 +12,16 @@ export interface GenerateOptions {
      */
     dialect?: string;
     prettyPrint?: boolean;
-    values?: Record<string, any>;
+    params?: Record<string, any>;
     dialectVersion?: string;
+    strictParams?: boolean;
 }
 
 export interface SerializeContext extends GenerateOptions {
     serializeHooks?: Function[];
     queryParams?: Record<string, any> | any[];
     returningFields?: { field: string, alias?: string }[];
+    strictParamGenId?: number;
 }
 
 export interface GenerateResult {

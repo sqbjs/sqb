@@ -1,6 +1,6 @@
 import '../_support/env';
 import assert from 'assert';
-import {DataType, Eq, Param, Raw, SerializationType, Update} from '@sqb/builder';
+import {Eq, Param, Raw, SerializationType, Update} from '@sqb/builder';
 
 describe('Serialize update query', function () {
 
@@ -46,7 +46,7 @@ describe('Serialize update query', function () {
     it('should serialize params with "values" argument: COLON', function () {
         const query = Update('table1', {id: Param('id'), name: Param('name')});
         const result = query.generate(Object.assign({
-            values: {
+            params: {
                 id: 1,
                 name: 'abc'
             }, ...options

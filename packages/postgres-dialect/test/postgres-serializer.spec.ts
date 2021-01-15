@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Param, Update, DataType,
+    Select, Param, Update,
 } from '@sqb/builder';
 import {PostgresSerializer} from '../src/PostgresSerializer';
 
@@ -79,7 +79,7 @@ describe('PostgresSerializer', function () {
         const query = Select().from('table1').where({ID: Param('ID')});
         const result = query.generate({
             dialect: 'postgres',
-            values: {ID: 5}
+            params: {ID: 5}
         });
         assert.strictEqual(result.sql, 'select * from table1 where ID = $1');
         assert.deepStrictEqual(result.params, [5]);
@@ -99,7 +99,7 @@ describe('PostgresSerializer', function () {
             .where({'ID in': [1, 2, 3]});
         const result = query.generate({
             dialect: 'postgres',
-            values: {ID: 5}
+            params: {ID: 5}
         });
         assert.strictEqual(result.sql, 'select * from table1 where ID in (1,2,3)');
     });

@@ -1,6 +1,7 @@
 import './_support/env';
 import path from 'path';
 import {SqljsAdapter} from '../src/SqljsAdapter';
+// noinspection ES6PreferShortImport
 import {getInsertSQLsForTestData, initAdapterTests} from '../../connect/test/_shared/adapter-tests';
 import {SqlJs} from 'sql.js/module';
 

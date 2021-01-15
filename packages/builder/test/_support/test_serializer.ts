@@ -1,4 +1,4 @@
-import {Maybe, SerializationType, SerializeContext} from '@sqb/builder';
+import {SerializationType, SerializeContext} from '@sqb/builder';
 
 export class TestSerializer {
 
@@ -16,8 +16,8 @@ export class TestSerializer {
         return false;
     }
 
-    private _serializeParameter(ctx: SerializeContext, o: any): Maybe<string> {
-        const prmValue = ctx.values && ctx.values[o.name];
+    private _serializeParameter(ctx: SerializeContext, o: any): string {
+        const prmValue = ctx.params && ctx.params[o.name];
         ctx.queryParams = ctx.queryParams || {};
         ctx.queryParams[o.name] = prmValue;
         return '::' + o.name;

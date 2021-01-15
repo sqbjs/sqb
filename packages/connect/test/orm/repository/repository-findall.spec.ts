@@ -1,7 +1,7 @@
 import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {Eq, In} from '@sqb/builder';
+import {Eq, In, Param} from '@sqb/builder';
 import {Customer} from '../../_support/customers.entity';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
@@ -60,6 +60,21 @@ describe('"findAll()" method', function () {
             assert.strictEqual(rows.length, 2);
             assert.strictEqual(rows[0].code, 'CA');
             assert.strictEqual(rows[1].code, 'US');
+        });
+
+        it('should filter if field name different than property name', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            const rows = await repo.findAll({
+                filter: {
+                    givenName: Param('givenName'),
+                    familyName: 'Marsh'
+                },
+                params: {
+                    givenName: 'Belle'
+                }
+            },);
+            assert.strictEqual(rows.length, 1);
+            assert.strictEqual(rows[0].id, 3);
         });
 
         it('should limit result rows', async function () {

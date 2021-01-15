@@ -3,6 +3,7 @@ import {Serializable, serializeFallback, serializeObject} from '../../Serializab
 import {SerializeContext} from '../../types';
 import {SerializationType} from '../../enums';
 import {isSelectQuery} from '../../typeguards';
+import {Param} from '../sqlobject.initializers';
 
 export abstract class CompOperator extends Operator {
 
@@ -23,12 +24,20 @@ export abstract class CompOperator extends Operator {
     _serialize(ctx: SerializeContext): string {
         const left = this._expression instanceof Serializable ?
             this._expression._serialize(ctx) : this._expression;
+        let right = this._value;
+        if (ctx.strictParams && typeof this._expression === 'string') {
+            ctx.strictParamGenId = ctx.strictParamGenId || 0;
+            const name = 'strictParam$' + ++ctx.strictParamGenId;
+            right = Param(name);
+            ctx.params = ctx.params || {};
+            ctx.params[name] = this._value;
+        }
         const o: any = {
             operatorType: this._operatorType,
             left: isSelectQuery(this._expression) ?
                 '(' + left + ')' : left,
             symbol: this._symbol,
-            right: this._value
+            right
         };
 
         return this.__serialize(ctx, o);

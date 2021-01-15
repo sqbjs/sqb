@@ -63,7 +63,7 @@ export class PostgresSerializer implements SerializerExtension {
     }
 
     private _serializeParameter(ctx: SerializeContext, o: any): string {
-        const prmValue = ctx.values && ctx.values[o.name];
+        const prmValue = ctx.params && ctx.params[o.name];
         ctx.queryParams = ctx.queryParams || [];
         ctx.queryParams.push(prmValue);
         return '$' + ctx.queryParams.length;
