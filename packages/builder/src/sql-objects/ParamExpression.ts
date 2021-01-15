@@ -26,7 +26,7 @@ export class ParamExpression extends Serializable {
 
     protected __defaultSerialize(ctx: SerializeContext,
                                  o: { name: string, dataType?: DataType }): string {
-        const prmValue = ctx.values && ctx.values[o.name];
+        const prmValue = ctx.params && ctx.params[o.name];
         ctx.queryParams = ctx.queryParams || {};
         ctx.queryParams[o.name] = prmValue;
         return ':' + o.name;

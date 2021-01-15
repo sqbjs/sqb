@@ -127,9 +127,18 @@ describe('serialize "SelectQuery"', function () {
         const query = Select()
             .from('table1')
             .where({id: Param('id')})
-        const result = query.generate({...options, values: {id: 1}});
+        const result = query.generate({...options, params: {id: 1}});
         assert.strictEqual(result.sql, 'select * from table1 where id = ::id');
         assert.strictEqual(result.params.id, 1);
+    });
+
+    it('should force using params if strictParams=true', function () {
+        const query = Select()
+            .from('table1')
+            .where({id: 1})
+        const result = query.generate({...options, strictParams: true});
+        assert.strictEqual(result.sql, 'select * from table1 where id = ::strictParam$1');
+        assert.strictEqual(result.params.strictParam$1, 1);
     });
 
     it('should pretty print - test2', function () {

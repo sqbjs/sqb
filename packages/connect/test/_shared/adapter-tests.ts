@@ -28,7 +28,7 @@ export function initAdapterTests(adapter: Adapter,
 
     async function adapterExecute(query: Query,
                                   opts?: Partial<QueryRequest>): Promise<Adapter.Response & { objRows: any[] }> {
-        const q = query.generate({dialect: adapter.dialect, values: opts?.params});
+        const q = query.generate({dialect: adapter.dialect, params: opts?.params});
         const result: any = await connection.execute({
             ...opts,
             sql: q.sql,

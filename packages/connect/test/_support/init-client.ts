@@ -1,4 +1,5 @@
 import {SqbClient, ClientConfiguration} from '@sqb/connect';
+// noinspection ES6PreferShortImport
 import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
 export function initClient(config?: ClientConfiguration): SqbClient {

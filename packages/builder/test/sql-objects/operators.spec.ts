@@ -136,9 +136,7 @@ describe('serialize "Operators"', function () {
             const query = Select()
                 .from('table1')
                 .where(Eq('id', Param('id')));
-            const result = query.generate(Object.assign({
-                values: {id: 1}
-            }, options));
+            const result = query.generate(Object.assign({params: {id: 1}}, options));
             assert.strictEqual(result.sql, 'select * from table1 where id = :id');
             assert.strictEqual(result.params.id, 1);
         });
@@ -182,9 +180,7 @@ describe('serialize "Operators"', function () {
             const query = Select()
                 .from('table1')
                 .where(Ne('id', Param('id')));
-            const result = query.generate(Object.assign({
-                values: {id: 1}
-            }, options));
+            const result = query.generate(Object.assign({params: {id: 1}}, options));
             assert.strictEqual(result.sql, 'select * from table1 where id != :id');
             assert.strictEqual(result.params.id, 1);
         });
@@ -348,7 +344,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Between('id', Param('id1'), Param('id2')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id1: 1,
                     id2: 5
                 }
@@ -407,7 +403,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotBetween('id', Param('id1'), Param('id2')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id1: 1,
                     id2: 5
                 }
@@ -451,7 +447,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Like('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
@@ -493,7 +489,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotLike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
@@ -535,7 +531,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Ilike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
@@ -577,7 +573,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotILike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
@@ -618,7 +614,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(In('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: [1, 2, 3]
                 }
             }, options));
@@ -668,7 +664,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotIn('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: [1, 2, 3]
                 }
             }, options));
@@ -858,7 +854,7 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Eq('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: null
                 }
             }, options));
