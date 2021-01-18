@@ -60,6 +60,23 @@ describe('"update()" method', function () {
         assert.notStrictEqual(c2.updatedAt, updated.updatedAt);
     });
 
+    it('should apply transformWrite function', async function () {
+        const customer = await createCustomer();
+        ids.push(customer.id);
+
+        const repo = client.getRepository<Customer>(Customer);
+        const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
+        const updated = await repo.update({
+            id: ids[0],
+            givenName: newGivenName,
+            gender: 'Female'
+        });
+        const c2 = await repo.findByPk(ids[0]);
+        assert.strictEqual(updated.id, c2.id);
+        assert.strictEqual(updated.gender, 'Female');
+
+    });
+
     it('should work within transaction', async function () {
         return client.acquire(async (connection) => {
             const repo = connection.getRepository<Customer>(Customer);

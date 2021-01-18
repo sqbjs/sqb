@@ -27,6 +27,8 @@ export async function updateAllRaw<T>(args: UpdateAllCommandArgs<T>): Promise<Qu
             if (returning && col.autoGenerate && col.canUpdate)
                 returning.push(col.fieldName);
             v = values[col.name];
+            if (typeof col.transformWrite === 'function')
+                v = col.transformWrite(v, col, values);
             if (v === undefined || col.update === false)
                 continue;
             i++;

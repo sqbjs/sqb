@@ -36,6 +36,21 @@ describe('create() method', function () {
         assert.strictEqual(x.country.code, customer.countryCode);
     });
 
+    it('should apply transformWrite function', async function () {
+        const values = {
+            givenName: 'G' + Math.trunc(Math.random() * 10000),
+            familyName: 'F' + Math.trunc(Math.random() * 10000),
+            countryCode: 'TR',
+            gender: 'Male'
+        }
+        const repo = client.getRepository<Customer>(Customer);
+        const customer = await repo.create(values);
+        assert.ok(customer);
+        const x = await repo.findByPk(customer, {columns: ['id', 'gender']});
+        assert.strictEqual(x.id, customer.id);
+        assert.strictEqual(x.gender, 'Male');
+    });
+
     it('should work within transaction', async function () {
         let c = 0;
         return client.acquire(async (connection) => {

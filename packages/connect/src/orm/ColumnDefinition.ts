@@ -53,7 +53,8 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     hidden?: boolean;
     update?: boolean;
     insert?: boolean;
-    transform?: ColumnTransformFunction;
+    transformRead?: ColumnTransformFunction;
+    transformWrite?: ColumnTransformFunction;
 
     constructor(entity: EntityDefinition, name: string) {
         super(entity, name);
