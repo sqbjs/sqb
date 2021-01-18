@@ -5,7 +5,7 @@ import {ClientConfiguration} from '@sqb/connect';
 import {
     getInsertSQLsForTestData,
     initAdapterTests
-} from '../../connect/test/_shared/adapter-tests';
+} from '@sqb/connect/test/_shared/adapter-tests';
 import {clientConfigurationToDriver} from '../src/helpers';
 
 describe('OraAdapter', function () {
@@ -74,10 +74,11 @@ async function createTestSchema(connection: oracledb.Connection) {
         }
 
     }
-
 }
 
 export function stringifyValueForSQL(v: any): string {
+    if (v == null)
+        return 'null';
     if (typeof v === 'string') {
         if (v.match(/^\d{4}-\d{2}-\d{2}T/))
             return `TO_TIMESTAMP_TZ('${v}','YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')`;

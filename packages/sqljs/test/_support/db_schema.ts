@@ -21,6 +21,7 @@ CREATE TABLE customers
     given_name text,
     family_name text,
     birth_date date,
+    gender text,
     city text,
     country_code text,
     created_at text,

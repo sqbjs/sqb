@@ -78,6 +78,7 @@ CONSTRAINT FK_countries_continent_CODE
   id    INTEGER,
   given_name  VARCHAR2(64),
   family_name  VARCHAR2(64),
+  gender  CHAR(1),
   birth_date  DATE,
   city  VARCHAR2(32),
   country_code  VARCHAR2(5)

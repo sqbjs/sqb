@@ -124,6 +124,14 @@ describe('"findAll()" method', function () {
                     repo.findAll({sort: ['country']}),
                 /Can not sort by/);
         });
+
+        it('should apply transformRead function', async function () {
+            const repo = client.getRepository<Customer>(Customer);
+            const rows = await repo.findAll({sort: ['id'], limit: 10});
+            assert.strictEqual(rows[0].gender, 'Male');
+            assert.strictEqual(rows[1].gender, 'Female');
+        });
+
     });
 
     /**

@@ -41,6 +41,7 @@ CREATE TABLE ${schema}.customers
     id SERIAL,
     given_name character varying(64),
     family_name character varying(64),
+    gender char(1),
     birth_date date,
     city character varying(32),
     country_code character varying(5),

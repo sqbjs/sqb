@@ -106,11 +106,12 @@ export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
             const trg = {};
             for (let colIdx = 0; colIdx < colLen; colIdx++) {
                 cinfo = queryColumns[colIdx];
+                const colDef = cinfo.column;
 
-                if (isRelationColumn(cinfo.column) && cinfo.subTask) {
-                    if (cinfo.column.lazy) {
+                if (isRelationColumn(colDef) && cinfo.subTask) {
+                    if (colDef.lazy) {
                         const subTask = cinfo.subTask as FindCommandArgs;
-                        const hasMany = cinfo.column.hasMany;
+                        const hasMany = colDef.hasMany;
                         const _params: any = {};
                         for (const alias of cinfo.subTaskAliases as string[]) {
                             const f = fields.get(alias);
@@ -144,25 +145,28 @@ export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
                             }
                         }
                     }
-                    continue;
+                } else if (isDataColumn(colDef)) {
+                    if (!(cinfo.alias && cinfo.visible))
+                        continue;
+                    field = fields.get(cinfo.alias);
+                    if (!field)
+                        continue;
+                    o = trg;
+                    // One2One relation columns has path property
+                    // We iterate over path to create sub objects to write value in
+                    if (cinfo.path) {
+                        for (const [i, p] of cinfo.path.entries()) {
+                            o = o[p] = (o[p] || {});
+                            // @ts-ignore
+                            Object.setPrototypeOf(o, (cinfo.pathEntities[i]).ctor.prototype);
+                        }
+                    }
+                    let v = src[field.index];
+                    if (typeof colDef.transformRead === 'function')
+                        v = colDef.transformRead(v, colDef, trg);
+                    o[cinfo.name] = v;
                 }
 
-                if (!(cinfo.alias && cinfo.visible))
-                    continue;
-                field = fields.get(cinfo.alias);
-                if (!field)
-                    continue;
-                o = trg;
-                // One2One relation columns has path property
-                // We iterate over path to create sub objects to write value in
-                if (cinfo.path) {
-                    for (const [i, p] of cinfo.path.entries()) {
-                        o = o[p] = (o[p] || {});
-                        // @ts-ignore
-                        Object.setPrototypeOf(o, (cinfo.pathEntities[i]).ctor.prototype);
-                    }
-                }
-                o[cinfo.name] = src[field.index];
             }
             // Set object prototype to entities prototype
             Object.setPrototypeOf(trg, entityDef.ctor.prototype);

@@ -26,6 +26,8 @@ export async function createRaw<T>(args: CreateCommandArgs<T>): Promise<QueryRes
             v = values[col.name];
             if (returning && col.autoGenerate && col.canInsert)
                 returning.push(col.fieldName);
+            if (typeof col.transformWrite === 'function')
+                v = col.transformWrite(v, col, values);
             if (v === undefined || col.insert === false)
                 continue;
             input[col.fieldName] = Param(col.fieldName);
