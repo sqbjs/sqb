@@ -163,6 +163,27 @@ describe('Client', function () {
         assert.strictEqual(c3, c);
     });
 
+    it('should acquire(callback) rollback transaction if not committed', async function () {
+        const c = (await client.execute('select count(*) from customers')).rows[0].count;
+        try {
+            await client.acquire(async (connection) => {
+                await connection.startTransaction();
+                await connection.execute('insert into customers (given_name) values (:given)', {
+                    params: {
+                        given: 'John'
+                    }
+                });
+                const c2 = (await connection.execute('select count(*) from customers'))
+                    .rows[0].count;
+                assert.strictEqual(c2, c);
+            });
+        } catch (ignored) {
+            //
+        }
+        const c3 = (await client.execute('select count(*) from customers')).rows[0].count;
+        assert.strictEqual(c3, c);
+    });
+
     it('should commit can be called in execute(callback)', async function () {
         const c = (await client.execute('select count(*) from customers')).rows[0].count;
         const given = 'X' + Math.floor(Math.random() * 10000);

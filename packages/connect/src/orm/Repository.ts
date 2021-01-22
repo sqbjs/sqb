@@ -1,6 +1,7 @@
 import {
     Operator
 } from '@sqb/builder';
+// noinspection ES6PreferShortImport
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {PickWritable} from './orm.types';
@@ -107,7 +108,6 @@ export class Repository<T> {
     async findByPk(keyValue: T | any | Record<string, any>, options?: Repository.GetOptions): Promise<Maybe<T>> {
         const opts: Repository.FindAllOptions = {...options};
         opts.filter = [extractKeyValues(this._entityDef, keyValue)];
-        opts.limit = 1;
         delete opts.offset;
         return await this.findOne(opts);
     }

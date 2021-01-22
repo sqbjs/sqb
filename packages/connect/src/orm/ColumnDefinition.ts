@@ -47,8 +47,6 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     scale?: number;
     collation?: string;
     autoGenerate?: ColumnAutoGenerationStrategy;
-    sortAscending?: boolean;
-    sortDescending?: boolean;
     required?: boolean;
     hidden?: boolean;
     update?: boolean;

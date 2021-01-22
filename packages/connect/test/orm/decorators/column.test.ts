@@ -77,8 +77,6 @@ describe('Column()', function () {
         assert.strictEqual(idColumn.update, true);
         assert.strictEqual(idColumn.hidden, false);
         assert.strictEqual(idColumn.required, false);
-        assert.strictEqual(idColumn.sortAscending, true);
-        assert.strictEqual(idColumn.sortDescending, true);
     });
 
 });
