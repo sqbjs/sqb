@@ -29,7 +29,10 @@ export class CountStatement extends Serializable {
             () => this.__defaultSerialize(ctx, undefined));
     }
 
-    protected __defaultSerialize(ctx: SerializeContext, o: any): string {
+    // noinspection JSUnusedLocalSymbols
+    protected __defaultSerialize(
+        /* eslint-disable-next-line */
+        ctx: SerializeContext, o: any): string {
         return 'count(*)';
     }
 
