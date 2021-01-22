@@ -111,13 +111,6 @@ describe('"findAll()" method', function () {
             assert.deepStrictEqual(arr1, arr2);
         });
 
-        it('should sort by sort-enabled columns only ', async function () {
-            const repo = client.getRepository<Customer>(Customer);
-            return assert.rejects(() =>
-                    repo.findAll({sort: ['countryCode']}),
-                /is not allowed/);
-        });
-
         it('should sort by data columns only ', async function () {
             const repo = client.getRepository<Customer>(Customer);
             return assert.rejects(() =>

@@ -378,7 +378,6 @@ async function joinRelationTable(target: JoinInfo[],
     return join;
 }
 
-
 function prepareSort(entityDef: EntityDefinition, sort: string[]): string[] {
     const orderColumns: string[] = [];
     for (const item of sort) {
@@ -392,10 +391,6 @@ function prepareSort(entityDef: EntityDefinition, sort: string[]): string[] {
         if (!isDataColumn(col))
             throw new Error(`Can not sort by "${colName}", because it is not a data column`);
         const dir = m[1] || '+';
-        if (dir === '+' && !col.sortAscending)
-            throw new Error(`Ascending sort on olumn "${colName}" is not allowed`);
-        if (dir === '-' && !col.sortDescending)
-            throw new Error(`Descending sort on olumn "${colName}" is not allowed`);
         orderColumns.push((dir || '') + col.fieldName);
     }
     return orderColumns;
