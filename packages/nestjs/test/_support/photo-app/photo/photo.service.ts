@@ -1,7 +1,7 @@
 import '@sqb/postgres';
 
 import {Injectable} from '@nestjs/common';
-import {Client} from '@sqb/connect';
+import {SqbClient} from '@sqb/connect';
 import {InjectConnection} from '@sqb/nestjs';
 import {Select, Insert} from '@sqb/builder';
 
@@ -9,7 +9,7 @@ import {Select, Insert} from '@sqb/builder';
 export class PhotoService {
     constructor(
         @InjectConnection('db1')
-        private readonly client: Client
+        private readonly client: SqbClient
     ) {
     }
 

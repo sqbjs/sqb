@@ -103,16 +103,6 @@ export interface ColumnConfig {
     autoGenerate?: ColumnAutoGenerationStrategy;
 
     /**
-     * Indicates column can be sorted ascending order
-     */
-    sortAscending?: boolean;
-
-    /**
-     * Indicates column can be sorted descending order
-     */
-    sortDescending?: boolean;
-
-    /**
      * Indicates if column is required
      */
     required?: boolean;

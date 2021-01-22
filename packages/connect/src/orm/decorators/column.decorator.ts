@@ -34,10 +34,6 @@ export function Column(options?: string | ColumnConfig): PropertyDecorator {
                 col.scale = opts.scale;
             if (opts.autoGenerate != null)
                 col.autoGenerate = opts.autoGenerate;
-            if (opts.sortAscending != null)
-                col.sortAscending = opts.sortAscending;
-            if (opts.sortDescending != null)
-                col.sortDescending = opts.sortDescending;
             if (opts.required != null)
                 col.required = opts.required;
             if (opts.required != null)
