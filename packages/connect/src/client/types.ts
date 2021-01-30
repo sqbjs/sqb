@@ -5,6 +5,7 @@ import type {Cursor} from './Cursor';
 import type {PoolConfiguration} from 'lightning-pool';
 import type {Adapter} from './Adapter';
 import type {Maybe} from '../types';
+import {DataType} from '@sqb/builder';
 
 export {DataType} from '@sqb/builder';
 
@@ -174,7 +175,7 @@ export interface QueryExecuteOptions {
 
     action?: string;
 
-    returningFields?: {field: string, alias?: string}[];
+    fetchAsString?: DataType[];
 
 }
 
@@ -209,6 +210,7 @@ export interface QueryRequest {
     transform?: ValueTransformFunction;
     showSql?: boolean;
     action?: string;
+    fetchAsString?: DataType[];
     executeHooks?: ExecuteHookFunction[];
     fetchHooks?: FetchFunction[];
 }

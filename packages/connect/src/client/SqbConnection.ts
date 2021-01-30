@@ -233,7 +233,8 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
             fieldNaming: coalesce(options.namingStrategy, defaults.fieldNaming) as FieldNaming,
             transform: coalesce(options.transform, defaults.transform),
             showSql: coerceToBoolean(coalesce(options.showSql, defaults.showSql), false),
-            action: coerceToString(options.action)
+            action: coerceToString(options.action),
+            fetchAsString: options.fetchAsString
         };
         request.ignoreNulls = request.ignoreNulls && request.objectRows;
 
@@ -245,6 +246,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
                     dialect: request.dialect,
                     dialectVersion: request.dialectVersion,
                     params: options.params,
+                    strictParams: true
                 });
             request.sql = q.sql;
             request.params = q.params;
@@ -257,7 +259,6 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
         } else if (typeof query === 'string') {
             request.sql = query;
             request.params = options.params;
-            request.returningFields = options.returningFields;
         }
         // @ts-ignore
         if (!request.sql)
