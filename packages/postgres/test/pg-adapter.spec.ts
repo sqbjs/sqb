@@ -1,5 +1,6 @@
 import './_support/env';
 import {PgAdapter} from '../src/PgAdapter';
+// noinspection ES6PreferShortImport
 import {initAdapterTests} from '../../connect/test/_shared/adapter-tests';
 import {createTestSchema} from './_support/create-db';
 

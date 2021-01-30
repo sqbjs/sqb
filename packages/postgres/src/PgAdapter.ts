@@ -1,4 +1,4 @@
-import {Adapter, ClientConfiguration} from '@sqb/connect';
+import {Adapter, ClientConfiguration, DataType} from '@sqb/connect';
 import '@sqb/postgres-dialect';
 import {
     Connection, ConnectionConfiguration,
@@ -9,6 +9,10 @@ export class PgAdapter implements Adapter {
 
     driver = 'postgresql-client';
     dialect = 'postgres';
+    features = {
+        cursor: true,
+        fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
+    }
 
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         const cfg: ConnectionConfiguration = {...config.driverOptions};

@@ -1,6 +1,24 @@
-import {Adapter, QueryRequest} from '@sqb/connect';
-import {Connection} from 'postgresql-client';
-import {FieldInfo} from 'postgresql-client/dist/definitions';
+import {Adapter, QueryRequest, DataType} from '@sqb/connect';
+import {Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions} from 'postgresql-client';
+
+const SqbDataTypToOIDMap = {
+    [DataType.BOOL]: DataTypeOIDs.bool,
+    [DataType.CHAR]: DataTypeOIDs.char,
+    [DataType.VARCHAR]: DataTypeOIDs.varchar,
+    [DataType.SMALLINT]: DataTypeOIDs.int2,
+    [DataType.INTEGER]: DataTypeOIDs.int4,
+    [DataType.BIGINT]: DataTypeOIDs.int8,
+    [DataType.FLOAT]: DataTypeOIDs.float4,
+    [DataType.DOUBLE]: DataTypeOIDs.float8,
+    [DataType.NUMBER]: DataTypeOIDs.float8,
+    [DataType.DATE]: DataTypeOIDs.date,
+    [DataType.TIMESTAMP]: DataTypeOIDs.timestamp,
+    [DataType.TIMESTAMPTZ]: DataTypeOIDs.timestamptz,
+    [DataType.TIME]: DataTypeOIDs.time,
+    [DataType.BINARY]: DataTypeOIDs.bytea,
+    [DataType.TEXT]: DataTypeOIDs.text,
+    [DataType.GUID]: DataTypeOIDs.uuid,
+}
 
 export class PgConnection implements Adapter.Connection {
     private readonly intlcon: Connection;
@@ -43,13 +61,24 @@ export class PgConnection implements Adapter.Connection {
     }
 
     async execute(query: QueryRequest): Promise<Adapter.Response> {
-        const resp = await this.intlcon.query(query.sql, {
+        const opts: QueryOptions = {
             autoCommit: query.autoCommit,
             params: query.params,
             cursor: query.cursor,
             fetchCount: query.fetchRows,
             objectRows: query.objectRows
-        });
+        };
+        if (query.fetchAsString) {
+            const items = query.fetchAsString.reduce<OID[]>((a, v) => {
+                const oid = SqbDataTypToOIDMap[v];
+                if (oid)
+                    a.push(oid);
+                return a;
+            }, []);
+            if (items.length)
+                opts.fetchAsString = items;
+        }
+        const resp = await this.intlcon.query(query.sql, opts);
         const out: Adapter.Response = {};
         if (resp.fields)
             out.fields = this._convertFields(resp.fields);

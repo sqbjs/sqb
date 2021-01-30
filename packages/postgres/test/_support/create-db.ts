@@ -2,7 +2,7 @@ import {Connection, stringifyValueForSQL} from 'postgresql-client';
 // noinspection ES6PreferShortImport
 import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
 
-const schema = process.env.PGSCHEMA || 'postgres';
+const schema = process.env.PGSCHEMA || 'test';
 
 const schemaSql = `
 DROP SCHEMA IF EXISTS ${schema} CASCADE;
