@@ -1,8 +1,9 @@
+const schema = process.env.PGSCHEMA || 'test';
 export const sql = `
-DROP SCHEMA IF EXISTS ${process.env.PGSCHEMA} CASCADE;
-CREATE SCHEMA ${process.env.PGSCHEMA} AUTHORIZATION postgres;
+DROP SCHEMA IF EXISTS ${schema} CASCADE;
+CREATE SCHEMA ${schema} AUTHORIZATION postgres;
 
-CREATE TABLE ${process.env.PGSCHEMA}.photos
+CREATE TABLE ${schema}.photos
 (
     id SERIAL NOT NULL,
     name character varying(32),
