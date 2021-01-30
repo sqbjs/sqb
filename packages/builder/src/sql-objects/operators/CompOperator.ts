@@ -2,7 +2,7 @@ import {Operator} from '../Operator';
 import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
 import {SerializeContext} from '../../types';
 import {SerializationType} from '../../enums';
-import {isSelectQuery} from '../../typeguards';
+import {isSelectQuery, isSerializable} from '../../typeguards';
 import {Param} from '../sqlobject.initializers';
 
 export abstract class CompOperator extends Operator {
@@ -25,7 +25,8 @@ export abstract class CompOperator extends Operator {
         const left = this._expression instanceof Serializable ?
             this._expression._serialize(ctx) : this._expression;
         let right = this._value;
-        if (ctx.strictParams && typeof this._expression === 'string') {
+        if (ctx.strictParams && !isSerializable(this._value) &&
+            typeof this._expression === 'string') {
             ctx.strictParamGenId = ctx.strictParamGenId || 0;
             const name = 'strictParam$' + ++ctx.strictParamGenId;
             right = Param(name);
