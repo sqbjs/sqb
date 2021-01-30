@@ -181,17 +181,16 @@ describe('"findAll()" method', function () {
 
         it('should use "exists" when filtering by o2o relational column', async function () {
             const repo = client.getRepository<Customer>(Customer);
-            let sql = '';
-            client.once('execute', (request => {
-                sql = request.sql;
-            }));
+            let request: any = {};
+            client.once('execute', (req => request = req));
             await repo.findAll({
                 columns: ['id'],
                 filter: [{'country.continent.code': 'AM'}]
             });
-            assert.strictEqual(sql, 'select T.ID as T_ID from customers T where ' +
+            assert.strictEqual(request.sql, 'select T.ID as T_ID from customers T where ' +
                 'exists (select 1 from countries E1 where E1.code = T.country_code and ' +
-                'exists (select 1 from continents E2 where E2.code = E1.continent_code and E2.code = \'AM\'))');
+                'exists (select 1 from continents E2 where E2.code = E1.continent_code and E2.code = $1))');
+            assert.deepStrictEqual(request.params, ['AM']);
         });
 
         it('should specify returning columns', async function () {

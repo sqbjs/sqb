@@ -2,11 +2,8 @@
 import fs from "fs";
 import path from "path";
 import assert from "assert";
-import {Query, Insert, Param, Select, Update} from '@sqb/builder';
-import {
-    Adapter, ClientConfiguration, QueryRequest,
-    registerAdapter, unRegisterAdapter
-} from '@sqb/connect';
+import {DataType, Insert, Param, Query, Select, Update} from '@sqb/builder';
+import {Adapter, ClientConfiguration, QueryRequest, registerAdapter, unRegisterAdapter} from '@sqb/connect';
 
 export function initAdapterTests(adapter: Adapter,
                                  config?: Partial<ClientConfiguration>) {
@@ -81,6 +78,10 @@ export function initAdapterTests(adapter: Adapter,
     });
 
     it('should return cursor', async function () {
+        if (!adapter.features?.cursor) {
+            this.skip();
+            return;
+        }
         connection = await adapter.connect(clientConfig);
         const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {
@@ -91,6 +92,7 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(result.fields);
         assert.ok(result.cursor);
         const rows = await result.cursor.fetch(1);
+        assert.ok(rows);
         assert.strictEqual(rows.length, 1);
         if (result.rowType === 'array')
             assert.strictEqual(rows[0][0], 1);
@@ -108,6 +110,38 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(result);
         assert.ok(result.rows);
         assert.strictEqual(result.rows.length, 5);
+    });
+
+    it('should fetch date fields as string (fetchAsString)', async function () {
+        if (!adapter.features?.fetchAsString?.includes(DataType.DATE))
+            return this.skip();
+        connection = await adapter.connect(clientConfig);
+        const query = Select('birth_date').from('customers');
+        const result = await adapterExecute(query, {
+            objectRows: false,
+            fetchRows: 1,
+            fetchAsString: [DataType.DATE]
+        });
+        assert.ok(result);
+        assert.ok(result.rows);
+        assert.strictEqual(result.rows.length, 1);
+        assert.strictEqual(typeof result.rows[0][0], 'string');
+    });
+
+    it('should fetch timestamp fields as string (fetchAsString)', async function () {
+        if (!adapter.features?.fetchAsString?.includes(DataType.TIMESTAMP))
+            return this.skip();
+        connection = await adapter.connect(clientConfig);
+        const query = Select('created_at').from('customers');
+        const result = await adapterExecute(query, {
+            objectRows: false,
+            fetchRows: 1,
+            fetchAsString: [DataType.TIMESTAMP]
+        });
+        assert.ok(result);
+        assert.ok(result.rows);
+        assert.strictEqual(result.rows.length, 1);
+        assert.strictEqual(typeof result.rows[0][0], 'string');
     });
 
     it('should return error if sql is invalid', async function () {

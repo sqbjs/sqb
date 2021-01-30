@@ -32,7 +32,11 @@ export async function updateAllRaw<T>(args: UpdateAllCommandArgs<T>): Promise<Qu
             if (v === undefined || col.update === false)
                 continue;
             i++;
-            input[col.fieldName] = Param('$input_' + col.fieldName);
+            input[col.fieldName] = Param({
+                name: '$input_' + col.fieldName,
+                dataType: col.dataType,
+                isArray: col.isArray
+            });
             _params['$input_' + col.fieldName] = v;
         }
         if (i === 0)
@@ -68,7 +72,9 @@ export async function update<T>(args: {
 
     const filter = {};
     for (const k of Object.keys(keyValues)) {
-        filter[k] = Param(k);
+        const col = entityDef.getColumn(k);
+        if (isDataColumn(col))
+            filter[k] = Param({name: k, dataType: col.dataType, isArray: col.isArray});
     }
 
     const r = await updateAllRaw({

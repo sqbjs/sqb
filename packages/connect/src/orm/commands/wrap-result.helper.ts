@@ -1,6 +1,11 @@
 import type {EntityDefinition} from '../EntityDefinition';
-import type {QueryResult} from '../../client/types';
+import type {QueryResult} from '../..';
 import {isDataColumn} from '../ColumnDefinition';
+
+export function makeEntityInstance<T>(trg: any, ctor: Function): T {
+    Object.setPrototypeOf(trg, ctor.prototype);
+    return trg as T;
+}
 
 export function wrapCreateResult(
     entityDef: EntityDefinition,
@@ -21,6 +26,5 @@ export function wrapCreateResult(
                 out[k] = values[k];
         }
     } else out = {...values};
-    Object.setPrototypeOf(out, entityDef.ctor.prototype);
-    return out;
+    return makeEntityInstance(out, entityDef.ctor);
 }

@@ -35,7 +35,8 @@
     "putil-merge": "^3.6.2",
     "putil-promisify": "^1.8.2",
     "putil-taskqueue": "^2.5.1",
-    "putil-varhelpers": "^1.2.2"
+    "putil-varhelpers": "^1.2.2",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5"

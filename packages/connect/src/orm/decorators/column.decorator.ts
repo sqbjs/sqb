@@ -1,19 +1,35 @@
 import {ColumnConfig} from '../orm.types';
-import {EntityDefinition} from '../EntityDefinition';
+import {DataType} from '../..';
+import {declareColumn} from '../helpers';
 
-export function Column(options?: string | ColumnConfig): PropertyDecorator {
+export function Column(options?: DataType | ColumnConfig): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
-        const entity = EntityDefinition.attach(target.constructor);
         const opts = typeof options === 'string' ?
-            {type: options} : options;
-        const col = entity.addDataColumn(propertyKey);
+            {dataType: options} : options;
+        const col = declareColumn(target, propertyKey);
         if (opts) {
             if (opts.fieldName)
-                col.fieldName = opts.fieldName || entity.name;
-            if (opts.type)
+                col.fieldName = opts.fieldName;
+            if (opts.type) {
                 col.type = opts.type;
+                if (col.type === Boolean)
+                    col.dataType = DataType.BOOL;
+                else if (col.type === String)
+                    col.dataType = DataType.VARCHAR;
+                else if (col.type === Number)
+                    col.dataType = DataType.NUMBER;
+                else if (col.type === Date)
+                    col.dataType = DataType.TIMESTAMP;
+                else if (col.type === Array) {
+                    col.dataType = DataType.VARCHAR;
+                    col.isArray = true;
+                } else if (col.type === Buffer)
+                    col.dataType = DataType.BINARY;
+            }
+            if (opts.dataType)
+                col.dataType = opts.dataType;
             if (opts.defaultValue != null)
                 col.defaultValue = opts.defaultValue;
             if (opts.isArray != null)

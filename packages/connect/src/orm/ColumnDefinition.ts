@@ -8,6 +8,7 @@ import {
 } from './orm.types';
 import {Maybe} from '../types';
 import {getEntityDefinition, isEntityClass} from './helpers';
+import {DataType} from '@sqb/builder';
 
 export type ColumnKind = 'data' | 'relation';
 export type ColumnDefinition = DataColumnDefinition | RelationColumnDefinition;
@@ -36,9 +37,10 @@ export abstract class BaseColumnDefinition {
 export class DataColumnDefinition extends BaseColumnDefinition {
     kind: ColumnKind = 'data';
     fieldName: string;
+    type?: Function;
     comment?: string;
     defaultValue: any;
-    type: string;
+    dataType?: DataType;
     isArray?: boolean;
     enum?: (string | number)[] | Object;
     length?: number;
@@ -57,11 +59,6 @@ export class DataColumnDefinition extends BaseColumnDefinition {
     constructor(entity: EntityDefinition, name: string) {
         super(entity, name);
         this.fieldName = name;
-        this.type = 'string';
-    }
-
-    get dataType(): string {
-        return 'string';
     }
 
     get canUpdate(): boolean {
