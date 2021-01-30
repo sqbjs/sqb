@@ -2,7 +2,8 @@ import {classes} from '@sqb/builder';
 import {
     ClientConfiguration,
     QueryRequest,
-    RowType
+    RowType,
+    DataType
 } from './types';
 import {Maybe} from '../types';
 
@@ -10,6 +11,10 @@ export interface Adapter {
     driver: string;
     dialect: string;
     connect: (config: ClientConfiguration) => Promise<Adapter.Connection>;
+    features?: {
+        cursor?: boolean;
+        fetchAsString?: DataType[];
+    }
 }
 
 export namespace Adapter {
