@@ -12,6 +12,10 @@ export class SqljsAdapter implements Adapter {
 
     driver = 'sqljs';
     dialect = 'sqlite';
+    features = {
+        cursor: true,
+        // fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
+    }
 
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         if (!config.database)
