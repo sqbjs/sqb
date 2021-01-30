@@ -8,6 +8,10 @@ export class OraAdapter implements Adapter {
 
     driver = 'oracledb';
     dialect = 'oracle';
+    features = {
+        cursor: true,
+        // fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
+    }
 
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         const cfg = clientConfigurationToDriver(config);
