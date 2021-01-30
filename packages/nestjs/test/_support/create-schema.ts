@@ -6,6 +6,7 @@ let created = false;
 export async function createSchema(): Promise<void> {
     if (created)
         return;
+    process.env.PGSCHEMA = process.env.PGSCHEMA || 'test';
     const connection = new Connection();
     await connection.connect();
     created = true;
