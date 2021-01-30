@@ -14,8 +14,8 @@ export interface IndexDefinition {
 }
 
 export class EntityDefinition {
-    name;
-    tableName;
+    name: string;
+    tableName: string;
     columns = new Map<string, ColumnDefinition>();
     columnKeys: string[] = [];
     schema?: string;
@@ -139,32 +139,6 @@ export class EntityDefinition {
     static get(ctor: Function): EntityDefinition {
         return ctor.hasOwnProperty(ENTITY_DEFINITION_PROPERTY) &&
             ctor[ENTITY_DEFINITION_PROPERTY];
-    }
-
-    static attach(ctor: Function): EntityDefinition {
-        let entity: EntityDefinition = EntityDefinition.get(ctor);
-        if (entity)
-            return entity;
-        ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor as Constructor);
-        // Merge base entity columns into this one
-        const baseCtor = Object.getPrototypeOf(ctor);
-        const baseDef = EntityDefinition.get(baseCtor);
-        if (baseDef) {
-            for (const k of baseDef.columnKeys) {
-                const colDef = baseDef.columns.get(k.toUpperCase());
-                if (colDef) {
-                    entity.columnKeys.push(k);
-                    entity.columns.set(k.toUpperCase(), colDef);
-                }
-            }
-        }
-        if (baseDef.primaryIndex) {
-            entity.primaryIndex = {
-                column: baseDef.primaryIndex.column,
-                unique: true
-            }
-        }
-        return entity;
     }
 
 }

@@ -11,6 +11,7 @@ import {Repository} from '../Repository';
 import {LazyResolver} from '../orm.types';
 import {EntityDefinition} from '../EntityDefinition';
 import {prepareFilter} from './filter.helper';
+import {makeEntityInstance} from './wrap-result.helper';
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 
@@ -86,7 +87,7 @@ export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
         params: args.params,
         fetchRows: args.limit,
         objectRows: false,
-        cursor: false,
+        cursor: false
     });
 
     // Create rows
@@ -168,9 +169,7 @@ export async function findAll<T = any>(args: FindCommandArgs): Promise<T[]> {
                 }
 
             }
-            // Set object prototype to entities prototype
-            Object.setPrototypeOf(trg, entityDef.ctor.prototype);
-            rows.push(trg as T);
+            rows.push(makeEntityInstance<T>(trg, entityDef.ctor));
         }
 
         // Fetch one-2-many related rows and merge with result rows

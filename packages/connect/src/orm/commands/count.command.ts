@@ -1,6 +1,6 @@
 import {And, Count, LogicalOperator, Select} from '@sqb/builder';
 import {prepareFilter} from './filter.helper';
-import {QueryExecutor} from '../../client/types';
+import {QueryExecutor} from '../../';
 import {EntityDefinition} from '../EntityDefinition';
 import {Repository} from '../Repository';
 

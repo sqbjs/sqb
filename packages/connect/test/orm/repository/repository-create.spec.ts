@@ -28,6 +28,7 @@ describe('create() method', function () {
             columns: ['id', 'givenName', 'familyName', 'countryCode', 'country']
         });
         const c2 = await repo.count();
+        assert.ok(x);
         assert.strictEqual(c2, c + 1);
         assert.strictEqual(x.id, customer.id);
         assert.strictEqual(x.givenName, customer.givenName);
@@ -47,6 +48,7 @@ describe('create() method', function () {
         const customer = await repo.create(values);
         assert.ok(customer);
         const x = await repo.findByPk(customer, {columns: ['id', 'gender']});
+        assert.ok(x);
         assert.strictEqual(x.id, customer.id);
         assert.strictEqual(x.gender, 'Male');
     });

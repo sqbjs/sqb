@@ -37,6 +37,7 @@ describe('"update()" method', function () {
         assert.notStrictEqual(updated.givenName, customer.givenName);
 
         const c2 = await repo.findByPk(ids[0]);
+        assert.ok(c2);
         assert.strictEqual(updated.id, c2.id);
         assert.strictEqual(updated.givenName, c2.givenName);
         assert.notStrictEqual(updated.familyName, c2.familyName);
@@ -54,6 +55,7 @@ describe('"update()" method', function () {
         assert.ok(updated.updatedAt);
 
         const c2 = await repo.findByPk(ids[0]);
+        assert.ok(c2);
         assert.strictEqual(c2.id, updated.id);
         assert.strictEqual(c2.givenName, updated.givenName);
         assert.notStrictEqual(c2.familyName, updated.familyName);
@@ -72,6 +74,7 @@ describe('"update()" method', function () {
             gender: 'Female'
         });
         const c2 = await repo.findByPk(ids[0]);
+        assert.ok(c2);
         assert.strictEqual(updated.id, c2.id);
         assert.strictEqual(updated.gender, 'Female');
 
@@ -81,6 +84,7 @@ describe('"update()" method', function () {
         return client.acquire(async (connection) => {
             const repo = connection.getRepository<Customer>(Customer);
             const c1 = await repo.findByPk(ids[0]);
+            assert.ok(c1);
 
             await connection.startTransaction();
             const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -92,6 +96,7 @@ describe('"update()" method', function () {
 
             await connection.rollback();
             const c2 = await repo.findByPk(ids[0]);
+            assert.ok(c2);
             assert.strictEqual(c2.givenName, c1.givenName);
         });
     });
@@ -117,6 +122,7 @@ describe('updateOnly() method', function () {
         assert.strictEqual(success, false);
 
         const c2 = await repo.findByPk(ids[0]);
+        assert.ok(c2);
         assert.strictEqual(c2.id, ids[0]);
         assert.strictEqual(c2.givenName, newGivenName);
     });

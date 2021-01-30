@@ -30,7 +30,11 @@ export async function createRaw<T>(args: CreateCommandArgs<T>): Promise<QueryRes
                 v = col.transformWrite(v, col, values);
             if (v === undefined || col.insert === false)
                 continue;
-            input[col.fieldName] = Param(col.fieldName);
+            input[col.fieldName] = Param({
+                name: col.fieldName,
+                dataType: col.dataType,
+                isArray: col.isArray
+            });
             params[col.fieldName] = v;
         }
     }

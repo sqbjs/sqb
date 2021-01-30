@@ -1,11 +1,11 @@
 import type {ColumnDefinition} from './ColumnDefinition';
 import type {Repository} from './Repository';
+import {DataType} from '..';
 
 /* Model related */
 
 export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
     'timestamp' | 'custom';
-export type SortDirection = 'ascending' | 'descending' | 'both';
 
 export type ColumnTransformFunction = (value: any, col: ColumnDefinition, row: any) => any;
 export type Constructor<T = {}> = new (...args: any[]) => T;
@@ -42,10 +42,15 @@ export interface IndexConfig {
 }
 
 export interface ColumnConfig {
+    /*
+      JS type
+     */
+    type?: Function;
+
     /**
      * Column data type
      */
-    type?: string
+    dataType?: DataType
 
     /**
      * Field name in the database table. Default: property name
