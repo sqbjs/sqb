@@ -121,7 +121,7 @@ function convertDataValue(dataType: DataType, v: any): any {
     if (typeof v === 'bigint')
         return v.toString();
 
-    if (typeof v === 'object' && typeof v.toJSON === 'function')
+    if (v && typeof v === 'object' && typeof v.toJSON === 'function')
         return v.toJSON();
 
     return v;
