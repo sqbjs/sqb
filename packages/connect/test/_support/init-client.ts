@@ -6,6 +6,7 @@ export function initClient(config?: ClientConfiguration): SqbClient {
 
     let client = new SqbClient({
         dialect: 'postgres',
+        schema: process.env.PGSCHEMA || 'test',
         ...config
     })
 

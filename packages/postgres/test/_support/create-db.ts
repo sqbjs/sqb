@@ -3,6 +3,7 @@ import {Connection, stringifyValueForSQL} from 'postgresql-client';
 import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
 
 const schema = process.env.PGSCHEMA || 'test';
+let schemaCreated = false;
 
 const schemaSql = `
 DROP SCHEMA IF EXISTS ${schema} CASCADE;
@@ -57,7 +58,7 @@ CREATE TABLE ${schema}.customers
 ALTER SEQUENCE ${schema}.customers_id_seq RESTART WITH 10000;
 
 CREATE TRIGGER customers_set_updated_at
-BEFORE UPDATE ON customers
+BEFORE UPDATE ON ${schema}.customers
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_updated_at();
 
@@ -111,6 +112,8 @@ values
 `
 
 export async function createTestSchema() {
+    if (schemaCreated)
+        return;
     const connection = new Connection();
     await connection.connect();
     try {
@@ -121,6 +124,7 @@ export async function createTestSchema() {
         });
         for (const table of dataFiles)
             await connection.execute(table.scripts.join(';\n'));
+        schemaCreated = true;
     } finally {
         await connection.close(0);
     }

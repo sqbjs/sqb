@@ -207,7 +207,7 @@ export class Cursor extends SafeEventEmitter {
      *
      */
     async _seek(step: number, silent?: boolean): Promise<number> {
-        step = coerceToInt(step);
+        step = coerceToInt(step, 0);
         if (!step || (step > 0 && this.isClosed))
             return this.rowNum;
 
