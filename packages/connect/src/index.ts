@@ -1,3 +1,5 @@
+export * from './types';
+
 export * from './client/types';
 export {registerAdapter, unRegisterAdapter} from './client/extensions';
 export * from './client/Adapter';
