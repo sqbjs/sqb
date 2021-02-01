@@ -4,10 +4,10 @@ import {
 // noinspection ES6PreferShortImport
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
-import {PickWritable} from './orm.types';
+// noinspection ES6PreferShortImport
 import {EntityDefinition} from './EntityDefinition';
 import {QueryExecutor} from '../client/types';
-import {Maybe} from '../types';
+import {Maybe, PartialWritable} from '../types';
 import {extractKeyValues} from './commands/keyvalues.helper';
 import {count} from './commands/count.command';
 import {create, createRaw} from './commands/create.command';
@@ -61,7 +61,7 @@ export class Repository<T> {
         this._entityDef = entityDef;
     }
 
-    async create(values: Partial<PickWritable<T>>): Promise<T> {
+    async create(values: PartialWritable<T>): Promise<T> {
         return create<T>({
             executor: this._executor,
             entityDef: this._entityDef,
@@ -70,7 +70,7 @@ export class Repository<T> {
         });
     }
 
-    async createOnly(values: Partial<PickWritable<T>>): Promise<void> {
+    async createOnly(values: PartialWritable<T>): Promise<void> {
         await createRaw<T>({
             executor: this._executor,
             entityDef: this._entityDef,
@@ -130,7 +130,7 @@ export class Repository<T> {
         });
     }
 
-    async update(values: Partial<PickWritable<T>>): Promise<Partial<T> | undefined> {
+    async update(values: PartialWritable<T>): Promise<Partial<T> | undefined> {
         return update({
             executor: this._executor,
             entityDef: this._entityDef,
@@ -139,7 +139,7 @@ export class Repository<T> {
         });
     }
 
-    async updateOnly(values: Partial<PickWritable<T>>): Promise<boolean> {
+    async updateOnly(values: PartialWritable<T>): Promise<boolean> {
         const x = await update({
             executor: this._executor,
             entityDef: this._entityDef,
@@ -149,7 +149,7 @@ export class Repository<T> {
         return !!x;
     }
 
-    async updateAll(values: Partial<PickWritable<T>>, options?: Repository.UpdateAllOptions): Promise<number> {
+    async updateAll(values: PartialWritable<T>, options?: Repository.UpdateAllOptions): Promise<number> {
         const r = await updateAllRaw<T>({
             executor: this._executor,
             entityDef: this._entityDef,
