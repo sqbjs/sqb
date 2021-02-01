@@ -6,7 +6,7 @@ export abstract class BaseEntity<T extends BaseEntity<any>> {
     private [BASE_ENTITY_REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial: Partial<T>) {
-        const elements = EntityDefinition.getOwnElementNames(Object.getPrototypeOf(this).constructor);
+        const elements = EntityDefinition.getOwnColumnNames(Object.getPrototypeOf(this).constructor);
         if (elements) {
             for (const k of elements)
                 if (partial[k] !== undefined)
@@ -24,12 +24,20 @@ export abstract class BaseEntity<T extends BaseEntity<any>> {
         return this;
     }
 
-    static getElementNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getElementNames(this) || []) as K[];
+    static getColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityDefinition.getColumnNames(this) || []) as K[];
     }
 
-    static getOwnElementNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getOwnElementNames(this) || []) as K[];
+    static getOwnColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityDefinition.getOwnColumnNames(this) || []) as K[];
+    }
+
+    static getInsertColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityDefinition.getInsertColumnNames(this) || []) as K[];
+    }
+
+    static getUpdateColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityDefinition.getUpdateColumnNames(this) || []) as K[];
     }
 
 }
