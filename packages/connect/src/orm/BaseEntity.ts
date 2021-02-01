@@ -1,6 +1,6 @@
 import {BASE_ENTITY_REPOSITORY_KEY} from './consts';
 import type {Repository} from './Repository';
-import {EntityDefinition} from '@sqb/connect/src';
+import {EntityDefinition} from './EntityDefinition';
 
 export abstract class BaseEntity<T extends BaseEntity<any>> {
     private [BASE_ENTITY_REPOSITORY_KEY]: Repository<any>;
