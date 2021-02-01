@@ -5,34 +5,45 @@ import {BaseEntity, Column, Entity, HasOne} from '@sqb/connect';
 
 describe('EntityDefinition', function () {
 
-    it(`should override toJSON prototype method`, () => {
-        @Entity()
-        class Country extends BaseEntity<MyEntity> {
-            @Column()
-            code: string;
+    @Entity()
+    class Country extends BaseEntity<MyEntity> {
+        @Column()
+        code: string;
 
-        }
+    }
 
-        @Entity()
-        class MyEntity extends BaseEntity<MyEntity> {
+    @Entity()
+    class MyEntity extends BaseEntity<MyEntity> {
 
-            @Column()
-            p1: string;
+        @Column({update: false})
+        p1: string;
 
-            @Column()
-            p2: number;
+        @Column({insert: false})
+        p2: number;
 
-            @HasOne({
-                target: Country,
-                targetColumn: ['code'],
-                column: 'countryId'
-            })
-            p3: Country;
+        @HasOne({
+            target: Country,
+            targetColumn: ['code'],
+            column: 'countryId'
+        })
+        p3: Country;
 
-        }
+    }
 
-        assert.deepStrictEqual(MyEntity.getElementNames(), ['p1', 'p2', 'p3']);
-        assert.deepStrictEqual(MyEntity.getOwnElementNames(), ['p1', 'p2']);
+    it(`should getColumnNames() return all column names`, () => {
+        assert.deepStrictEqual(MyEntity.getColumnNames(), ['p1', 'p2', 'p3']);
+    });
+
+    it(`should getOwnColumnNames() return only own column names`, () => {
+        assert.deepStrictEqual(MyEntity.getOwnColumnNames(), ['p1', 'p2']);
+    });
+
+    it(`should getInsertColumnNames() return only insertable column names`, () => {
+        assert.deepStrictEqual(MyEntity.getInsertColumnNames(), ['p1']);
+    });
+
+    it(`should getUpdateColumnNames() return only updatable column names`, () => {
+        assert.deepStrictEqual(MyEntity.getUpdateColumnNames(), ['p2']);
     });
 
 });

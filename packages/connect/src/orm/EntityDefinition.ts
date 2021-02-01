@@ -141,19 +141,47 @@ export class EntityDefinition {
             ctor[ENTITY_DEFINITION_PROPERTY];
     }
 
-    static getElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+    static getColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const def = this.get(ctor);
         return def && [...def.columnKeys] as K[];
     }
 
-    static getOwnElementNames(ctor: Function): string[] | undefined {
+    static getOwnColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const def = this.get(ctor);
         if (def) {
-            const out: string[] = [];
+            const out: K[] = [];
             for (const k of def.columnKeys) {
                 const col = def.getColumn(k);
                 if (isDataColumn(col)) {
-                    out.push(k);
+                    out.push(k as K);
+                }
+            }
+            return out.length ? out : undefined;
+        }
+    }
+
+    static getInsertColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+        const def = this.get(ctor);
+        if (def) {
+            const out: K[] = [];
+            for (const k of def.columnKeys) {
+                const col = def.getColumn(k);
+                if (isDataColumn(col) && (col.insert || col.insert == null)) {
+                    out.push(k as K);
+                }
+            }
+            return out.length ? out : undefined;
+        }
+    }
+
+    static getUpdateColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+        const def = this.get(ctor);
+        if (def) {
+            const out: K[] = [];
+            for (const k of def.columnKeys) {
+                const col = def.getColumn(k);
+                if (isDataColumn(col) && (col.update || col.update == null)) {
+                    out.push(k as K);
                 }
             }
             return out.length ? out : undefined;
