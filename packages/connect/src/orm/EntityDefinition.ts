@@ -141,4 +141,23 @@ export class EntityDefinition {
             ctor[ENTITY_DEFINITION_PROPERTY];
     }
 
+    static getElementNames(ctor: Function): string[] | undefined {
+        const def = this.get(ctor);
+        return def && [...def.columnKeys];
+    }
+
+    static getOwnElementNames(ctor: Function): string[] | undefined {
+        const def = this.get(ctor);
+        if (def) {
+            const out: string[] = [];
+            for (const k of def.columnKeys) {
+                const col = def.getColumn(k);
+                if (isDataColumn(col)) {
+                    out.push(k);
+                }
+            }
+            return out.length ? out : undefined;
+        }
+    }
+
 }
