@@ -141,9 +141,9 @@ export class EntityDefinition {
             ctor[ENTITY_DEFINITION_PROPERTY];
     }
 
-    static getElementNames(ctor: Function): string[] | undefined {
+    static getElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const def = this.get(ctor);
-        return def && [...def.columnKeys];
+        return def && [...def.columnKeys] as K[];
     }
 
     static getOwnElementNames(ctor: Function): string[] | undefined {
