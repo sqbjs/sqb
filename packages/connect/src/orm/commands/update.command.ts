@@ -75,7 +75,7 @@ export async function update<T>(args: {
     for (const k of Object.keys(keyValues)) {
         const col = entityDef.getColumn(k);
         if (isDataColumn(col))
-            filter[k] = Param({name: k, dataType: col.dataType, isArray: col.isArray});
+            filter[col.fieldName] = Param({name: k, dataType: col.dataType, isArray: col.isArray});
     }
 
     const r = await updateAllRaw({

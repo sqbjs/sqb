@@ -100,6 +100,8 @@ function convertValue(col: ColumnDefinition, v: any): any {
 }
 
 function convertDataValue(dataType: DataType, v: any): any {
+    if (v == null)
+        return;
     if (v instanceof Date &&
         (dataType === DataType.DATE || dataType === DataType.TIMESTAMP)) {
         return v.getFullYear() + '-' +

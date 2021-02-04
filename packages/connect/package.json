@@ -1,7 +1,7 @@
 {
   "name": "@sqb/connect",
   "description": "Multi-dialect database connection framework written with TypeScript",
-  "version": "4.0.1-alpha.18",
+  "version": "4.0.1-alpha.19",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -35,14 +35,14 @@
     "putil-merge": "^3.6.2",
     "putil-promisify": "^1.8.2",
     "putil-taskqueue": "^2.5.1",
-    "putil-varhelpers": "^1.4.0",
+    "putil-varhelpers": "^1.6.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.0.1-alpha.18"
+    "@sqb/builder": "^4.0.1-alpha.19"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
