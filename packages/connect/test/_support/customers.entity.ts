@@ -10,6 +10,14 @@ const GenderMap = {
     F: 'Female'
 }
 
+export class PersonName {
+    @Column({fieldName: 'given_name'})
+    given?: string;
+
+    @Column({fieldName: 'family_name'})
+    family?: string;
+}
+
 @Entity('customers')
 export class Customer extends BaseEntity<Customer> {
     @PrimaryKey()

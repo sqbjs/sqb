@@ -1,7 +1,7 @@
 {
   "name": "@sqb/nestjs",
   "description": "Nestjs module for data connection using SQB",
-  "version": "4.0.1-alpha.18",
+  "version": "4.0.1-alpha.19",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -22,12 +22,12 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@nestjs/common": "^7.6.7",
-    "@nestjs/core": "^7.6.7",
-    "@nestjs/platform-express": "^7.6.7",
-    "@nestjs/testing": "^7.6.7",
+    "@nestjs/common": "^7.6.11",
+    "@nestjs/core": "^7.6.11",
+    "@nestjs/platform-express": "^7.6.11",
+    "@nestjs/testing": "^7.6.11",
     "@types/supertest": "^2.0.10",
-    "postgresql-client": "^1.13.1",
+    "postgresql-client": "^1.13.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3",
     "rxjs-compat": "^6.6.3",
@@ -38,8 +38,8 @@
     "@nestjs/core": "^7.6.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3",
-    "@sqb/builder": "^4.0.1-alpha.18",
-    "@sqb/connect": "^4.0.1-alpha.18"
+    "@sqb/builder": "^4.0.1-alpha.19",
+    "@sqb/connect": "^4.0.1-alpha.19"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
