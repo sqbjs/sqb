@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import {EntityDefinition} from './EntityDefinition';
 import {Constructor} from './orm.types';
-import {ENTITY_DEFINITION_PROPERTY} from './consts';
-import {ColumnDefinition, DataColumnDefinition, isDataColumn} from './ColumnDefinition';
+import {ENTITY_DEFINITION_KEY} from './consts';
+import {ColumnDefinition, isDataColumn} from './ColumnDefinition';
 import {DataType} from '../client/types';
 
 const padZero = (n: number): string => (n < 9 ? '0' : '') + n;
@@ -12,18 +12,18 @@ export function isClass(fn: any): fn is Constructor {
 }
 
 export function isEntityClass(fn: any): fn is Constructor {
-    return !!(isClass(fn) && fn[ENTITY_DEFINITION_PROPERTY]);
+    return !!(isClass(fn) && fn[ENTITY_DEFINITION_KEY]);
 }
 
 export function getEntityDefinition(fn: Function): EntityDefinition {
-    return fn[ENTITY_DEFINITION_PROPERTY];
+    return fn[ENTITY_DEFINITION_KEY];
 }
 
 export function declareEntity(ctor: Function): EntityDefinition {
     let entity: EntityDefinition = EntityDefinition.get(ctor);
     if (entity)
         return entity;
-    ctor[ENTITY_DEFINITION_PROPERTY] = entity = new EntityDefinition(ctor as Constructor);
+    ctor[ENTITY_DEFINITION_KEY] = entity = new EntityDefinition(ctor as Constructor);
     // Merge base entity columns into this one
     const baseCtor = Object.getPrototypeOf(ctor);
     const baseDef = EntityDefinition.get(baseCtor);
@@ -60,28 +60,6 @@ export function declareEntity(ctor: Function): EntityDefinition {
         return obj;
     }
     return entity;
-}
-
-export function declareColumn(target: Object, propertyKey: string): DataColumnDefinition {
-    const entity = declareEntity(target.constructor);
-    const col = entity.addDataColumn(propertyKey);
-    if (!col.dataType) {
-        col.type = Reflect.getMetadata("design:type", target, propertyKey);
-        if (col.type === Boolean)
-            col.dataType = DataType.BOOL;
-        else if (col.type === String)
-            col.dataType = DataType.VARCHAR;
-        else if (col.type === Number)
-            col.dataType = DataType.NUMBER;
-        else if (col.type === Date)
-            col.dataType = DataType.TIMESTAMP;
-        else if (col.type === Array) {
-            col.dataType = DataType.VARCHAR;
-            col.isArray = true;
-        } else if (col.type === Buffer)
-            col.dataType = DataType.BINARY;
-    }
-    return col;
 }
 
 function convertValue(col: ColumnDefinition, v: any): any {

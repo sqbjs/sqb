@@ -1,5 +1,5 @@
 import {IndexConfig} from '../orm.types';
-import {declareColumn, declareEntity} from '../helpers';
+import {declareEntity} from '../helpers';
 
 export function PrimaryKey(fields: string | string[], options?: IndexConfig): ClassDecorator
 export function PrimaryKey(options?: IndexConfig): PropertyDecorator
@@ -15,7 +15,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
         const entity = declareEntity(target.constructor);
-        declareColumn(target, propertyKey);
+        entity.defineDataColumn(propertyKey);
         entity.definePrimaryIndex(propertyKey, arg0);
         return;
     };

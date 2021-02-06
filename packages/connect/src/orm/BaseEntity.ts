@@ -1,9 +1,9 @@
-import {BASE_ENTITY_REPOSITORY_KEY} from './consts';
+import {REPOSITORY_KEY} from './consts';
 import type {Repository} from './Repository';
 import {EntityDefinition} from './EntityDefinition';
 
 export abstract class BaseEntity<T extends BaseEntity<any>> {
-    private [BASE_ENTITY_REPOSITORY_KEY]: Repository<any>;
+    private [REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial: Partial<T>) {
         const elements = EntityDefinition.getOwnColumnNames(Object.getPrototypeOf(this).constructor);
@@ -15,7 +15,7 @@ export abstract class BaseEntity<T extends BaseEntity<any>> {
     }
 
     async destroy(): Promise<boolean> {
-        const repo = this[BASE_ENTITY_REPOSITORY_KEY];
+        const repo = this[REPOSITORY_KEY];
         return repo.destroy(this);
     }
 

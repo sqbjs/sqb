@@ -128,8 +128,14 @@ export interface ColumnConfig {
     insert?: boolean;
 }
 
+export interface GroupColumnConfig {
+    type: ConstructorThunk;
+    fieldNamePrefix?: string;
+    fieldNameSuffix?: string;
+}
+
 export interface RelationColumnConfig {
-    target: Constructor | ConstructorThunk;
+    target: ConstructorThunk;
     column: string | string[];
     targetColumn: string | string[];
     lazy?: boolean;
