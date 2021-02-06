@@ -1,11 +1,12 @@
+import {DataType} from '@sqb/builder';
 import {
     ColumnDefinition,
-    DataColumnDefinition, isDataColumn, isRelationColumn,
-    RelationColumnDefinition
+    DataColumnDefinition, GroupColumnDefinition, RelationColumnDefinition,
+    isDataColumn, isGroupColumn, isRelationColumn
 } from './ColumnDefinition';
-import {Constructor, RelationColumnConfig, IndexConfig} from './orm.types';
+import {Constructor, RelationColumnConfig, IndexConfig, ColumnConfig, GroupColumnConfig} from './orm.types';
 import {Maybe} from '../types';
-import {ENTITY_DEFINITION_PROPERTY} from './consts';
+import {ENTITY_DEFINITION_KEY} from './consts';
 
 export interface IndexDefinition {
     name?: string;
@@ -49,43 +50,143 @@ export class EntityDefinition {
         return isRelationColumn(col) ? col : undefined;
     }
 
-    addDataColumn(column: string): DataColumnDefinition {
-        let col = this.getColumn(column);
-        if (col && col.kind !== 'data')
-            throw new Error(`A ${col.kind} column for "${column}" already defined`);
-        if (!col) {
-            col = new DataColumnDefinition(this, column);
-            this.columns.set(column.toUpperCase(), col);
-            this.columnKeys.push(col.name);
-        }
-        return col as DataColumnDefinition;
+    getGroupColumn(name: string): Maybe<GroupColumnDefinition> {
+        if (!name)
+            return;
+        const col = this.columns.get(name.toUpperCase());
+        return isGroupColumn(col) ? col : undefined;
     }
 
-    addOne2OneRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
-        let col = this.getColumn(column);
-        if (col && col.kind !== 'relation')
-            throw new Error(`A ${col.kind} column for "${column}" already defined`);
-        if (typeof cfg.target !== 'function')
+    defineDataColumn(propertyKey: string, options?: ColumnConfig): DataColumnDefinition {
+        let col = this.getColumn(propertyKey);
+        if (!col) {
+            col = new DataColumnDefinition(this, propertyKey);
+            this.columns.set(propertyKey.toUpperCase(), col);
+            this.columnKeys.push(col.name);
+        }
+        if (!isDataColumn(col))
+            throw new Error(`A ${col.kind} column for "${propertyKey}" already defined`);
+
+        if (options) {
+            if (options.fieldName)
+                col.fieldName = options.fieldName;
+            if (options.type) {
+                col.type = options.type;
+                if (col.type === Boolean)
+                    col.dataType = DataType.BOOL;
+                else if (col.type === String)
+                    col.dataType = DataType.VARCHAR;
+                else if (col.type === Number)
+                    col.dataType = DataType.NUMBER;
+                else if (col.type === Date)
+                    col.dataType = DataType.TIMESTAMP;
+                else if (col.type === Array) {
+                    col.dataType = DataType.VARCHAR;
+                    col.isArray = true;
+                } else if (col.type === Buffer)
+                    col.dataType = DataType.BINARY;
+            }
+            if (options.dataType)
+                col.dataType = options.dataType;
+            if (options.defaultValue != null)
+                col.defaultValue = options.defaultValue;
+            if (options.isArray != null)
+                col.isArray = options.isArray;
+            if (options.comment != null)
+                col.comment = options.comment;
+            if (options.collation != null)
+                col.collation = options.collation;
+            if (options.nullable != null)
+                col.nullable = options.nullable;
+            if (options.enum != null)
+                col.enum = options.enum;
+            if (options.length != null)
+                col.length = options.length;
+            if (options.precision != null)
+                col.precision = options.precision;
+            if (options.scale != null)
+                col.scale = options.scale;
+            if (options.autoGenerate != null)
+                col.autoGenerate = options.autoGenerate;
+            if (options.required != null)
+                col.required = options.required;
+            if (options.required != null)
+                col.required = options.required;
+            if (options.hidden != null)
+                col.hidden = options.hidden;
+            if (options.update != null)
+                col.update = options.update;
+            if (options.insert != null)
+                col.insert = options.insert;
+        }
+
+        const reflectType = Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
+        if (reflectType === Array)
+            col.isArray = true;
+
+        if (!col.dataType) {
+            col.type = reflectType;
+            if (col.type === Boolean)
+                col.dataType = DataType.BOOL;
+            else if (col.type === String)
+                col.dataType = DataType.VARCHAR;
+            else if (col.type === Number)
+                col.dataType = DataType.NUMBER;
+            else if (col.type === Date)
+                col.dataType = DataType.TIMESTAMP;
+            else if (col.type === Array) {
+                col.dataType = DataType.VARCHAR;
+            } else if (col.type === Buffer)
+                col.dataType = DataType.BINARY;
+        }
+
+        return col;
+    }
+
+    defineGroupColumn(propertyKey: string, cfg: GroupColumnConfig): GroupColumnDefinition {
+        if (typeof cfg.type !== 'function')
+            throw new Error('"type" must be defined');
+        let col = this.getColumn(propertyKey);
+        if (!col) {
+            col = new GroupColumnDefinition(this, propertyKey, cfg.type);
+            this.columns.set(propertyKey.toUpperCase(), col);
+            this.columnKeys.push(col.name);
+        }
+        if (!isGroupColumn(col))
+            throw new Error(`A ${col.kind} column for "${propertyKey}" already defined`);
+        if (cfg.fieldNamePrefix != null)
+            col.fieldNamePrefix = cfg.fieldNamePrefix;
+        if (cfg.fieldNameSuffix != null)
+            col.fieldNameSuffix = cfg.fieldNameSuffix;
+        return col;
+    }
+
+    defineOne2OneRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+        if (!(cfg && typeof cfg.target === 'function'))
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
+        let col = this.getColumn(column);
         if (!col) {
             col = new RelationColumnDefinition(this, column, cfg);
             this.columns.set(column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
+        if (!isRelationColumn(col))
+            throw new Error(`A ${col.kind} column for "${column}" already defined`);
+
         return col as RelationColumnDefinition;
     }
 
-    addOne2ManyRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
-        let col = this.getColumn(column);
-        if (col && col.kind !== 'relation')
-            throw new Error(`A ${col.kind} column for "${column}" already defined`);
-        if (typeof cfg.target !== 'function')
+    defineOne2ManyRelation(column: string, cfg: RelationColumnConfig): RelationColumnDefinition {
+        if (!(cfg && typeof cfg.target === 'function'))
             throw new Error('You must provide Entity constructor of a function that return Entity constructor');
+        let col = this.getColumn(column);
         if (!col) {
             col = new RelationColumnDefinition(this, column, cfg, true);
             this.columns.set(column.toUpperCase(), col);
             this.columnKeys.push(col.name);
         }
+        if (!isRelationColumn(col))
+            throw new Error(`A ${col.kind} column for "${column}" already defined`);
         return col as RelationColumnDefinition;
     }
 
@@ -137,8 +238,8 @@ export class EntityDefinition {
     }
 
     static get(ctor: Function): EntityDefinition {
-        return ctor.hasOwnProperty(ENTITY_DEFINITION_PROPERTY) &&
-            ctor[ENTITY_DEFINITION_PROPERTY];
+        return ctor.hasOwnProperty(ENTITY_DEFINITION_KEY) &&
+            ctor[ENTITY_DEFINITION_KEY];
     }
 
     static getColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {

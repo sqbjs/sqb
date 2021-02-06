@@ -4,14 +4,14 @@ import {
     ConstructorThunk,
     ColumnTransformFunction,
     RelationColumnConfig,
-    ConstructorResolver
+    ConstructorResolver,
 } from './orm.types';
 import {Maybe} from '../types';
 import {getEntityDefinition, isEntityClass} from './helpers';
 import {DataType} from '@sqb/builder';
 
-export type ColumnKind = 'data' | 'relation';
-export type ColumnDefinition = DataColumnDefinition | RelationColumnDefinition;
+export type ColumnKind = 'data' | 'relation' | 'group';
+export type ColumnDefinition = DataColumnDefinition | RelationColumnDefinition | GroupColumnDefinition;
 
 export const isDataColumn = (f: Maybe<BaseColumnDefinition>): f is DataColumnDefinition => {
     return !!(f && f.kind === 'data');
@@ -19,6 +19,10 @@ export const isDataColumn = (f: Maybe<BaseColumnDefinition>): f is DataColumnDef
 
 export const isRelationColumn = (f: Maybe<BaseColumnDefinition>): f is RelationColumnDefinition => {
     return !!(f && f.kind === 'relation');
+}
+
+export const isGroupColumn = (f: Maybe<BaseColumnDefinition>): f is GroupColumnDefinition => {
+    return !!(f && f.kind === 'group');
 }
 
 export abstract class BaseColumnDefinition {
@@ -121,6 +125,20 @@ export class RelationColumnDefinition extends BaseColumnDefinition {
                     ` ${targetEntity.name} has no data column named "${c}"`);
             return col;
         });
+    }
+
+}
+
+export class GroupColumnDefinition extends BaseColumnDefinition {
+    kind: ColumnKind = 'group';
+    type: ConstructorThunk;
+    fieldNamePrefix?: string;
+    fieldNameSuffix?: string;
+
+    constructor(entity: EntityDefinition, name: string,
+                type: ConstructorThunk) {
+        super(entity, name);
+        this.type = type;
     }
 
 }

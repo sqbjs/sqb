@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres-dialect",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.0.1-alpha.18",
+  "version": "4.0.1-alpha.19",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
