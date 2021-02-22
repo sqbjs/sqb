@@ -2,12 +2,12 @@
 import '../_support/env';
 import fs from 'fs';
 
-describe('Decorators', function () {
+describe('Model', function () {
 
-    const testFiles = fs.readdirSync(__dirname + '/decorators');
+    const testFiles = fs.readdirSync(__dirname + '/model');
     testFiles.forEach(file => {
         if (file.endsWith('.test.ts'))
-            require('./decorators/' + file);
+            require('./model/' + file);
     });
 
 });

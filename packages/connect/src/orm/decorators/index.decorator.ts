@@ -1,21 +1,23 @@
-import {IndexConfig} from '../orm.types';
-import {declareEntity} from '../helpers';
+import {IndexOptions} from '../types';
+import {EntityMeta} from '../metadata/entity-meta';
 
-export function Index(options?: IndexConfig): PropertyDecorator
-export function Index(fields: string | string[], options?: IndexConfig): ClassDecorator
+export function Index(fields: string | string[], options?: IndexOptions): ClassDecorator
+export function Index(options?: IndexOptions): PropertyDecorator
 export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator {
-    return function (target: Object | Function, propertyKey?: string): void {
+    return function (target: Object | Function, propertyKey?: string | symbol): void {
         if (typeof target === 'function') {
-            const entity = declareEntity(target);
-            entity.defineIndex(arg0, arg1);
+            if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
+                throw new Error(`You must specify index column(s)`);
+            const entity = EntityMeta.attachTo(target);
+            entity.addIndex(arg0, arg1);
             return;
         }
         if (!target.constructor)
             throw new Error('Property decorators can be used for class properties only');
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
-        const entity = declareEntity(target.constructor);
-        entity.defineIndex(propertyKey, arg0);
-        return;
+        const entity = EntityMeta.attachTo(target.constructor);
+        entity.addIndex(propertyKey, arg0);
     };
+
 }

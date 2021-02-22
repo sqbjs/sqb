@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
 import '../../_support/env';
 import * as assert from 'assert';
-import {Column, DataType, Entity} from '@sqb/connect';
-import {ColumnGroup} from '@sqb/connect/src/orm/decorators/column-group.decorator';
+import {Column, Embedded, Entity} from '@sqb/connect';
 
-describe('ColumnGroup()', function () {
+describe('Nested object element', function () {
 
     class PersonName {
         @Column()
@@ -13,24 +12,23 @@ describe('ColumnGroup()', function () {
         family: string
     }
 
-    it(`should define group column metadata`, () => {
+    it(`should define nested element metadata`, () => {
         class MyEntity {
-            @ColumnGroup(PersonName)
+            @Embedded(PersonName)
             name: PersonName;
         }
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getGroupColumn('name');
+        const name = meta.getEmbeddedColumn('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
     });
 
     it(`should define prefix ans suffix`, () => {
         class MyEntity {
-            @ColumnGroup({
-                type: PersonName,
+            @Embedded(PersonName, {
                 fieldNamePrefix: 'prefix',
                 fieldNameSuffix: 'suffix'
             })
@@ -40,7 +38,7 @@ describe('ColumnGroup()', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getGroupColumn('name');
+        const name = meta.getEmbeddedColumn('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
         assert.strictEqual(name.fieldNamePrefix, 'prefix');

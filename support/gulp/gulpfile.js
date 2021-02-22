@@ -3,7 +3,6 @@ const lint = require('./tasks/lint');
 const compile = require('./tasks/compile');
 const build = require('./tasks/build');
 const test = require('./tasks/test');
-const update = require('./tasks/update');
 const version = require('./tasks/version');
 const link = require('./tasks/link');
 const publish = require('./tasks/publish');
@@ -14,7 +13,6 @@ const tasks = {
   ...compile,
   ...build,
   ...test,
-  ...update,
   ...version,
   ...link,
   ...publish

@@ -3,7 +3,7 @@ import '../../_support/env';
 import * as assert from 'assert';
 import {Entity, PrimaryKey} from '@sqb/connect';
 
-describe('PrimaryKey()', function () {
+describe('PrimaryKey', function () {
 
     it(`should define primary index field with string argument`, () => {
         @PrimaryKey('id')
@@ -14,7 +14,7 @@ describe('PrimaryKey()', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.ok(meta.primaryIndex);
-        assert.strictEqual(meta.primaryIndex.column, 'id');
+        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
         assert.strictEqual(meta.primaryIndex.unique, true);
     });
 
@@ -29,7 +29,7 @@ describe('PrimaryKey()', function () {
         assert.ok(meta);
         assert.ok(meta.primaryIndex);
         assert.strictEqual(meta.primaryIndex.name, 'px_myentity_id');
-        assert.strictEqual(meta.primaryIndex.column, 'id');
+        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
         assert.strictEqual(meta.primaryIndex.unique, true);
     });
 
@@ -44,7 +44,7 @@ describe('PrimaryKey()', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.ok(meta.primaryIndex);
-        assert.strictEqual(meta.primaryIndex.column, 'id');
+        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
         assert.strictEqual(meta.primaryIndex.name, 'px_myentity_id');
         assert.strictEqual(meta.primaryIndex.unique, true);
     });
@@ -57,7 +57,7 @@ describe('PrimaryKey()', function () {
             class MyEntity {
 
             }
-        }, /You must specify primary index field/);
+        }, /You must specify primary index column/);
 
         assert.throws(() => {
             // @ts-ignore
@@ -65,7 +65,7 @@ describe('PrimaryKey()', function () {
             class MyEntity {
 
             }
-        }, /You must specify primary index field/);
+        }, /You must specify primary index column/);
     });
 
 });

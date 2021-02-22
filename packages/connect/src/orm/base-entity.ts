@@ -1,12 +1,12 @@
 import {REPOSITORY_KEY} from './consts';
-import type {Repository} from './Repository';
-import {EntityDefinition} from './EntityDefinition';
+import type {Repository} from './repository';
+import {EntityMeta} from './metadata/entity-meta';
 
 export abstract class BaseEntity<T extends BaseEntity<any>> {
     private [REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial: Partial<T>) {
-        const elements = EntityDefinition.getOwnColumnNames(Object.getPrototypeOf(this).constructor);
+        const elements = EntityMeta.getDataColumnNames(Object.getPrototypeOf(this).constructor);
         if (elements) {
             for (const k of elements)
                 if (partial[k] !== undefined)
@@ -24,20 +24,20 @@ export abstract class BaseEntity<T extends BaseEntity<any>> {
         return this;
     }
 
-    static getColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getColumnNames(this) || []) as K[];
+    static getElementNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityMeta.getElementNames(this) || []) as K[];
     }
 
-    static getOwnColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getOwnColumnNames(this) || []) as K[];
+    static getDataColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
+        return (EntityMeta.getDataColumnNames(this) || []) as K[];
     }
 
     static getInsertColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getInsertColumnNames(this) || []) as K[];
+        return (EntityMeta.getInsertColumnNames(this) || []) as K[];
     }
 
     static getUpdateColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityDefinition.getUpdateColumnNames(this) || []) as K[];
+        return (EntityMeta.getUpdateColumnNames(this) || []) as K[];
     }
 
 }

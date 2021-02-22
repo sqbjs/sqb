@@ -1,16 +1,13 @@
-import {EntityDefinition} from '../EntityDefinition';
-import {isDataColumn} from '../ColumnDefinition';
+import {EntityMeta} from '../metadata/entity-meta';
+import {isDataColumn} from '../metadata/data-column-meta';
 
 export function extractKeyValues<T>(
-    entityDef: EntityDefinition,
+    entityDef: EntityMeta,
     valueOrInstance: any | Record<string, any> | T): Record<string, any> {
     const primaryIndex = entityDef.primaryIndex;
     if (!primaryIndex)
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
-    const primaryColumns = Array.isArray(primaryIndex.column) ?
-        (primaryIndex.column.length > 1 ? primaryIndex.column : primaryIndex.column[0]) :
-        primaryIndex.column;
     const validateCol = (k) => {
         const col = entityDef.getColumn(k);
         if (!col)
@@ -20,7 +17,7 @@ export function extractKeyValues<T>(
     }
 
     // if entities primary key has more than one key field
-    if (Array.isArray(primaryColumns) && primaryColumns.length > 1) {
+    if (primaryIndex.columns.length > 1) {
         if (typeof valueOrInstance !== 'object')
             throw new Error(`"${entityDef.name}" entity` +
                 ` has more than one primary key field and you must provide all values with an key/value pair`);
@@ -29,7 +26,7 @@ export function extractKeyValues<T>(
         const valueKeysUpper = valueKeys.map(x => x.toUpperCase());
 
         const out: Record<string, any> = {};
-        for (const k of primaryColumns) {
+        for (const k of primaryIndex.columns) {
             const i = valueKeysUpper.indexOf(k.toUpperCase());
             if (i < 0)
                 throw new Error(`Value of key field "${entityDef.name}.${k}" required to perform this operation`);
@@ -39,7 +36,7 @@ export function extractKeyValues<T>(
         return out;
     }
 
-    const primaryColumnName = primaryIndex.column as string;
+    const primaryColumnName = primaryIndex.columns[0];
     validateCol(primaryColumnName);
     if (typeof valueOrInstance === 'object') {
         const valueKeys = Object.keys(valueOrInstance);

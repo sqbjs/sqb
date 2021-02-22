@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/sqbjs/sqb.git"
   },
+  "workspaces": [
+    "packages/**"
+  ],
   "devDependencies": {
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
