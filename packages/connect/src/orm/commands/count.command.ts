@@ -1,12 +1,12 @@
 import {And, Count, LogicalOperator, Select} from '@sqb/builder';
 import {prepareFilter} from './filter.helper';
 import {QueryExecutor} from '../../';
-import {EntityDefinition} from '../EntityDefinition';
-import {Repository} from '../Repository';
+import {EntityMeta} from '../metadata/entity-meta';
+import {Repository} from '../repository';
 
 export type CountCommandArgs = {
     executor: QueryExecutor;
-    entityDef: EntityDefinition;
+    entityDef: EntityMeta;
 } & Repository.CountOptions;
 
 export async function count(args: CountCommandArgs): Promise<number> {

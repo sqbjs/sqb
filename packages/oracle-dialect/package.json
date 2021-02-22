@@ -25,7 +25,6 @@
     "compare-versions": "^3.6.0"
   },
   "devDependencies": {
-    "@types/compare-versions": "^3.3.0",
     "fast-glob": "^3.2.5"
   },
   "main": "dist/index.js",

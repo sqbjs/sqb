@@ -1,10 +1,14 @@
-import {EntityDefinition} from '../EntityDefinition';
-import {Repository} from '../Repository';
-import {And, Eq, Exists, isCompOperator, isLogicalOperator, LogicalOperator, Raw, Select} from '@sqb/builder';
-import {isDataColumn, isRelationColumn} from '../ColumnDefinition';
+import {
+    And, Eq, Exists, isCompOperator, isLogicalOperator,
+    LogicalOperator, Raw, Select
+} from '@sqb/builder';
+import {EntityMeta} from '../metadata/entity-meta';
+import {Repository} from '../repository';
+import {isRelationElement} from '../metadata/relation-element-meta';
+import {isDataColumn} from '../metadata/data-column-meta';
 
 export async function prepareFilter(
-    entityDef: EntityDefinition,
+    entityDef: EntityMeta,
     filter: Repository.SearchFilter,
     trgOp: LogicalOperator,
     tableAlias = 'T'): Promise<void> {
@@ -45,27 +49,20 @@ export async function prepareFilter(
                         const ctor = Object.getPrototypeOf(item).constructor;
                         trgOp.add(new ctor(_tableAlias + '.' + col.fieldName, item._value));
                     } else {
-                        if (!isRelationColumn(col))
+                        if (!isRelationElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
-                        const targetEntity = await col.resolveTarget();
+                        const targetEntity = await col.foreign.resolveTarget();
                         const trgAlias = 'E' + (i + 1);
                         const select = Select(Raw('1'))
                             .from(targetEntity.tableName + ' ' + trgAlias);
                         trgOp.add(Exists(select));
-                        for (let k = 0; k < col.column.length; k++) {
-                            const curCol = col.entity.getDataColumn(col.column[k]);
-                            if (!curCol)
-                                throw new Error(`Relation column "${col.name}" definition error. ` +
-                                    ` ${col.entity.name} has no column "${col.column[k]}"`);
-                            const targetCol = targetEntity.getDataColumn(col.targetColumn[k]);
-                            if (!targetCol)
-                                throw new Error(`Relation column "${col.name}" definition error. ` +
-                                    `${targetEntity.name} has no column "${col.targetColumn[k]}"`);
-                            select.where(
-                                Eq(trgAlias + '.' + targetCol.fieldName, Raw(_tableAlias + '.' + curCol.fieldName))
-                            )
-                            trgOp = select._where as LogicalOperator;
-                        }
+                        const keyCol = await col.foreign.resolveKeyColumn();
+                        const targetCol = await col.foreign.resolveTargetColumn();
+                        select.where(
+                            Eq(trgAlias + '.' + targetCol.fieldName,
+                                Raw(_tableAlias + '.' + keyCol.fieldName))
+                        )
+                        trgOp = select._where as LogicalOperator;
                         _entityDef = targetEntity;
                         _tableAlias = trgAlias;
                     }

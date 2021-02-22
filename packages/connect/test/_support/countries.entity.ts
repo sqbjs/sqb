@@ -1,8 +1,18 @@
-import {Column, Entity, PrimaryKey, LazyResolver, HasOne, HasMany} from '@sqb/connect';
+import {
+    Column,
+    Entity,
+    PrimaryKey,
+    LazyResolver,
+    HasOne,
+    HasMany,
+    FieldName,
+    HasOneLazy,
+    HasManyLazy, ForeignKey
+} from '@sqb/connect';
 import {Continent} from './continents.entity';
 import type {Customer} from './customers.entity';
 
-@Entity({tableName: 'countries'})
+@Entity('countries')
 export class Country {
     @PrimaryKey()
     @Column()
@@ -11,40 +21,25 @@ export class Country {
     @Column()
     name: string;
 
-    @Column({fieldName: 'phone_code'})
+    @Column()
+    @FieldName('phone_code')
     phoneCode: string;
 
-    @Column({fieldName: 'continent_code'})
+    @Column()
+    @FieldName('continent_code')
+    @ForeignKey(Continent)
     continentCode: string;
 
-    @HasOne({
-        target: Continent,
-        column: 'continentCode',
-        targetColumn: 'code'
-    })
+    @HasOne()
     readonly continent: Continent;
 
-    @HasOne({
-        target: Continent,
-        column: 'continentCode',
-        targetColumn: 'code',
-        lazy: true
-    })
+    @HasOneLazy(Continent)
     readonly continentLazy: LazyResolver<Continent>;
 
-    @HasMany({
-        target: async () => (await import('./customers.entity')).Customer,
-        column: 'code',
-        targetColumn: 'countryCode'
-    })
+    @HasMany(async () => (await import('./customers.entity')).Customer)
     readonly customers: Customer[];
 
-    @HasMany({
-        target: async () => (await import('./customers.entity')).Customer,
-        column: 'code',
-        targetColumn: 'countryCode',
-        lazy: true
-    })
+    @HasManyLazy(async () => (await import('./customers.entity')).Customer)
     readonly customersLazy: LazyResolver<Customer[]>;
 
 }

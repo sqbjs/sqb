@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
 import '../../_support/env';
 import * as assert from 'assert';
-import {Entity, TransformRead, TransformWrite} from '@sqb/connect';
+import {Entity, Parse, Serialize} from '@sqb/connect';
 
-describe('TransformRead()', function () {
+describe('Parse', function () {
 
-    it(`should add column metadata and set "transformRead" option`, () => {
+    it(`should @Parse() decorator set "parse" property of metadata`, () => {
         const fn = (v) => '>' + v;
 
         class MyEntity {
-            @TransformRead(fn)
+            @Parse(fn)
             id: string
         }
 
@@ -18,18 +18,18 @@ describe('TransformRead()', function () {
         assert.strictEqual(meta.name, 'MyEntity');
         const idColumn = meta.getDataColumn('id');
         assert.ok(idColumn);
-        assert.strictEqual(idColumn.transformRead, fn);
+        assert.strictEqual(idColumn.parse, fn);
     });
 
 });
 
-describe('TransformWrite()', function () {
+describe('Serialize', function () {
 
-    it(`should add column metadata and set "transformWrite" option`, () => {
+    it(`should @Serialize() decorator set "parse" property of metadata`, () => {
         const fn = (v) => '>' + v;
 
         class MyEntity {
-            @TransformWrite(fn)
+            @Serialize(fn)
             id: string
         }
 
@@ -38,7 +38,7 @@ describe('TransformWrite()', function () {
         assert.strictEqual(meta.name, 'MyEntity');
         const idColumn = meta.getDataColumn('id');
         assert.ok(idColumn);
-        assert.strictEqual(idColumn.transformWrite, fn);
+        assert.strictEqual(idColumn.serialize, fn);
     });
 
 });

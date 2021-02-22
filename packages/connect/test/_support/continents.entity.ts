@@ -1,6 +1,6 @@
 import {Column, Entity, PrimaryKey} from '@sqb/connect';
 
-@Entity({tableName: 'continents'})
+@Entity('continents')
 export class Continent {
     @PrimaryKey()
     @Column()

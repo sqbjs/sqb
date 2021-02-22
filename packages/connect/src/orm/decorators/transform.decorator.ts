@@ -1,22 +1,22 @@
-import {ColumnTransformFunction} from '../orm.types';
-import {declareEntity} from '../helpers';
+import {ColumnTransformFunction} from '../types';
+import {EntityMeta} from '../metadata/entity-meta';
 
-export function TransformRead(fn: ColumnTransformFunction): PropertyDecorator {
+export function Parse(fn: ColumnTransformFunction): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
-        declareEntity(target.constructor)
-            .defineDataColumn(propertyKey)
-            .transformRead = fn;
+        EntityMeta.attachTo(target.constructor)
+            .setDataColumn(propertyKey)
+            .parse = fn;
     }
 }
 
-export function TransformWrite(fn: ColumnTransformFunction): PropertyDecorator {
+export function Serialize(fn: ColumnTransformFunction): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
-        declareEntity(target.constructor)
-            .defineDataColumn(propertyKey)
-            .transformWrite = fn;
+        EntityMeta.attachTo(target.constructor)
+            .setDataColumn(propertyKey)
+            .serialize = fn;
     }
 }

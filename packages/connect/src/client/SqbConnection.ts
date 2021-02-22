@@ -13,9 +13,9 @@ import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {SafeEventEmitter} from '../SafeEventEmitter';
-import {Constructor} from '../orm/orm.types';
-import {Repository} from '../orm/Repository';
-import {EntityDefinition} from '../orm/EntityDefinition';
+import {Constructor} from '../orm/types';
+import {Repository} from '../orm/repository';
+import {EntityMeta} from '../orm/metadata/entity-meta';
 
 const debug = _debug('sqb:connection');
 
@@ -119,7 +119,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
             if (!ctor)
                 throw new Error(`Repository "${entity}" is not registered`);
         } else ctor = entity;
-        const entityDef = EntityDefinition.get(ctor);
+        const entityDef = EntityMeta.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
         return new Repository<T>(entityDef, this);

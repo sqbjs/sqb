@@ -3,7 +3,7 @@ import '../../_support/env';
 import * as assert from 'assert';
 import {Entity, Index} from '@sqb/connect';
 
-describe('Index()', function () {
+describe('Index', function () {
 
     it(`should define index field with string argument`, () => {
         @Index('id')
@@ -14,7 +14,7 @@ describe('Index()', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.indexes.length, 1);
-        assert.strictEqual(meta.indexes[0].column, 'id');
+        assert.deepStrictEqual(meta.indexes[0].columns, ['id']);
     });
 
     it(`should define index field with object definition`, () => {
@@ -28,7 +28,7 @@ describe('Index()', function () {
         assert.ok(meta);
         assert.strictEqual(meta.indexes.length, 1);
         assert.strictEqual(meta.indexes[0].name, 'idx_myentity_name');
-        assert.strictEqual(meta.indexes[0].column, 'name');
+        assert.deepStrictEqual(meta.indexes[0].columns, ['name']);
         assert.deepStrictEqual(meta.indexes[0].unique, true);
     });
 
@@ -43,7 +43,7 @@ describe('Index()', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.indexes.length, 1);
-        assert.deepStrictEqual(meta.indexes[0].column, 'id');
+        assert.deepStrictEqual(meta.indexes[0].columns, ['id']);
         assert.deepStrictEqual(meta.indexes[0].unique, true);
     });
 
@@ -55,7 +55,7 @@ describe('Index()', function () {
             class MyEntity {
 
             }
-        }, /You must specify index field/);
+        }, /You must specify index column/);
 
         assert.throws(() => {
             // @ts-ignore
@@ -63,7 +63,7 @@ describe('Index()', function () {
             class MyEntity {
 
             }
-        }, /You must specify index field/);
+        }, /You must specify index column/);
     });
 
 });

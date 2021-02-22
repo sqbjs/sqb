@@ -1,9 +1,9 @@
-import {Column} from '@sqb/connect';
+import {FieldName} from '@sqb/connect';
 
 export class PersonName {
-    @Column({fieldName: 'given_name'})
+    @FieldName('given_name')
     given?: string;
 
-    @Column({fieldName: 'family_name'})
+    @FieldName('family_name')
     family?: string;
 }

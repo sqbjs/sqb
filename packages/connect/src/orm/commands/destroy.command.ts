@@ -1,13 +1,13 @@
 import {And, Delete, LogicalOperator} from '@sqb/builder';
 import {QueryExecutor} from '../../client/types';
-import {EntityDefinition} from '../EntityDefinition';
-import {Repository} from '../Repository';
+import {EntityMeta} from '../metadata/entity-meta';
+import {Repository} from '../repository';
 import SearchFilter = Repository.SearchFilter;
 import {prepareFilter} from './filter.helper';
 
 export async function destroyAll(args: {
     executor: QueryExecutor;
-    entityDef: EntityDefinition;
+    entityDef: EntityMeta;
     filter?: SearchFilter;
     params?: any;
 }): Promise<number> {

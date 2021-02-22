@@ -1,17 +1,15 @@
 import {
     Operator
 } from '@sqb/builder';
-// noinspection ES6PreferShortImport
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
-// noinspection ES6PreferShortImport
-import {EntityDefinition} from './EntityDefinition';
+import {EntityMeta} from './metadata/entity-meta';
 import {QueryExecutor} from '../client/types';
 import {Maybe, PartialWritable} from '../types';
 import {extractKeyValues} from './commands/keyvalues.helper';
 import {count} from './commands/count.command';
 import {create, createRaw} from './commands/create.command';
-import {findAll} from './commands/find.command';
+import {FindCommand} from './commands/find.command';
 import {destroyAll} from './commands/destroy.command';
 import {update, updateAllRaw} from './commands/update.command';
 
@@ -25,11 +23,13 @@ export namespace Repository {
     }
 
     export interface GetOptions {
-        columns?: string[];
+        elements?: string[];
     }
 
     export interface FindOneOptions {
-        columns?: string[];
+        elements?: string[];
+        include?: string[];
+        exclude?: string[];
         filter?: SearchFilter;
         params?: any;
         sort?: string[];
@@ -54,9 +54,9 @@ export namespace Repository {
 
 export class Repository<T> {
     private readonly _executor: QueryExecutor;
-    private readonly _entityDef: EntityDefinition;
+    private readonly _entityDef: EntityMeta;
 
-    constructor(entityDef: EntityDefinition, executor: SqbClient | SqbConnection) {
+    constructor(entityDef: EntityMeta, executor: SqbClient | SqbConnection) {
         this._executor = executor;
         this._entityDef = entityDef;
     }
@@ -87,21 +87,14 @@ export class Repository<T> {
         });
     }
 
-    findAll(options?: Repository.FindAllOptions): Promise<T[]> {
-        return findAll({
-            ...options,
-            executor: this._executor,
-            entityDef: this._entityDef
-        });
+    async findAll(options?: Repository.FindAllOptions): Promise<T[]> {
+        const cmd = await FindCommand.prepare(this._entityDef, options);
+        return cmd.execute(this._executor, options);
     }
 
     async findOne(options?: Repository.FindOneOptions): Promise<Maybe<T>> {
-        const rows = await findAll({
-            ...options,
-            limit: 1,
-            executor: this._executor,
-            entityDef: this._entityDef
-        });
+        const cmd = await FindCommand.prepare(this._entityDef, options);
+        const rows = await cmd.execute(this._executor, {...options, limit: 1});
         return rows && rows[0];
     }
 
