@@ -37,13 +37,13 @@ describe('findAll() One-2-One lazy', function () {
         const repo = client.getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             filter: [Eq('id', 1)],
-            elements: ['id', 'countryCode', 'countryLazy.continentCode']
+            elements: ['id', 'countryLazy']
         });
         assert.ok(rows);
         assert.ok(rows.length);
         assert.strictEqual(rows[0].id, 1);
         assert.strictEqual(rows[0].countryCode, 'US');
-        let x = await rows[0].countryLazy();
+        let x = await rows[0].countryLazy({elements: ['continentCode']});
         assert.ok(typeof x === 'object');
         assert.ok(!Array.isArray(x));
         assert.deepStrictEqual(x, Object.assign(new Country(), {

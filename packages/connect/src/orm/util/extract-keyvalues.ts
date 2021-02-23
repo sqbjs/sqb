@@ -9,7 +9,7 @@ export function extractKeyValues<T>(
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
     const validateCol = (k) => {
-        const col = entityDef.getColumn(k);
+        const col = entityDef.getElement(k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
         if (!isDataColumn(col))

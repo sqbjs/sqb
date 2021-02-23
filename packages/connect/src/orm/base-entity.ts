@@ -19,6 +19,11 @@ export abstract class BaseEntity<T extends BaseEntity<any>> {
         return repo.destroy(this);
     }
 
+    async exists(): Promise<boolean> {
+        const repo = this[REPOSITORY_KEY];
+        return repo.exists(this);
+    }
+
     toJSON(): any {
         // this method is an placeholder an will be overwritten by declareEntity() method
         return this;

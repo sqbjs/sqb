@@ -9,7 +9,7 @@
     "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../*"]
+      "@sqb/*": ["../[!connect.]*"]
     }
   },
   "include": ["src/**/*.ts"],

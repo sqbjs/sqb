@@ -70,7 +70,7 @@ describe('create()', function () {
         assert.ok(customer instanceof Customer);
         assert.ok(customer.id);
         assert.ok(customer.id > 0);
-        assert.deepStrictEqual(customer.name, values.name);
+        assert.deepStrictEqual({...customer.name}, values.name);
         const x = await repo.findByPk(customer, {
             elements: ['id', 'name']
         });
@@ -78,7 +78,7 @@ describe('create()', function () {
         assert.ok(x);
         assert.strictEqual(c2, c + 1);
         assert.strictEqual(x.id, customer.id);
-        assert.deepStrictEqual(x.name, values.name);
+        assert.deepStrictEqual({...x.name}, values.name);
     });
 
 

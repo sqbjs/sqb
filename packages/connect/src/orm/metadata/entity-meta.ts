@@ -1,4 +1,5 @@
 import {isRelationElement, RelationElementMeta} from './relation-element-meta';
+import {DataType, Eq} from '@sqb/builder';
 import {
     Constructor,
     IndexOptions,
@@ -11,7 +12,8 @@ import {ForeignKeyMeta} from './foreign-key-meta';
 import {DataColumnMeta, isDataColumn} from './data-column-meta';
 import {EmbeddedElementMeta, isEmbeddedElement} from './embedded-element-meta';
 import {serializeColumn} from '../util/serialize-element';
-import {DataType} from '@sqb/builder';
+import {FindCommand} from '../commands/find.command';
+import {Repository} from '../repository';
 
 type ColumnMeta = DataColumnMeta | EmbeddedElementMeta | RelationElementMeta;
 
@@ -31,7 +33,7 @@ export class EntityMeta {
         this.name = ctor.name;
     }
 
-    getColumn(name: string): Maybe<ColumnMeta> {
+    getElement(name: string): Maybe<ColumnMeta> {
         if (!name)
             return;
         return this.elements.get(name.toLowerCase());
@@ -59,7 +61,7 @@ export class EntityMeta {
     }
 
     setDataColumn(name: string, options?: DataColumnOptions): DataColumnMeta {
-        let col = this.getColumn(name);
+        let col = this.getElement(name);
         if (!col || !isDataColumn(col)) {
             col = new DataColumnMeta(this, name, options);
             if (!col.type)
@@ -91,17 +93,35 @@ export class EntityMeta {
                       options?: RelationColumnOptions): RelationElementMeta {
         if (typeof target !== 'function')
             throw new Error('"target" must be defined');
-        if (options?.lazy) {
-            const desc = Object.getOwnPropertyDescriptor(this.ctor.prototype, name);
-            if (desc)
-                delete this.ctor.prototype[name];
-        }
-
-
         const col = new RelationElementMeta(this, name, target, options);
         if (!this.elements.has(name.toLowerCase()))
             this.elementKeys.push(name);
         this.elements.set(name.toLowerCase(), col);
+
+        if (options?.lazy) {
+            // Set lazy resolver function to prototype
+            const desc = Object.getOwnPropertyDescriptor(this.ctor.prototype, name);
+            if (desc)
+                delete this.ctor.prototype[name];
+            this.ctor.prototype[name] = async function (opts?: Repository.FindAllOptions) {
+                const keyCol = await col.foreign.resolveKeyColumn();
+                if (this[keyCol.name] == null)
+                    return;
+                const targetEntity = await col.foreign.resolveTarget();
+                const targetCol = await col.foreign.resolveTargetColumn();
+
+                const filter = Eq(targetCol.name, this[keyCol.name]);
+                const connection = this[Symbol.for('connection')];
+                const r = await FindCommand.execute({
+                    connection,
+                    ...opts,
+                    entity: targetEntity,
+                    filter: opts?.filter ? [filter, opts?.filter] : filter,
+                });
+                return col.hasMany ? r : r[0];
+            }
+        }
+
         return col;
     }
 
@@ -109,7 +129,7 @@ export class EntityMeta {
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
 
-        let col = this.getColumn(name);
+        let col = this.getElement(name);
         if (!col || !isEmbeddedElement(col)) {
             col = new EmbeddedElementMeta(this, name, type);
             if (!this.elements.has(name.toLowerCase()))
@@ -152,7 +172,7 @@ export class EntityMeta {
     getDataColumnNames(): string[] {
         const out: string[] = [];
         for (const k of this.elementKeys) {
-            const col = this.getColumn(k);
+            const col = this.getElement(k);
             if (isDataColumn(col))
                 out.push(k);
         }
@@ -162,7 +182,7 @@ export class EntityMeta {
     getInsertColumnNames(): string[] {
         const out: string[] = [];
         for (const k of this.elementKeys) {
-            const col = this.getColumn(k);
+            const col = this.getElement(k);
             if (isDataColumn(col) && !col.noInsert)
                 out.push(k);
         }
@@ -172,7 +192,7 @@ export class EntityMeta {
     getUpdateColumnNames(): string[] {
         const out: string[] = [];
         for (const k of this.elementKeys) {
-            const col = this.getColumn(k);
+            const col = this.getElement(k);
             if (isDataColumn(col) && !col.noUpdate)
                 out.push(k);
         }
@@ -215,7 +235,7 @@ export class EntityMeta {
                 v = this[key];
                 if (v === undefined)
                     continue;
-                const col = entity.getColumn(key);
+                const col = entity.getElement(key);
                 if (col)
                     obj[key] = serializeColumn(col, v);
             }

@@ -31,7 +31,7 @@ describe('findAll() One-2-One eager', function () {
         }));
     });
 
-    it('should return related of related record', async function () {
+    it('should return related record deeper', async function () {
         const repo = client.getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             filter: [Eq('id', 1)],

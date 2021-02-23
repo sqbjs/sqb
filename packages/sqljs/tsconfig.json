@@ -7,7 +7,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../*"]
+      "@sqb/*": ["../[!sqljs.]*"]
     }
   },
   "include": ["src/**/*.ts"],

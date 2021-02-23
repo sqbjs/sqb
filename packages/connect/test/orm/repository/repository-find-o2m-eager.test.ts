@@ -39,10 +39,9 @@ describe('findAll() One-2-Many eager', function () {
         for (const country of rows) {
             assert.ok(Array.isArray(country.customers));
             assert.ok(country.customers.length);
-            for (const customer of country.customers) {
-                assert.strictEqual(customer.countryCode, country.code);
-                assert.deepStrictEqual(Object.keys(customer), ['givenName', 'countryCode']);
-            }
+            const customer = country.customers[0];
+            assert.strictEqual(customer.countryCode, country.code);
+            assert.deepStrictEqual(Object.keys(customer), ['givenName', 'countryCode']);
         }
     });
 
