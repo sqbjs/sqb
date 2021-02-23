@@ -7,7 +7,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../*"]
+      "@sqb/*": ["../[!mssql-dialect.]*"]
     }
   },
   "include": ["src/**/*.ts"],

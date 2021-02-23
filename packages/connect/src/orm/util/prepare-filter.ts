@@ -3,13 +3,12 @@ import {
     LogicalOperator, Raw, Select
 } from '@sqb/builder';
 import {EntityMeta} from '../metadata/entity-meta';
-import {Repository} from '../repository';
 import {isRelationElement} from '../metadata/relation-element-meta';
 import {isDataColumn} from '../metadata/data-column-meta';
 
 export async function prepareFilter(
     entityDef: EntityMeta,
-    filter: Repository.SearchFilter,
+    filter: any,
     trgOp: LogicalOperator,
     tableAlias = 'T'): Promise<void> {
     let srcOp: LogicalOperator;
@@ -39,7 +38,7 @@ export async function prepareFilter(
                 let _tableAlias = tableAlias;
                 for (let i = 0; i < l; i++) {
                     pt = itemPath[i];
-                    const col = _entityDef.getColumn(pt);
+                    const col = _entityDef.getElement(pt);
                     if (!col)
                         throw new Error(`Unknown column (${item._expression}) defined in filter`);
                     // if last item on path

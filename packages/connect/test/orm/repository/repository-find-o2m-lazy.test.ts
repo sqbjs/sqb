@@ -30,17 +30,33 @@ describe('findAll() One-2-Many lazy', function () {
         }
     });
 
+    it('should always include key columns needed by foreign relation', async function () {
+        const repo = client.getRepository<Country>(Country);
+        const rows = await repo.findAll({
+            limit: 1,
+            elements: ['customersLazy']
+        });
+        assert.ok(rows);
+        assert.ok(rows.length);
+        assert.ok(rows[0].code);
+
+        const customers = await rows[0].customersLazy();
+        assert.ok(Array.isArray(customers));
+        assert.ok(customers.length);
+        assert.ok(customers[0].countryCode);
+    });
+
     it('should specify returning columns', async function () {
         const repo = client.getRepository<Country>(Country);
         const rows = await repo.findAll({
             filter: [Eq('code', 'DE')],
-            elements: ['code', 'customersLazy.countryCode']
+            elements: ['code', 'customersLazy']
         });
         assert.ok(rows);
         assert.ok(rows.length);
         assert.strictEqual(rows[0].code, 'DE');
 
-        const customers = await rows[0].customersLazy();
+        const customers = await rows[0].customersLazy({elements: ['countryCode']});
         assert.ok(Array.isArray(customers));
         assert.ok(customers.length);
         for (const customer of customers) {

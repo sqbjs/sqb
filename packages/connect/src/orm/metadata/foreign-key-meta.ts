@@ -33,7 +33,7 @@ export class ForeignKeyMeta {
 
     async resolveKeyColumn(): Promise<DataColumnMeta> {
         const n = await this.resolveKeyColumnName();
-        const col = this.entity.getColumn(n);
+        const col = this.entity.getElement(n);
         if (!col)
             throw new Error(`Can't resolve keyColumn of ${this.display}. ` +
                 `${this.entity.name} has no element named "${n}"`);
@@ -88,7 +88,7 @@ export class ForeignKeyMeta {
     async resolveTargetColumn(): Promise<DataColumnMeta> {
         const target = await this.resolveTarget();
         const n = await this.resolveTargetColumnName();
-        const col = target.getColumn(n);
+        const col = target.getElement(n);
         if (!col)
             throw new Error(`Can't resolve targetColumn of ${this.display}. ` +
                 `${target.name} has no element named "${n}"`);

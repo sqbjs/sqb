@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@sqb/*": ["../*"]
+      "@sqb/*": ["../[!nestjs.]*"]
     }
   },
   "include": ["src/**/*.ts"],

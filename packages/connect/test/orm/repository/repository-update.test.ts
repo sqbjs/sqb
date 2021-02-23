@@ -37,8 +37,8 @@ describe('update()', function () {
     before(() => client = initClient());
 
     it('should update and return updated columns', async function () {
-        const customer = await createCustomer();
-        ids.push(customer.id);
+        const old = await createCustomer();
+        ids.push(old.id);
 
         const repo = client.getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -48,24 +48,24 @@ describe('update()', function () {
         });
 
         assert.ok(updated);
-        assert.strictEqual(updated.id, ids[0]);
+        assert.strictEqual(updated.id, old.id);
         assert.strictEqual(updated.givenName, newGivenName);
-        assert.notStrictEqual(updated.givenName, customer.givenName);
+        assert.notStrictEqual(updated.givenName, old.givenName);
 
         const c2 = await repo.findByPk(ids[0]);
         assert.ok(c2);
-        assert.strictEqual(updated.id, c2.id);
-        assert.strictEqual(updated.givenName, c2.givenName);
-        assert.notStrictEqual(updated.familyName, c2.familyName);
+        assert.strictEqual(c2.id, old.id);
+        assert.strictEqual(c2.givenName, newGivenName);
+        assert.notStrictEqual(c2.givenName, old.givenName);
     });
 
-    it('should update if property name and field name differs', async function () {
+    it('should update even element name and field name differs', async function () {
         const customer = await createCustomer();
         ids.push(customer.id);
 
         const repo = client.getRepository(Customer2);
         let sql = '';
-        client.on('execute', request => {
+        client.once('execute', request => {
             sql = request.sql;
         });
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -75,7 +75,7 @@ describe('update()', function () {
         });
 
         assert.ok(updated);
-        assert.strictEqual(sql, 'update customers set given_name = $1 where id = $2 returning id');
+        assert.strictEqual(sql, 'update customers T set given_name = $1 where T.id = $2');
         assert.strictEqual(updated.pk, ids[0]);
         assert.strictEqual(updated.given, newGivenName);
         assert.notStrictEqual(updated.given, customer.givenName);
@@ -86,27 +86,9 @@ describe('update()', function () {
         assert.strictEqual(updated.given, c2.given);
     });
 
-    it('should return auto generated columns', async function () {
-        const repo = client.getRepository(Customer);
-        const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.update({
-            id: ids[0],
-            givenName: newGivenName
-        });
-        assert.ok(updated);
-        assert.ok(updated.updatedAt);
-
-        const c2 = await repo.findByPk(ids[0]);
-        assert.ok(c2);
-        assert.strictEqual(c2.id, updated.id);
-        assert.strictEqual(c2.givenName, updated.givenName);
-        assert.notStrictEqual(c2.familyName, updated.familyName);
-        assert.notStrictEqual(c2.updatedAt, updated.updatedAt);
-    });
-
-    it('should apply transformWrite function', async function () {
-        const customer = await createCustomer();
-        ids.push(customer.id);
+    it('should apply serialize function', async function () {
+        const old = await createCustomer();
+        ids.push(old.id);
 
         const repo = client.getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -150,7 +132,7 @@ describe('updateOnly()', function () {
 
     before(() => client = initClient());
 
-    it('should return true if update success', async function () {
+    it('should return "true" if update success', async function () {
         const repo = client.getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         let success = await repo.updateOnly({
@@ -171,7 +153,7 @@ describe('updateOnly()', function () {
         assert.strictEqual(c2.givenName, newGivenName);
     });
 
-    it('should not use "returning" query for fast execution', async function () {
+    it('should not fetch after update for fast execution', async function () {
         return client.acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
             let sql = '';
@@ -182,7 +164,7 @@ describe('updateOnly()', function () {
                 id: ids[0],
                 givenName: 'any name'
             });
-            assert.ok(!sql.includes('returning'));
+            assert.ok(!sql.includes('select'));
         });
     });
 

@@ -7,7 +7,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../*"]
+      "@sqb/*": ["../[!sqlite-dialect.]*"]
     }
   },
   "include": ["src/**/*.ts"],

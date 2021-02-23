@@ -63,7 +63,7 @@ describe('Entity', function () {
         const baseMeta = Entity.getMetadata(Base);
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        assert.ok(meta.getColumn('id'));
+        assert.ok(meta.getElement('id'));
         assert.ok(meta.primaryIndex);
         assert.deepStrictEqual(meta.primaryIndex.columns, baseMeta.primaryIndex.columns);
     });
