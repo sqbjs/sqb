@@ -11,7 +11,7 @@ import {
     FieldName,
     NoUpdate,
     Parse,
-    Serialize, NoInsert, HasOneLazy,
+    Serialize, NoInsert, HasOneLazy, NotNull,
 } from '@sqb/connect';
 import {Country} from './countries.entity';
 import {Embedded} from '@sqb/connect';
@@ -50,6 +50,7 @@ export class Customer extends BaseEntity<Customer> {
 
     @FieldName('country_code')
     @ForeignKey(Country)
+    @NotNull
     countryCode?: string;
 
     @Column(DataType.TIMESTAMP)

@@ -39,6 +39,7 @@ export namespace Repository {
     export interface FindAllOptions extends FindOneOptions {
         limit?: number;
         maxEagerFetch?: number;
+        maxRelationLevel?: number;
     }
 
     export interface GetOptions extends CommandOptions {

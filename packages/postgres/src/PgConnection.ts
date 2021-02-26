@@ -1,3 +1,4 @@
+import assert from 'assert';
 import {Adapter, QueryRequest, DataType} from '@sqb/connect';
 import {Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions} from 'postgresql-client';
 
@@ -21,18 +22,21 @@ const SqbDataTypToOIDMap = {
 }
 
 export class PgConnection implements Adapter.Connection {
-    private readonly intlcon: Connection;
+    private intlcon?: Connection;
 
     constructor(conn: Connection) {
         this.intlcon = conn;
     }
 
     get sessionId(): any {
-        return this.intlcon.processID;
+        return this.intlcon && this.intlcon.processID;
     }
 
     async close() {
+        if (!this.intlcon)
+            return;
         await this.intlcon.close(0);
+        this.intlcon = undefined;
     }
 
     async reset() {
@@ -40,27 +44,50 @@ export class PgConnection implements Adapter.Connection {
     }
 
     async startTransaction(): Promise<void> {
+        assert.ok(this.intlcon, 'Can not start transaction for a closed db session');
         await this.intlcon.startTransaction();
     }
 
     async commit(): Promise<void> {
+        assert.ok(this.intlcon, 'Can not commit transaction for a closed db session');
         await this.intlcon.commit();
     }
 
     async rollback(): Promise<void> {
+        if (!this.intlcon)
+            return;
         await this.intlcon.rollback();
     }
 
     async test(): Promise<void> {
+        assert.ok(this.intlcon, 'DB session is closed');
         await this.intlcon.query('select 1');
     }
 
+
+    async getSchema(): Promise<string> {
+        assert.ok(this.intlcon, 'DB session is closed');
+        const r = await this.intlcon.query('SHOW search_path');
+        if (r && r.rows && r.rows[0])
+            return (r.rows as any)[0][0] as string;
+        return '';
+    }
+
+    async setSchema(schema: string): Promise<void> {
+        assert.ok(this.intlcon, 'Can not set schema of a closed db session');
+        await this.intlcon.execute('SET search_path TO ' + schema);
+    }
+
     onGenerateQuery(request: QueryRequest): void {
-        // eslint-disable-next-line dot-notation
-        request.dialectVersion = this.intlcon.sessionParameters['server_version'];
+        if (this.intlcon) {
+            // eslint-disable-next-line dot-notation
+            request.dialectVersion = this.intlcon.sessionParameters['server_version'];
+        }
     }
 
     async execute(query: QueryRequest): Promise<Adapter.Response> {
+        assert.ok(this.intlcon, 'Can not execute query with a closed db session');
+
         const opts: QueryOptions = {
             autoCommit: query.autoCommit,
             params: query.params,

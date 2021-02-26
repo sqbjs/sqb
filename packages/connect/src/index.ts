@@ -13,7 +13,7 @@ export * from './orm/decorators/primarykey.decorator';
 export * from './orm/decorators/index.decorator';
 export * from './orm/decorators/column.decorator';
 export * from './orm/decorators/relation-column.decorator';
-export * from './orm/decorators/nested.decorator';
+export * from './orm/decorators/embedded.decorator';
 export * from './orm/decorators/foreignkey.decorator';
 export * from './orm/decorators/events.decorator';
 export * from './orm/decorators/transform.decorator';

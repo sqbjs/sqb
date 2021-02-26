@@ -46,7 +46,7 @@ export class CreateCommand {
 
         const query = Insert(tableName, ctx.queryValues);
         if (args.returning && entity.primaryIndex)
-            query.returning(...entity.primaryIndex.columns);
+            query.returning(...entity.getPrimaryIndexColumns().map(col => col.fieldName));
 
         const qr = await args.connection.execute(query, {
             params: ctx.queryParams,
@@ -57,12 +57,9 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const fieldName = f.name.toLowerCase();
-                for (const el of entity.elements.values()) {
-                    if (isDataColumn(el) && el.fieldName.toLowerCase() === fieldName) {
-                        keyValues[el.fieldName] = qr.rows[0][f.index]
-                    }
-                }
+                const el = entity.getDataColumnByFieldName(f.fieldName);
+                if (el)
+                    keyValues[el.name] = qr.rows[0][f.index];
             }
             return keyValues;
         }
@@ -73,15 +70,21 @@ export class CreateCommand {
         let v;
         for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (v === undefined)
-                continue;
             if (isDataColumn(col)) {
                 if (col.noInsert)
                     continue;
+                if (v == null && col.defaultValue !== undefined) {
+                    v = typeof col.defaultValue === 'function' ?
+                        col.defaultValue(values) : col.defaultValue;
+                }
                 if (typeof col.serialize === 'function')
                     v = col.serialize(v, col, values);
-                if (v === undefined)
+                if (v == null) {
+                    if (col.notNull)
+                        throw new Error(`${entity.name}.${col.name} is required an can't be null`);
                     continue;
+                }
+                col.checkEnumValue(v);
                 const k = '$input_' + col.fieldName;
                 ctx.queryValues[col.fieldName] = Param({
                     name: k,

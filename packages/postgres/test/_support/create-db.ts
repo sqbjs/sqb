@@ -66,7 +66,9 @@ EXECUTE PROCEDURE trigger_set_updated_at();
 CREATE TABLE ${schema}.customer_tags
 (
     customer_id int4,
-    tag character varying(16),   
+    tag character varying(16),
+    color character varying(8),
+    active boolean,
     CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag),
     CONSTRAINT fk_customer_tags_customer_id FOREIGN KEY (customer_id)
         REFERENCES ${schema}.customers (id) MATCH SIMPLE

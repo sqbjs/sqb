@@ -1,5 +1,6 @@
 import {ConstructorThunk, RelationColumnOptions} from '../types';
 import {EntityMeta} from '../metadata/entity-meta';
+import {isClass} from '../helpers';
 
 export function HasOne(type?: ConstructorThunk, options?: Omit<RelationColumnOptions, 'hasMany' | 'lazy'>): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
@@ -34,7 +35,7 @@ export function HasMany(type: ConstructorThunk, options?: Omit<RelationColumnOpt
         if (!type)
             throw new Error('You must provide target entity');
         if (Reflect.getMetadata("design:type", target, propertyKey) !== Array)
-            throw new Error('Returning type of property must be an array');
+            throw new Error(`Returning type of property (${propertyKey}) must be an array`);
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: true, lazy: false}
         entity.setRelationColumn(propertyKey, type, opts);
@@ -47,8 +48,9 @@ export function HasManyLazy(type: ConstructorThunk, options?: Omit<RelationColum
             throw new Error('You can define a column for only string properties');
         if (!type)
             throw new Error('You must provide target entity');
-        if (Reflect.getMetadata("design:type", target, propertyKey) !== Function)
-            throw new Error('Returning type of property must be a Function');
+        const typ = Reflect.getMetadata("design:type", target, propertyKey);
+        if (typeof typ !== 'function' || isClass(typ))
+            throw new Error(`Function type type required for property "${propertyKey}", but ${typ} found`);
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: true, lazy: true}
         entity.setRelationColumn(propertyKey, type, opts);

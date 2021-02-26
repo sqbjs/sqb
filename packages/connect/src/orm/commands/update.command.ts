@@ -72,15 +72,16 @@ export class UpdateCommand {
         let v;
         for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (v === undefined)
-                continue;
             if (isDataColumn(col)) {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')
                     v = col.serialize(v, col, values);
+                if (v === null && col.notNull)
+                    throw new Error(`${entity.name}.${col.name} is required an can't be null`);
                 if (v === undefined)
                     continue;
+                col.checkEnumValue(v);
                 const k = '$input_' + col.fieldName;
                 ctx.queryValues[col.fieldName] = Param({
                     name: k,

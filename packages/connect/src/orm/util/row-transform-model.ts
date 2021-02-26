@@ -7,58 +7,66 @@ import {DataColumnMeta, isDataColumn} from '../metadata/data-column-meta';
 import {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
 import {FindCommandArgs} from '../commands/find.command';
 
-export interface RowTransformElement {
-    column: EntityElementMeta;
+export interface RowTransformItem {
+    element: EntityElementMeta;
     fieldAlias: string;
     node?: RowTransformModel;
-    prepareOptions?: Omit<FindCommandArgs, 'entity' | 'connection'>;
+    subQueryOptions?: Omit<FindCommandArgs, 'entity' | 'connection'>;
     eagerParams?: any;
+    eagerTargets?: any[];
+}
+
+const isOne2ManyEagerProperty = (prop: RowTransformItem): boolean => {
+    return !!(isRelationElement(prop.element) && prop.subQueryOptions && !prop.element.lazy)
 }
 
 export class RowTransformModel {
     entity: EntityMeta;
-    private _elements: Record<string, RowTransformElement> = {};
-    private _elementKeys?: string[];
+    private _properties: Record<string, RowTransformItem> = {};
+    private _propertyKeys?: string[];
+    private _circularCheckList: EntityMeta[];
 
-    constructor(entity: EntityMeta) {
+    constructor(entity: EntityMeta, parent?: RowTransformModel) {
         this.entity = entity;
+        this._circularCheckList = parent?._circularCheckList || [];
+        this._circularCheckList.push(entity);
     }
 
     addDataElement(col: DataColumnMeta, fieldAlias: string) {
-        this._elements[col.name] = {
-            column: col,
+        this._properties[col.name] = {
+            element: col,
             fieldAlias
         };
-        this._elementKeys = undefined;
+        this._propertyKeys = undefined;
     }
 
     addOne2ManyEagerElement(col: RelationElementMeta,
                             fieldAlias: string,
-                            prepareOptions?: Omit<FindCommandArgs, 'entity' | 'connection'>) {
-        this._elements[col.name] = {
-            column: col,
+                            options?: Omit<FindCommandArgs, 'entity' | 'connection'>) {
+        this._properties[col.name] = {
+            element: col,
             fieldAlias,
-            prepareOptions
+            subQueryOptions: options
         };
-        this._elementKeys = undefined;
+        this._propertyKeys = undefined;
     }
 
     addNode(col: EmbeddedElementMeta | RelationElementMeta, node: RowTransformModel) {
-        this._elements[col.name] = {
-            column: col,
+        this._properties[col.name] = {
+            element: col,
             fieldAlias: '',
             node
         };
-        this._elementKeys = undefined;
+        this._propertyKeys = undefined;
     }
 
     get elementKeys(): string[] {
-        if (!this._elementKeys)
-            this._elementKeys = Object.keys(this._elements);
-        return this._elementKeys;
+        if (!this._propertyKeys)
+            this._propertyKeys = Object.keys(this._properties);
+        return this._propertyKeys;
     }
 
-    async transformRows(connection: QueryExecutor, fields: FieldInfoMap, rows: any): Promise<any> {
+    async transform(connection: QueryExecutor, fields: FieldInfoMap, rows: any): Promise<any[]> {
         const rowLen = rows.length;
         const result: any[] = [];
         for (let rowIdx = 0; rowIdx < rowLen; rowIdx++) {
@@ -68,78 +76,86 @@ export class RowTransformModel {
         if (!this.elementKeys)
             return result;
 
-        // Fetch one-2-many related rows and merge with result rows
-        const elementLen = this.elementKeys.length;
-        for (let elIdx = 0; elIdx < elementLen; elIdx++) {
-            const elKey = this.elementKeys[elIdx];
-            const el = this._elements[elKey];
+        await this.iterateForOne2Many(this, connection);
 
-            if (el.column && el.prepareOptions && isRelationElement(el.column) && !el.column.lazy) {
+        return result;
+    }
+
+    private async iterateForOne2Many(node: RowTransformModel, connection: QueryExecutor): Promise<void> {
+        // Fetch one-2-many related rows and merge with result rows
+        const propertyLen = node.elementKeys.length;
+        for (let propIdx = 0; propIdx < propertyLen; propIdx++) {
+            const propKey = node.elementKeys[propIdx];
+            const prop = node._properties[propKey];
+
+            if (prop.eagerTargets && isRelationElement(prop.element) && prop.subQueryOptions) {
                 const {FindCommand} = await import('../commands/find.command');
-                const prepareOptions = el.prepareOptions;
-                const targetEntity = await el.column.foreign.resolveTarget();
+                const targetEntity = await prop.element.foreign.resolveTarget();
+                if (this._circularCheckList.includes(targetEntity))
+                    throw new Error('Circular query call is not allowed');
+
+                const subQueryOptions = prop.subQueryOptions;
+                const keyCol = await prop.element.foreign.resolveKeyColumnName();
+                const trgCol = await prop.element.foreign.resolveTargetColumnName();
+
                 const r = await FindCommand.execute({
-                    ...prepareOptions,
+                    ...subQueryOptions,
                     entity: targetEntity,
                     connection,
-                    limit: prepareOptions.maxEagerFetch,
-                    params: el.eagerParams
+                    limit: subQueryOptions.maxEagerFetch,
+                    params: prop.eagerParams
                 });
                 const subRows = new Set(r);
-
-                const keyCol = await el.column.foreign.resolveKeyColumnName();
-                const trgCol = await el.column.foreign.resolveTargetColumnName();
-
-                // init array value for column
-                for (const row of result) {
-                    row[elKey] = [];
-                }
-                // Merge rows
-                const rowCount = result.length;
-                let row;
-                for (let i = 0; i < rowCount; i++) {
-                    row = result[i];
+                for (const obj of prop.eagerTargets) {
+                    // init array value for element
+                    // noinspection JSMismatchedCollectionQueryUpdate
+                    const arr: any[] = obj[propKey] = [];
+                    // Merge rows
                     for (const subRow of subRows) {
-                        if (subRow[trgCol] === row[keyCol]) {
-                            row[elKey].push(subRow);
+                        if (subRow[trgCol] === obj[keyCol]) {
+                            arr.push(subRow);
                             subRows.delete(subRow);
                         }
                     }
                 }
+            } else if (prop.node) {
+                await this.iterateForOne2Many(prop.node, connection);
             }
+
         }
-        return result;
     }
 
-    transformRow(executor: QueryExecutor, fields: FieldInfoMap, row: any[]): any {
+    private transformRow(executor: QueryExecutor, fields: FieldInfoMap, row: any[]): any {
         // Cache keys for better performance
         const elementKeys = this.elementKeys;
         const elementLen = elementKeys.length;
         const result = {};
         for (let elIdx = 0; elIdx < elementLen; elIdx++) {
             const elKey = elementKeys[elIdx];
-            const el = this._elements[elKey];
-            if (isDataColumn(el.column)) {
-                const field = fields.get(el.fieldAlias);
+            const prop = this._properties[elKey];
+            if (isDataColumn(prop.element)) {
+                const field = fields.get(prop.fieldAlias);
                 if (field) {
                     let v = row[field.index];
-                    if (typeof el.column.parse === 'function')
-                        v = el.column.parse(v, el.column, result);
+                    if (typeof prop.element.parse === 'function')
+                        v = prop.element.parse(v, prop.element, result);
                     if (v !== null)
                         result[elKey] = v;
                 }
-            } else if (el.node) {
-                result[elKey] = el.node.transformRow(executor, fields, row);
-            } else if (el.column && el.prepareOptions && isRelationElement(el.column) && !el.column.lazy) {
+            } else if (isOne2ManyEagerProperty(prop)) {
                 // One2Many Eager element
                 // Keep a list of key field/value pairs to fetch rows for eager relation
-                const _params = el.eagerParams = el.eagerParams || {};
-                const f = fields.get(el.fieldAlias);
+                const _params = prop.eagerParams = prop.eagerParams || {};
+                const f = fields.get(prop.fieldAlias);
                 const v = f && row[f.index];
                 if (v != null) {
-                    _params[el.fieldAlias] = _params[el.fieldAlias] || [];
-                    _params[el.fieldAlias].push(v);
+                    _params[prop.fieldAlias] = _params[prop.fieldAlias] || [];
+                    _params[prop.fieldAlias].push(v);
                 }
+                prop.eagerTargets = prop.eagerTargets || [];
+                prop.eagerTargets.push(result);
+            } else if (prop.node) {
+                result[elKey] = prop.node.transformRow(executor, fields, row);
             }
         }
 

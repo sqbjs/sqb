@@ -46,6 +46,16 @@ export class EntityMeta {
         return isDataColumn(col) ? col : undefined;
     }
 
+    getDataColumnByFieldName(fieldName: string): Maybe<DataColumnMeta> {
+        if (!fieldName)
+            return;
+        fieldName = fieldName.toLowerCase();
+        for (const el of this.elements.values()) {
+            if (isDataColumn(el) && el.fieldName.toLowerCase() === fieldName)
+                return el;
+        }
+    }
+
     getRelationColumn(name: string): Maybe<RelationElementMeta> {
         if (!name)
             return;
@@ -64,8 +74,13 @@ export class EntityMeta {
         let col = this.getElement(name);
         if (!col || !isDataColumn(col)) {
             col = new DataColumnMeta(this, name, options);
-            if (!col.type)
-                col.type = Reflect.getMetadata("design:type", this.ctor, name);
+            if (!col.type) {
+                const typ = Reflect.getMetadata("design:type", this.ctor.prototype, name);
+                if (typ === Array) {
+                    col.type = String;
+                    col.isArray = true;
+                } else col.type = typ;
+            }
             if (!col.dataType) {
                 if (col.type === Boolean)
                     col.dataType = DataType.BOOL;
@@ -142,6 +157,7 @@ export class EntityMeta {
 
     setPrimaryIndex(column: string | string[], options?: IndexOptions): void {
         this.primaryIndex = new IndexMeta(this, column, options);
+        this.primaryIndex.unique = true;
     }
 
     addIndex(column: string | string[], options?: IndexOptions): void {
@@ -167,6 +183,19 @@ export class EntityMeta {
 
     after(event: 'insert' | 'update' | 'destroy', fn: Constructor): void {
         this.eventListeners.push({event: 'after-' + event, fn});
+    }
+
+    getPrimaryIndexColumns(): DataColumnMeta[] {
+        const out: DataColumnMeta[] = [];
+        if (this.primaryIndex) {
+            for (const k of this.primaryIndex.columns) {
+                const col = this.getDataColumn(k);
+                if (!col)
+                    throw new Error(`Data column "${k}" in primary index of ${this.name} does not exists`)
+                out.push(col);
+            }
+        }
+        return out;
     }
 
     getDataColumnNames(): string[] {

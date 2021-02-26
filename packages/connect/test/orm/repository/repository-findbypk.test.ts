@@ -1,15 +1,13 @@
 import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
 import {CustomerTag} from '../../_support/customer-tags.entity';
 
 describe('findByPk()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return single instance by key value', async function () {
         const repo = client.getRepository<Country>(Country);
@@ -29,10 +27,10 @@ describe('findByPk()', function () {
 
     it('should return instance from multi-key entities', async function () {
         const repo = client.getRepository<CustomerTag>(CustomerTag);
-        const row = await repo.findByPk({customerId: 2, tag: 'green'});
+        const row = await repo.findByPk({customerId: 2, tag: 'large'});
         assert.ok(row);
         assert.strictEqual(row.customerId, 2);
-        assert.strictEqual(row.tag, 'green');
+        assert.strictEqual(row.tag, 'large');
     });
 
 });

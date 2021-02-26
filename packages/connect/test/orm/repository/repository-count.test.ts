@@ -1,14 +1,12 @@
 import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {initClient} from '../../_support/init-client';
 import {Country} from '../../_support/countries.entity';
 
 describe('count()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return number of rows', async function () {
         const repo = client.getRepository<Country>(Country);

@@ -15,31 +15,45 @@
   "rows": [
     {
       "customer_id": 1,
-      "tag": "red"
+      "tag": "small",
+      "color": "yellow",
+      "active": true
     },
     {
       "customer_id": 1,
-      "tag": "blue"
+      "tag": "generous",
+      "color": "green",
+      "active": true
     },
     {
       "customer_id": 2,
-      "tag": "red"
+      "tag": "large",
+      "color": "orange",
+      "active": true
     },
     {
       "customer_id": 2,
-      "tag": "yellow"
+      "tag": "stingy",
+      "color": "red",
+      "active": true
     },
     {
       "customer_id": 2,
-      "tag": "green"
-    },
-    {
-      "customer_id": 2,
-      "tag": "white"
+      "tag": "rich",
+      "color": "blue",
+      "active": true
     },
     {
       "customer_id": 3,
-      "tag": "yellow"
+      "tag": "enterprise",
+      "color": "brown",
+      "active": true
+    },
+    {
+      "customer_id": 3,
+      "tag": "rich",
+      "color": "blue",
+      "active": true
     }
   ]
 }

@@ -123,6 +123,7 @@ describe('Relation column', function () {
     it(`should provide target entity type`, async function () {
 
         assert.throws(function () {
+            // noinspection JSUnusedLocalSymbols
             class Customer {
                 // @ts-ignore
                 @HasMany()
@@ -134,6 +135,7 @@ describe('Relation column', function () {
     it(`should throw if property type is not an array (Not Lazy)`, async function () {
 
         assert.throws(function () {
+            // noinspection JSUnusedLocalSymbols
             class Customer {
 
                 @HasMany(Country)
@@ -145,12 +147,13 @@ describe('Relation column', function () {
     it(`should throw if property type is not an Function (Lazy)`, async function () {
 
         assert.throws(function () {
+            // noinspection JSUnusedLocalSymbols
             class Customer {
 
                 @HasManyLazy(Country)
                 countries: Country;
             }
-        }, /must be a Function/)
+        }, /Function type type required/)
     });
 
 });

@@ -1,4 +1,5 @@
-import {Column, Entity, PrimaryKey} from '@sqb/connect';
+import {Column, Entity, HasMany, PrimaryKey} from '@sqb/connect';
+import type {Country} from './countries.entity';
 
 @Entity('continents')
 export class Continent {
@@ -8,5 +9,8 @@ export class Continent {
 
     @Column()
     name: string;
+
+    @HasMany(() => require('./countries.entity').Country)
+    countries: Country[];
 
 }

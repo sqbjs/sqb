@@ -1,4 +1,5 @@
 import {classes} from '@sqb/builder';
+import assert from 'assert';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
@@ -125,13 +126,24 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
         return new Repository<T>(entityDef, this);
     }
 
+    async getSchema(): Promise<string> {
+        assert.ok(this._intlcon, `Can't set schema, because connection is released`);
+        assert.ok(this._intlcon.getSchema, `${this.client.dialect} adapter does have Schema support`);
+        return await this._intlcon.getSchema();
+    }
+
+    async setSchema(schema: string): Promise<void> {
+        assert.ok(this._intlcon, `Can't set schema, because connection is released`);
+        assert.ok(this._intlcon.setSchema, `${this.client.dialect} adapter does have Schema support`);
+        await this._intlcon.setSchema(schema);
+    }
+
     /**
      * Executes a query
      */
     protected async _execute(query: string | classes.Query,
                              options?: QueryExecuteOptions): Promise<any> {
-        if (!this._intlcon)
-            throw new Error(`Can't execute query, because connection is released`);
+        assert.ok(this._intlcon, `Can't execute query, because connection is released`);
         const intlcon = this._intlcon;
         this.retain();
         try {

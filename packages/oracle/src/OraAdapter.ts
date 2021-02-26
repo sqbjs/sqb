@@ -10,6 +10,7 @@ export class OraAdapter implements Adapter {
     dialect = 'oracle';
     features = {
         cursor: true,
+        schema: true,
         // fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
     }
 
@@ -24,12 +25,11 @@ export class OraAdapter implements Adapter {
             if (r && r.rows)
                 sessionId = r.rows[0][0];
 
+            const oracon = new OraConnection(connection, sessionId);
             /* Set default schema */
-            if (config.schema) {
-                await connection.execute('alter SESSION set CURRENT_SCHEMA = ' + config.schema, [], {autoCommit: true});
-            }
-
-            return new OraConnection(connection, sessionId);
+            if (config.schema)
+                await oracon.setSchema(config.schema);
+            return oracon;
         } catch (e) {
             if (connection)
                 await connection.close();

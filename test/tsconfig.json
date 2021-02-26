@@ -10,16 +10,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../packages/builder/src"],
-      "@sqb/connect": ["../packages/connect/src"],
-      "@sqb/postgres-dialect": ["../packages/postgres-dialect/src"],
-      "@sqb/sqlite-dialect": ["../packages/sqlite-dialect/src"],
-      "@sqb/mssql-dialect": ["../packages/mssql-dialect/src"],
-      "@sqb/oracle-dialect": ["../packages/oracle-dialect/src"],
-      "@sqb/postgres": ["../packages/postgres/src"],
-      "@sqb/sqlite": ["../packages/sqlite/src"],
-      "@sqb/oracle": ["../packages/oracle/src"],
-      "@sqb/nestjs": ["../packages/nestjs/src"]
+      "@sqb/*": ["../packages/*/src"]
     }
   }
 }

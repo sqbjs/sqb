@@ -12,6 +12,6 @@ export function Embedded(type: ConstructorThunk, options?: NestedOptions): Prope
         if (options?.fieldNamePrefix)
             el.fieldNamePrefix = options.fieldNamePrefix;
         if (options?.fieldNameSuffix)
-            el.fieldNamePrefix = options.fieldNameSuffix;
+            el.fieldNameSuffix = options.fieldNameSuffix;
     }
 }

@@ -5,7 +5,7 @@ import type {EntityMeta} from './entity-meta';
 import {
     ElementKind,
     ColumnAutoGenerationStrategy,
-    ColumnTransformFunction, DataColumnOptions, EnumValue,
+    ColumnTransformFunction, DataColumnOptions, EnumValue, FieldValue, DefaultValueGetter,
 } from '../types';
 import {EntityElementMeta} from './entity-element-meta';
 
@@ -27,7 +27,7 @@ export class DataColumnMeta extends EntityElementMeta {
     /**
      * Column's default value
      */
-    defaultValue: any;
+    defaultValue?: FieldValue | DefaultValueGetter;
 
     /**
      * Indicates if column data is an array
@@ -96,6 +96,14 @@ export class DataColumnMeta extends EntityElementMeta {
 
     assign(options: DataColumnOptions) {
         Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
+    }
+
+    checkEnumValue(v: FieldValue) {
+        if (v === undefined || !this.enum)
+            return;
+        const enumKeys = Array.isArray(this.enum) ? this.enum : Object.keys(this.enum);
+        if (!enumKeys.includes(v))
+            throw new Error(`${this.entity.name}.${this.name} value must be one of (${enumKeys})`);
     }
 
 }
