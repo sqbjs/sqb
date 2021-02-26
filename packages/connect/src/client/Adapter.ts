@@ -10,11 +10,12 @@ import {Maybe} from '../types';
 export interface Adapter {
     driver: string;
     dialect: string;
-    connect: (config: ClientConfiguration) => Promise<Adapter.Connection>;
     features?: {
         cursor?: boolean;
+        schema?: boolean;
         fetchAsString?: DataType[];
-    }
+    };
+    connect: (config: ClientConfiguration) => Promise<Adapter.Connection>;
 }
 
 export namespace Adapter {
@@ -28,6 +29,8 @@ export namespace Adapter {
         startTransaction: () => Promise<void>;
         commit: () => Promise<void>;
         rollback: () => Promise<void>;
+        setSchema?: (schema: string) => Promise<void>;
+        getSchema?: () => Promise<string>;
         onGenerateQuery?: (request: QueryRequest, query: classes.Query) => void;
     }
 

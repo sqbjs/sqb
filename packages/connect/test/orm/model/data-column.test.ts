@@ -61,8 +61,8 @@ describe('Data Column', function () {
                 scale: 2,
                 notNull: false,
                 hidden: true,
-                dontInsert: true,
-                dontUpdate: true,
+                noInsert: true,
+                noUpdate: true,
                 enum: [1, 2, 3]
             })
             id: number
@@ -127,7 +127,7 @@ describe('Data Column', function () {
         assert.strictEqual(col.type, Buffer);
         assert.strictEqual(col.dataType, DataType.BINARY);
         col = meta.getDataColumn('col6');
-        assert.strictEqual(col.type, Array);
+        assert.strictEqual(col.type, String);
         assert.strictEqual(col.dataType, DataType.VARCHAR);
         assert.strictEqual(col.isArray, true);
     });

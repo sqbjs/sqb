@@ -1,14 +1,12 @@
 import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {initClient} from '../../_support/init-client';
 import {Customer} from '../../_support/customers.entity';
 
 describe('findOne()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return single instance', async function () {
         const repo = client.getRepository<Customer>(Customer);

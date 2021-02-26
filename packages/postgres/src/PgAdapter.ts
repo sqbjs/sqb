@@ -11,6 +11,7 @@ export class PgAdapter implements Adapter {
     dialect = 'postgres';
     features = {
         cursor: true,
+        schema: true,
         fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
     }
 

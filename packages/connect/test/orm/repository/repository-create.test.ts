@@ -1,14 +1,14 @@
 import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
+import {CustomerTag} from '@sqb/connect/test/_support/customer-tags.entity';
 
 describe('create()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
+    const ids: number[] = [];
 
     it('should insert new record and return new values', async function () {
         const values = {
@@ -37,6 +37,7 @@ describe('create()', function () {
         assert.strictEqual(x.familyName, values.familyName);
         assert.strictEqual(x.countryCode, values.countryCode);
         assert.strictEqual(x.country.code, values.countryCode);
+        ids.push(customer.id);
     });
 
     it('should apply column.serialize() before insert', async function () {
@@ -53,6 +54,7 @@ describe('create()', function () {
         assert.ok(x);
         assert.strictEqual(x.id, customer.id);
         assert.strictEqual(x.gender, 'Male');
+        ids.push(customer.id);
     });
 
     it('should map embedded elements into fields', async function () {
@@ -79,15 +81,39 @@ describe('create()', function () {
         assert.strictEqual(c2, c + 1);
         assert.strictEqual(x.id, customer.id);
         assert.deepStrictEqual({...x.name}, values.name);
+        ids.push(customer.id);
     });
 
+    it('should set default value', async function () {
+        const repo = client.getRepository(CustomerTag);
+        const tag = await repo.create({customerId: ids[0], tag: 'small'});
+        assert.ok(tag);
+        assert.ok(tag instanceof CustomerTag);
+        assert.strictEqual(tag.customerId, ids[0]);
+        assert.strictEqual(tag.tag, 'small');
+        assert.strictEqual(tag.color, 'yellow');
+        assert.strictEqual(tag.active, true);
+    });
+
+    it('should check enum value', async function () {
+        const repo = client.getRepository(CustomerTag);
+        await assert.rejects(() => repo.create({customerId: ids[0], tag: 'small', color: 'pink'}),
+            /value must be one of/);
+    });
+
+    it('should column is required', async function () {
+        const repo = client.getRepository(Customer);
+        await assert.rejects(() => repo.create({givenName: 'aa', familyName: 'bb'}),
+            /is required/);
+    });
 
     it('should execute in transaction', async function () {
         let c = 0;
         return client.acquire(async (connection) => {
             const values = {
                 givenName: 'abc',
-                familyName: 'def'
+                familyName: 'def',
+                countryCode: 'DE'
             };
             const repo = connection.getRepository<Customer>(Customer);
             c = await repo.count();
@@ -105,14 +131,14 @@ describe('create()', function () {
 
 describe('createOnly()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should not generate "returning" sql query for fast execution', async function () {
         return client.acquire(async (connection) => {
             const values = {
                 givenName: 'abc',
-                familyName: 'def'
+                familyName: 'def',
+                countryCode: 'DE'
             };
             const repo = connection.getRepository(Customer);
             let sql = '';

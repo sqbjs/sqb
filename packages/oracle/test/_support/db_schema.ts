@@ -112,7 +112,9 @@ END;`,
 
     `CREATE TABLE ${process.env.ORASCHEMA}.customer_tags (
   customer_id    INTEGER,
-  tag  VARCHAR2(16)
+  tag  VARCHAR2(16),
+  color VARCHAR2(8),
+  active smallint
 )`,
 
     `ALTER TABLE ${process.env.ORASCHEMA}.customer_tags ADD (

@@ -38,6 +38,7 @@ type FindCommandContext = {
     requestElements?: string[];
     excludeElements?: string[];
     maxEagerFetch?: number;
+    maxRelationLevel: number;
 }
 
 export class FindCommand {
@@ -57,8 +58,15 @@ export class FindCommand {
             entity,
             model: new RowTransformModel(entity),
             sqlColumns: {},
-            maxEagerFetch: args.maxEagerFetch || 100000
+            maxEagerFetch: args.maxEagerFetch || 100000,
+            maxRelationLevel: typeof args.maxRelationLevel === 'number' ? args.maxRelationLevel : 5
         }
+        /* if (parentContext) {
+            if (parentContext.entitiesQueried.includes(entity))
+                throw new Error(`Circular query detected`);
+            ctx.entitiesQueried.push(...parentContext.entitiesQueried);
+        }
+        ctx.entitiesQueried.push(entity); */
 
         // Prepare list of included element names
         if (args.elements && args.elements.length)
@@ -71,6 +79,13 @@ export class FindCommand {
                 if (!requestElements.includes(k.toLowerCase()))
                     requestElements.push(k.toLowerCase());
             }
+        }
+        if (ctx.requestElements) {
+            ctx.requestElements.forEach(s => {
+                const m = s.match(/\./);
+                if (m && m.length > ctx.maxRelationLevel)
+                    throw new Error(`Requested element ${s} exceeds maximum sub query limit`);
+            })
         }
         // Prepare list of excluded element names
         if (args.exclude && args.exclude.length)
@@ -120,7 +135,7 @@ export class FindCommand {
         const rows: any[] = [];
         if (resp.rows && resp.fields) {
             const fields = resp.fields;
-            return ctx.model.transformRows(args.connection, fields, resp.rows)
+            return ctx.model.transform(args.connection, fields, resp.rows)
         }
         return rows;
     }
@@ -160,7 +175,7 @@ export class FindCommand {
 
             if (isEmbeddedElement(col)) {
                 const typ = await col.resolveType();
-                const subModel = new RowTransformModel(typ);
+                const subModel = new RowTransformModel(typ, model);
                 await this._addEntityElements(ctx, typ, subModel, tableAlias,
                     currentPath ? currentPath + '.' + col.name : col.name);
                 model.addNode(col, subModel);
@@ -186,7 +201,7 @@ export class FindCommand {
                 // One-2-One Eager relation
                 if (!col.hasMany && !col.lazy) {
                     const joinInfo = await this._addJoin(ctx, tableAlias, col);
-                    const subModel = new RowTransformModel(joinInfo.targetEntity);
+                    const subModel = new RowTransformModel(joinInfo.targetEntity, model);
                     model.addNode(col, subModel);
                     // Add join fields to select columns list
                     await this._addEntityElements(ctx,
@@ -202,6 +217,7 @@ export class FindCommand {
                 // We need to know key value to filter sub query.
                 // So add key field into select columns
                 const fieldAlias = this._addSelectColumn(ctx, tableAlias, keyCol);
+                model.addDataElement(keyCol, fieldAlias);
 
                 // prepare requested columns and select only paths for target entity
                 const _reqElements = ctx.requestElements && ctx.requestElements
@@ -212,21 +228,25 @@ export class FindCommand {
                     }, [] as string[]);
                 const _excludedElements = ctx.excludeElements && ctx.excludeElements
                     .reduce((a, x) => {
+                        if (x.toLowerCase() === targetCol.name.toLowerCase())
+                            return a;
                         if (x.startsWith(pPathDot + colNameLower + '.'))
                             a.push(x.substring(pPathDot.length + colNameLower.length + 1).toLowerCase())
                         return a;
                     }, [] as string[]);
 
                 // Eager operation must contain foreign fields
-                if (_reqElements && !_reqElements.includes(targetCol.name.toLowerCase()))
-                    _reqElements.push(targetCol.name.toLowerCase());
+                // if (_reqElements && !_reqElements.includes(targetCol.name.toLowerCase()))
+                //    _reqElements.push(targetCol.name.toLowerCase());
 
                 // Add element to result model
                 const prepareOptions = {
                     elements: _reqElements && _reqElements.length ? _reqElements : undefined,
+                    include: [targetCol.name],
                     exclude: _excludedElements && _excludedElements.length ? _excludedElements : undefined,
                     filter: In(targetCol.name, Param(fieldAlias)),
-                    maxEagerFetch: ctx.maxEagerFetch
+                    maxEagerFetch: ctx.maxEagerFetch,
+                    maxRelationLevel: ctx.maxRelationLevel - 1
                 }
                 model.addOne2ManyEagerElement(col, fieldAlias, prepareOptions);
             }

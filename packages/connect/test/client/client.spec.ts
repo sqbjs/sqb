@@ -213,6 +213,17 @@ describe('Client', function () {
         assert.strictEqual(c2, c);
     });
 
+    it('should get and set active schema of connection', async function () {
+        await client.acquire(async (connection) => {
+            const schema = await connection.getSchema();
+            assert.ok(schema);
+            await connection.setSchema('postgres');
+            assert.strictEqual((await connection.getSchema()), 'postgres');
+            await connection.setSchema(schema);
+            assert.strictEqual((await connection.getSchema()), schema);
+        })
+    });
+
     it('should use defaults.objectRows option', async function () {
         client.defaults.objectRows = false;
         let result = await client.execute('select * from customers');

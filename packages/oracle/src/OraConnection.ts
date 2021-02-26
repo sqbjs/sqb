@@ -1,3 +1,4 @@
+import assert from 'assert';
 import oracledb from 'oracledb';
 import {Adapter, QueryRequest} from '@sqb/connect';
 import {OraCursor} from './OraCursor';
@@ -80,12 +81,12 @@ export class OraConnection implements Adapter.Connection {
     }
 
     async startTransaction(): Promise<void> {
+        assert.ok(this.intlcon, 'Can not start transaction for a closed db session');
         this._inTransaction = true;
     }
 
     async commit(): Promise<void> {
-        if (!this.intlcon)
-            return;
+        assert.ok(this.intlcon, 'Can not commit transaction for a closed db session');
         await this.intlcon.commit();
         this._inTransaction = false;
     }
@@ -98,9 +99,23 @@ export class OraConnection implements Adapter.Connection {
     }
 
     async test(): Promise<void> {
-        if (!this.intlcon)
-            return;
+        assert.ok(this.intlcon, 'DB session is closed');
         await this.intlcon.execute('select 1 from dual', [], {});
+    }
+
+    async getSchema(): Promise<string> {
+        assert.ok(this.intlcon, 'DB session is closed');
+        const r = await this.intlcon.execute('select sys_context( \'userenv\', \'current_schema\' ) from dual',
+            [], {autoCommit: true});
+        if (r && r.rows && r.rows[0])
+            return (r.rows as any)[0][0] as string;
+        return '';
+    }
+
+    async setSchema(schema: string): Promise<void> {
+        assert.ok(this.intlcon, 'Can not set schema of a closed db session');
+        await this.intlcon.execute('alter SESSION set CURRENT_SCHEMA = ' + schema,
+            [], {autoCommit: true});
     }
 
     onGenerateQuery(prepared: QueryRequest): void {
@@ -109,8 +124,7 @@ export class OraConnection implements Adapter.Connection {
     }
 
     async execute(request: QueryRequest): Promise<Adapter.Response> {
-        if (!this.intlcon)
-            throw new Error('Can not execute while db session is closed');
+        assert.ok(this.intlcon, 'Can not execute query with a closed db session');
 
         const oraOptions: oracledb.ExecuteOptions = {
             autoCommit: request.autoCommit,

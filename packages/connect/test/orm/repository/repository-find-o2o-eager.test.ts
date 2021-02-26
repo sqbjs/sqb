@@ -2,16 +2,16 @@ import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
 import {Eq} from '@sqb/builder';
-import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
-import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
-import {Continent} from '../../_support/continents.entity';
+
+function toJSON(obj: any): any {
+    return JSON.parse(JSON.stringify(obj));
+}
 
 describe('findAll() One-2-One eager', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return relation record', async function () {
         const repo = client.getRepository<Customer>(Customer);
@@ -23,12 +23,12 @@ describe('findAll() One-2-One eager', function () {
         assert.ok(rows.length);
         assert.strictEqual(rows[0].id, 1);
         assert.strictEqual(rows[0].countryCode, 'US');
-        assert.deepStrictEqual(rows[0].country, Object.assign(new Country(), {
+        assert.deepStrictEqual(toJSON(rows[0].country), {
             code: 'US',
             name: 'United States',
             phoneCode: '+1',
             continentCode: 'AM'
-        }));
+        });
     });
 
     it('should return related record deeper', async function () {
@@ -40,13 +40,13 @@ describe('findAll() One-2-One eager', function () {
         assert.ok(rows);
         assert.ok(rows.length);
         assert.strictEqual(rows[0].id, 1);
-        assert.deepStrictEqual(rows[0].country, Object.assign(new Country(), {
+        assert.deepStrictEqual(toJSON(rows[0].country), {
             code: 'US',
-            continent: Object.assign(new Continent(), {
+            continent: {
                 code: 'AM',
                 name: 'America'
-            })
-        }));
+            }
+        });
     });
 
     it('should filter by relation column', async function () {
@@ -84,10 +84,10 @@ describe('findAll() One-2-One eager', function () {
         assert.ok(rows.length);
         assert.strictEqual(rows[0].id, 1);
         assert.strictEqual(rows[0].countryCode, 'US');
-        assert.deepStrictEqual(rows[0].country, Object.assign(new Country(), {
+        assert.deepStrictEqual(toJSON(rows[0].country), {
                 code: 'US',
                 phoneCode: '+1'
-            })
+            }
         );
     });
 

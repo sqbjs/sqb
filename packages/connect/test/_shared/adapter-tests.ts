@@ -55,6 +55,21 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(connection);
     });
 
+    it('should set active working schema', async function () {
+        if (adapter.features.schema) {
+            connection = await adapter.connect(clientConfig);
+            await connection.setSchema(clientConfig.schema);
+        } else this.skip();
+    });
+
+    it('should get active working schema', async function () {
+        if (adapter.features.schema) {
+            connection = await adapter.connect(clientConfig);
+            assert.strictEqual((await connection.getSchema()).toUpperCase(),
+                clientConfig.schema.toUpperCase());
+        } else this.skip();
+    });
+
     it('should execute a select query and return fields and rows (objectRows=false)', async function () {
         connection = await adapter.connect(clientConfig);
         const query = Select('id').from('customers').orderBy('id');

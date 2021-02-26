@@ -20,7 +20,10 @@ export type ConstructorThunk<T = {}> = Constructor<T> | ConstructorResolver<T>;
 
 export type LazyResolver<T> = (options?: Repository.FindAllOptions) => Promise<T>;
 
-export type EnumValue = (string | number)[] | Object;
+export type EnumValue = (FieldValue)[] | Object;
+
+export type FieldValue = string | number | boolean | Date | null;
+export type DefaultValueGetter = (obj?: any)=> FieldValue;
 
 export interface EntityConfig {
     /**
@@ -90,7 +93,7 @@ export interface DataColumnOptions {
     /**
      * Column's default value
      */
-    defaultValue?: any;
+    defaultValue?: FieldValue | DefaultValueGetter;
 
     /**
      * The precision for a decimal field
