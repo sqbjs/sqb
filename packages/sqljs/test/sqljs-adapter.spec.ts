@@ -3,7 +3,6 @@ import path from 'path';
 import {SqljsAdapter} from '../src/SqljsAdapter';
 // noinspection ES6PreferShortImport
 import {getInsertSQLsForTestData, initAdapterTests} from '../../connect/test/_shared/adapter-tests';
-import {SqlJs} from 'sql.js/module';
 
 describe('SqljsAdapter', function () {
     const adapter = new SqljsAdapter();
@@ -25,7 +24,7 @@ describe('SqljsAdapter', function () {
     initAdapterTests(adapter, {database: dbFile});
 });
 
-async function createTestSchema(connection: SqlJs.Database) {
+async function createTestSchema(connection) {
     connection.exec(
         (await import('./_support/db_schema')).sql
     );

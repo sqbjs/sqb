@@ -1,12 +1,10 @@
 import {Adapter, RowType} from '@sqb/connect';
-import {SqlJs} from 'sql.js/module';
-import Statement = SqlJs.Statement;
 
 export class SqljsCursor implements Adapter.Cursor {
-    private _stmt?: Statement;
+    private _stmt?: any;
     private readonly _rowType: RowType;
 
-    constructor(stmt: Statement, opts: {
+    constructor(stmt: any, opts: {
         rowType: RowType;
     }) {
         this._rowType = opts.rowType;

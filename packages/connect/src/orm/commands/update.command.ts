@@ -78,7 +78,7 @@ export class UpdateCommand {
                 if (typeof col.serialize === 'function')
                     v = col.serialize(v, col, values);
                 if (v === null && col.notNull)
-                    throw new Error(`${entity.name}.${col.name} is required an can't be null`);
+                    throw new Error(`${entity.name}.${col.name} is required and can't be null`);
                 if (v === undefined)
                     continue;
                 col.checkEnumValue(v);
