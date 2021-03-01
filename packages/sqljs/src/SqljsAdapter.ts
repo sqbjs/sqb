@@ -3,10 +3,9 @@ import path from 'path';
 import {Adapter, ClientConfiguration} from '@sqb/connect';
 import '@sqb/sqlite-dialect';
 import initSqlJs from 'sql.js';
-import {SqlJs} from 'sql.js/module';
 import {SqljsConnection} from './SqljsConnection';
 
-const dbCache: Record<string, SqlJs.Database> = {};
+const dbCache: Record<string, any> = {};
 
 export class SqljsAdapter implements Adapter {
 

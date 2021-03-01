@@ -141,7 +141,7 @@ export interface DataColumnOptions {
     noInsert?: boolean;
 }
 
-export interface NestedOptions {
+export interface EmbeddedTypeOptions {
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;
 }

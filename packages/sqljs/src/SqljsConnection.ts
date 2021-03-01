@@ -1,12 +1,10 @@
 import {Adapter, QueryRequest} from '@sqb/connect';
-import {SqlJs} from 'sql.js/module';
 import {SqljsCursor} from './SqljsCursor';
-import Statement = SqlJs.Statement;
 
 export class SqljsConnection implements Adapter.Connection {
-    private readonly intlcon: SqlJs.Database;
+    private readonly intlcon: any;
 
-    constructor(db: SqlJs.Database) {
+    constructor(db: any) {
         this.intlcon = db;
     }
 
@@ -100,7 +98,7 @@ export class SqljsConnection implements Adapter.Connection {
             }
         }
 
-        let stmt: Statement | undefined = this.intlcon.prepare(query.sql, query.params);
+        let stmt = this.intlcon.prepare(query.sql, query.params);
         try {
             const colNames = stmt.getColumnNames();
             if (colNames && colNames.length) {

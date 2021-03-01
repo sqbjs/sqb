@@ -34,7 +34,7 @@ CREATE TABLE customer_tags
     customer_id INTEGER,
     tag text,
     color text,
-    active integer
+    active integer,
     PRIMARY KEY (customer_id, tag)
 );
 

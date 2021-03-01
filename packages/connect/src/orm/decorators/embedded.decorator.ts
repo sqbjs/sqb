@@ -1,7 +1,7 @@
-import {NestedOptions, ConstructorThunk} from '../types';
+import {EmbeddedTypeOptions, ConstructorThunk} from '../types';
 import {EntityMeta} from '../metadata/entity-meta';
 
-export function Embedded(type: ConstructorThunk, options?: NestedOptions): PropertyDecorator {
+export function Embedded(type: ConstructorThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');

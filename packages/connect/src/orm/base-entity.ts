@@ -2,7 +2,7 @@ import {REPOSITORY_KEY} from './consts';
 import type {Repository} from './repository';
 import {EntityMeta} from './metadata/entity-meta';
 
-export abstract class BaseEntity<T extends BaseEntity<any>> {
+export abstract class BaseEntity<T> {
     private [REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial: Partial<T>) {
