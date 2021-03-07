@@ -1,7 +1,7 @@
 {
   "name": "@sqb/sqljs",
   "description": "SQB serialization extension for sql.js driver",
-  "version": "4.0.1-alpha.21",
+  "version": "4.0.1-alpha.22",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"

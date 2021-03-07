@@ -1,7 +1,7 @@
 {
   "name": "sqb.v4",
   "private": true,
-  "version": "4.0.1-alpha.21",
+  "version": "4.0.1-alpha.22",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -43,7 +43,7 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "gulp": {
-    "compile-order": [
+    "package-order": [
       "builder",
       "connect",
       "postgres-dialect",
