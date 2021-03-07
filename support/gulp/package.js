@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const gulp = require('gulp');
-const {argv, execSh} = require('./common');
+const {execSh} = require('./common');
 const {camelCase} = require('putil-varhelpers');
 
 const projectDir = path.resolve(__dirname, '../..');
@@ -52,24 +51,6 @@ class Package {
 
 }
 
-function createRunAllScriptsTask(scriptName, target) {
-  const series = [];
-  const tasks = {};
-  for (const pkg of packages) {
-    if (!argv.package || argv.package === pkg.name) {
-      const task = pkg.createRunScriptTask(scriptName);
-      if (task) {
-        series.push(task);
-        tasks[pkg.name + ':' + scriptName] = task;
-      }
-    }
-  }
-  if (series.length) {
-    target[scriptName] = gulp.series(series);
-    Object.assign(target, tasks);
-  }
-}
-
 class PackageList {
   constructor() {
     const arr = [];
@@ -78,8 +59,8 @@ class PackageList {
         arr.push(f);
       }
     }
-    if (pkgjson.gulp && pkgjson.gulp['compile-order']) {
-      const order = pkgjson.gulp['compile-order'];
+    if (pkgjson.gulp && pkgjson.gulp['package-order']) {
+      const order = pkgjson.gulp['package-order'];
       arr.sort((a, b) => {
         if (!order.includes(a))
           return 1;
@@ -132,6 +113,5 @@ module.exports = {
   Package,
   packages,
   projectDir,
-  packagesDir,
-  createRunAllScriptsTask
+  packagesDir
 };

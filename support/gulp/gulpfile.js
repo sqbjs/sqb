@@ -6,7 +6,6 @@ const test = require('./tasks/test');
 const version = require('./tasks/version');
 const link = require('./tasks/link');
 const publish = require('./tasks/publish');
-const npm = require('./tasks/npm');
 
 const tasks = {
   ...clean,
@@ -16,8 +15,7 @@ const tasks = {
   ...test,
   ...version,
   ...link,
-  ...publish,
-  ...npm
+  ...publish
 };
 
 const keys = Object.keys(tasks).sort();

@@ -7,7 +7,7 @@ export abstract class BaseEntity<T> {
 
     constructor(partial: Partial<T>) {
         const elements = EntityMeta.getDataColumnNames(Object.getPrototypeOf(this).constructor);
-        if (elements) {
+        if (elements && partial) {
             for (const k of elements)
                 if (partial[k] !== undefined)
                     this[k] = partial[k];
