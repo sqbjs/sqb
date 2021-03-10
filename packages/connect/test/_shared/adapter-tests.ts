@@ -55,20 +55,18 @@ export function initAdapterTests(adapter: Adapter,
         assert.ok(connection);
     });
 
-    it('should set active working schema', async function () {
-        if (adapter.features.schema) {
+    if (adapter.features.schema) {
+        it('should set active working schema', async function () {
             connection = await adapter.connect(clientConfig);
             await connection.setSchema(clientConfig.schema);
-        } else this.skip();
-    });
+        });
 
-    it('should get active working schema', async function () {
-        if (adapter.features.schema) {
+        it('should get active working schema', async function () {
             connection = await adapter.connect(clientConfig);
             assert.strictEqual((await connection.getSchema()).toUpperCase(),
                 clientConfig.schema.toUpperCase());
-        } else this.skip();
-    });
+        });
+    }
 
     it('should execute a select query and return fields and rows (objectRows=false)', async function () {
         connection = await adapter.connect(clientConfig);
@@ -127,37 +125,37 @@ export function initAdapterTests(adapter: Adapter,
         assert.strictEqual(result.rows.length, 5);
     });
 
-    it('should fetch date fields as string (fetchAsString)', async function () {
-        if (!adapter.features?.fetchAsString?.includes(DataType.DATE))
-            return this.skip();
-        connection = await adapter.connect(clientConfig);
-        const query = Select('birth_date').from('customers');
-        const result = await adapterExecute(query, {
-            objectRows: false,
-            fetchRows: 1,
-            fetchAsString: [DataType.DATE]
+    if (adapter.features?.fetchAsString?.includes(DataType.DATE)) {
+        it('should fetch date fields as string (fetchAsString)', async function () {
+            connection = await adapter.connect(clientConfig);
+            const query = Select('birth_date').from('customers');
+            const result = await adapterExecute(query, {
+                objectRows: false,
+                fetchRows: 1,
+                fetchAsString: [DataType.DATE]
+            });
+            assert.ok(result);
+            assert.ok(result.rows);
+            assert.strictEqual(result.rows.length, 1);
+            assert.strictEqual(typeof result.rows[0][0], 'string');
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rows.length, 1);
-        assert.strictEqual(typeof result.rows[0][0], 'string');
-    });
+    }
 
-    it('should fetch timestamp fields as string (fetchAsString)', async function () {
-        if (!adapter.features?.fetchAsString?.includes(DataType.TIMESTAMP))
-            return this.skip();
-        connection = await adapter.connect(clientConfig);
-        const query = Select('created_at').from('customers');
-        const result = await adapterExecute(query, {
-            objectRows: false,
-            fetchRows: 1,
-            fetchAsString: [DataType.TIMESTAMP]
+    if (adapter.features?.fetchAsString?.includes(DataType.TIMESTAMP)) {
+        it('should fetch timestamp fields as string (fetchAsString)', async function () {
+            connection = await adapter.connect(clientConfig);
+            const query = Select('created_at').from('customers');
+            const result = await adapterExecute(query, {
+                objectRows: false,
+                fetchRows: 1,
+                fetchAsString: [DataType.TIMESTAMP]
+            });
+            assert.ok(result);
+            assert.ok(result.rows);
+            assert.strictEqual(result.rows.length, 1);
+            assert.strictEqual(typeof result.rows[0][0], 'string');
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rows.length, 1);
-        assert.strictEqual(typeof result.rows[0][0], 'string');
-    });
+    }
 
     it('should return error if sql is invalid', async function () {
         connection = await adapter.connect(clientConfig);

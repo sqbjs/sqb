@@ -7,12 +7,11 @@ import type {QueryExecutor} from '../../client/types';
 import type {Repository} from '../repository';
 import type {EntityMeta} from '../metadata/entity-meta';
 import {prepareFilter} from '../util/prepare-filter';
+import {prepareSort} from '../util/prepare-sort';
 import {isDataColumn, DataColumnMeta} from '../metadata/data-column-meta';
 import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
 import {RowTransformModel} from '../util/row-transform-model';
-
-const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 
 interface JoinInfo {
     column: RelationElementMeta;
@@ -34,7 +33,6 @@ type FindCommandContext = {
         column: DataColumnMeta;
     }>;
     joins?: JoinInfo[];
-    orderColumns?: string[];
     requestElements?: string[];
     excludeElements?: string[];
     maxEagerFetch?: number;
@@ -100,9 +98,6 @@ export class FindCommand {
             where = And();
             await prepareFilter(entity, args.filter, where);
         }
-        if (args.sort)
-            this._prepareSort(ctx, entity, args.sort)
-
 
         // Generate select query
         const columnSqls = Object.keys(ctx.sqlColumns)
@@ -118,8 +113,10 @@ export class FindCommand {
 
         if (where)
             query.where(...where._items);
-        if (ctx.orderColumns)
-            query.orderBy(...ctx.orderColumns);
+        if (args.sort) {
+            const sort = await prepareSort(entity, args.sort);
+            query.orderBy(...sort);
+        }
         if (args.offset)
             query.offset(args.offset);
 
@@ -285,25 +282,6 @@ export class FindCommand {
         }
         ctx.joins.push(joinInfo);
         return joinInfo;
-    }
-
-    private static _prepareSort(ctx: FindCommandContext, entityDef: EntityMeta, sort: string[]) {
-        const orderColumns: string[] = [];
-        for (const item of sort) {
-            const m = item.match(SORT_ORDER_PATTERN);
-            if (!m)
-                throw new Error(`"${item}" is not a valid order expression`);
-            const colName = m[2];
-            const col = entityDef.getElement(colName);
-            if (!col)
-                throw new Error(`Unknown column (${colName}) declared in sort property`);
-            if (!isDataColumn(col))
-                throw new Error(`Can not sort by "${colName}", because it is not a data column`);
-            const dir = m[1] || '+';
-            orderColumns.push((dir || '') + col.fieldName);
-        }
-        if (orderColumns.length)
-            ctx.orderColumns = orderColumns;
     }
 
 }
