@@ -5,6 +5,7 @@ import {
 import {EntityMeta} from '../metadata/entity-meta';
 import {isRelationElement} from '../metadata/relation-element-meta';
 import {isDataColumn} from '../metadata/data-column-meta';
+import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 
 export async function prepareFilter(
     entityDef: EntityMeta,
@@ -48,6 +49,10 @@ export async function prepareFilter(
                         const ctor = Object.getPrototypeOf(item).constructor;
                         trgOp.add(new ctor(_tableAlias + '.' + col.fieldName, item._value));
                     } else {
+                        if (isEmbeddedElement(col)) {
+                            _entityDef = await col.resolveType();
+                            continue;
+                        }
                         if (!isRelationElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
                         const targetEntity = await col.foreign.resolveTarget();

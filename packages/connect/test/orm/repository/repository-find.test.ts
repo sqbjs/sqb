@@ -113,6 +113,21 @@ describe('findAll()', function () {
         assert.strictEqual(rows[0].id, 3);
     });
 
+    it('should filter by embedded sub element', async function () {
+        const repo = client.getRepository<Customer>(Customer);
+        const rows = await repo.findAll({
+            filter: {
+                'name.given': Param('givenName'),
+                'name.family': 'Marsh'
+            },
+            params: {
+                givenName: 'Belle'
+            }
+        });
+        assert.strictEqual(rows.length, 1);
+        assert.strictEqual(rows[0].id, 3);
+    });
+
     it('should limit result rows', async function () {
         const repo = client.getRepository<Customer>(Customer);
         const rows = await repo.findAll({
@@ -152,6 +167,21 @@ describe('findAll()', function () {
         return assert.rejects(() =>
                 repo.findAll({sort: ['country']}),
             /Can not sort by/);
+    });
+
+    it('should sort by embedded sub element', async function () {
+        const repo = client.getRepository<Customer>(Customer);
+        const rows = await repo.findAll({sort: ['name.given']});
+        const arr1 = rows.map(x => x.name.given);
+        const arr2 = [...arr1];
+        arr2.sort((a, b) => {
+            if (a < b)
+                return -1
+            if (a > b)
+                return 1
+            return 0;
+        });
+        assert.deepStrictEqual(arr1, arr2);
     });
 
     it('should apply "parse"', async function () {
