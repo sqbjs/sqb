@@ -66,12 +66,12 @@ describe('findAll() One-2-Many lazy', function () {
     it('should sort in lazy resolver function', async function () {
         const repo = client.getRepository<Country>(Country);
         const rows = await repo.findAll({
-            filter: [Eq('code', 'DE')],
+            filter: [Eq('code', 'TR')],
             elements: ['code', 'customersLazy']
         });
         assert.ok(rows);
         assert.ok(rows.length);
-        assert.strictEqual(rows[0].code, 'DE');
+        assert.strictEqual(rows[0].code, 'TR');
 
         const customers = await rows[0].customersLazy({sort: ['givenName']});
         const arr1 = customers.map(c => c.givenName);

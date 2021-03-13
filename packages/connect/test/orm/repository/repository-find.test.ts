@@ -175,9 +175,9 @@ describe('findAll()', function () {
         const arr1 = rows.map(x => x.name.given);
         const arr2 = [...arr1];
         arr2.sort((a, b) => {
-            if (a < b)
+            if (a.toLowerCase() < b.toLowerCase())
                 return -1
-            if (a > b)
+            if (a.toLowerCase() > b.toLowerCase())
                 return 1
             return 0;
         });
