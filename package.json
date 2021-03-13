@@ -11,11 +11,11 @@
     "packages/**"
   ],
   "devDependencies": {
+    "@babel/eslint-parser": "^7.13.10",
     "@types/mocha": "^8.2.0",
     "@types/node": "^14.14.22",
     "@typescript-eslint/eslint-plugin": "^4.14.1",
     "@typescript-eslint/parser": "^4.14.1",
-    "babel-eslint": "^10.1.0",
     "colors": "^1.4.0",
     "eslint": "^7.18.0",
     "eslint-config-google": "^0.14.0",
