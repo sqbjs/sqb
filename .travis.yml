@@ -17,8 +17,9 @@ services:
 env:
   - PGDATABASE=travis_ci_test
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'create database travis_ci_test;' -d postgres -U postgres
 install:
+  - "npm install npm -g"
   - "npm install"
 script:
   - "npm run test"
