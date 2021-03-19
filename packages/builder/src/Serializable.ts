@@ -11,7 +11,8 @@ export const ReservedWords = [
     'and', 'or', 'not', 'between', 'null', 'like', 'ilike',
     'count', 'sum', 'average', 'avg', 'cascade', 'authorization',
     'create', 'add', 'drop', 'alter', 'index', 'private', 'sequence',
-    'default', 'constraint', 'references', 'primary', 'foreign'];
+    'default', 'constraint', 'references', 'primary', 'foreign',
+    'user', 'password'];
 
 export abstract class Serializable {
 
