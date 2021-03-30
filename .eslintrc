@@ -130,10 +130,11 @@
         "eslint:recommended",
         "google"
       ],
-      "parser": "babel-eslint",
+      "parser": "@babel/eslint-parser",
       "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
+        "requireConfigFile": false,
         "ecmaFeatures": {
           "jsx": true,
           "modules": true,

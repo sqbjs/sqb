@@ -14,7 +14,7 @@ import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {SafeEventEmitter} from '../SafeEventEmitter';
-import {Constructor} from '../orm/types';
+import {Type} from '../types';
 import {Repository} from '../orm/repository';
 import {EntityMeta} from '../orm/metadata/entity-meta';
 
@@ -113,7 +113,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
         return this._tasks.enqueue(() => this._execute(query, options));
     }
 
-    getRepository<T>(entity: Constructor<T> | string): Repository<T> {
+    getRepository<T>(entity: Type<T> | string): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
             ctor = this.client.getEntity<T>(entity);

@@ -1,11 +1,10 @@
 import {isRelationElement, RelationElementMeta} from './relation-element-meta';
 import {DataType, Eq} from '@sqb/builder';
 import {
-    Constructor,
     IndexOptions,
     ConstructorThunk, ForeignKeyOptions, RelationColumnOptions, DataColumnOptions,
 } from '../types';
-import {Maybe} from '../../types';
+import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../consts';
 import {IndexMeta} from './index-meta';
 import {ForeignKeyMeta} from './foreign-key-meta';
@@ -177,11 +176,11 @@ export class EntityMeta {
         this.foreignKeys.push(fk);
     }
 
-    before(event: 'insert' | 'update' | 'destroy', fn: Constructor): void {
+    before(event: 'insert' | 'update' | 'destroy', fn: Type): void {
         this.eventListeners.push({event: 'before-' + event, fn});
     }
 
-    after(event: 'insert' | 'update' | 'destroy', fn: Constructor): void {
+    after(event: 'insert' | 'update' | 'destroy', fn: Type): void {
         this.eventListeners.push({event: 'after-' + event, fn});
     }
 

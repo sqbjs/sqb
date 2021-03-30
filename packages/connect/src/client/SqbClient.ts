@@ -16,7 +16,7 @@ import {Adapter} from './Adapter';
 import {SqbConnection} from './SqbConnection';
 import {adapters} from './extensions';
 import {SafeEventEmitter} from '../SafeEventEmitter';
-import {Constructor} from '../orm/types';
+import {Type} from '../types';
 import {Repository} from '../orm/repository';
 import {EntityMeta} from '../orm/metadata/entity-meta';
 import {Maybe} from '../types';
@@ -28,7 +28,7 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
-    private readonly _entities: Record<string, Constructor<any>> = {};
+    private readonly _entities: Record<string, Type> = {};
 
     constructor(config: ClientConfiguration) {
         super();
@@ -179,7 +179,7 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
         }
     }
 
-    getRepository<T>(entity: Constructor<T> | string): Repository<T> {
+    getRepository<T>(entity: Type<T> | string): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
             ctor = this.getEntity<T>(entity);
@@ -192,8 +192,8 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
         return new Repository<T>(entityDef, this);
     }
 
-    getEntity<T>(name: string): Maybe<Constructor<T>> {
-        return this._entities[name] as Constructor<T>;
+    getEntity<T>(name: string): Maybe<Type<T>> {
+        return this._entities[name] as Type<T>;
     }
 
     toString() {
