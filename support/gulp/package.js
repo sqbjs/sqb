@@ -12,12 +12,12 @@ class Package {
   constructor(name) {
     this.name = name;
     this.dirname = path.join(packagesDir, name);
-    const jsonPath = path.join(this.dirname, 'package.json');
-    this.json = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+    this.jsonPath = path.join(this.dirname, 'package.json');
+    this.json = JSON.parse(fs.readFileSync(this.jsonPath, 'utf-8'));
   }
 
   execSh(command, options) {
-    return execSh(command, {...options, cwd: this.dirname});
+    return execSh(command, {cwd: this.dirname, ...options});
   }
 
   hasScript(name) {
@@ -26,27 +26,8 @@ class Package {
 
   async execScript(name) {
     const command = this.json.scripts[name];
-    if (command) {
-      const commands = command.split('&&');
-      for (const c of commands) {
-        const m = c.match(/^ *npm +run +(.+)/);
-        if (m)
-          await this.execScript(m[1].trim());
-        else
-          await this.execSh(c);
-      }
-    }
-  }
-
-  createRunScriptTask(scriptName) {
-    if (this.hasScript(scriptName)) {
-      const _this = this;
-      const task = function() {
-        return _this.execScript(scriptName);
-      };
-      task.displayName = this.name + ':' + scriptName;
-      return task;
-    }
+    if (command)
+      await this.execSh('npm run ' + name, {cwd: path.dirname(this.jsonPath)});
   }
 
 }
@@ -62,8 +43,12 @@ class PackageList {
     if (pkgjson.gulp && pkgjson.gulp['package-order']) {
       const order = pkgjson.gulp['package-order'];
       arr.sort((a, b) => {
-        if (!order.includes(a))
+        const l = order.indexOf(a);
+        const r = order.indexOf(b);
+        if (l >= 0 && r < 0)
           return 1;
+        if (l < 0 && r >= 0)
+          return -1;
         return order.indexOf(a) - order.indexOf(b);
       });
     }

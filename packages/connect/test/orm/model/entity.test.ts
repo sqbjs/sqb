@@ -1,7 +1,17 @@
 /* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
 import '../../_support/env';
 import * as assert from 'assert';
-import {BaseEntity, Column, DataType, NoInsert, NoUpdate, Entity, HasOne, PrimaryKey} from '@sqb/connect';
+import {
+    BaseEntity,
+    Column,
+    DataType,
+    NoInsert,
+    NoUpdate,
+    Entity,
+    HasOne,
+    PrimaryKey,
+    getDataColumnNames, getElementNames, getInsertColumnNames, getUpdateColumnNames
+} from '@sqb/connect';
 
 describe('Entity', function () {
 
@@ -149,7 +159,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(Customer.getElementNames(), ['id', 'name', 'country', 'code']);
+        assert.deepStrictEqual(getElementNames(Customer), ['id', 'name', 'country', 'code']);
     });
 
     it(`should EntityDefinition.getDataColumnNames() return only data column names`, function () {
@@ -179,7 +189,39 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(Customer.getDataColumnNames(), ['id', 'name', 'code']);
+        assert.deepStrictEqual(getDataColumnNames(Customer), ['id', 'name', 'code']);
+    });
+
+    it(`should getInsertColumnNames() return only data column names to insert`, function () {
+        @Entity()
+        class Country {
+            @Column()
+            code: string;
+        }
+
+        @Entity()
+        class BaseCustomer extends BaseEntity<BaseCustomer> {
+
+            @Column()
+            @NoInsert
+            id: string;
+
+            @Column()
+            @NoUpdate
+            name: number;
+
+            @HasOne()
+            country: Country;
+
+        }
+
+        @Entity()
+        class Customer extends BaseCustomer {
+            @Column()
+            code: string
+        }
+
+        assert.deepStrictEqual(getInsertColumnNames(Customer), ['name', 'code']);
     });
 
     it(`should EntityDefinition.getInsertColumnNames() return only data column names to insert`, function () {
@@ -211,39 +253,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(Customer.getInsertColumnNames(), ['name', 'code']);
-    });
-
-    it(`should EntityDefinition.getInsertColumnNames() return only data column names to insert`, function () {
-        @Entity()
-        class Country {
-            @Column()
-            code: string;
-        }
-
-        @Entity()
-        class BaseCustomer extends BaseEntity<BaseCustomer> {
-
-            @Column()
-            @NoInsert
-            id: string;
-
-            @Column()
-            @NoUpdate
-            name: number;
-
-            @HasOne()
-            country: Country;
-
-        }
-
-        @Entity()
-        class Customer extends BaseCustomer {
-            @Column()
-            code: string
-        }
-
-        assert.deepStrictEqual(Customer.getUpdateColumnNames(), ['id', 'code']);
+        assert.deepStrictEqual(getUpdateColumnNames(Customer), ['id', 'code']);
     });
 
 });

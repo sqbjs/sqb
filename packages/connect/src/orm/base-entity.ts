@@ -1,6 +1,7 @@
 import {REPOSITORY_KEY} from './consts';
 import type {Repository} from './repository';
 import {EntityMeta} from './metadata/entity-meta';
+import {PickWritable, Type} from '../types';
 
 export abstract class BaseEntity<T> {
     private [REPOSITORY_KEY]: Repository<any>;
@@ -28,21 +29,20 @@ export abstract class BaseEntity<T> {
         // this method is an placeholder an will be overwritten by declareEntity() method
         return this;
     }
+}
 
-    static getElementNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityMeta.getElementNames(this) || []) as K[];
-    }
+export function getElementNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityMeta.getElementNames(classRef) || []) as K[];
+}
 
-    static getDataColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityMeta.getDataColumnNames(this) || []) as K[];
-    }
+export function getDataColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityMeta.getDataColumnNames(classRef) || []) as K[];
+}
 
-    static getInsertColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityMeta.getInsertColumnNames(this) || []) as K[];
-    }
+export function getInsertColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityMeta.getInsertColumnNames(classRef) || []) as K[];
+}
 
-    static getUpdateColumnNames<TT extends BaseEntity<any>, K extends keyof TT>(): K[] {
-        return (EntityMeta.getUpdateColumnNames(this) || []) as K[];
-    }
-
+export function getUpdateColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityMeta.getUpdateColumnNames(classRef) || []) as K[];
 }

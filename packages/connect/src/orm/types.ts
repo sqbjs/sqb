@@ -1,6 +1,6 @@
 import type {EntityElementMeta} from './metadata/entity-element-meta';
 import type {Repository} from './repository';
-import {DataType} from '..';
+import {DataType, Type} from '..';
 
 /* Model related */
 export type ElementKind = 'data' | 'relation' | 'embedded';
@@ -12,11 +12,9 @@ export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
     'timestamp' | 'custom';
 
 export type ColumnTransformFunction = (value: any, col: EntityElementMeta, row: any) => any;
-export interface Constructor<T = {}> extends Function {
-    new(...args: any[]): T;
-}
-export type ConstructorResolver<T> = () => Constructor<T> | Promise<Constructor<T>>;
-export type ConstructorThunk<T = {}> = Constructor<T> | ConstructorResolver<T>;
+
+export type ConstructorResolver<T> = () => Type<T> | Promise<Type<T>>;
+export type ConstructorThunk<T = {}> = Type<T> | ConstructorResolver<T>;
 
 export type LazyResolver<T> = (options?: Repository.FindAllOptions) => Promise<T>;
 
