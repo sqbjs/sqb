@@ -7,13 +7,13 @@ import {
     ColumnAutoGenerationStrategy,
     ColumnTransformFunction, DataColumnOptions, EnumValue, FieldValue, DefaultValueGetter,
 } from '../types';
-import {EntityElementMeta} from './entity-element-meta';
+import {AbstractElementMeta} from './abstract-element-meta';
 
 export function isDataColumn(f: any): f is DataColumnMeta {
-    return !!(f && f instanceof EntityElementMeta && f.kind === 'data');
+    return !!(f && f instanceof AbstractElementMeta && f.kind === 'data');
 }
 
-export class DataColumnMeta extends EntityElementMeta {
+export class DataColumnMeta extends AbstractElementMeta {
     readonly kind: ElementKind = 'data';
     fieldName: string;
     dataType?: DataType;

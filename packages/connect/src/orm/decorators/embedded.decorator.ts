@@ -1,12 +1,10 @@
 import {EmbeddedTypeOptions, ConstructorThunk} from '../types';
 import {EntityMeta} from '../metadata/entity-meta';
 
-export function Embedded(type: ConstructorThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
+export function Embedded(type?: ConstructorThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
-        if (typeof type !== 'function')
-            throw new Error('You must provide "type" argument');
         const el = EntityMeta.attachTo(target.constructor)
             .setEmbeddedElement(propertyKey, type);
         if (options?.fieldNamePrefix)

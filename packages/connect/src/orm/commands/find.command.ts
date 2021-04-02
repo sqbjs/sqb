@@ -59,12 +59,6 @@ export class FindCommand {
             maxEagerFetch: args.maxEagerFetch || 100000,
             maxRelationLevel: typeof args.maxRelationLevel === 'number' ? args.maxRelationLevel : 5
         }
-        /* if (parentContext) {
-            if (parentContext.entitiesQueried.includes(entity))
-                throw new Error(`Circular query detected`);
-            ctx.entitiesQueried.push(...parentContext.entitiesQueried);
-        }
-        ctx.entitiesQueried.push(entity); */
 
         // Prepare list of included element names
         if (args.elements && args.elements.length)
@@ -90,7 +84,7 @@ export class FindCommand {
             ctx.excludeElements = args.exclude.map(x => x.toLowerCase());
 
         //
-        await this._addEntityElements(ctx, entity, ctx.model, 'T', '');
+        await this._addEntityElements(ctx, entity, ctx.model, 'T');
 
         // Wrap search filter to operator instances
         let where: LogicalOperator | undefined;
@@ -140,29 +134,30 @@ export class FindCommand {
     private static async _addEntityElements(ctx: FindCommandContext,
                                             entity: EntityMeta,
                                             model: RowTransformModel,
-                                            tableAlias: string,
-                                            currentPath: string): Promise<void> {
+                                            tableAlias: string): Promise<void> {
 
-        const pPathLower = currentPath.toLowerCase();
-        const pPathDot = pPathLower ? pPathLower + '.' : '';
+        const {excludeElements, requestElements} = ctx;
+
         for (const key of entity.elementKeys) {
             const col = entity.getElement(key);
             if (!col)
                 continue;
             const colNameLower = col.name.toLowerCase();
 
-            // Check if element is excluded
-            if (ctx.excludeElements &&
-                ctx.excludeElements.find(x => x === pPathDot + colNameLower || x === pPathLower))
+            // Ignore element if in excluded list
+            if (excludeElements && excludeElements.includes(colNameLower))
                 continue;
 
-            // Check if element is requested
-            if ((isDataColumn(col) || isEmbeddedElement(col)) && ctx.requestElements &&
-                !ctx.requestElements.find(x => x === pPathDot + colNameLower || x === pPathLower))
+            // Ignore element if not requested
+            // Relational elements must be explicitly requested.
+            if (!requestElements && isRelationElement(col))
                 continue;
+            if (requestElements && !requestElements.find(
+                x => x === colNameLower || x.startsWith(colNameLower + '.')
+            )) continue;
 
+            // Add field to select list
             if (isDataColumn(col)) {
-                // Add select sql field
                 const fieldAlias = this._addSelectColumn(ctx, tableAlias, col);
                 // Add column to transform model
                 if (!col.hidden)
@@ -173,19 +168,16 @@ export class FindCommand {
             if (isEmbeddedElement(col)) {
                 const typ = await col.resolveType();
                 const subModel = new RowTransformModel(typ, model);
-                await this._addEntityElements(ctx, typ, subModel, tableAlias,
-                    currentPath ? currentPath + '.' + col.name : col.name);
+                await this._addEntityElements({
+                    ...ctx,
+                    requestElements: extractSubElements(colNameLower, requestElements),
+                    excludeElements: extractSubElements(colNameLower, excludeElements)
+                }, typ, subModel, tableAlias);
                 model.addNode(col, subModel);
                 continue;
             }
 
             if (isRelationElement(col)) {
-                // Relational columns must be explicitly requested.
-                if (!(ctx.requestElements && ctx.requestElements.find(x =>
-                    x === pPathDot + colNameLower || x.startsWith(pPathDot + colNameLower + '.')
-                )))
-                    continue;
-
                 // Lazy resolver requires key column value.
                 // So we need to add key column to result model
                 if (col.lazy) {
@@ -201,10 +193,13 @@ export class FindCommand {
                     const subModel = new RowTransformModel(joinInfo.targetEntity, model);
                     model.addNode(col, subModel);
                     // Add join fields to select columns list
-                    await this._addEntityElements(ctx,
+                    await this._addEntityElements({
+                            ...ctx,
+                            requestElements: extractSubElements(colNameLower, requestElements),
+                            excludeElements: extractSubElements(colNameLower, excludeElements)
+                        },
                         joinInfo.targetEntity,
-                        subModel, joinInfo.joinAlias,
-                        currentPath ? currentPath + '.' + col.name : col.name);
+                        subModel, joinInfo.joinAlias);
                     continue;
                 }
 
@@ -216,31 +211,15 @@ export class FindCommand {
                 const fieldAlias = this._addSelectColumn(ctx, tableAlias, keyCol);
                 model.addDataElement(keyCol, fieldAlias);
 
-                // prepare requested columns and select only paths for target entity
-                const _reqElements = ctx.requestElements && ctx.requestElements
-                    .reduce((a, x) => {
-                        if (x.startsWith(pPathDot + colNameLower + '.'))
-                            a.push(x.substring(pPathDot.length + colNameLower.length + 1).toLowerCase())
-                        return a;
-                    }, [] as string[]);
-                const _excludedElements = ctx.excludeElements && ctx.excludeElements
-                    .reduce((a, x) => {
-                        if (x.toLowerCase() === targetCol.name.toLowerCase())
-                            return a;
-                        if (x.startsWith(pPathDot + colNameLower + '.'))
-                            a.push(x.substring(pPathDot.length + colNameLower.length + 1).toLowerCase())
-                        return a;
-                    }, [] as string[]);
-
                 // Eager operation must contain foreign fields
                 // if (_reqElements && !_reqElements.includes(targetCol.name.toLowerCase()))
                 //    _reqElements.push(targetCol.name.toLowerCase());
 
                 // Add element to result model
                 const prepareOptions = {
-                    elements: _reqElements && _reqElements.length ? _reqElements : undefined,
+                    elements: extractSubElements(colNameLower, requestElements),
                     include: [targetCol.name],
-                    exclude: _excludedElements && _excludedElements.length ? _excludedElements : undefined,
+                    exclude: extractSubElements(colNameLower, excludeElements),
                     filter: In(targetCol.name, Param(fieldAlias)),
                     maxEagerFetch: ctx.maxEagerFetch,
                     maxRelationLevel: ctx.maxRelationLevel - 1
@@ -286,3 +265,13 @@ export class FindCommand {
 
 }
 
+function extractSubElements(colNameLower: string, elements?: string[]): string[] | undefined {
+    if (!elements)
+        return;
+    const result = elements.reduce((trg: string[], v: string) => {
+        if (v.startsWith(colNameLower + '.'))
+            trg.push(v.substring(colNameLower.length + 1).toLowerCase())
+        return trg;
+    }, [] as string[]);
+    return result.length ? result : undefined;
+}

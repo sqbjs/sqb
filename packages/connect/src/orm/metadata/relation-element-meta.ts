@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import type {EntityMeta} from './entity-meta';
 import {ElementKind, ConstructorThunk, RelationColumnOptions, DataColumnOptions} from '../types';
-import {EntityElementMeta} from './entity-element-meta';
+import {AbstractElementMeta} from './abstract-element-meta';
 import {ForeignKeyMeta} from '../metadata/foreign-key-meta';
 
 export const isRelationElement = (f: any): f is RelationElementMeta => {
-    return !!(f && f instanceof EntityElementMeta && f.kind === 'relation');
+    return !!(f && f instanceof AbstractElementMeta && f.kind === 'relation');
 }
 
-export class RelationElementMeta extends EntityElementMeta {
+export class RelationElementMeta extends AbstractElementMeta {
     readonly kind: ElementKind = 'relation';
     readonly foreign: ForeignKeyMeta;
     readonly hasMany?: boolean;

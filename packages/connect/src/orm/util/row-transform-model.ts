@@ -1,14 +1,14 @@
 import type {QueryExecutor} from '../../client/types';
 import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {EntityMeta} from '../metadata/entity-meta';
-import type {EntityElementMeta} from '../metadata/entity-element-meta';
+import type {AbstractElementMeta} from '../metadata/abstract-element-meta';
 import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
 import {DataColumnMeta, isDataColumn} from '../metadata/data-column-meta';
 import {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
 import {FindCommandArgs} from '../commands/find.command';
 
 export interface RowTransformItem {
-    element: EntityElementMeta;
+    element: AbstractElementMeta;
     fieldAlias: string;
     node?: RowTransformModel;
     subQueryOptions?: Omit<FindCommandArgs, 'entity' | 'connection'>;

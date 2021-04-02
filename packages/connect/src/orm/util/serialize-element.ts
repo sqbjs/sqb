@@ -1,8 +1,8 @@
 import {DataType} from '@sqb/builder';
-import {EntityElementMeta} from '../metadata/entity-element-meta';
+import {AbstractElementMeta} from '../metadata/abstract-element-meta';
 import {isDataColumn} from '../metadata/data-column-meta';
 
-export function serializeColumn(col: EntityElementMeta, v: any): any {
+export function serializeColumn(col: AbstractElementMeta, v: any): any {
     if (isDataColumn(col)) {
         if (col.isArray) {
             if (Array.isArray(v))
