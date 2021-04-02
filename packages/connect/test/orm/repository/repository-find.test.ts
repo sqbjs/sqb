@@ -32,6 +32,15 @@ describe('findAll()', function () {
         assert.ok(rows[0].name.family);
     });
 
+    it('should return embedded sub elements', async function () {
+        const repo = client.getRepository(Customer);
+        const rows = await repo.findAll({limit: 1, elements: ['name.given']});
+        assert.ok(rows);
+        assert.ok(rows.length);
+        assert.ok(rows[0].name);
+        assert.deepStrictEqual(Object.keys(rows[0].name), ['given']);
+    });
+
     it('should return requested elements if "elements" option set', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({

@@ -14,7 +14,7 @@ import {serializeColumn} from '../util/serialize-element';
 import {FindCommand} from '../commands/find.command';
 import {Repository} from '../repository';
 
-type ColumnMeta = DataColumnMeta | EmbeddedElementMeta | RelationElementMeta;
+export type ColumnMeta = DataColumnMeta | EmbeddedElementMeta | RelationElementMeta;
 
 export class EntityMeta {
     name: string;
@@ -139,16 +139,16 @@ export class EntityMeta {
         return col;
     }
 
-    setEmbeddedElement(name: string, type: ConstructorThunk): EmbeddedElementMeta {
+    setEmbeddedElement(propertyKey: string, type?: ConstructorThunk): EmbeddedElementMeta {
+        type = type || Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
-
-        let col = this.getElement(name);
+        let col = this.getElement(propertyKey);
         if (!col || !isEmbeddedElement(col)) {
-            col = new EmbeddedElementMeta(this, name, type);
-            if (!this.elements.has(name.toLowerCase()))
-                this.elementKeys.push(name);
-            this.elements.set(name.toLowerCase(), col);
+            col = new EmbeddedElementMeta(this, propertyKey, type);
+            if (!this.elements.has(propertyKey.toLowerCase()))
+                this.elementKeys.push(propertyKey);
+            this.elements.set(propertyKey.toLowerCase(), col);
         }
 
         return col;

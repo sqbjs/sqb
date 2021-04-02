@@ -1,7 +1,7 @@
 import type {EntityMeta} from './entity-meta';
 import {ElementKind} from '../types';
 
-export abstract class EntityElementMeta {
+export abstract class AbstractElementMeta {
 
     readonly entity: EntityMeta;
     readonly name: string;

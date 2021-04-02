@@ -1,4 +1,4 @@
-import type {EntityElementMeta} from './metadata/entity-element-meta';
+import type {AbstractElementMeta} from './metadata/abstract-element-meta';
 import type {Repository} from './repository';
 import {DataType, Type} from '..';
 
@@ -11,7 +11,7 @@ export type ElementKind = 'data' | 'relation' | 'embedded';
 export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
     'timestamp' | 'custom';
 
-export type ColumnTransformFunction = (value: any, col: EntityElementMeta, row: any) => any;
+export type ColumnTransformFunction = (value: any, col: AbstractElementMeta, row: any) => any;
 
 export type ConstructorResolver<T> = () => Type<T> | Promise<Type<T>>;
 export type ConstructorThunk<T = {}> = Type<T> | ConstructorResolver<T>;

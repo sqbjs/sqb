@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import {ElementKind, ConstructorThunk, DataColumnOptions} from '../types';
-import {EntityElementMeta} from './entity-element-meta';
+import {AbstractElementMeta} from './abstract-element-meta';
 import {EntityMeta} from './entity-meta';
 import {resolveEntityMeta} from '../helpers';
 
 export const isEmbeddedElement = (f: any): f is EmbeddedElementMeta => {
-    return !!(f && f instanceof EntityElementMeta && f.kind === 'embedded');
+    return !!(f && f instanceof AbstractElementMeta && f.kind === 'embedded');
 }
 
-export class EmbeddedElementMeta extends EntityElementMeta {
+export class EmbeddedElementMeta extends AbstractElementMeta {
     kind: ElementKind = 'embedded';
     type: ConstructorThunk;
     fieldNamePrefix?: string;
