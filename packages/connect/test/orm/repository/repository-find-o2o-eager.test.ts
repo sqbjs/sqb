@@ -105,6 +105,10 @@ describe('findAll() One-2-One eager', function () {
                 return -1
             if (a.country.code > b.country.code)
                 return 1
+            if (a.country.code < b.country.code)
+                return -1
+            if (a.country.code > b.country.code)
+                return 1
             return 0;
         });
         assert.deepStrictEqual(rows, sorted);
