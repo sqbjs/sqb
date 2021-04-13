@@ -7,7 +7,6 @@ import type {QueryExecutor} from '../../client/types';
 import type {Repository} from '../repository';
 import type {EntityMeta} from '../metadata/entity-meta';
 import {prepareFilter} from '../util/prepare-filter';
-import {prepareSort} from '../util/prepare-sort';
 import {isDataColumn, DataColumnMeta} from '../metadata/data-column-meta';
 import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
@@ -38,6 +37,8 @@ type FindCommandContext = {
     maxEagerFetch?: number;
     maxRelationLevel: number;
 }
+
+const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 
 export class FindCommand {
 
@@ -108,7 +109,7 @@ export class FindCommand {
         if (where)
             query.where(...where._items);
         if (args.sort) {
-            const sort = await prepareSort(entity, args.sort);
+            const sort = await this._prepareSort(ctx, entity, 'T', args.sort);
             query.orderBy(...sort);
         }
         if (args.offset)
@@ -261,6 +262,49 @@ export class FindCommand {
         }
         ctx.joins.push(joinInfo);
         return joinInfo;
+    }
+
+    private static async _prepareSort(ctx: FindCommandContext,
+                                      entityDef: EntityMeta,
+                                      tableAlias: string,
+                                      sort: string[]) {
+        const orderColumns: string[] = [];
+        for (const item of sort) {
+            const m = item.match(SORT_ORDER_PATTERN);
+            if (!m)
+                throw new Error(`"${item}" is not a valid order expression`);
+
+            let elName = m[2];
+            let prefix = '';
+            let suffix = '';
+            if (elName.includes('.')) {
+                const a: string[] = elName.split('.');
+                while (a.length > 1) {
+                    const col = entityDef.getElement(a.shift() || '');
+                    if (isEmbeddedElement(col)) {
+                        entityDef = await col.resolveType();
+                        if (col.fieldNamePrefix)
+                            prefix += col.fieldNamePrefix;
+                        if (col.fieldNameSuffix)
+                            suffix = col.fieldNameSuffix + suffix;
+                    } else if (isRelationElement(col) && !col.hasMany) {
+                        const joinInfo = await this._addJoin(ctx, 'T', col);
+                        tableAlias = joinInfo.joinAlias;
+                        entityDef = joinInfo.targetEntity;
+                    } else throw new Error(`Invalid column (${elName}) declared in sort property`);
+                }
+                elName = a.shift() || '';
+            }
+            const col = entityDef.getElement(elName);
+            if (!col)
+                throw new Error(`Unknown element (${elName}) declared in sort property`);
+            if (!isDataColumn(col))
+                throw new Error(`Can not sort by "${elName}", because it is not a data column`);
+
+            const dir = m[1] || '+';
+            orderColumns.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
+        }
+        return orderColumns;
     }
 
 }

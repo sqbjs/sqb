@@ -91,4 +91,23 @@ describe('findAll() One-2-One eager', function () {
         );
     });
 
+    it('should order by o2o relation column', async function () {
+        const repo = client.getRepository<Customer>(Customer);
+        const rows = await repo.findAll({
+            elements: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
+            sort: ['country.code']
+        });
+        assert.ok(rows);
+        assert.ok(rows.length);
+        const sorted = [...rows];
+        sorted.sort((a, b) => {
+            if (a.country.code < b.country.code)
+                return -1
+            if (a.country.code > b.country.code)
+                return 1
+            return 0;
+        });
+        assert.deepStrictEqual(rows, sorted);
+    });
+
 });
