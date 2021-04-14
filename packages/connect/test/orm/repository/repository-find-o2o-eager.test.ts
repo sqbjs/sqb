@@ -99,19 +99,10 @@ describe('findAll() One-2-One eager', function () {
         });
         assert.ok(rows);
         assert.ok(rows.length);
-        const sorted = [...rows];
-        sorted.sort((a, b) => {
-            if (a.country.code < b.country.code)
-                return -1
-            if (a.country.code > b.country.code)
-                return 1
-            if (a.country.code < b.country.code)
-                return -1
-            if (a.country.code > b.country.code)
-                return 1
-            return 0;
-        });
-        assert.deepStrictEqual(rows, sorted);
+        const left = rows.map(x => x.country.code);
+        const sorted = [...left]
+        sorted.sort();
+        assert.deepStrictEqual(left, sorted);
     });
 
 });
