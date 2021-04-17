@@ -20,7 +20,7 @@ export class TestSerializer {
         const prmValue = ctx.params && ctx.params[o.name];
         ctx.queryParams = ctx.queryParams || {};
         ctx.queryParams[o.name] = prmValue;
-        return '::' + o.name;
+        return '__' + o.name;
     }
 
 }

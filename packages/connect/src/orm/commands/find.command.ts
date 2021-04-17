@@ -101,6 +101,9 @@ export class FindCommand {
         const query = Select(...columnSqls)
             .from(entity.tableName + ' as T');
 
+        if (args.distinct)
+            query.distinct();
+
         if (ctx.joins)
             for (const j of ctx.joins) {
                 query.join(j.join);
