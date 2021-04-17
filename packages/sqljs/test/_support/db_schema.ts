@@ -24,18 +24,26 @@ CREATE TABLE customers
     gender text,
     city text,
     country_code text,
+    active INTEGER default 1,
     created_at text,
     updated_at text,
     FOREIGN KEY (country_code) REFERENCES countries (code)
 );
 
+CREATE TABLE tags
+(
+    id INTEGER,
+    name text,
+    color text,
+    active integer,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE customer_tags
 (
     customer_id INTEGER,
-    tag text,
-    color text,
-    active integer,
-    PRIMARY KEY (customer_id, tag)
+    tag_id INTEGER,
+    PRIMARY KEY (customer_id, tag_id)
 );
 
 `

@@ -46,6 +46,7 @@ CREATE TABLE ${schema}.customers
     birth_date date,
     city character varying(32),
     country_code character varying(5),
+    active boolean default true,
     created_at timestamp default NOW(),
     updated_at timestamp,
     CONSTRAINT customers_pkey PRIMARY KEY (id),
@@ -63,17 +64,26 @@ FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_updated_at();
 
 
+CREATE TABLE ${schema}.tags
+(
+    id SERIAL,
+    name character varying(16),
+    color character varying(16),
+    active boolean,
+    CONSTRAINT tags_pkey PRIMARY KEY (id)  
+);
+
+ALTER SEQUENCE ${schema}.tags_id_seq RESTART WITH 100;
+
 CREATE TABLE ${schema}.customer_tags
 (
     customer_id int4,
-    tag character varying(16),
-    color character varying(8),
-    active boolean,
-    CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag),
+    tag_id int4,     
+    CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag_id),
     CONSTRAINT fk_customer_tags_customer_id FOREIGN KEY (customer_id)
-        REFERENCES ${schema}.customers (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        REFERENCES ${schema}.customers (id) MATCH SIMPLE,
+    CONSTRAINT fk_customer_tags_tag_id FOREIGN KEY (tag_id)
+        REFERENCES ${schema}.tags (id)
 );
 
 CREATE TABLE ${schema}.data_types

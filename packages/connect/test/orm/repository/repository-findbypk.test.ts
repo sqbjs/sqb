@@ -27,10 +27,10 @@ describe('findByPk()', function () {
 
     it('should return instance from multi-key entities', async function () {
         const repo = client.getRepository<CustomerTag>(CustomerTag);
-        const row = await repo.findByPk({customerId: 2, tag: 'large'});
+        const row = await repo.findByPk({customerId: 1, tagId: 1});
         assert.ok(row);
-        assert.strictEqual(row.customerId, 2);
-        assert.strictEqual(row.tag, 'large');
+        assert.strictEqual(row.customerId, 1);
+        assert.strictEqual(row.tagId, 1);
     });
 
 });
