@@ -7,53 +7,40 @@
       "jsType": "number"
     },
     {
-      "fieldName": "tag",
-      "dataType": "varchar",
-      "jsType": "string"
+      "fieldName": "tag_id",
+      "dataType": "integer",
+      "jsType": "number"
     }
   ],
   "rows": [
     {
       "customer_id": 1,
-      "tag": "small",
-      "color": "yellow",
-      "active": true
+      "tag_id": 1
     },
     {
       "customer_id": 1,
-      "tag": "generous",
-      "color": "green",
-      "active": true
+      "tag_id": 5
     },
     {
       "customer_id": 2,
-      "tag": "large",
-      "color": "orange",
-      "active": true
+      "tag_id": 2
     },
     {
       "customer_id": 2,
-      "tag": "stingy",
-      "color": "red",
-      "active": true
+      "tag_id": 6
     },
     {
       "customer_id": 2,
-      "tag": "rich",
-      "color": "blue",
-      "active": true
+      "tag_id": 7
     },
     {
       "customer_id": 3,
-      "tag": "enterprise",
-      "color": "brown",
-      "active": true
+      "tag_id": 4
     },
     {
       "customer_id": 3,
-      "tag": "rich",
-      "color": "blue",
-      "active": true
+      "tag_id": 5,
+      "active": false
     }
   ]
 }

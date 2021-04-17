@@ -3,12 +3,11 @@ import '@sqb/postgres';
 import assert from 'assert';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
-import {CustomerTag} from '@sqb/connect/test/_support/customer-tags.entity';
+import {Tag} from '@sqb/connect/test/_support/tags.entity';
 
 describe('create()', function () {
 
     const client = initClient();
-    const ids: number[] = [];
 
     it('should insert new record and return new values', async function () {
         const values = {
@@ -37,7 +36,6 @@ describe('create()', function () {
         assert.strictEqual(x.familyName, values.familyName);
         assert.strictEqual(x.countryCode, values.countryCode);
         assert.strictEqual(x.country.code, values.countryCode);
-        ids.push(customer.id);
     });
 
     it('should apply column.serialize() before insert', async function () {
@@ -54,7 +52,6 @@ describe('create()', function () {
         assert.ok(x);
         assert.strictEqual(x.id, customer.id);
         assert.strictEqual(x.gender, 'Male');
-        ids.push(customer.id);
     });
 
     it('should map embedded elements into fields', async function () {
@@ -81,23 +78,25 @@ describe('create()', function () {
         assert.strictEqual(c2, c + 1);
         assert.strictEqual(x.id, customer.id);
         assert.deepStrictEqual({...x.name}, values.name);
-        ids.push(customer.id);
     });
 
     it('should set default value', async function () {
-        const repo = client.getRepository(CustomerTag);
-        const tag = await repo.create({customerId: ids[0], tag: 'small'});
-        assert.ok(tag);
-        assert.ok(tag instanceof CustomerTag);
-        assert.strictEqual(tag.customerId, ids[0]);
-        assert.strictEqual(tag.tag, 'small');
-        assert.strictEqual(tag.color, 'yellow');
-        assert.strictEqual(tag.active, true);
+        const values = {
+            name: {
+                given: 'G' + Math.trunc(Math.random() * 10000),
+                family: 'F' + Math.trunc(Math.random() * 10000),
+            },
+            countryCode: 'TR'
+        }
+        const repo = client.getRepository(Customer);
+        const customer = await repo.create(values);
+        assert.ok(customer);
+        assert.strictEqual(customer.active, true);
     });
 
     it('should check enum value', async function () {
-        const repo = client.getRepository(CustomerTag);
-        await assert.rejects(() => repo.create({customerId: ids[0], tag: 'small', color: 'pink'}),
+        const repo = client.getRepository(Tag);
+        await assert.rejects(() => repo.create({name: 'small', color: 'pink'}),
             /value must be one of/);
     });
 

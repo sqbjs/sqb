@@ -76,10 +76,15 @@ export class Customer extends BaseEntity<Customer> {
     @HasOneLazy(Country)
     readonly countryLazy?: LazyResolver<Country>;
 
-    /* @HasMany(CustomerTag, 'id>customerId', Through(String, '')
-    )
-    readonly tags?: CustomerTag[];*/
+    @Column({defaultValue: true})
+    active: boolean;
 
-    /*  */
+    /*
+    @HasMany(CustomerTag, {
+        through: {
+            entity:
+        }
+    })
+    readonly tags?: CustomerTag[];*/
 
 }

@@ -60,6 +60,7 @@ export interface ForeignKeyOptions {
 
     keyColumn?: string;
     targetColumn?: string;
+
 }
 
 export interface DataColumnOptions {
