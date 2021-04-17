@@ -180,7 +180,7 @@ describe('findAll()', function () {
 
     it('should sort by embedded sub element', async function () {
         const repo = client.getRepository<Customer>(Customer);
-        const rows = await repo.findAll({sort: ['name.given']});
+        const rows = await repo.findAll({sort: ['name.given', 'name.family']});
         const arr1 = rows.map(x => x.name.given);
         const arr2 = [...arr1];
         arr2.sort((a, b) => {

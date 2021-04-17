@@ -277,12 +277,13 @@ export class FindCommand {
             let elName = m[2];
             let prefix = '';
             let suffix = '';
+            let _entityDef = entityDef;
             if (elName.includes('.')) {
                 const a: string[] = elName.split('.');
                 while (a.length > 1) {
-                    const col = entityDef.getElement(a.shift() || '');
+                    const col = _entityDef.getElement(a.shift() || '');
                     if (isEmbeddedElement(col)) {
-                        entityDef = await col.resolveType();
+                        _entityDef = await col.resolveType();
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
                         if (col.fieldNameSuffix)
@@ -290,12 +291,12 @@ export class FindCommand {
                     } else if (isRelationElement(col) && !col.hasMany) {
                         const joinInfo = await this._addJoin(ctx, 'T', col);
                         tableAlias = joinInfo.joinAlias;
-                        entityDef = joinInfo.targetEntity;
+                        _entityDef = joinInfo.targetEntity;
                     } else throw new Error(`Invalid column (${elName}) declared in sort property`);
                 }
                 elName = a.shift() || '';
             }
-            const col = entityDef.getElement(elName);
+            const col = _entityDef.getElement(elName);
             if (!col)
                 throw new Error(`Unknown element (${elName}) declared in sort property`);
             if (!isDataColumn(col))
