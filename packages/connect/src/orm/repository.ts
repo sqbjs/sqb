@@ -34,6 +34,7 @@ export namespace Repository {
         params?: any;
         sort?: string[];
         offset?: number;
+        distinct?: boolean;
     }
 
     export interface FindAllOptions extends FindOneOptions {

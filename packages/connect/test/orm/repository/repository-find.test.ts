@@ -193,6 +193,19 @@ describe('findAll()', function () {
         assert.deepStrictEqual(arr1, arr2);
     });
 
+    it('should return distinct results', async function () {
+        const repo = client.getRepository<Customer>(Customer);
+        const rows = await repo.findAll({
+            elements: ['countryCode'],
+            distinct: true
+        });
+        assert.ok(rows);
+        const a = rows.map(customer => customer.countryCode);
+        // Create distinct array
+        const b = a.filter((v, i, arr) => arr.indexOf(v) === i);
+        assert.deepStrictEqual(a, b);
+    });
+
     it('should apply "parse"', async function () {
         const repo = client.getRepository<Customer>(Customer);
         const rows = await repo.findAll({sort: ['id'], limit: 10});

@@ -19,11 +19,12 @@ export class SelectQuery extends Query {
     _columns?: Serializable[];
     _joins?: JoinStatement[];
     _where?: LogicalOperator;
-    _groupby?: (GroupColumn | RawStatement)[];
-    _orderby?: (OrderColumn | RawStatement)[];
+    _groupBy?: (GroupColumn | RawStatement)[];
+    _orderBy?: (OrderColumn | RawStatement)[];
     _limit?: number;
     _offset?: number;
     _alias?: string;
+    _distinct?: boolean;
 
     constructor(...column: (string | string[] | Serializable)[]) {
         super();
@@ -90,10 +91,10 @@ export class SelectQuery extends Query {
      * Defines "where" part of query
      */
     groupBy(...field: (string | RawStatement)[]): this {
-        this._groupby = this._groupby || [];
+        this._groupBy = this._groupBy || [];
         for (const arg of field) {
             if (!arg) continue;
-            this._groupby.push(typeof arg === 'string' ? new GroupColumn(arg) : arg);
+            this._groupBy.push(typeof arg === 'string' ? new GroupColumn(arg) : arg);
         }
         return this;
     }
@@ -102,10 +103,10 @@ export class SelectQuery extends Query {
      * Defines "order by" part of query.
      */
     orderBy(...field: (string | RawStatement)[]): this {
-        this._orderby = this._orderby || [];
+        this._orderBy = this._orderBy || [];
         for (const arg of field) {
             if (!arg) continue;
-            this._orderby.push(typeof arg === 'string' ? new OrderColumn(arg) : arg);
+            this._orderBy.push(typeof arg === 'string' ? new OrderColumn(arg) : arg);
         }
         return this;
     }
@@ -131,6 +132,14 @@ export class SelectQuery extends Query {
      */
     offset(offset: number): this {
         this._offset = coerceToInt(offset);
+        return this;
+    }
+
+    /**
+     * Enables distinct mode
+     */
+    distinct(): this {
+        this._distinct = true;
         return this;
     }
 
@@ -161,6 +170,7 @@ export class SelectQuery extends Query {
 
         return serializeFallback(ctx, this._type, o, () => {
             let out = 'select';
+            if (this._distinct) out += ' distinct';
             // columns part
             /* istanbul ignore else */
             if (o.columns) {
@@ -276,8 +286,8 @@ export class SelectQuery extends Query {
      */
     protected __serializeGroupColumns(ctx: SerializeContext): string {
         const arr: string[] = [];
-        if (this._groupby)
-            for (const t of this._groupby) {
+        if (this._groupBy)
+            for (const t of this._groupBy) {
                 const s = t._serialize(ctx);
                 /* istanbul ignore else */
                 if (s)
@@ -291,8 +301,8 @@ export class SelectQuery extends Query {
 
     protected __serializeOrderColumns(ctx: SerializeContext): string {
         const arr: string[] = [];
-        if (this._orderby)
-            for (const t of this._orderby) {
+        if (this._orderBy)
+            for (const t of this._orderBy) {
                 const s = t._serialize(ctx);
                 /* istanbul ignore else */
                 if (s)
