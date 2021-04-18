@@ -152,3 +152,6 @@ export interface RelationColumnOptions {
     lazy?: boolean;
 }
 
+export interface RelationLink {
+
+}
