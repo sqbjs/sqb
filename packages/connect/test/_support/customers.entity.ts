@@ -1,6 +1,7 @@
 import {
     DataType,
     BaseEntity,
+    Embedded,
     Column,
     Entity,
     HasOne,
@@ -14,7 +15,6 @@ import {
     Serialize, NoInsert, HasOneLazy, NotNull,
 } from '@sqb/connect';
 import {Country} from './countries.entity';
-import {Embedded} from '@sqb/connect';
 import {PersonName} from '../_support/person-name.entity';
 
 const GenderMap = {
@@ -80,11 +80,13 @@ export class Customer extends BaseEntity<Customer> {
     active: boolean;
 
     /*
-    @HasMany(CustomerTag, {
-        through: {
-            entity:
-        }
-    })
-    readonly tags?: CustomerTag[];*/
-
+    @HasMany(
+        JoinEntity(CustomerTag, [
+            'Customer.id=ct.customerId',
+            {'ct.active': true}]
+        ).as('ct'),
+        JoinEntity(Tag, ['ct.tagId=Tag.id'])
+    )
+    readonly tags?: Tag[];
+*/
 }

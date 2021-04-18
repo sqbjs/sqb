@@ -56,3 +56,5 @@ export function HasManyLazy(type: ConstructorThunk, options?: Omit<RelationColum
         entity.setRelationColumn(propertyKey, type, opts);
     }
 }
+
+

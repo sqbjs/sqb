@@ -1,9 +1,9 @@
-import '../../_support/env';
 import '@sqb/postgres';
 import assert from 'assert';
+import '../../_support/env';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
-import {Tag} from '@sqb/connect/test/_support/tags.entity';
+import {Tag} from '../../_support/tags.entity';
 
 describe('create()', function () {
 
