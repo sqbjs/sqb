@@ -1,4 +1,4 @@
-import {Entity, FieldName, ForeignKey, NotNull, PrimaryKey} from '@sqb/connect';
+import {Column, Default, Entity, FieldName, ForeignKey, NotNull, PrimaryKey} from '@sqb/connect';
 
 @Entity({tableName: 'customer_tags'})
 @PrimaryKey(['customerId', 'tagId'], {name: 'pk_customer_tags'})
@@ -11,5 +11,10 @@ export class CustomerTag {
     @FieldName('tag_id')
     @NotNull
     tagId: number;
+
+    @Column()
+    @Default(false)
+    @NotNull
+    deleted: boolean = false;
 
 }

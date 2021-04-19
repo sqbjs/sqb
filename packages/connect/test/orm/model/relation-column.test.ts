@@ -44,7 +44,7 @@ describe('Relation column', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getRelationColumn('country');
+        const col = meta.getRelationElement('country');
         assert.ok(col);
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.keyColumn, 'countryCode');
@@ -66,7 +66,7 @@ describe('Relation column', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getRelationColumn('country');
+        const col = meta.getRelationElement('country');
         assert.ok(col);
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.keyColumn, 'countryCode');
@@ -88,7 +88,7 @@ describe('Relation column', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getRelationColumn('country');
+        const col = meta.getRelationElement('country');
         assert.ok(col);
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.keyColumn, 'countryCode');
@@ -110,7 +110,7 @@ describe('Relation column', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getRelationColumn('countries');
+        const col = meta.getRelationElement('countries');
         assert.ok(col);
         assert.strictEqual(col.name, 'countries');
         assert.strictEqual(col.keyColumn, 'countryCode');

@@ -2,7 +2,7 @@ import {camelCase} from 'putil-varhelpers';
 import {ConstructorThunk, ForeignKeyOptions} from '../types';
 import {resolveEntityMeta} from '../helpers';
 import {EntityMeta} from './entity-meta';
-import {DataColumnMeta, isDataColumn} from '../metadata/data-column-meta';
+import {ColumnElementMeta, isColumnElement} from './column-element-meta';
 
 export class ForeignKeyMeta {
     private _keyColumn?: string | null; // cached value for auto determined keyColumn
@@ -31,13 +31,13 @@ export class ForeignKeyMeta {
         throw new Error(`Can't resolve target entity of "${this.display}`);
     }
 
-    async resolveKeyColumn(): Promise<DataColumnMeta> {
+    async resolveKeyColumn(): Promise<ColumnElementMeta> {
         const n = await this.resolveKeyColumnName();
         const col = this.entity.getElement(n);
         if (!col)
             throw new Error(`Can't resolve keyColumn of ${this.display}. ` +
                 `${this.entity.name} has no element named "${n}"`);
-        if (!isDataColumn(col))
+        if (!isColumnElement(col))
             throw new Error(`Can't resolve keyColumn of ${this.display}. ` +
                 `${this.entity.name}.${n} is not a data column`);
         return col;
@@ -76,23 +76,23 @@ export class ForeignKeyMeta {
 
         // snake-case
         keyColumn = target.name[0].toLowerCase() + target.name.substring(1) + '_' + idColumn;
-        if (this.entity.getDataColumn(keyColumn))
+        if (this.entity.getColumnElement(keyColumn))
             return this._keyColumn = keyColumn;
         keyColumn = camelCase(keyColumn);
-        if (this.entity.getDataColumn(keyColumn))
+        if (this.entity.getColumnElement(keyColumn))
             return this._keyColumn = keyColumn;
 
         throw new Error(`Can't detect keyColumn of ${this.display}`);
     }
 
-    async resolveTargetColumn(): Promise<DataColumnMeta> {
+    async resolveTargetColumn(): Promise<ColumnElementMeta> {
         const target = await this.resolveTarget();
         const n = await this.resolveTargetColumnName();
         const col = target.getElement(n);
         if (!col)
             throw new Error(`Can't resolve targetColumn of ${this.display}. ` +
                 `${target.name} has no element named "${n}"`);
-        if (!isDataColumn(col))
+        if (!isColumnElement(col))
             throw new Error(`Can't resolve targetColumn of ${this.display}. ` +
                 `${target.name}.${n} is not a data column`);
         return col;
@@ -126,7 +126,7 @@ export class ForeignKeyMeta {
 
         if (target.primaryIndex && target.primaryIndex.columns.length === 1) {
             targetColumn = target.primaryIndex.columns[0];
-            if (targetColumn && target.getDataColumn(targetColumn))
+            if (targetColumn && target.getColumnElement(targetColumn))
                 return this._targetColumn = targetColumn;
         }
 

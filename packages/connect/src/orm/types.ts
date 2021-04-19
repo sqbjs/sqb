@@ -63,7 +63,7 @@ export interface ForeignKeyOptions {
 
 }
 
-export interface DataColumnOptions {
+export interface ColumnOptions {
     /*
       JS type
      */

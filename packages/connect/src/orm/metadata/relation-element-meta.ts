@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import type {EntityMeta} from './entity-meta';
-import {ElementKind, ConstructorThunk, RelationColumnOptions, DataColumnOptions} from '../types';
+import {ElementKind, ConstructorThunk, RelationColumnOptions, ColumnOptions} from '../types';
 import {AbstractElementMeta} from './abstract-element-meta';
 import {ForeignKeyMeta} from '../metadata/foreign-key-meta';
 
@@ -36,7 +36,7 @@ export class RelationElementMeta extends AbstractElementMeta {
         return this.foreign.targetColumn;
     }
 
-    assign(options: DataColumnOptions) {
+    assign(options: ColumnOptions) {
         Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
     }
 

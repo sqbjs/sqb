@@ -7,7 +7,7 @@ import type {QueryExecutor} from '../../client/types';
 import type {Repository} from '../repository';
 import type {EntityMeta} from '../metadata/entity-meta';
 import {prepareFilter} from '../util/prepare-filter';
-import {isDataColumn, DataColumnMeta} from '../metadata/data-column-meta';
+import {isColumnElement, ColumnElementMeta} from '../metadata/column-element-meta';
 import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
 import {RowTransformModel} from '../util/row-transform-model';
@@ -29,7 +29,7 @@ type FindCommandContext = {
     model: RowTransformModel;
     sqlColumns: Record<string, {
         sqlStatement: string;
-        column: DataColumnMeta;
+        column: ColumnElementMeta;
     }>;
     joins?: JoinInfo[];
     requestElements?: string[];
@@ -67,7 +67,7 @@ export class FindCommand {
         // Add included elements to requestElements array
         if (args.include && args.include.length) {
             const requestElements = ctx.requestElements = ctx.requestElements ||
-                entity.getDataColumnNames().map(x => x.toLowerCase());
+                entity.getColumnElementNames().map(x => x.toLowerCase());
             for (const k of args.include) {
                 if (!requestElements.includes(k.toLowerCase()))
                     requestElements.push(k.toLowerCase());
@@ -161,7 +161,7 @@ export class FindCommand {
             )) continue;
 
             // Add field to select list
-            if (isDataColumn(col)) {
+            if (isColumnElement(col)) {
                 const fieldAlias = this._addSelectColumn(ctx, tableAlias, col);
                 // Add column to transform model
                 if (!col.hidden)
@@ -234,7 +234,7 @@ export class FindCommand {
         }
     }
 
-    private static _addSelectColumn(ctx: FindCommandContext, tableAlias: string, column: DataColumnMeta): string {
+    private static _addSelectColumn(ctx: FindCommandContext, tableAlias: string, column: ColumnElementMeta): string {
         const fieldAlias = tableAlias + '_' + column.name.toUpperCase();
         ctx.sqlColumns[fieldAlias] = {
             column,
@@ -302,7 +302,7 @@ export class FindCommand {
             const col = _entityDef.getElement(elName);
             if (!col)
                 throw new Error(`Unknown element (${elName}) declared in sort property`);
-            if (!isDataColumn(col))
+            if (!isColumnElement(col))
                 throw new Error(`Can not sort by "${elName}", because it is not a data column`);
 
             const dir = m[1] || '+';

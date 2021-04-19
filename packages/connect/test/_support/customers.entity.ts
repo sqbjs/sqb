@@ -12,10 +12,12 @@ import {
     FieldName,
     NoUpdate,
     Parse,
-    Serialize, NoInsert, HasOneLazy, NotNull,
+    Serialize, NoInsert, HasOneLazy, NotNull, HasMany, EntityLink,
 } from '@sqb/connect';
 import {Country} from './countries.entity';
 import {PersonName} from '../_support/person-name.entity';
+import {CustomerTag} from '../_support/customer-tags.entity';
+import {Tag} from '../_support/tags.entity';
 
 const GenderMap = {
     M: 'Male',
@@ -78,15 +80,21 @@ export class Customer extends BaseEntity<Customer> {
 
     @Column({defaultValue: true})
     active: boolean;
-
-    /*
+/*
     @HasMany(
-        JoinEntity(CustomerTag, [
+       /* JoinEntity(CustomerTag, {
+            link: {'CustomerTag.id': 'Customer.id'},
+            conditions: {'CustomerTag.deleted': false}
+        }),
+        JoinEntity(CustomerTag).as('ct').on(
             'Customer.id=ct.customerId',
-            {'ct.active': true}]
-        ).as('ct'),
-        JoinEntity(Tag, ['ct.tagId=Tag.id'])
+            {'ct.active': true})
+        ),* /
+        JoinEntity(Tag)
+            //.link('id', 'Tag.id')
+           // .filter('ct.active': true)
     )
+    @HasMany(Tag, {through: CustomerTag})
     readonly tags?: Tag[];
 */
 }

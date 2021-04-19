@@ -140,7 +140,8 @@ END;`,
 
     `CREATE TABLE ${process.env.ORASCHEMA}.customer_tags (
   customer_id    INTEGER,
-  tag_id    INTEGER
+  tag_id    INTEGER,
+  deleted boolean default false
 )`,
 
     `ALTER TABLE ${process.env.ORASCHEMA}.customer_tags ADD (

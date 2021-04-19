@@ -5,15 +5,15 @@ import type {EntityMeta} from './entity-meta';
 import {
     ElementKind,
     ColumnAutoGenerationStrategy,
-    ColumnTransformFunction, DataColumnOptions, EnumValue, FieldValue, DefaultValueGetter,
+    ColumnTransformFunction, ColumnOptions, EnumValue, FieldValue, DefaultValueGetter,
 } from '../types';
 import {AbstractElementMeta} from './abstract-element-meta';
 
-export function isDataColumn(f: any): f is DataColumnMeta {
+export function isColumnElement(f: any): f is ColumnElementMeta {
     return !!(f && f instanceof AbstractElementMeta && f.kind === 'data');
 }
 
-export class DataColumnMeta extends AbstractElementMeta {
+export class ColumnElementMeta extends AbstractElementMeta {
     readonly kind: ElementKind = 'data';
     fieldName: string;
     dataType?: DataType;
@@ -87,14 +87,14 @@ export class DataColumnMeta extends AbstractElementMeta {
     parse?: ColumnTransformFunction;
     serialize?: ColumnTransformFunction;
 
-    constructor(entity: EntityMeta, name: string, options: DataColumnOptions = {}) {
+    constructor(entity: EntityMeta, name: string, options: ColumnOptions = {}) {
         super(entity, name);
         this.fieldName = name;
         if (options)
             this.assign(options);
     }
 
-    assign(options: DataColumnOptions) {
+    assign(options: ColumnOptions) {
         Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
     }
 

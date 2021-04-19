@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {ElementKind, ConstructorThunk, DataColumnOptions} from '../types';
+import {ElementKind, ConstructorThunk, ColumnOptions} from '../types';
 import {AbstractElementMeta} from './abstract-element-meta';
 import {EntityMeta} from './entity-meta';
 import {resolveEntityMeta} from '../helpers';
@@ -27,7 +27,7 @@ export class EmbeddedElementMeta extends AbstractElementMeta {
         throw new Error(`Can't resolve type of ${this.entity.name}.${this.name}`);
     }
 
-    assign(options: DataColumnOptions) {
+    assign(options: ColumnOptions) {
         Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
     }
 

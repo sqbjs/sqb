@@ -21,7 +21,7 @@ describe('Nested object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getEmbeddedColumn('name');
+        const name = meta.getEmbeddedElement('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
     });
@@ -38,7 +38,7 @@ describe('Nested object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getEmbeddedColumn('name');
+        const name = meta.getEmbeddedElement('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
         assert.strictEqual(name.fieldNamePrefix, 'prefix');

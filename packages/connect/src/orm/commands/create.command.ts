@@ -1,7 +1,7 @@
 import {Insert, Param} from '@sqb/builder';
 import type {QueryExecutor} from '../../client/types';
 import type {EntityMeta} from '../metadata/entity-meta';
-import {isDataColumn} from '../metadata/data-column-meta';
+import {isColumnElement} from '../metadata/column-element-meta';
 import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 
 export type CreateCommandArgs = {
@@ -57,7 +57,7 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const el = entity.getDataColumnByFieldName(f.fieldName);
+                const el = entity.getColumnElementByFieldName(f.fieldName);
                 if (el)
                     keyValues[el.name] = qr.rows[0][f.index];
             }
@@ -70,7 +70,7 @@ export class CreateCommand {
         let v;
         for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (isDataColumn(col)) {
+            if (isColumnElement(col)) {
                 if (col.noInsert)
                     continue;
                 if (v == null && col.defaultValue !== undefined) {
