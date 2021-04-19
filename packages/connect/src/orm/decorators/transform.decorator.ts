@@ -6,7 +6,7 @@ export function Parse(fn: ColumnTransformFunction): PropertyDecorator {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
         EntityMeta.attachTo(target.constructor)
-            .setDataColumn(propertyKey)
+            .defineColumnElement(propertyKey)
             .parse = fn;
     }
 }
@@ -16,7 +16,7 @@ export function Serialize(fn: ColumnTransformFunction): PropertyDecorator {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a Column for only string properties');
         EntityMeta.attachTo(target.constructor)
-            .setDataColumn(propertyKey)
+            .defineColumnElement(propertyKey)
             .serialize = fn;
     }
 }

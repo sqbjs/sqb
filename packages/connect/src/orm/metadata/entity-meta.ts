@@ -2,19 +2,20 @@ import {isRelationElement, RelationElementMeta} from './relation-element-meta';
 import {DataType, Eq} from '@sqb/builder';
 import {
     IndexOptions,
-    ConstructorThunk, ForeignKeyOptions, RelationColumnOptions, DataColumnOptions,
+    ConstructorThunk, ForeignKeyOptions, RelationColumnOptions, ColumnOptions,
 } from '../types';
 import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../consts';
 import {IndexMeta} from './index-meta';
 import {ForeignKeyMeta} from './foreign-key-meta';
-import {DataColumnMeta, isDataColumn} from './data-column-meta';
+import {ColumnElementMeta, isColumnElement} from './column-element-meta';
 import {EmbeddedElementMeta, isEmbeddedElement} from './embedded-element-meta';
 import {serializeColumn} from '../util/serialize-element';
 import {FindCommand} from '../commands/find.command';
 import {Repository} from '../repository';
+import {EntityLinkDef} from './entity-link';
 
-export type ColumnMeta = DataColumnMeta | EmbeddedElementMeta | RelationElementMeta;
+export type ColumnMeta = ColumnElementMeta | EmbeddedElementMeta | RelationElementMeta;
 
 export class EntityMeta {
     name: string;
@@ -38,41 +39,41 @@ export class EntityMeta {
         return this.elements.get(name.toLowerCase());
     }
 
-    getDataColumn(name: string): Maybe<DataColumnMeta> {
+    getColumnElement(name: string): Maybe<ColumnElementMeta> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
-        return isDataColumn(col) ? col : undefined;
+        return isColumnElement(col) ? col : undefined;
     }
 
-    getDataColumnByFieldName(fieldName: string): Maybe<DataColumnMeta> {
+    getColumnElementByFieldName(fieldName: string): Maybe<ColumnElementMeta> {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
         for (const el of this.elements.values()) {
-            if (isDataColumn(el) && el.fieldName.toLowerCase() === fieldName)
+            if (isColumnElement(el) && el.fieldName.toLowerCase() === fieldName)
                 return el;
         }
     }
 
-    getRelationColumn(name: string): Maybe<RelationElementMeta> {
+    getRelationElement(name: string): Maybe<RelationElementMeta> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
         return isRelationElement(col) ? col : undefined;
     }
 
-    getEmbeddedColumn(name: string): Maybe<EmbeddedElementMeta> {
+    getEmbeddedElement(name: string): Maybe<EmbeddedElementMeta> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
         return isEmbeddedElement(col) ? col : undefined;
     }
 
-    setDataColumn(name: string, options?: DataColumnOptions): DataColumnMeta {
+    defineColumnElement(name: string, options?: ColumnOptions): ColumnElementMeta {
         let col = this.getElement(name);
-        if (!col || !isDataColumn(col)) {
-            col = new DataColumnMeta(this, name, options);
+        if (!col || !isColumnElement(col)) {
+            col = new ColumnElementMeta(this, name, options);
             if (!col.type) {
                 const typ = Reflect.getMetadata("design:type", this.ctor.prototype, name);
                 if (typ === Array) {
@@ -103,11 +104,11 @@ export class EntityMeta {
         return col;
     }
 
-    setRelationColumn(name: string, target: ConstructorThunk,
-                      options?: RelationColumnOptions): RelationElementMeta {
-        if (typeof target !== 'function')
-            throw new Error('"target" must be defined');
-        const col = new RelationElementMeta(this, name, target, options);
+    defineRelationElement(name: string, type: ConstructorThunk | EntityLinkDef<any>,
+                          options?: RelationColumnOptions): RelationElementMeta {
+        if (typeof type !== 'function')
+            throw new Error('"type" argument must be defined');
+        const col = new RelationElementMeta(this, name, type, options);
         if (!this.elements.has(name.toLowerCase()))
             this.elementKeys.push(name);
         this.elements.set(name.toLowerCase(), col);
@@ -139,7 +140,7 @@ export class EntityMeta {
         return col;
     }
 
-    setEmbeddedElement(propertyKey: string, type?: ConstructorThunk): EmbeddedElementMeta {
+    defineEmbeddedElement(propertyKey: string, type?: ConstructorThunk): EmbeddedElementMeta {
         type = type || Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
@@ -184,11 +185,11 @@ export class EntityMeta {
         this.eventListeners.push({event: 'after-' + event, fn});
     }
 
-    getPrimaryIndexColumns(): DataColumnMeta[] {
-        const out: DataColumnMeta[] = [];
+    getPrimaryIndexColumns(): ColumnElementMeta[] {
+        const out: ColumnElementMeta[] = [];
         if (this.primaryIndex) {
             for (const k of this.primaryIndex.columns) {
-                const col = this.getDataColumn(k);
+                const col = this.getColumnElement(k);
                 if (!col)
                     throw new Error(`Data column "${k}" in primary index of ${this.name} does not exists`)
                 out.push(col);
@@ -197,11 +198,11 @@ export class EntityMeta {
         return out;
     }
 
-    getDataColumnNames(): string[] {
+    getColumnElementNames(): string[] {
         const out: string[] = [];
         for (const k of this.elementKeys) {
             const col = this.getElement(k);
-            if (isDataColumn(col))
+            if (isColumnElement(col))
                 out.push(k);
         }
         return out;
@@ -211,7 +212,7 @@ export class EntityMeta {
         const out: string[] = [];
         for (const k of this.elementKeys) {
             const col = this.getElement(k);
-            if (isDataColumn(col) && !col.noInsert)
+            if (isColumnElement(col) && !col.noInsert)
                 out.push(k);
         }
         return out;
@@ -221,7 +222,7 @@ export class EntityMeta {
         const out: string[] = [];
         for (const k of this.elementKeys) {
             const col = this.getElement(k);
-            if (isDataColumn(col) && !col.noUpdate)
+            if (isColumnElement(col) && !col.noUpdate)
                 out.push(k);
         }
         return out;
@@ -277,10 +278,10 @@ export class EntityMeta {
         return meta && [...meta.elementKeys] as K[];
     }
 
-    static getDataColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+    static getColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const meta = this.get(ctor);
         if (meta)
-            return meta.getDataColumnNames() as (K[]);
+            return meta.getColumnElementNames() as (K[]);
     }
 
     static getInsertColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {

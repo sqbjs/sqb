@@ -83,7 +83,7 @@ describe('findAll()', function () {
         let rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows[0].phoneCode);
-        const col = EntityMeta.get(Country).getDataColumn('phoneCode');
+        const col = EntityMeta.get(Country).getColumnElement('phoneCode');
         col.hidden = true;
         rows = await repo.findAll({limit: 1});
         assert.ok(rows);

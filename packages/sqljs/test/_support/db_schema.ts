@@ -43,6 +43,7 @@ CREATE TABLE customer_tags
 (
     customer_id INTEGER,
     tag_id INTEGER,
+    deleted INTEGER default 0,
     PRIMARY KEY (customer_id, tag_id)
 );
 

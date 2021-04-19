@@ -1,5 +1,5 @@
 import {EntityMeta} from '../metadata/entity-meta';
-import {isDataColumn} from '../metadata/data-column-meta';
+import {isColumnElement} from '../metadata/column-element-meta';
 
 export function extractKeyValues<T>(
     entityDef: EntityMeta,
@@ -12,7 +12,7 @@ export function extractKeyValues<T>(
         const col = entityDef.getElement(k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
-        if (!isDataColumn(col))
+        if (!isColumnElement(col))
             throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
     }
 

@@ -78,7 +78,8 @@ ALTER SEQUENCE ${schema}.tags_id_seq RESTART WITH 100;
 CREATE TABLE ${schema}.customer_tags
 (
     customer_id int4,
-    tag_id int4,     
+    tag_id int4,
+    deleted boolean default false,     
     CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag_id),
     CONSTRAINT fk_customer_tags_customer_id FOREIGN KEY (customer_id)
         REFERENCES ${schema}.customers (id) MATCH SIMPLE,

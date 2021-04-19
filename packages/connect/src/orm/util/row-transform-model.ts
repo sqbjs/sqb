@@ -3,7 +3,7 @@ import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {EntityMeta} from '../metadata/entity-meta';
 import type {AbstractElementMeta} from '../metadata/abstract-element-meta';
 import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
-import {DataColumnMeta, isDataColumn} from '../metadata/data-column-meta';
+import {ColumnElementMeta, isColumnElement} from '../metadata/column-element-meta';
 import {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
 import {FindCommandArgs} from '../commands/find.command';
 
@@ -32,7 +32,7 @@ export class RowTransformModel {
         this._circularCheckList.push(entity);
     }
 
-    addDataElement(col: DataColumnMeta, fieldAlias: string) {
+    addDataElement(col: ColumnElementMeta, fieldAlias: string) {
         this._properties[col.name] = {
             element: col,
             fieldAlias
@@ -133,7 +133,7 @@ export class RowTransformModel {
         for (let elIdx = 0; elIdx < elementLen; elIdx++) {
             const elKey = elementKeys[elIdx];
             const prop = this._properties[elKey];
-            if (isDataColumn(prop.element)) {
+            if (isColumnElement(prop.element)) {
                 const field = fields.get(prop.fieldAlias);
                 if (field) {
                     let v = row[field.index];

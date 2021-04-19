@@ -2,7 +2,7 @@ import {And, Param, Update} from '@sqb/builder';
 import {QueryExecutor} from '../../client/types';
 import {EntityMeta} from '../metadata/entity-meta';
 import {Repository} from '../repository';
-import {isDataColumn} from '../metadata/data-column-meta';
+import {isColumnElement} from '../metadata/column-element-meta';
 import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 import {prepareFilter} from '../util/prepare-filter';
 
@@ -72,7 +72,7 @@ export class UpdateCommand {
         let v;
         for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (isDataColumn(col)) {
+            if (isColumnElement(col)) {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')

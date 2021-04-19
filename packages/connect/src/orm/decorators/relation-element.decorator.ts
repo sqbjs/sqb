@@ -1,8 +1,10 @@
 import {ConstructorThunk, RelationColumnOptions} from '../types';
 import {EntityMeta} from '../metadata/entity-meta';
 import {isClass} from '../helpers';
+import {EntityLinkDef} from '../metadata/entity-link';
 
-export function HasOne(type?: ConstructorThunk, options?: Omit<RelationColumnOptions, 'hasMany' | 'lazy'>): PropertyDecorator {
+export function HasOne(type?: ConstructorThunk | EntityLinkDef<any>,
+                       options?: Omit<RelationColumnOptions, 'hasMany' | 'lazy'>): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('You can define a column for only string properties');
@@ -11,7 +13,7 @@ export function HasOne(type?: ConstructorThunk, options?: Omit<RelationColumnOpt
             throw new Error('You must provide "type"');
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: false, lazy: false}
-        entity.setRelationColumn(propertyKey, type, opts);
+        entity.defineRelationElement(propertyKey, type, opts);
     }
 }
 
@@ -24,7 +26,7 @@ export function HasOneLazy(type?: ConstructorThunk, options?: Omit<RelationColum
             throw new Error('You must provide "type"');
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: false, lazy: true}
-        entity.setRelationColumn(propertyKey, type, opts);
+        entity.defineRelationElement(propertyKey, type, opts);
     }
 }
 
@@ -38,7 +40,7 @@ export function HasMany(type: ConstructorThunk, options?: Omit<RelationColumnOpt
             throw new Error(`Returning type of property (${propertyKey}) must be an array`);
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: true, lazy: false}
-        entity.setRelationColumn(propertyKey, type, opts);
+        entity.defineRelationElement(propertyKey, type, opts);
     }
 }
 
@@ -53,8 +55,6 @@ export function HasManyLazy(type: ConstructorThunk, options?: Omit<RelationColum
             throw new Error(`Function type type required for property "${propertyKey}", but ${typ} found`);
         const entity = EntityMeta.attachTo(target.constructor);
         const opts = {...options, hasMany: true, lazy: true}
-        entity.setRelationColumn(propertyKey, type, opts);
+        entity.defineRelationElement(propertyKey, type, opts);
     }
 }
-
-

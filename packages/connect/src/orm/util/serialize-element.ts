@@ -1,9 +1,9 @@
 import {DataType} from '@sqb/builder';
 import {AbstractElementMeta} from '../metadata/abstract-element-meta';
-import {isDataColumn} from '../metadata/data-column-meta';
+import {isColumnElement} from '../metadata/column-element-meta';
 
 export function serializeColumn(col: AbstractElementMeta, v: any): any {
-    if (isDataColumn(col)) {
+    if (isColumnElement(col)) {
         if (col.isArray) {
             if (Array.isArray(v))
                 return v.map(x => serializeDataValue(col.dataType || DataType.VARCHAR, x));
