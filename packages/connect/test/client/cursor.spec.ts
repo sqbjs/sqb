@@ -1,5 +1,4 @@
 import '../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
 import {Select} from '@sqb/builder';
 import { Cursor} from '@sqb/connect';

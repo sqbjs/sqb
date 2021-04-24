@@ -1,6 +1,6 @@
 import {DataType} from '@sqb/builder';
 import {AbstractElementMeta} from '../metadata/abstract-element-meta';
-import {isColumnElement} from '../metadata/column-element-meta';
+import {isColumnElement} from '../helpers';
 
 export function serializeColumn(col: AbstractElementMeta, v: any): any {
     if (isColumnElement(col)) {

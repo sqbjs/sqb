@@ -2,10 +2,11 @@ import type {QueryExecutor} from '../../client/types';
 import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {EntityMeta} from '../metadata/entity-meta';
 import type {AbstractElementMeta} from '../metadata/abstract-element-meta';
-import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
-import {ColumnElementMeta, isColumnElement} from '../metadata/column-element-meta';
-import {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
-import {FindCommandArgs} from '../commands/find.command';
+import type {RelationElementMeta} from '../metadata/relation-element-meta';
+import type {ColumnElementMeta} from '../metadata/column-element-meta';
+import type {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
+import type {FindCommandArgs} from '../commands/find.command';
+import {isColumnElement, isRelationElement} from '../helpers';
 
 export interface RowTransformItem {
     element: AbstractElementMeta;
@@ -90,13 +91,14 @@ export class RowTransformModel {
 
             if (prop.eagerTargets && isRelationElement(prop.element) && prop.subQueryOptions) {
                 const {FindCommand} = await import('../commands/find.command');
-                const targetEntity = await prop.element.foreign.resolveTarget();
+                const lastLink = prop.element.chain.getLast();
+                const targetEntity = await lastLink.resolveTarget();
                 if (this._circularCheckList.includes(targetEntity))
                     throw new Error('Circular query call is not allowed');
 
                 const subQueryOptions = prop.subQueryOptions;
-                const keyCol = await prop.element.foreign.resolveKeyColumnName();
-                const trgCol = await prop.element.foreign.resolveTargetColumnName();
+                const keyCol = await lastLink.resolveSourceColumnName();
+                const trgCol = await lastLink.resolveTargetColumnName();
 
                 const r = await FindCommand.execute({
                     ...subQueryOptions,

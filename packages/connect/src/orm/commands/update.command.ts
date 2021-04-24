@@ -2,9 +2,8 @@ import {And, Param, Update} from '@sqb/builder';
 import {QueryExecutor} from '../../client/types';
 import {EntityMeta} from '../metadata/entity-meta';
 import {Repository} from '../repository';
-import {isColumnElement} from '../metadata/column-element-meta';
-import {isEmbeddedElement} from '../metadata/embedded-element-meta';
 import {prepareFilter} from '../util/prepare-filter';
+import {isColumnElement, isEmbeddedElement} from '../helpers';
 
 export type UpdateCommandArgs = {
     entity: EntityMeta;

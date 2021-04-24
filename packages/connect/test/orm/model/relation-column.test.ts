@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
+/* eslint-disable */
 import '../../_support/env';
 import * as assert from 'assert';
 import {
@@ -8,9 +8,10 @@ import {
     HasManyLazy,
     HasOne,
     HasOneLazy,
-    LazyResolver,
+    LazyResolver, EntityChain,
     PrimaryKey
 } from '@sqb/connect';
+import {isRelationElement} from '@sqb/connect/src/orm/helpers';
 
 class Country {
     @PrimaryKey()
@@ -35,21 +36,37 @@ describe('Relation column', function () {
     it(`should @HasOne() decorator define relation column`, function () {
 
         class Customer extends BaseCustomer {
-            @HasOne(Country, {
-                keyColumn: 'countryCode',
-                targetColumn: 'code'
-            })
+            @HasOne(Country)
             country: Country;
         }
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
         const col = meta.getRelationElement('country');
-        assert.ok(col);
+        assert.ok(isRelationElement(col));
         assert.strictEqual(col.name, 'country');
-        assert.strictEqual(col.keyColumn, 'countryCode');
-        assert.strictEqual(col.targetColumn, 'code');
-        assert.strictEqual(col.target, Country);
+        assert.strictEqual(col.chain.source, Customer);
+        assert.strictEqual(col.chain.target, Country);
+        assert.strictEqual(col.hasMany, false);
+        assert.strictEqual(col.lazy, false);
+    });
+
+    it(`should @HasOne() accept EntityLink`, function () {
+
+        class Customer extends BaseCustomer {
+            @HasOne(EntityChain(Country).link('code', 'countryCode'))
+            country: Country;
+        }
+
+        const meta = Entity.getMetadata(Customer);
+        assert.ok(meta);
+        const col = meta.getRelationElement('country');
+        assert.ok(isRelationElement(col));
+        assert.strictEqual(col.name, 'country');
+        assert.strictEqual(col.chain.source, Customer);
+        assert.strictEqual(col.chain.target, Country);
+        assert.strictEqual(col.chain.sourceColumn, 'countryCode');
+        assert.strictEqual(col.chain.targetColumn, 'code');
         assert.strictEqual(col.hasMany, false);
         assert.strictEqual(col.lazy, false);
     });
@@ -57,10 +74,7 @@ describe('Relation column', function () {
     it(`should @HasOneLazy() decorator define relation column`, function () {
 
         class Customer extends BaseCustomer {
-            @HasOneLazy(Country, {
-                keyColumn: 'countryCode',
-                targetColumn: 'code'
-            })
+            @HasOneLazy(EntityChain(Country).link('code', 'countryCode'))
             country: LazyResolver<Country>;
         }
 
@@ -68,10 +82,12 @@ describe('Relation column', function () {
         assert.ok(meta);
         const col = meta.getRelationElement('country');
         assert.ok(col);
+        assert.ok(isRelationElement(col));
         assert.strictEqual(col.name, 'country');
-        assert.strictEqual(col.keyColumn, 'countryCode');
-        assert.strictEqual(col.targetColumn, 'code');
-        assert.strictEqual(col.target, Country);
+        assert.strictEqual(col.chain.source, Customer);
+        assert.strictEqual(col.chain.target, Country);
+        assert.strictEqual(col.chain.sourceColumn, 'countryCode');
+        assert.strictEqual(col.chain.targetColumn, 'code');
         assert.strictEqual(col.hasMany, false);
         assert.strictEqual(col.lazy, true);
     });
@@ -79,10 +95,7 @@ describe('Relation column', function () {
     it(`should @HasMany() decorator define relation column`, function () {
 
         class Customer extends BaseCustomer {
-            @HasMany(Country, {
-                keyColumn: 'countryCode',
-                targetColumn: 'code'
-            })
+            @HasMany(EntityChain(Country).link('code', 'countryCode'))
             country: Country[];
         }
 
@@ -90,10 +103,11 @@ describe('Relation column', function () {
         assert.ok(meta);
         const col = meta.getRelationElement('country');
         assert.ok(col);
+        assert.ok(isRelationElement(col));
         assert.strictEqual(col.name, 'country');
-        assert.strictEqual(col.keyColumn, 'countryCode');
-        assert.strictEqual(col.targetColumn, 'code');
-        assert.strictEqual(col.target, Country);
+        assert.strictEqual(col.chain.sourceColumn, 'countryCode');
+        assert.strictEqual(col.chain.targetColumn, 'code');
+        assert.strictEqual(col.chain.target, Country);
         assert.strictEqual(col.hasMany, true);
         assert.strictEqual(col.lazy, false);
     });
@@ -101,10 +115,7 @@ describe('Relation column', function () {
     it(`should @HasManyLazy() decorator define relation column`, function () {
 
         class Customer extends BaseCustomer {
-            @HasManyLazy(Country, {
-                keyColumn: 'countryCode',
-                targetColumn: 'code'
-            })
+            @HasManyLazy(EntityChain(Country).link('code', 'countryCode'))
             countries: LazyResolver<Country[]>;
         }
 
@@ -112,10 +123,11 @@ describe('Relation column', function () {
         assert.ok(meta);
         const col = meta.getRelationElement('countries');
         assert.ok(col);
+        assert.ok(isRelationElement(col));
         assert.strictEqual(col.name, 'countries');
-        assert.strictEqual(col.keyColumn, 'countryCode');
-        assert.strictEqual(col.targetColumn, 'code');
-        assert.strictEqual(col.target, Country);
+        assert.strictEqual(col.chain.sourceColumn, 'countryCode');
+        assert.strictEqual(col.chain.targetColumn, 'code');
+        assert.strictEqual(col.chain.target, Country);
         assert.strictEqual(col.hasMany, true);
         assert.strictEqual(col.lazy, true);
     });

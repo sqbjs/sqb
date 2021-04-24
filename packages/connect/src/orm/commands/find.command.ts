@@ -7,13 +7,14 @@ import type {QueryExecutor} from '../../client/types';
 import type {Repository} from '../repository';
 import type {EntityMeta} from '../metadata/entity-meta';
 import {prepareFilter} from '../util/prepare-filter';
-import {isColumnElement, ColumnElementMeta} from '../metadata/column-element-meta';
-import {isEmbeddedElement} from '../metadata/embedded-element-meta';
-import {isRelationElement, RelationElementMeta} from '../metadata/relation-element-meta';
+import type {ColumnElementMeta} from '../metadata/column-element-meta';
+import type {RelationElementMeta} from '../metadata/relation-element-meta';
 import {RowTransformModel} from '../util/row-transform-model';
+import {EntityChainRing} from '../metadata/entity-chain-ring';
+import {isColumnElement, isEmbeddedElement, isRelationElement} from '../helpers';
 
 interface JoinInfo {
-    column: RelationElementMeta;
+    chainRing: EntityChainRing;
     targetEntity: EntityMeta;
     joinAlias: string;
     join: JoinStatement
@@ -104,11 +105,6 @@ export class FindCommand {
         if (args.distinct)
             query.distinct();
 
-        if (ctx.joins)
-            for (const j of ctx.joins) {
-                query.join(j.join);
-            }
-
         if (where)
             query.where(...where._items);
         if (args.sort) {
@@ -117,6 +113,12 @@ export class FindCommand {
         }
         if (args.offset)
             query.offset(args.offset);
+
+        // joins must be added last
+        if (ctx.joins)
+            for (const j of ctx.joins) {
+                query.join(j.join);
+            }
 
         // Execute query
         const resp = await args.connection.execute(query, {
@@ -185,15 +187,16 @@ export class FindCommand {
                 // Lazy resolver requires key column value.
                 // So we need to add key column to result model
                 if (col.lazy) {
-                    const keyCol = await col.foreign.resolveKeyColumn();
-                    const fieldAlias = this._addSelectColumn(ctx, tableAlias, keyCol);
-                    model.addDataElement(keyCol, fieldAlias);
+                    const finalLink = col.chain.getLast();
+                    const sourceCol = await finalLink.resolveSourceColumn();
+                    const fieldAlias = this._addSelectColumn(ctx, tableAlias, sourceCol);
+                    model.addDataElement(sourceCol, fieldAlias);
                     continue;
                 }
 
                 // One-2-One Eager relation
                 if (!col.hasMany && !col.lazy) {
-                    const joinInfo = await this._addJoin(ctx, tableAlias, col);
+                    const joinInfo = await this._joinLinks(ctx, tableAlias, col);
                     const subModel = new RowTransformModel(joinInfo.targetEntity, model);
                     model.addNode(col, subModel);
                     // Add join fields to select columns list
@@ -208,12 +211,13 @@ export class FindCommand {
                 }
 
                 // One-2-Many Eager relation
-                const keyCol = await col.foreign.resolveKeyColumn();
-                const targetCol = await col.foreign.resolveTargetColumn();
+                const lastLink = col.chain.getLast();
+                const sourceCol = await lastLink.resolveSourceColumn();
+                const targetCol = await lastLink.resolveTargetColumn();
                 // We need to know key value to filter sub query.
                 // So add key field into select columns
-                const fieldAlias = this._addSelectColumn(ctx, tableAlias, keyCol);
-                model.addDataElement(keyCol, fieldAlias);
+                const fieldAlias = this._addSelectColumn(ctx, tableAlias, sourceCol);
+                model.addDataElement(sourceCol, fieldAlias);
 
                 // Eager operation must contain foreign fields
                 // if (_reqElements && !_reqElements.includes(targetCol.name.toLowerCase()))
@@ -243,14 +247,28 @@ export class FindCommand {
         return fieldAlias;
     }
 
-    private static async _addJoin(ctx: FindCommandContext, tableAlias: string, column: RelationElementMeta): Promise<JoinInfo> {
+    private static async _joinLinks(ctx: FindCommandContext, tableAlias: string,
+                                    column: RelationElementMeta): Promise<JoinInfo> {
+        let ring = column.chain;
+        while (ring) {
+            const joinInfo = await this._addJoin(ctx, tableAlias, ring);
+            if (!ring.next)
+                return joinInfo;
+            tableAlias = joinInfo.joinAlias;
+            ring = ring.next;
+        }
+        throw new Error('Column chain undefined');
+    }
+
+    private static async _addJoin(ctx: FindCommandContext, tableAlias: string,
+                                  chainRing: EntityChainRing): Promise<JoinInfo> {
         ctx.joins = ctx.joins || [];
-        let joinInfo = ctx.joins.find(j => j.column === column);
+        let joinInfo = ctx.joins.find(j => j.chainRing === chainRing);
         if (joinInfo)
             return joinInfo;
-        const targetEntity = await column.foreign.resolveTarget();
-        const keyCol = await column.foreign.resolveKeyColumn();
-        const targetCol = await column.foreign.resolveTargetColumn();
+        const targetEntity = await chainRing.resolveTarget();
+        const keyCol = await chainRing.resolveSourceColumn();
+        const targetCol = await chainRing.resolveTargetColumn();
 
         const joinAlias = 'J' + (ctx.joins.length + 1);
         const join = LeftOuterJoin(targetEntity.tableName + ' as ' + joinAlias);
@@ -258,7 +276,7 @@ export class FindCommand {
             Raw(tableAlias + '.' + keyCol.fieldName)))
 
         joinInfo = {
-            column,
+            chainRing,
             targetEntity,
             joinAlias,
             join
@@ -292,7 +310,7 @@ export class FindCommand {
                         if (col.fieldNameSuffix)
                             suffix = col.fieldNameSuffix + suffix;
                     } else if (isRelationElement(col) && !col.hasMany) {
-                        const joinInfo = await this._addJoin(ctx, 'T', col);
+                        const joinInfo = await this._joinLinks(ctx, 'T', col);
                         tableAlias = joinInfo.joinAlias;
                         _entityDef = joinInfo.targetEntity;
                     } else throw new Error(`Invalid column (${elName}) declared in sort property`);

@@ -14,7 +14,7 @@ export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
 export type ColumnTransformFunction = (value: any, col: AbstractElementMeta, row: any) => any;
 
 export type ConstructorResolver<T> = () => Type<T> | Promise<Type<T>>;
-export type ConstructorThunk<T = {}> = Type<T> | ConstructorResolver<T>;
+export type ConstructorThunk<T = any> = Type<T> | ConstructorResolver<T>;
 
 export type LazyResolver<T> = (options?: Repository.FindAllOptions) => Promise<T>;
 
@@ -146,8 +146,6 @@ export interface EmbeddedTypeOptions {
 }
 
 export interface RelationColumnOptions {
-    keyColumn?: string;
-    targetColumn?: string;
     hasMany?: boolean;
     lazy?: boolean;
 }

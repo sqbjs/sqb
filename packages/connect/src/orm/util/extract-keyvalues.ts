@@ -1,5 +1,5 @@
 import {EntityMeta} from '../metadata/entity-meta';
-import {isColumnElement} from '../metadata/column-element-meta';
+import {isColumnElement} from '../helpers';
 
 export function extractKeyValues<T>(
     entityDef: EntityMeta,

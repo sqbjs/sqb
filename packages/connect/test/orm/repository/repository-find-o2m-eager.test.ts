@@ -1,15 +1,16 @@
 import '../../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
 import {In} from '@sqb/builder';
+import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
-import {Customer} from '@sqb/connect/test/_support/customers.entity';
-import {Continent} from '@sqb/connect/test/_support/continents.entity';
+import {Customer} from '../../_support/customers.entity';
+import {Continent} from '../../_support/continents.entity';
 
 describe('findAll() One-2-Many eager', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should return relation records in array', async function () {
         const repo = client.getRepository<Country>(Country);

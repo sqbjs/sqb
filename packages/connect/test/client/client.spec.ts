@@ -2,13 +2,13 @@
 import '../_support/env';
 import assert from 'assert';
 import {Insert, Param, Select} from '@sqb/builder';
-import '@sqb/postgres';
 import {SqbClient} from '@sqb/connect';
 import {initClient} from '../_support/init-client';
 
 describe('Client', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
     const dialect = 'postgres';
     const insertedIds: any[] = [];
 

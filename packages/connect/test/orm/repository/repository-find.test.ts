@@ -1,7 +1,6 @@
 import '../../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
-import {EntityMeta} from '@sqb/connect';
+import {EntityMeta, SqbClient} from '@sqb/connect';
 import {Eq, Param} from '@sqb/builder';
 import {Customer} from '../../_support/customers.entity';
 import {Country} from '../../_support/countries.entity';
@@ -9,7 +8,8 @@ import {initClient} from '../../_support/init-client';
 
 describe('findAll()', function () {
 
-    const client = initClient()
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should return only data columns if "elements" option is null', async function () {
         const repo = client.getRepository(Customer);
