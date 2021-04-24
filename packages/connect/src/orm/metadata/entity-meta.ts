@@ -1,4 +1,3 @@
-import {isRelationElement, RelationElementMeta} from './relation-element-meta';
 import {DataType, Eq} from '@sqb/builder';
 import {
     IndexOptions,
@@ -8,12 +7,14 @@ import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../consts';
 import {IndexMeta} from './index-meta';
 import {ForeignKeyMeta} from './foreign-key-meta';
-import {ColumnElementMeta, isColumnElement} from './column-element-meta';
-import {EmbeddedElementMeta, isEmbeddedElement} from './embedded-element-meta';
+import {ColumnElementMeta} from './column-element-meta';
+import {EmbeddedElementMeta} from './embedded-element-meta';
+import {RelationElementMeta} from './relation-element-meta';
 import {serializeColumn} from '../util/serialize-element';
 import {FindCommand} from '../commands/find.command';
 import {Repository} from '../repository';
-import {EntityLinkDef} from './entity-link';
+import {EntityChainRing} from './entity-chain-ring';
+import {isColumnElement, isEmbeddedElement, isRelationElement} from '../helpers';
 
 export type ColumnMeta = ColumnElementMeta | EmbeddedElementMeta | RelationElementMeta;
 
@@ -29,7 +30,7 @@ export class EntityMeta {
     foreignKeys: ForeignKeyMeta[] = [];
     eventListeners: { event: string, fn: Function }[] = [];
 
-    constructor(readonly ctor: Function) {
+    constructor(readonly ctor: Type) {
         this.name = ctor.name;
     }
 
@@ -104,11 +105,17 @@ export class EntityMeta {
         return col;
     }
 
-    defineRelationElement(name: string, type: ConstructorThunk | EntityLinkDef<any>,
+    defineRelationElement(name: string, type: ConstructorThunk | EntityChainRing,
                           options?: RelationColumnOptions): RelationElementMeta {
-        if (typeof type !== 'function')
-            throw new Error('"type" argument must be defined');
-        const col = new RelationElementMeta(this, name, type, options);
+        const chain = type instanceof EntityChainRing ? type :
+            new EntityChainRing('', this.ctor, type);
+        let l: EntityChainRing | undefined = chain;
+        let i = 1;
+        while (l) {
+            chain.name = this.name + '.' + name + '(#' + (i++) + ')';
+            l = l.next;
+        }
+        const col = new RelationElementMeta(this, name, chain, options);
         if (!this.elements.has(name.toLowerCase()))
             this.elementKeys.push(name);
         this.elements.set(name.toLowerCase(), col);
@@ -118,12 +125,16 @@ export class EntityMeta {
             const desc = Object.getOwnPropertyDescriptor(this.ctor.prototype, name);
             if (desc)
                 delete this.ctor.prototype[name];
+            const lastLink = col.chain.getLast();
+            let keyCol: ColumnElementMeta;
+            let targetCol: ColumnElementMeta;
+            let targetEntity: EntityMeta;
             this.ctor.prototype[name] = async function (opts?: Repository.FindAllOptions) {
-                const keyCol = await col.foreign.resolveKeyColumn();
+                keyCol = keyCol || await lastLink.resolveSourceColumn();
                 if (this[keyCol.name] == null)
                     return;
-                const targetEntity = await col.foreign.resolveTarget();
-                const targetCol = await col.foreign.resolveTargetColumn();
+                targetEntity = targetEntity || await lastLink.resolveTarget();
+                targetCol = await lastLink.resolveTargetColumn();
 
                 const filter = Eq(targetCol.name, this[keyCol.name]);
                 const connection = this[Symbol.for('connection')];
@@ -233,7 +244,7 @@ export class EntityMeta {
             ctor[ENTITY_DEFINITION_KEY];
     }
 
-    static attachTo(ctor: Function) {
+    static attachTo(ctor: Type) {
         let entity: EntityMeta = this.get(ctor);
         if (entity)
             return entity;

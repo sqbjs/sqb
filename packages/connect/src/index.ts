@@ -25,4 +25,5 @@ export * from './orm/metadata/embedded-element-meta';
 export * from './orm/metadata/relation-element-meta';
 export * from './orm/metadata/foreign-key-meta';
 export * from './orm/metadata/index-meta';
-export * from './orm/metadata/entity-link';
+
+export {isColumnElement, isEmbeddedElement, isRelationElement, isEntityClass} from './orm/helpers';

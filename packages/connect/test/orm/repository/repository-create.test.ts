@@ -1,13 +1,14 @@
-import '@sqb/postgres';
 import assert from 'assert';
 import '../../_support/env';
+import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
 import {Tag} from '../../_support/tags.entity';
 
 describe('create()', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should insert new record and return new values', async function () {
         const values = {
@@ -130,7 +131,8 @@ describe('create()', function () {
 
 describe('createOnly()', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should not generate "returning" sql query for fast execution', async function () {
         return client.acquire(async (connection) => {

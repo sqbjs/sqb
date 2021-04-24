@@ -4,10 +4,6 @@ import {AbstractElementMeta} from './abstract-element-meta';
 import {EntityMeta} from './entity-meta';
 import {resolveEntityMeta} from '../helpers';
 
-export const isEmbeddedElement = (f: any): f is EmbeddedElementMeta => {
-    return !!(f && f instanceof AbstractElementMeta && f.kind === 'embedded');
-}
-
 export class EmbeddedElementMeta extends AbstractElementMeta {
     kind: ElementKind = 'embedded';
     type: ConstructorThunk;

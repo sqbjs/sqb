@@ -9,10 +9,6 @@ import {
 } from '../types';
 import {AbstractElementMeta} from './abstract-element-meta';
 
-export function isColumnElement(f: any): f is ColumnElementMeta {
-    return !!(f && f instanceof AbstractElementMeta && f.kind === 'data');
-}
-
 export class ColumnElementMeta extends AbstractElementMeta {
     readonly kind: ElementKind = 'data';
     fieldName: string;

@@ -12,7 +12,7 @@ import {
     FieldName,
     NoUpdate,
     Parse,
-    Serialize, NoInsert, HasOneLazy, NotNull, HasMany, EntityLink,
+    Serialize, NoInsert, HasOneLazy, NotNull, HasMany, EntityChain,
 } from '@sqb/connect';
 import {Country} from './countries.entity';
 import {PersonName} from '../_support/person-name.entity';
@@ -80,21 +80,13 @@ export class Customer extends BaseEntity<Customer> {
 
     @Column({defaultValue: true})
     active: boolean;
-/*
+
     @HasMany(
-       /* JoinEntity(CustomerTag, {
-            link: {'CustomerTag.id': 'Customer.id'},
-            conditions: {'CustomerTag.deleted': false}
-        }),
-        JoinEntity(CustomerTag).as('ct').on(
-            'Customer.id=ct.customerId',
-            {'ct.active': true})
-        ),* /
-        JoinEntity(Tag)
-            //.link('id', 'Tag.id')
-           // .filter('ct.active': true)
+        EntityChain(CustomerTag).link('customerId', 'id')
+            .ifTarget({deleted: false})
+            .chain(Tag, 'id', 'tagId')
+            .ifTarget({active: true})
     )
-    @HasMany(Tag, {through: CustomerTag})
     readonly tags?: Tag[];
-*/
+
 }

@@ -1,12 +1,13 @@
 import '../../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
+import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
 
 describe('destroy()', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should delete single record (key value as argument)', async function () {
         const values = {
@@ -66,7 +67,8 @@ describe('destroy()', function () {
 
 describe('destroyAll()', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should delete multiple records by filter', async function () {
         const values = {

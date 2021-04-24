@@ -1,13 +1,14 @@
 import '../../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
 import {Eq} from '@sqb/builder';
+import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
 
 describe('findAll() One-2-Many lazy', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
     it('should resolve records async', async function () {
         const repo = client.getRepository<Country>(Country);

@@ -1,5 +1,3 @@
-import '@sqb/postgres';
-
 import {Injectable} from '@nestjs/common';
 import {SqbClient} from '@sqb/connect';
 import {InjectConnection} from '@sqb/nestjs';

@@ -1,8 +1,11 @@
 import 'reflect-metadata';
-import {EntityMeta} from './metadata/entity-meta';
-import {ConstructorResolver, ConstructorThunk} from './types';
+import type {ConstructorResolver, ConstructorThunk} from './types';
+import type {Type} from '../types';
+import type {EntityMeta} from './metadata/entity-meta';
+import type {ColumnElementMeta} from './metadata/column-element-meta';
+import type {EmbeddedElementMeta} from './metadata/embedded-element-meta';
+import type {RelationElementMeta} from './metadata/relation-element-meta';
 import {ENTITY_DEFINITION_KEY} from './consts';
-import {Type} from '../types';
 
 export function isClass(fn: any): fn is Type {
     return typeof fn === 'function' && /^\s*class/.test(fn.toString());
@@ -10,6 +13,18 @@ export function isClass(fn: any): fn is Type {
 
 export function isEntityClass(fn: any): fn is Type {
     return !!(isClass(fn) && fn[ENTITY_DEFINITION_KEY]);
+}
+
+export function isColumnElement(f: any): f is ColumnElementMeta {
+    return !!(f && f.entity && f.kind === 'data');
+}
+
+export const isEmbeddedElement = (f: any): f is EmbeddedElementMeta => {
+    return !!(f && f.entity && f.kind === 'embedded');
+}
+
+export const isRelationElement = (f: any): f is RelationElementMeta => {
+    return !!(f && f.entity && f.kind === 'relation');
 }
 
 export async function resolveEntity(ctorThunk: ConstructorThunk): Promise<Type | undefined> {
@@ -22,6 +37,7 @@ export async function resolveEntity(ctorThunk: ConstructorThunk): Promise<Type |
 }
 
 export async function resolveEntityMeta(ctorThunk: ConstructorThunk): Promise<EntityMeta | undefined> {
-    const entity = await resolveEntity(ctorThunk);
-    return entity && EntityMeta.get(entity);
+    const ctor = await resolveEntity(ctorThunk);
+    return ctor && ctor.hasOwnProperty(ENTITY_DEFINITION_KEY) &&
+        ctor[ENTITY_DEFINITION_KEY];
 }

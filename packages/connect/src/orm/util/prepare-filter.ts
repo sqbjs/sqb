@@ -1,11 +1,10 @@
 import {
-    And, Eq, Exists, isCompOperator, isLogicalOperator,
+    And, Eq, Exists, isCompOperator, isLogicalOperator, LeftOuterJoin,
     LogicalOperator, Raw, Select
 } from '@sqb/builder';
 import {EntityMeta} from '../metadata/entity-meta';
-import {isRelationElement} from '../metadata/relation-element-meta';
-import {isColumnElement} from '../metadata/column-element-meta';
-import {isEmbeddedElement} from '../metadata/embedded-element-meta';
+import {isColumnElement, isEmbeddedElement, isRelationElement} from '../helpers';
+import {EntityChainRing} from '../metadata/entity-chain-ring';
 
 export async function prepareFilter(
     entityDef: EntityMeta,
@@ -55,13 +54,30 @@ export async function prepareFilter(
                         }
                         if (!isRelationElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
-                        const targetEntity = await col.foreign.resolveTarget();
                         const trgAlias = 'E' + (i + 1);
+                        let chainRing = col.chain;
+                        let targetEntity = await chainRing.resolveTarget();
                         const select = Select(Raw('1'))
                             .from(targetEntity.tableName + ' ' + trgAlias);
+                        let joinIdx = 1;
+                        let parentAlias = trgAlias;
+                        while (chainRing.next) {
+                            chainRing = chainRing.next;
+                            targetEntity = await chainRing.resolveTarget();
+                            const sourceColumn = await chainRing.resolveSourceColumn();
+                            const targetColumn = await chainRing.resolveTargetColumn();
+                            const joinAlias = 'J' + (joinIdx++);
+                            select.join(
+                                LeftOuterJoin(targetEntity.tableName + ' ' + joinAlias)
+                                    .on(Eq(joinAlias + '.' + targetColumn.fieldName,
+                                        Raw(parentAlias + '.' + sourceColumn.fieldName)))
+                            )
+                            parentAlias = joinAlias;
+                        }
+
                         trgOp.add(Exists(select));
-                        const keyCol = await col.foreign.resolveKeyColumn();
-                        const targetCol = await col.foreign.resolveTargetColumn();
+                        const keyCol = await col.chain.resolveSourceColumn();
+                        const targetCol = await col.chain.resolveTargetColumn();
                         select.where(
                             Eq(trgAlias + '.' + targetCol.fieldName,
                                 Raw(_tableAlias + '.' + keyCol.fieldName))

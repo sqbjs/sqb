@@ -1,7 +1,7 @@
 import '../../_support/env';
-import '@sqb/postgres';
 import assert from 'assert';
 import {Eq} from '@sqb/builder';
+import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
 
@@ -9,12 +9,13 @@ function toJSON(obj: any): any {
     return JSON.parse(JSON.stringify(obj));
 }
 
-describe('findAll() One-2-One eager', function () {
+describe('findAll() One-to-One eager', function () {
 
-    const client = initClient();
+    let client: SqbClient;
+    before(() => client = initClient());
 
-    it('should return relation record', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+    it('should return related instance', async function () {
+        const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             filter: [Eq('id', 1)],
             elements: ['id', 'countryCode', 'country']
@@ -31,8 +32,8 @@ describe('findAll() One-2-One eager', function () {
         });
     });
 
-    it('should return related record deeper', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+    it('should return only requested sub elements', async function () {
+        const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             filter: [Eq('id', 1)],
             elements: ['id', 'country.code', 'country.continent']
@@ -50,7 +51,7 @@ describe('findAll() One-2-One eager', function () {
     });
 
     it('should filter by relation column', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             elements: ['id', 'countryCode'],
             filter: Eq('country.continent.code', 'AM')
@@ -61,7 +62,7 @@ describe('findAll() One-2-One eager', function () {
     });
 
     it('should use "exists" when filtering by relation column', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client.getRepository(Customer);
         let request: any = {};
         client.once('execute', (req => request = req));
         await repo.findAll({
@@ -74,25 +75,8 @@ describe('findAll() One-2-One eager', function () {
         assert.deepStrictEqual(request.params, ['AM']);
     });
 
-    it('should specify returning columns', async function () {
-        const repo = client.getRepository<Customer>(Customer);
-        const rows = await repo.findAll({
-            filter: [Eq('id', 1)],
-            elements: ['id', 'countryCode', 'country.code', 'country.phoneCode']
-        });
-        assert.ok(rows);
-        assert.ok(rows.length);
-        assert.strictEqual(rows[0].id, 1);
-        assert.strictEqual(rows[0].countryCode, 'US');
-        assert.deepStrictEqual(toJSON(rows[0].country), {
-                code: 'US',
-                phoneCode: '+1'
-            }
-        );
-    });
-
     it('should order by o2o relation column', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             elements: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
             sort: ['country.code']

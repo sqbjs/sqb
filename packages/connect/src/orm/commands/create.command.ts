@@ -1,8 +1,7 @@
 import {Insert, Param} from '@sqb/builder';
 import type {QueryExecutor} from '../../client/types';
 import type {EntityMeta} from '../metadata/entity-meta';
-import {isColumnElement} from '../metadata/column-element-meta';
-import {isEmbeddedElement} from '../metadata/embedded-element-meta';
+import {isColumnElement, isEmbeddedElement} from '../helpers';
 
 export type CreateCommandArgs = {
     entity: EntityMeta;
