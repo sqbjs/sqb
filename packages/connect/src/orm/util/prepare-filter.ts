@@ -3,8 +3,8 @@ import {
     LogicalOperator, Raw, Select
 } from '@sqb/builder';
 import {EntityMeta} from '../metadata/entity-meta';
-import {isColumnElement, isEmbeddedElement, isRelationElement} from '../helpers';
-import {EntityChainRing} from '../metadata/entity-chain-ring';
+import {isColumnElement, isEmbeddedElement, isAssociationElement} from '../helpers';
+import {AssociationNode} from '../metadata/association-node';
 
 export async function prepareFilter(
     entityDef: EntityMeta,
@@ -52,10 +52,10 @@ export async function prepareFilter(
                             _entityDef = await col.resolveType();
                             continue;
                         }
-                        if (!isRelationElement(col))
+                        if (!isAssociationElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
                         const trgAlias = 'E' + (i + 1);
-                        let chainRing = col.chain;
+                        let chainRing = col.association;
                         let targetEntity = await chainRing.resolveTarget();
                         const select = Select(Raw('1'))
                             .from(targetEntity.tableName + ' ' + trgAlias);
@@ -76,8 +76,8 @@ export async function prepareFilter(
                         }
 
                         trgOp.add(Exists(select));
-                        const keyCol = await col.chain.resolveSourceColumn();
-                        const targetCol = await col.chain.resolveTargetColumn();
+                        const keyCol = await col.association.resolveSourceColumn();
+                        const targetCol = await col.association.resolveTargetColumn();
                         select.where(
                             Eq(trgAlias + '.' + targetCol.fieldName,
                                 Raw(_tableAlias + '.' + keyCol.fieldName))

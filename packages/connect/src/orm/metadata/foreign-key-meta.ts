@@ -1,14 +1,14 @@
 import {ConstructorThunk, ForeignKeyOptions} from '../types';
 import {EntityMeta} from './entity-meta';
-import {Association} from '../association';
+import {AssociationResolver} from '../association-resolver';
 
 export class ForeignKeyMeta {
-    association: Association;
+    association: AssociationResolver;
     name?: string;
 
     constructor(readonly entity: EntityMeta, target: ConstructorThunk, display: string,
                 options?: ForeignKeyOptions) {
-        this.association = new Association(display, entity.ctor, target,
+        this.association = new AssociationResolver(display, entity.ctor, target,
             options?.keyColumn, options?.targetColumn);
         this.name = options?.name;
     }

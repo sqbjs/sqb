@@ -19,7 +19,7 @@ export class Customer2 {
 
 }
 
-let client: SqbClient;
+let client: () => SqbClient;
 const ids: number[] = [];
 
 const createCustomer = async function (values?: any): Promise<Customer> {
@@ -29,7 +29,7 @@ const createCustomer = async function (values?: any): Promise<Customer> {
         countryCode: 'TR',
         ...values
     }
-    const repo = client.getRepository(Customer);
+    const repo = client().getRepository(Customer);
     return await repo.create(v);
 }
 
@@ -41,7 +41,7 @@ describe('update()', function () {
         const old = await createCustomer();
         ids.push(old.id);
 
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         const updated = await repo.update({
             id: ids[0],
@@ -64,9 +64,9 @@ describe('update()', function () {
         const customer = await createCustomer();
         ids.push(customer.id);
 
-        const repo = client.getRepository(Customer2);
+        const repo = client().getRepository(Customer2);
         let sql = '';
-        client.once('execute', request => {
+        client().once('execute', request => {
             sql = request.sql;
         });
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -91,7 +91,7 @@ describe('update()', function () {
         const old = await createCustomer();
         ids.push(old.id);
 
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         const updated = await repo.update({
             id: ids[0],
@@ -106,7 +106,7 @@ describe('update()', function () {
     });
 
     it('should work within transaction', async function () {
-        return client.acquire(async (connection) => {
+        return client().acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
             const c1 = await repo.findByPk(ids[0]);
             assert.ok(c1);
@@ -127,13 +127,13 @@ describe('update()', function () {
     });
 
     it('should check enum value', async function () {
-        const repo = client.getRepository(Tag);
+        const repo = client().getRepository(Tag);
         await assert.rejects(() => repo.update({id: 1, name: 'small', color: 'pink'}),
             /value must be one of/);
     });
 
     it('should column is required', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         await assert.rejects(() => repo.update({id: 1, countryCode: null}),
             /is required/);
     });
@@ -146,7 +146,7 @@ describe('updateOnly()', function () {
     client = initClient();
 
     it('should return "true" if update success', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         let success = await repo.updateOnly({
             id: ids[0],
@@ -167,7 +167,7 @@ describe('updateOnly()', function () {
     });
 
     it('should not fetch after update for fast execution', async function () {
-        return client.acquire(async (connection) => {
+        return client().acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
             let sql = '';
             connection.on('execute', req => {
@@ -182,7 +182,7 @@ describe('updateOnly()', function () {
     });
 
     it('should map embedded elements into fields', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const newName = {given: 'G' + Math.trunc(Math.random() * 10000)};
         const c1 = await repo.update({
             id: ids[0],
@@ -212,7 +212,7 @@ describe('updateAll()', function () {
             const customer = await createCustomer({city: oldCity});
             ids.push(customer.id);
         }
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const newCity = 'C' + Math.trunc(Math.random() * 10000);
         const count = await repo.updateAll({city: newCity}, {filter: In('id', ids)});
         assert.strictEqual(count, ids.length);

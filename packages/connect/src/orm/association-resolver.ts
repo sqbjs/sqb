@@ -4,29 +4,32 @@ import {isColumnElement, resolveEntityMeta} from './helpers';
 import type {EntityMeta} from './metadata/entity-meta';
 import type {ColumnElementMeta} from './metadata/column-element-meta';
 
-export class Association {
-    private _keyColumn?: string | null; // cached value for auto determined keyColumn
-    private _targetColumn?: string | null; // cached value for auto determined targetColumn
+export class AssociationResolver {
+    private _sourceColumn?: string | null; // cached value
+    private _targetColumn?: string | null; // cached value
+    private _source?: EntityMeta;  // cached value
+    private _target?: EntityMeta;  // cached value
 
     constructor(public name: string,
                 public source: ConstructorThunk,
                 public target: ConstructorThunk,
                 public sourceColumn?: string,
-                public targetColumn?: string) {
+                public targetColumn?: string,
+                private _inverse?: boolean) {
     }
 
     async resolveSource(): Promise<EntityMeta> {
-        const source = await resolveEntityMeta(this.source);
-        if (source)
-            return source;
-        throw new Error(`Can't resolve source entity of "${this.name}`);
+        this._source = this._source || await resolveEntityMeta(this.source);
+        if (!this._source)
+            throw new Error(`Can't resolve source entity of association "${this.name}"`);
+        return this._source;
     }
 
     async resolveTarget(): Promise<EntityMeta> {
-        const target = await resolveEntityMeta(this.target);
-        if (target)
-            return target;
-        throw new Error(`Can't resolve target entity of "${this.name}`);
+        this._target = this._target || await resolveEntityMeta(this.target);
+        if (!this._target)
+            throw new Error(`Can't resolve target entity of association "${this.name}"`);
+        return this._target;
     }
 
     async resolveSourceColumn(): Promise<ColumnElementMeta> {
@@ -34,18 +37,18 @@ export class Association {
         const n = await this.resolveSourceColumnName();
         const col = source.getElement(n);
         if (!col)
-            throw new Error(`Can't resolve keyColumn of ${this.name}. ` +
+            throw new Error(`Can't resolve link source column of ${this.name}. ` +
                 `${source.name} has no element named "${n}"`);
         if (!isColumnElement(col))
-            throw new Error(`Can't resolve keyColumn of ${this.name}. ` +
+            throw new Error(`Can't resolve link source column of ${this.name}. ` +
                 `${source.name}.${n} is not a data column`);
         return col;
     }
 
     async resolveSourceColumnName(): Promise<string> {
-        let keyColumn = this.sourceColumn || this._keyColumn;
-        if (keyColumn)
-            return keyColumn;
+        let sourceColumn = this.sourceColumn || this._sourceColumn;
+        if (sourceColumn)
+            return sourceColumn;
         const source = await this.resolveSource();
         const target = await this.resolveTarget();
 
@@ -55,8 +58,8 @@ export class Association {
                 continue;
             const trg = await fk.association.resolveTarget();
             if (trg && trg.ctor === target.ctor) {
-                keyColumn = await fk.association.resolveSourceColumnName();
-                return this._keyColumn = keyColumn;
+                sourceColumn = await fk.association.resolveSourceColumnName();
+                return this._sourceColumn = sourceColumn;
             }
         }
 
@@ -64,8 +67,8 @@ export class Association {
         for (const fk of target.foreignKeys) {
             const trg = await fk.association.resolveTarget();
             if (trg && trg.ctor === source.ctor) {
-                keyColumn = await fk.association.resolveTargetColumnName();
-                return this._keyColumn = keyColumn;
+                sourceColumn = await fk.association.resolveTargetColumnName();
+                return this._sourceColumn = sourceColumn;
             }
         }
 
@@ -75,14 +78,14 @@ export class Association {
             primaryIndex.columns[0] : 'id';
 
         // snake-case
-        keyColumn = target.name[0].toLowerCase() + target.name.substring(1) + '_' + idColumn;
-        if (source.getColumnElement(keyColumn))
-            return this._keyColumn = keyColumn;
-        keyColumn = camelCase(keyColumn);
-        if (source.getColumnElement(keyColumn))
-            return this._keyColumn = keyColumn;
+        sourceColumn = target.name[0].toLowerCase() + target.name.substring(1) + '_' + idColumn;
+        if (source.getColumnElement(sourceColumn))
+            return this._sourceColumn = sourceColumn;
+        sourceColumn = camelCase(sourceColumn);
+        if (source.getColumnElement(sourceColumn))
+            return this._sourceColumn = sourceColumn;
 
-        throw new Error(`Can't detect keyColumn of ${this.name}`);
+        throw new Error(`Can't detect link source column of ${this.name}`);
     }
 
     async resolveTargetColumn(): Promise<ColumnElementMeta> {

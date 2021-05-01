@@ -1,9 +1,10 @@
 import type {AbstractElementMeta} from './metadata/abstract-element-meta';
-import type {Repository} from './repository';
 import {DataType, Type} from '..';
 
 /* Model related */
 export type ElementKind = 'data' | 'relation' | 'embedded';
+
+export type AssociationKind = 'has-one' | 'has-many' | 'belongs-to' | 'belongs-to-many';
 
 /**
  * Indicates auto generation strategy
@@ -15,8 +16,6 @@ export type ColumnTransformFunction = (value: any, col: AbstractElementMeta, row
 
 export type ConstructorResolver<T> = () => Type<T> | Promise<Type<T>>;
 export type ConstructorThunk<T = any> = Type<T> | ConstructorResolver<T>;
-
-export type LazyResolver<T> = (options?: Repository.FindAllOptions) => Promise<T>;
 
 export type EnumValue = (FieldValue)[] | Object;
 
@@ -143,11 +142,6 @@ export interface ColumnOptions {
 export interface EmbeddedTypeOptions {
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;
-}
-
-export interface RelationColumnOptions {
-    hasMany?: boolean;
-    lazy?: boolean;
 }
 
 export interface RelationLink {

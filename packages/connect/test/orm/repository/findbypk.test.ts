@@ -1,17 +1,15 @@
 import '../../_support/env';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
 import {CustomerTag} from '../../_support/customer-tags.entity';
 
 describe('findByPk()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return single instance by key value', async function () {
-        const repo = client.getRepository<Country>(Country);
+        const repo = client().getRepository<Country>(Country);
         const row = await repo.findByPk('TR');
         assert.ok(row);
         assert.strictEqual(row.code, 'TR');
@@ -19,7 +17,7 @@ describe('findByPk()', function () {
     });
 
     it('should return single instance by object instance', async function () {
-        const repo = client.getRepository<Country>(Country);
+        const repo = client().getRepository<Country>(Country);
         const row = await repo.findByPk({code: 'TR'});
         assert.ok(row);
         assert.strictEqual(row.code, 'TR');
@@ -27,7 +25,7 @@ describe('findByPk()', function () {
     });
 
     it('should return instance from multi-key entities', async function () {
-        const repo = client.getRepository<CustomerTag>(CustomerTag);
+        const repo = client().getRepository<CustomerTag>(CustomerTag);
         const row = await repo.findByPk({customerId: 1, tagId: 1});
         assert.ok(row);
         assert.strictEqual(row.customerId, 1);

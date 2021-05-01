@@ -1,6 +1,6 @@
 import '../../_support/env';
 import assert from 'assert';
-import {EntityMeta, SqbClient} from '@sqb/connect';
+import {EntityMeta} from '@sqb/connect';
 import {Eq, Param} from '@sqb/builder';
 import {Customer} from '../../_support/customers.entity';
 import {Country} from '../../_support/countries.entity';
@@ -8,11 +8,10 @@ import {initClient} from '../../_support/init-client';
 
 describe('findAll()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should return only data columns if "elements" option is null', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows.length);
@@ -23,7 +22,7 @@ describe('findAll()', function () {
     });
 
     it('should return embedded elements', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows.length);
@@ -33,7 +32,7 @@ describe('findAll()', function () {
     });
 
     it('should return embedded sub elements', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({limit: 1, elements: ['name.given']});
         assert.ok(rows);
         assert.ok(rows.length);
@@ -42,7 +41,7 @@ describe('findAll()', function () {
     });
 
     it('should return requested elements if "elements" option set', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,
             elements: ['id', 'givenName']
@@ -52,7 +51,7 @@ describe('findAll()', function () {
     });
 
     it('should return data columns plus elements specified in "include" option', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             limit: 1,
             include: ['country']
@@ -64,7 +63,7 @@ describe('findAll()', function () {
     });
 
     it('should exclude returning elements specified in "exclude" option', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             limit: 1,
             include: ['country'],
@@ -79,7 +78,7 @@ describe('findAll()', function () {
     });
 
     it('should exclude hidden elements', async function () {
-        const repo = client.getRepository(Country);
+        const repo = client().getRepository(Country);
         let rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows[0].phoneCode);
@@ -92,7 +91,7 @@ describe('findAll()', function () {
     });
 
     it('should filter with Operator', async function () {
-        const repo = client.getRepository<Country>(Country);
+        const repo = client().getRepository<Country>(Country);
         const rows = await repo.findAll({filter: Eq('continentCode', 'AM')});
         assert.strictEqual(rows.length, 2);
         assert.strictEqual(rows[0].code, 'CA');
@@ -100,7 +99,7 @@ describe('findAll()', function () {
     });
 
     it('should filter with plain object', async function () {
-        const repo = client.getRepository<Country>(Country);
+        const repo = client().getRepository<Country>(Country);
         const rows = await repo.findAll({filter: {continentCode: 'AM'}});
         assert.strictEqual(rows.length, 2);
         assert.strictEqual(rows[0].code, 'CA');
@@ -108,7 +107,7 @@ describe('findAll()', function () {
     });
 
     it('should filter if field name different than property name', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             filter: {
                 givenName: Param('givenName'),
@@ -123,7 +122,7 @@ describe('findAll()', function () {
     });
 
     it('should filter by embedded sub element', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             filter: {
                 'name.given': Param('givenName'),
@@ -138,7 +137,7 @@ describe('findAll()', function () {
     });
 
     it('should limit result rows', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             sort: ['id'],
             limit: 5
@@ -150,7 +149,7 @@ describe('findAll()', function () {
     });
 
     it('should start from given offset', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             sort: ['id'],
             limit: 5,
@@ -163,7 +162,7 @@ describe('findAll()', function () {
     });
 
     it('should sort result rows', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({sort: ['-id']});
         const arr1 = rows.map(x => x.id);
         const arr2 = [...arr1];
@@ -172,14 +171,14 @@ describe('findAll()', function () {
     });
 
     it('should sort by data columns only ', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         return assert.rejects(() =>
                 repo.findAll({sort: ['country']}),
             /Can not sort by/);
     });
 
     it('should sort by embedded sub element', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({sort: ['name.given', 'name.family']});
         const arr1 = rows.map(x => x.name.given);
         const arr2 = [...arr1];
@@ -194,7 +193,7 @@ describe('findAll()', function () {
     });
 
     it('should return distinct results', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({
             elements: ['countryCode'],
             distinct: true
@@ -207,7 +206,7 @@ describe('findAll()', function () {
     });
 
     it('should apply "parse"', async function () {
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const rows = await repo.findAll({sort: ['id'], limit: 10});
         assert.strictEqual(rows[0].gender, 'Male');
         assert.strictEqual(rows[1].gender, 'Female');

@@ -63,6 +63,17 @@ BEFORE UPDATE ON ${schema}.customers
 FOR EACH ROW
 EXECUTE PROCEDURE trigger_set_updated_at();
 
+CREATE TABLE ${schema}.customer_details
+(
+    customer_id int4,
+    notes character varying(256),
+    alerts character varying(256),    
+    CONSTRAINT customer_details_pkey PRIMARY KEY (customer_id),
+    CONSTRAINT fk_customer_details_id FOREIGN KEY (customer_id)
+        REFERENCES ${schema}.customers (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
 
 CREATE TABLE ${schema}.tags
 (

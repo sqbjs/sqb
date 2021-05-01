@@ -1,0 +1,32 @@
+{
+  "name": "customer_details",
+  "fields": [
+    {
+      "fieldName": "customer_id",
+      "dataType": "integer",
+      "jsType": "number"
+    },
+    {
+      "fieldName": "notes",
+      "dataType": "varchar",
+      "jsType": "string"
+    },
+    {
+      "fieldName": "alerts",
+      "dataType": "varchar",
+      "jsType": "string"
+    }
+  ],
+  "rows": [
+    {
+      "customer_id": 1,
+      "notes": "test note 1",
+      "alerts": "test alert 1"
+    },
+    {
+      "customer_id": 2,
+      "notes": "test note 2",
+      "alerts": "test alert 2"
+    }
+  ]
+}

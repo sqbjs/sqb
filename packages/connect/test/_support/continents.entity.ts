@@ -1,4 +1,4 @@
-import {Column, Entity, HasMany, PrimaryKey} from '@sqb/connect';
+import {Column, Entity, PrimaryKey, HasMany} from '@sqb/connect';
 import type {Country} from './countries.entity';
 
 @Entity('continents')

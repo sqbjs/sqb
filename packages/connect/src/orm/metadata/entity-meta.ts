@@ -1,7 +1,7 @@
-import {DataType, Eq} from '@sqb/builder';
+import {DataType} from '@sqb/builder';
 import {
     IndexOptions,
-    ConstructorThunk, ForeignKeyOptions, RelationColumnOptions, ColumnOptions,
+    ConstructorThunk, ForeignKeyOptions, AssociationElementOptions, ColumnOptions,
 } from '../types';
 import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../consts';
@@ -9,14 +9,12 @@ import {IndexMeta} from './index-meta';
 import {ForeignKeyMeta} from './foreign-key-meta';
 import {ColumnElementMeta} from './column-element-meta';
 import {EmbeddedElementMeta} from './embedded-element-meta';
-import {RelationElementMeta} from './relation-element-meta';
+import {AssociationElementMeta} from './association-element-meta';
 import {serializeColumn} from '../util/serialize-element';
-import {FindCommand} from '../commands/find.command';
-import {Repository} from '../repository';
-import {EntityChainRing} from './entity-chain-ring';
-import {isColumnElement, isEmbeddedElement, isRelationElement} from '../helpers';
+import {AssociationNode} from './association-node';
+import {isColumnElement, isEmbeddedElement, isAssociationElement} from '../helpers';
 
-export type ColumnMeta = ColumnElementMeta | EmbeddedElementMeta | RelationElementMeta;
+export type ColumnMeta = ColumnElementMeta | EmbeddedElementMeta | AssociationElementMeta;
 
 export class EntityMeta {
     name: string;
@@ -57,11 +55,11 @@ export class EntityMeta {
         }
     }
 
-    getRelationElement(name: string): Maybe<RelationElementMeta> {
+    getAssociationElement(name: string): Maybe<AssociationElementMeta> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
-        return isRelationElement(col) ? col : undefined;
+        return isAssociationElement(col) ? col : undefined;
     }
 
     getEmbeddedElement(name: string): Maybe<EmbeddedElementMeta> {
@@ -105,49 +103,17 @@ export class EntityMeta {
         return col;
     }
 
-    defineRelationElement(name: string, type: ConstructorThunk | EntityChainRing,
-                          options?: RelationColumnOptions): RelationElementMeta {
-        const chain = type instanceof EntityChainRing ? type :
-            new EntityChainRing('', this.ctor, type);
-        let l: EntityChainRing | undefined = chain;
+    defineAssociationElement(name: string, association: AssociationNode): AssociationElementMeta {
+        const col = new AssociationElementMeta(this, name, association);
+        let l: AssociationNode | undefined = association;
         let i = 1;
         while (l) {
-            chain.name = this.name + '.' + name + '(#' + (i++) + ')';
+            l.name = this.name + '.' + name + '#' + (i++) + ')';
             l = l.next;
         }
-        const col = new RelationElementMeta(this, name, chain, options);
         if (!this.elements.has(name.toLowerCase()))
             this.elementKeys.push(name);
         this.elements.set(name.toLowerCase(), col);
-
-        if (options?.lazy) {
-            // Set lazy resolver function to prototype
-            const desc = Object.getOwnPropertyDescriptor(this.ctor.prototype, name);
-            if (desc)
-                delete this.ctor.prototype[name];
-            const lastLink = col.chain.getLast();
-            let keyCol: ColumnElementMeta;
-            let targetCol: ColumnElementMeta;
-            let targetEntity: EntityMeta;
-            this.ctor.prototype[name] = async function (opts?: Repository.FindAllOptions) {
-                keyCol = keyCol || await lastLink.resolveSourceColumn();
-                if (this[keyCol.name] == null)
-                    return;
-                targetEntity = targetEntity || await lastLink.resolveTarget();
-                targetCol = await lastLink.resolveTargetColumn();
-
-                const filter = Eq(targetCol.name, this[keyCol.name]);
-                const connection = this[Symbol.for('connection')];
-                const r = await FindCommand.execute({
-                    connection,
-                    ...opts,
-                    entity: targetEntity,
-                    filter: opts?.filter ? [filter, opts?.filter] : filter,
-                });
-                return col.hasMany ? r : r[0];
-            }
-        }
-
         return col;
     }
 

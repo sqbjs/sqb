@@ -2,7 +2,7 @@
 import '../../_support/env';
 import * as assert from 'assert';
 import {Column, ForeignIndex, PrimaryKey} from '@sqb/connect';
-import {Association} from '@sqb/connect/src/orm/association';
+import {AssociationResolver} from '../../../src/orm/association-resolver';
 
 class Country {
     @PrimaryKey()
@@ -22,46 +22,46 @@ class Customer {
     countryCode: string;
 }
 
-describe('Association', function () {
+describe('AssociationResolver', function () {
 
     it(`should resolve source entity (entity class)`, async () => {
-        const association = new Association('', Customer, Country);
+        const association = new AssociationResolver('', Customer, Country);
         const target = await association.resolveSource();
         assert.strictEqual(target.ctor, Customer);
     });
 
     it(`should resolve target entity (entity class)`, async () => {
-        const association = new Association('', () => Customer, () => Country);
+        const association = new AssociationResolver('', () => Customer, () => Country);
         const target = await association.resolveTarget();
         assert.strictEqual(target.ctor, Country);
     });
 
     it(`should resolve source entity (entity class resolver function)`, async () => {
-        const association = new Association('', () => Customer, () => Country);
+        const association = new AssociationResolver('', () => Customer, () => Country);
         const target = await association.resolveSource();
         assert.strictEqual(target.ctor, Customer);
     });
 
     it(`should resolve target entity (entity class resolver function)`, async () => {
-        const association = new Association('', () => Customer, () => Country);
+        const association = new AssociationResolver('', () => Customer, () => Country);
         const target = await association.resolveTarget();
         assert.strictEqual(target.ctor, Country);
     });
 
     it(`should resolve source entity (async entity class resolver function)`, async () => {
-        const association = new Association('', async () => Customer, async () => Country);
+        const association = new AssociationResolver('', async () => Customer, async () => Country);
         const target = await association.resolveSource();
         assert.strictEqual(target.ctor, Customer);
     });
 
     it(`should resolve target entity (async entity class resolver function)`, async () => {
-        const association = new Association('', async () => Customer, async () => Country);
+        const association = new AssociationResolver('', async () => Customer, async () => Country);
         const target = await association.resolveTarget();
         assert.strictEqual(target.ctor, Country);
     });
 
     it(`should determine sourceColumn from target's primary index (camel-case)`, async () => {
-        const association = new Association('', Customer, Country);
+        const association = new AssociationResolver('', Customer, Country);
         assert.strictEqual(await association.resolveSourceColumnName(), 'countryCode');
     });
 
@@ -72,12 +72,12 @@ describe('Association', function () {
             country_code: string;
         }
 
-        const association = new Association('', Customer2, Country);
+        const association = new AssociationResolver('', Customer2, Country);
         assert.strictEqual(await association.resolveSourceColumnName(), 'country_code');
     });
 
     it(`should determine targetColumn using target's primary index`, async () => {
-        const association = new Association('', Customer, Country);
+        const association = new AssociationResolver('', Customer, Country);
         assert.strictEqual(await association.resolveTargetColumnName(), 'code');
     });
 
@@ -94,7 +94,7 @@ describe('Association', function () {
 
         }
 
-        const association = new Association('', Customer2, CustomerPhone);
+        const association = new AssociationResolver('', Customer2, CustomerPhone);
         assert.strictEqual(await association.resolveSourceColumnName(), 'id');
         assert.strictEqual(await association.resolveTargetColumnName(), 'idOfCustomer');
     });
@@ -106,7 +106,7 @@ describe('Association', function () {
             countryCode: string;
         }
 
-        const association = new Association('', Customer2, Country);
+        const association = new AssociationResolver('', Customer2, Country);
         assert.strictEqual(await association.resolveSourceColumnName(), 'countryCode');
     });
 
@@ -117,7 +117,7 @@ describe('Association', function () {
             countryCode: string;
         }
 
-        const association = new Association('', Customer2, Country);
+        const association = new AssociationResolver('', Customer2, Country);
         assert.strictEqual(await association.resolveTargetColumnName(), 'code');
     });
 });
