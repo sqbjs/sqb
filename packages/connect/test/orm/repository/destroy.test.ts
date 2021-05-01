@@ -1,13 +1,11 @@
 import '../../_support/env';
 import assert from 'assert';
-import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
 
 describe('destroy()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should delete single record (key value as argument)', async function () {
         const values = {
@@ -15,7 +13,7 @@ describe('destroy()', function () {
             familyName: 'F' + Math.trunc(Math.random() * 10000),
             countryCode: 'TR'
         }
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const c = await repo.count();
         const customer = await repo.create(values);
         let c2 = await repo.count();
@@ -31,7 +29,7 @@ describe('destroy()', function () {
             familyName: 'F' + Math.trunc(Math.random() * 10000),
             countryCode: 'TR'
         }
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const c = await repo.count();
         const customer = await repo.create(values);
         let c2 = await repo.count();
@@ -43,7 +41,7 @@ describe('destroy()', function () {
 
     it('should execute in transaction', async function () {
         let c = 0;
-        return client.acquire(async (connection) => {
+        return client().acquire(async (connection) => {
             const values = {
                 givenName: 'abc',
                 familyName: 'def',
@@ -67,8 +65,7 @@ describe('destroy()', function () {
 
 describe('destroyAll()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should delete multiple records by filter', async function () {
         const values = {
@@ -77,7 +74,7 @@ describe('destroyAll()', function () {
             countryCode: 'US',
             city: 'unknown'
         }
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const c = await repo.count();
         await repo.createOnly(values);
         await repo.createOnly(values);

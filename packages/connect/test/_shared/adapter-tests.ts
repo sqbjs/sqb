@@ -390,7 +390,8 @@ export function getInsertSQLsForTestData(opts?: {
     const result: { table: string, scripts: string[] }[] = [];
     const repositoryRoot = path.resolve(__dirname, '../../../..');
 
-    const dataFiles: any[] = ['continents', 'countries', 'customers', 'tags', 'customer_tags'].map(f =>
+    const dataFiles: any[] = ['continents', 'countries', 'customers',
+        'customer_details', 'tags', 'customer_tags'].map(f =>
         JSON.parse(fs.readFileSync(
             path.join(repositoryRoot, 'support/test-data', f + '.json'), 'utf8')));
 

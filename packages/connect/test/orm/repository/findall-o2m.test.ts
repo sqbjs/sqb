@@ -1,25 +1,23 @@
 import '../../_support/env';
 import assert from 'assert';
 import {In} from '@sqb/builder';
-import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/countries.entity';
 import {initClient} from '../../_support/init-client';
 import {Customer} from '../../_support/customers.entity';
 import {Continent} from '../../_support/continents.entity';
 
-describe('findAll() One-2-Many eager', function () {
+describe('findAll() one-to-many (hasMany) associations', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
-    it('should return relation records in array', async function () {
-        const repo = client.getRepository<Country>(Country);
+    it('should return associated instances', async function () {
+        const repo = client().getRepository(Country);
         const rows = await repo.findAll({
             filter: [In('code', ['DE', 'TR'])],
             elements: ['code', 'customers']
         });
         assert.ok(rows);
-        assert.strictEqual(rows.length, 2);
+        assert.ok(rows.length);
         for (const country of rows) {
             assert.ok(Array.isArray(country.customers));
             assert.ok(country.customers.length);
@@ -29,8 +27,8 @@ describe('findAll() One-2-Many eager', function () {
         }
     });
 
-    it('should return multi level relation records', async function () {
-        const repo = client.getRepository(Continent);
+    it('should return multi level associated instances', async function () {
+        const repo = client().getRepository(Continent);
         const rows = await repo.findAll({
             filter: {code: 'AM'},
             elements: ['countries.customers']
@@ -50,8 +48,8 @@ describe('findAll() One-2-Many eager', function () {
         }
     });
 
-    it('should specify returning columns', async function () {
-        const repo = client.getRepository<Country>(Country);
+    it('should specify returning elements', async function () {
+        const repo = client().getRepository(Country);
         const rows = await repo.findAll({
             filter: [In('code', ['DE', 'TR'])],
             elements: ['code', 'customers.givenName']
@@ -67,8 +65,8 @@ describe('findAll() One-2-Many eager', function () {
         }
     });
 
-    it('should limit maximum relation levels', async function () {
-        const repo = client.getRepository(Customer);
+    it('should limit maximum association levels', async function () {
+        const repo = client().getRepository(Customer);
         await repo.findAll({
             elements: ['country.continent'],
             maxRelationLevel: 1
@@ -80,7 +78,7 @@ describe('findAll() One-2-Many eager', function () {
     });
 
     it('should detect circular queries', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         await assert.rejects(() => repo.findAll({
             filter: {id: 1},
             elements: ['country.customers']

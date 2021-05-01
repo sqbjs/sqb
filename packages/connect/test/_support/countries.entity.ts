@@ -2,12 +2,8 @@ import {
     Column,
     Entity,
     PrimaryKey,
-    LazyResolver,
-    HasOne,
-    HasMany,
     FieldName,
-    HasOneLazy,
-    HasManyLazy, ForeignKey
+    ForeignKey, HasOne, HasMany
 } from '@sqb/connect';
 import {Continent} from './continents.entity';
 import type {Customer} from './customers.entity';
@@ -33,13 +29,8 @@ export class Country {
     @HasOne()
     readonly continent: Continent;
 
-    @HasOneLazy(Continent)
-    readonly continentLazy: LazyResolver<Continent>;
-
     @HasMany(async () => (await import('./customers.entity')).Customer)
     readonly customers: Customer[];
 
-    @HasManyLazy(async () => (await import('./customers.entity')).Customer)
-    readonly customersLazy: LazyResolver<Customer[]>;
 
 }

@@ -4,7 +4,7 @@ import type {Type} from '../types';
 import type {EntityMeta} from './metadata/entity-meta';
 import type {ColumnElementMeta} from './metadata/column-element-meta';
 import type {EmbeddedElementMeta} from './metadata/embedded-element-meta';
-import type {RelationElementMeta} from './metadata/relation-element-meta';
+import type {AssociationElementMeta} from './metadata/association-element-meta';
 import {ENTITY_DEFINITION_KEY} from './consts';
 
 export function isClass(fn: any): fn is Type {
@@ -23,7 +23,7 @@ export const isEmbeddedElement = (f: any): f is EmbeddedElementMeta => {
     return !!(f && f.entity && f.kind === 'embedded');
 }
 
-export const isRelationElement = (f: any): f is RelationElementMeta => {
+export const isAssociationElement = (f: any): f is AssociationElementMeta => {
     return !!(f && f.entity && f.kind === 'relation');
 }
 

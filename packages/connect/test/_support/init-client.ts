@@ -4,7 +4,7 @@ import '@sqb/postgres';
 // noinspection ES6PreferShortImport
 import {createTestSchema} from '../../../postgres/test/_support/create-db';
 
-export function initClient(config?: ClientConfiguration): SqbClient {
+export function initClient(config?: ClientConfiguration): () => SqbClient {
 
     let client = new SqbClient({
         dialect: 'postgres',
@@ -25,6 +25,6 @@ export function initClient(config?: ClientConfiguration): SqbClient {
         client = undefined;
     });
 
-    return client;
+    return () => client;
 
 }

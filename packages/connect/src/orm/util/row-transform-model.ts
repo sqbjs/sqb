@@ -2,11 +2,11 @@ import type {QueryExecutor} from '../../client/types';
 import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {EntityMeta} from '../metadata/entity-meta';
 import type {AbstractElementMeta} from '../metadata/abstract-element-meta';
-import type {RelationElementMeta} from '../metadata/relation-element-meta';
+import type {AssociationElementMeta} from '../metadata/association-element-meta';
 import type {ColumnElementMeta} from '../metadata/column-element-meta';
 import type {EmbeddedElementMeta} from '../metadata/embedded-element-meta';
 import type {FindCommandArgs} from '../commands/find.command';
-import {isColumnElement, isRelationElement} from '../helpers';
+import {isColumnElement, isAssociationElement} from '../helpers';
 
 export interface RowTransformItem {
     element: AbstractElementMeta;
@@ -17,8 +17,8 @@ export interface RowTransformItem {
     eagerTargets?: any[];
 }
 
-const isOne2ManyEagerProperty = (prop: RowTransformItem): boolean => {
-    return !!(isRelationElement(prop.element) && prop.subQueryOptions && !prop.element.lazy)
+const isOne2ManyProperty = (prop: RowTransformItem): boolean => {
+    return !!(isAssociationElement(prop.element) && prop.subQueryOptions)
 }
 
 export class RowTransformModel {
@@ -41,9 +41,9 @@ export class RowTransformModel {
         this._propertyKeys = undefined;
     }
 
-    addOne2ManyEagerElement(col: RelationElementMeta,
-                            fieldAlias: string,
-                            options?: Omit<FindCommandArgs, 'entity' | 'connection'>) {
+    addOne2ManyElement(col: AssociationElementMeta,
+                       fieldAlias: string,
+                       options?: Omit<FindCommandArgs, 'entity' | 'connection'>) {
         this._properties[col.name] = {
             element: col,
             fieldAlias,
@@ -52,7 +52,7 @@ export class RowTransformModel {
         this._propertyKeys = undefined;
     }
 
-    addNode(col: EmbeddedElementMeta | RelationElementMeta, node: RowTransformModel) {
+    addNode(col: EmbeddedElementMeta | AssociationElementMeta, node: RowTransformModel) {
         this._properties[col.name] = {
             element: col,
             fieldAlias: '',
@@ -89,12 +89,12 @@ export class RowTransformModel {
             const propKey = node.elementKeys[propIdx];
             const prop = node._properties[propKey];
 
-            if (prop.eagerTargets && isRelationElement(prop.element) && prop.subQueryOptions) {
+            if (prop.eagerTargets && isAssociationElement(prop.element) && prop.subQueryOptions) {
                 const {FindCommand} = await import('../commands/find.command');
-                const lastLink = prop.element.chain.getLast();
+                const lastLink = prop.element.association.getLast();
                 const targetEntity = await lastLink.resolveTarget();
                 if (this._circularCheckList.includes(targetEntity))
-                    throw new Error('Circular query call is not allowed');
+                    continue;
 
                 const subQueryOptions = prop.subQueryOptions;
                 const keyCol = await lastLink.resolveSourceColumnName();
@@ -144,7 +144,7 @@ export class RowTransformModel {
                     if (v !== null)
                         result[elKey] = v;
                 }
-            } else if (isOne2ManyEagerProperty(prop)) {
+            } else if (isOne2ManyProperty(prop)) {
                 // One2Many Eager element
                 // Keep a list of key field/value pairs to fetch rows for eager relation
                 const _params = prop.eagerParams = prop.eagerParams || {};

@@ -1,14 +1,12 @@
 import assert from 'assert';
 import '../../_support/env';
-import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customers.entity';
 import {initClient} from '../../_support/init-client';
 import {Tag} from '../../_support/tags.entity';
 
 describe('create()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should insert new record and return new values', async function () {
         const values = {
@@ -16,7 +14,7 @@ describe('create()', function () {
             familyName: 'F' + Math.trunc(Math.random() * 10000),
             countryCode: 'TR'
         }
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const c = await repo.count();
         const customer = await repo.create(values);
         assert.ok(customer);
@@ -46,7 +44,7 @@ describe('create()', function () {
             countryCode: 'TR',
             gender: 'Male'
         }
-        const repo = client.getRepository<Customer>(Customer);
+        const repo = client().getRepository<Customer>(Customer);
         const customer = await repo.create(values);
         assert.ok(customer);
         const x = await repo.findByPk(customer, {elements: ['id', 'gender']});
@@ -63,7 +61,7 @@ describe('create()', function () {
             },
             countryCode: 'TR'
         }
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const c = await repo.count();
         const customer = await repo.create(values);
         assert.ok(customer);
@@ -89,27 +87,27 @@ describe('create()', function () {
             },
             countryCode: 'TR'
         }
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         const customer = await repo.create(values);
         assert.ok(customer);
         assert.strictEqual(customer.active, true);
     });
 
     it('should check enum value', async function () {
-        const repo = client.getRepository(Tag);
+        const repo = client().getRepository(Tag);
         await assert.rejects(() => repo.create({name: 'small', color: 'pink'}),
             /value must be one of/);
     });
 
     it('should column is required', async function () {
-        const repo = client.getRepository(Customer);
+        const repo = client().getRepository(Customer);
         await assert.rejects(() => repo.create({givenName: 'aa', familyName: 'bb'}),
             /is required/);
     });
 
     it('should execute in transaction', async function () {
         let c = 0;
-        return client.acquire(async (connection) => {
+        return client().acquire(async (connection) => {
             const values = {
                 givenName: 'abc',
                 familyName: 'def',
@@ -131,11 +129,10 @@ describe('create()', function () {
 
 describe('createOnly()', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
 
     it('should not generate "returning" sql query for fast execution', async function () {
-        return client.acquire(async (connection) => {
+        return client().acquire(async (connection) => {
             const values = {
                 givenName: 'abc',
                 familyName: 'def',
