@@ -50,9 +50,6 @@ export async function joinAssociation(joinInfos: JoinInfo[],
                 LeftOuterJoin(targetEntity.tableName + ' as ' + joinAlias);
             join.on(Eq(joinAlias + '.' + targetCol.fieldName,
                 Raw(parentAlias + '.' + keyCol.fieldName)))
-            if (node.sourceConditions) {
-                await prepareFilter(sourceEntity, node.sourceConditions, join._conditions, parentAlias);
-            }
             if (node.conditions)
                 await prepareFilter(targetEntity, node.conditions, join._conditions, joinAlias);
 

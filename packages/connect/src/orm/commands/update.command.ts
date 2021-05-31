@@ -75,7 +75,7 @@ export class UpdateCommand {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')
-                    v = col.serialize(v, col, values);
+                    v = col.serialize(v, col.name);
                 if (v === null && col.notNull)
                     throw new Error(`${entity.name}.${col.name} is required and can't be null`);
                 if (v === undefined)
