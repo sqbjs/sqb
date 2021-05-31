@@ -1,8 +1,8 @@
 import '../../_support/env';
 import assert from 'assert';
-import {Country} from '../../_support/countries.entity';
+import {Country} from '../../_support/country.entity';
 import {initClient} from '../../_support/init-client';
-import {CustomerTag} from '../../_support/customer-tags.entity';
+import {CustomerTag} from '../../_support/customer-tag.entity';
 
 describe('findByPk()', function () {
 

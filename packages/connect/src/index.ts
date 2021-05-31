@@ -6,24 +6,24 @@ export * from './client/SqbClient';
 export * from './client/Cursor';
 export {registerAdapter, unRegisterAdapter} from './client/extensions';
 
-export * from './orm/types';
-export * from './orm/base-entity';
+export * from './orm/orm.type';
+export * from './orm/base-entity.class';
 export * from './orm/decorators/entity.decorator';
 export * from './orm/decorators/primarykey.decorator';
 export * from './orm/decorators/index.decorator';
 export * from './orm/decorators/column.decorator';
-export * from './orm/decorators/association.decorator';
+export * from './orm/decorators/link.decorator';
 export * from './orm/decorators/embedded.decorator';
 export * from './orm/decorators/foreignkey.decorator';
 export * from './orm/decorators/events.decorator';
 export * from './orm/decorators/transform.decorator';
 
-export * from './orm/repository';
-export * from './orm/metadata/entity-meta';
-export * from './orm/metadata/column-element-meta';
-export * from './orm/metadata/embedded-element-meta';
-export * from './orm/metadata/association-element-meta';
-export * from './orm/metadata/foreign-key-meta';
-export * from './orm/metadata/index-meta';
+export * from './orm/repository.class';
+export * from './orm/model/entity-model';
+export * from './orm/model/entity-data-property';
+export * from './orm/model/entity-object-property';
+export * from './orm/model/entity-association-property';
+export * from './orm/model/association';
+export * from './orm/model/index-meta';
 
-export {isColumnElement, isEmbeddedElement, isAssociationElement, isEntityClass} from './orm/helpers';
+export {isDataProperty, isObjectProperty, isAssociationElement, isEntityClass} from './orm/orm.helper';

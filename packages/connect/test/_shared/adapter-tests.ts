@@ -383,32 +383,25 @@ export function initAdapterTests(adapter: Adapter,
 
 }
 
-export function getInsertSQLsForTestData(opts?: {
-    schema?: string,
+export function getInsertSQLsForTestData(opts: {
+    dialect: string;
+    schema?: string;
     stringifyValueForSQL?: (v: any) => string;
 }) {
     const result: { table: string, scripts: string[] }[] = [];
     const repositoryRoot = path.resolve(__dirname, '../../../..');
 
     const dataFiles: any[] = ['continents', 'countries', 'customers',
-        'customer_details', 'tags', 'customer_tags'].map(f =>
+        'customer_details', 'customer_vip_details', 'tags', 'customer_tags'].map(f =>
         JSON.parse(fs.readFileSync(
             path.join(repositoryRoot, 'support/test-data', f + '.json'), 'utf8')));
 
-    const stringify = opts?.stringifyValueForSQL || stringifyValueForSQL;
-    const schema = opts?.schema ? opts?.schema + '.' : '';
-
     for (const table of dataFiles) {
         const file = {table, scripts: []};
-
-        const keys = Object.keys(table.rows[0]);
-        const fields = keys.map(f => f.toLowerCase());
-
         for (const row of table.rows) {
-            const values = keys.map(x => stringify(row[x]));
-            const insertSql = 'insert into ' + schema + table.name +
-                ' (' + fields.join(',') + ') values (' + values.join(',') + ')';
-            file.scripts.push(insertSql);
+            const x = Insert((opts.schema ? opts.schema + '.' : '') + table.name, row)
+                .generate({dialect: opts.dialect});
+            file.scripts.push(x.sql);
         }
         result.push(file);
     }

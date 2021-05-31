@@ -28,7 +28,7 @@ async function createTestSchema(connection) {
     connection.exec(
         (await import('./_support/db_schema')).sql
     );
-    const dataFiles = getInsertSQLsForTestData();
+    const dataFiles = getInsertSQLsForTestData({dialect: 'sqlite'});
     for (const table of dataFiles)
         connection.exec(table.scripts.join(';\n'));
 }

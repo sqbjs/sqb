@@ -16,7 +16,7 @@ describe('Parse', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = meta.getDataProperty('id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.parse, fn);
     });
@@ -36,7 +36,7 @@ describe('Serialize', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = meta.getDataProperty('id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.serialize, fn);
     });

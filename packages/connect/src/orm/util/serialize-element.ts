@@ -1,9 +1,9 @@
 import {DataType} from '@sqb/builder';
-import {AbstractElementMeta} from '../metadata/abstract-element-meta';
-import {isColumnElement} from '../helpers';
+import {AbstractEntityProperty} from '../model/abstract-entity-property';
+import {isDataProperty} from '../orm.helper';
 
-export function serializeColumn(col: AbstractElementMeta, v: any): any {
-    if (isColumnElement(col)) {
+export function serializeColumn(col: AbstractEntityProperty, v: any): any {
+    if (isDataProperty(col)) {
         if (col.isArray) {
             if (Array.isArray(v))
                 return v.map(x => serializeDataValue(col.dataType || DataType.VARCHAR, x));

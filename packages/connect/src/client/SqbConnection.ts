@@ -15,8 +15,8 @@ import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Type} from '../types';
-import {Repository} from '../orm/repository';
-import {EntityMeta} from '../orm/metadata/entity-meta';
+import {Repository} from '../orm/repository.class';
+import {EntityModel} from '../orm/model/entity-model';
 
 const debug = _debug('sqb:connection');
 
@@ -120,7 +120,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
             if (!ctor)
                 throw new Error(`Repository "${entity}" is not registered`);
         } else ctor = entity;
-        const entityDef = EntityMeta.get(ctor);
+        const entityDef = EntityModel.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
         return new Repository<T>(entityDef, this);
@@ -245,6 +245,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
             fieldNaming: coalesce(options.namingStrategy, defaults.fieldNaming) as FieldNaming,
             transform: coalesce(options.transform, defaults.transform),
             showSql: coerceToBoolean(coalesce(options.showSql, defaults.showSql), false),
+            prettyPrint: coerceToBoolean(coalesce(options.prettyPrint, defaults.prettyPrint), false),
             action: coerceToString(options.action),
             fetchAsString: options.fetchAsString
         };
@@ -258,7 +259,8 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
                     dialect: request.dialect,
                     dialectVersion: request.dialectVersion,
                     params: options.params,
-                    strictParams: true
+                    strictParams: true,
+                    prettyPrint: request.prettyPrint
                 });
             request.sql = q.sql;
             request.params = q.params;

@@ -12,6 +12,7 @@ CREATE TABLE countries
     name text,
     phone_code text,
     continent_code text,
+    has_market integer default 1,
     FOREIGN KEY (continent_code) REFERENCES continents (code)
 );
 
@@ -25,9 +26,26 @@ CREATE TABLE customers
     city text,
     country_code text,
     active INTEGER default 1,
+    vip integer,
     created_at text,
     updated_at text,
     FOREIGN KEY (country_code) REFERENCES countries (code)
+);
+
+CREATE TABLE customer_details
+(
+  customer_id INTEGER PRIMARY KEY,
+  notes text,
+  alerts text,
+  FOREIGN KEY (customer_id) REFERENCES customers (id)
+);
+
+CREATE TABLE customer_vip_details
+(
+  customer_id INTEGER PRIMARY KEY,
+  notes text,
+  rank integer default 0,
+  FOREIGN KEY (customer_id) REFERENCES customers (id)
 );
 
 CREATE TABLE tags

@@ -37,6 +37,8 @@ export enum SerializationType {
     RETURNING_BLOCK = 'returning_block',
     DATE_VALUE = 'date_value',
     STRING_VALUE = 'string_value',
+    BOOLEAN_VALUE = 'boolean_value',
+    NUMBER_VALUE = 'number_value',
     EXTERNAL_PARAMETER = 'external_parameter'
 }
 

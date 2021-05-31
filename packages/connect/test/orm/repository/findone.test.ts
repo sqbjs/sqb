@@ -1,7 +1,7 @@
 import '../../_support/env';
 import assert from 'assert';
 import {initClient} from '../../_support/init-client';
-import {Customer} from '../../_support/customers.entity';
+import {Customer} from '../../_support/customer.entity';
 
 describe('findOne()', function () {
 

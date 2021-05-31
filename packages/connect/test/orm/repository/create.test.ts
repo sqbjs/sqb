@@ -1,6 +1,6 @@
 import assert from 'assert';
 import '../../_support/env';
-import {Customer} from '../../_support/customers.entity';
+import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 import {Tag} from '../../_support/tags.entity';
 

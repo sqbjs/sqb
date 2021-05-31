@@ -12,7 +12,7 @@ export class JoinStatement extends Serializable {
 
     _joinType: JoinType;
     _table: TableName | SelectQuery | RawStatement;
-    _conditions?: LogicalOperator;
+    _conditions: LogicalOperator = new OpAnd();
 
     constructor(joinType: JoinType, table: string | TableName | SelectQuery | RawStatement) {
         super();
@@ -30,7 +30,6 @@ export class JoinStatement extends Serializable {
     }
 
     on(...conditions: Serializable[]): this {
-        this._conditions = this._conditions || new OpAnd();
         this._conditions.add(...conditions);
         return this;
     }
@@ -84,7 +83,7 @@ export class JoinStatement extends Serializable {
     }
 
     protected __serializeConditions(ctx, join: JoinStatement) {
-        if (join._conditions) {
+        if (join._conditions._items.length) {
             const s = join._conditions._serialize(ctx);
             return serializeFallback(ctx, SerializationType.JOIN_CONDITIONS, s,
                 () => s ? 'on ' + s : '');

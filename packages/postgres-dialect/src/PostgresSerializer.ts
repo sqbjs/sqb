@@ -41,7 +41,9 @@ export class PostgresSerializer implements SerializerExtension {
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         if (typeof o.right === 'string') {
-            if (o.right.startsWith('(')) {
+            if (o.operatorType === 'in' && o.right.toLowerCase() === 'null') {
+                o.symbol = '=';
+            } else if (o.right.startsWith('(')) {
                 if (o.operatorType === 'eq')
                     o.symbol = 'in';
                 if (o.operatorType === 'ne')
@@ -64,6 +66,8 @@ export class PostgresSerializer implements SerializerExtension {
 
     private _serializeParameter(ctx: SerializeContext, o: any): string {
         let prmValue = ctx.params && ctx.params[o.name];
+        if (prmValue === undefined)
+            return 'null';
         if (o.isArray && !Array.isArray(prmValue))
             prmValue = [prmValue];
         ctx.queryParams = ctx.queryParams || [];

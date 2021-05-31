@@ -25,6 +25,11 @@
       "fieldName": "internal_id",
       "dataType": "varchar",
       "jsType": "string"
+    },
+    {
+      "fieldName": "has_market",
+      "dataType": "boolean",
+      "jsType": "boolean"
     }
   ],
   "rows": [
@@ -32,13 +37,15 @@
       "code": "DE",
       "name": "Germany",
       "phone_code": "+49",
-      "continent_code": "EU"
+      "continent_code": "EU",
+      "has_market": true
     },
     {
       "code": "CA",
       "name": "Canada",
       "phone_code": "+1",
-      "continent_code": "AM"
+      "continent_code": "AM",
+      "has_market": false
     },
     {
       "code": "TR",

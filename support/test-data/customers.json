@@ -35,6 +35,16 @@
       "fieldName": "country_code",
       "dataType": "varchar",
       "jsType": "string"
+    },
+    {
+      "fieldName": "active",
+      "dataType": "boolean",
+      "jsType": "boolean"
+    },
+    {
+      "fieldName": "vip",
+      "dataType": "boolean",
+      "jsType": "boolean"
     }
   ],
   "rows": [
@@ -45,7 +55,9 @@
       "gender": "M",
       "birth_date": "1976-08-13T00:08:37-07:00",
       "city": "Norman",
-      "country_code": "US"
+      "country_code": "US",
+      "active": true,
+      "vip": true
     },
     {
       "ID": 2,
@@ -63,7 +75,8 @@
       "family_name": "Marsh",
       "birth_date": "1996-02-06T04:20:46-08:00",
       "city": "Erciş",
-      "country_code": "TR"
+      "country_code": "TR",
+      "vip": true
     },
     {
       "ID": 4,
@@ -72,7 +85,9 @@
       "family_name": "Kidd",
       "birth_date": "2006-04-22T17:01:02-07:00",
       "city": "Dallas",
-      "country_code": "US"
+      "country_code": "US",
+      "active": false,
+      "vip": true
     },
     {
       "ID": 5,
@@ -81,7 +96,9 @@
       "family_name": "Collier",
       "birth_date": "2009-11-09T12:33:57-08:00",
       "city": "Balıkesir",
-      "country_code": "TR"
+      "country_code": "TR",
+      "active": false,
+      "vip": true
     },
     {
       "ID": 6,
@@ -90,7 +107,8 @@
       "family_name": "Mcfarland",
       "birth_date": "1994-10-11T10:09:54-07:00",
       "city": "Butte",
-      "country_code": "US"
+      "country_code": "US",
+      "vip": true
     },
     {
       "ID": 7,
@@ -99,7 +117,9 @@
       "family_name": "Miles",
       "birth_date": "1980-05-18T09:37:40-07:00",
       "city": "Smoky Lake",
-      "country_code": "CA"
+      "country_code": "CA",
+      "active": false,
+      "vip": true
     },
     {
       "ID": 8,
@@ -108,7 +128,8 @@
       "family_name": "Crosby",
       "birth_date": "2002-12-22T19:33:45-08:00",
       "city": "Marystown",
-      "country_code": "CA"
+      "country_code": "CA",
+      "vip": true
     },
     {
       "ID": 9,
@@ -342,7 +363,8 @@
       "family_name": "Mckenzie",
       "birth_date": "1963-11-22T07:01:23-08:00",
       "city": "Bremen",
-      "country_code": "DE"
+      "country_code": "DE",
+      "vip": true
     },
     {
       "ID": 36,

@@ -31,7 +31,8 @@
     },
     {
       "customer_id": 2,
-      "tag_id": 7
+      "tag_id": 7,
+      "deleted": true
     },
     {
       "customer_id": 3,
@@ -40,7 +41,7 @@
     {
       "customer_id": 3,
       "tag_id": 5,
-      "active": false
+      "deleted": false
     }
   ]
 }

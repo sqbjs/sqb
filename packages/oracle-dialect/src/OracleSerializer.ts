@@ -26,10 +26,14 @@ export class OracleSerializer implements SerializerExtension {
                 return this._serializeFrom(ctx, o, defFn);
             case SerializationType.COMPARISON_EXPRESSION:
                 return this._serializeComparison(ctx, o, defFn);
+            case SerializationType.STRING_VALUE:
+                return this._serializeStringValue(ctx, o, defFn);
             case SerializationType.DATE_VALUE:
                 return this._serializeDateValue(ctx, o, defFn);
+            case SerializationType.BOOLEAN_VALUE:
+                return this._serializeBooleanValue(ctx, o);
             case SerializationType.RETURNING_BLOCK:
-               return this._serializeReturning();
+                return this._serializeReturning();
         }
     }
 
@@ -78,11 +82,25 @@ export class OracleSerializer implements SerializerExtension {
         return defFn(ctx, o);
     }
 
+    private _serializeStringValue(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
+        if (typeof o === 'string') {
+            if (o.match(/^\d{4}-\d{2}-\d{2}$/))
+                return 'to_date(' + o + ', \'yyyy-mm-dd\')';
+            if (o.match(/^\d{4}-\d{2}-\d{2}T/))
+                return `to_timestamp_tz('${o}','yyyy-mm-dd"T"hh24:mi:sstzh:tzm')`;
+        }
+        return defFn(ctx, o);
+    }
+
     private _serializeDateValue(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         const s = defFn(ctx, o);
         return s && (s.length <= 12 ?
             'to_date(' + s + ', \'yyyy-mm-dd\')' :
             'to_date(' + s + ', \'yyyy-mm-dd hh24:mi:ss\')');
+    }
+
+    private _serializeBooleanValue(_ctx: SerializeContext, o: any): string {
+        return o == null ? 'null' : (o ? '1' : '0');
     }
 
     private _serializeReturning(): string {

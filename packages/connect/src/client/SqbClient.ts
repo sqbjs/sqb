@@ -17,8 +17,8 @@ import {SqbConnection} from './SqbConnection';
 import {adapters} from './extensions';
 import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Type} from '../types';
-import {Repository} from '../orm/repository';
-import {EntityMeta} from '../orm/metadata/entity-meta';
+import {Repository} from '../orm/repository.class';
+import {EntityModel} from '../orm/model/entity-model';
 import {Maybe} from '../types';
 
 const debug = _debug('sqb:client');
@@ -186,7 +186,7 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
             if (!ctor)
                 throw new Error(`Repository "${entity}" is not registered`);
         } else ctor = entity;
-        const entityDef = EntityMeta.get(ctor);
+        const entityDef = EntityModel.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
         return new Repository<T>(entityDef, this);

@@ -1,0 +1,67 @@
+{
+  "name": "customer_vip_details",
+  "fields": [
+    {
+      "fieldName": "customer_id",
+      "dataType": "integer",
+      "jsType": "number"
+    },
+    {
+      "fieldName": "vip_rank",
+      "dataType": "integer",
+      "jsType": "number"
+    },
+    {
+      "fieldName": "notes",
+      "dataType": "varchar",
+      "jsType": "string"
+    }
+  ],
+  "rows": [
+    {
+      "customer_id": 1,
+      "notes": "test note 1",
+      "rank": 1
+    },
+    {
+      "customer_id": 2,
+      "notes": "test note 2",
+      "rank": 2
+    },
+    {
+      "customer_id": 3,
+      "notes": "test note 3",
+      "rank": 3
+    },
+    {
+      "customer_id": 4,
+      "notes": "test note 4",
+      "rank": 4
+    },
+    {
+      "customer_id": 5,
+      "notes": "test note 5",
+      "rank": 5
+    },
+    {
+      "customer_id": 6,
+      "notes": "test note 6",
+      "rank": 1
+    },
+    {
+      "customer_id": 7,
+      "notes": "test note 7",
+      "rank": 2
+    },
+    {
+      "customer_id": 8,
+      "notes": "test note 8",
+      "rank": 1
+    },
+    {
+      "customer_id": 9,
+      "notes": "test note 9",
+      "rank": 1
+    }
+  ]
+}

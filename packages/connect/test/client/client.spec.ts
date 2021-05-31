@@ -7,8 +7,7 @@ import {initClient} from '../_support/init-client';
 
 describe('Client', function () {
 
-    let client: SqbClient;
-    before(() => client = initClient());
+    const client = initClient();
     const dialect = 'postgres';
     const insertedIds: any[] = [];
 
@@ -50,11 +49,11 @@ describe('Client', function () {
     });
 
     it('should make a connection test', async function () {
-        await client.test();
+        await client().test();
     });
 
     it('should execute a raw select query', async function () {
-        const result = await client.execute(
+        const result = await client().execute(
             'select * from customers', {
                 objectRows: false
             });
@@ -64,7 +63,7 @@ describe('Client', function () {
     });
 
     it('should execute an sqb query', async function () {
-        const result = await client.execute(
+        const result = await client().execute(
             Select().from('customers'), {
                 objectRows: false
             })
@@ -74,7 +73,7 @@ describe('Client', function () {
     });
 
     it('should select() and return array rows', async function () {
-        const result = await client.execute(
+        const result = await client().execute(
             Select().from('customers'),
             {objectRows: false, fetchRows: 2})
         assert(result && result.rows);
@@ -83,7 +82,7 @@ describe('Client', function () {
     });
 
     it('should select() and return object rows', async function () {
-        const result = await client.execute(
+        const result = await client().execute(
             Select().from('customers'),
             {fetchRows: 2});
         assert(result && result.rows);
@@ -93,7 +92,7 @@ describe('Client', function () {
     });
 
     it('should limit returning record with fetchRows property', async function () {
-        const result = await client.execute(
+        const result = await client().execute(
             Select().from('customers'), {
                 objectRows: false,
                 fetchRows: 2
@@ -106,11 +105,11 @@ describe('Client', function () {
 
     it('should insert record', async function () {
         const given = 'X' + Math.floor(Math.random() * 10000);
-        const c = (await client.execute('select count(*) from customers')).rows[0].count;
-        const result = await client.execute(Insert('customers', {given_name: given}));
+        const c = (await client().execute('select count(*) from customers')).rows[0].count;
+        const result = await client().execute(Insert('customers', {given_name: given}));
         assert(result);
         assert.strictEqual(result.rowsAffected, 1);
-        const c2 = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c2 = (await client().execute('select count(*) from customers')).rows[0].count;
         assert.strictEqual(c2, c + 1);
     });
 
@@ -122,7 +121,7 @@ describe('Client', function () {
             family_name: family,
             city: null,
         }).returning('id');
-        const result = await client.execute(query);
+        const result = await client().execute(query);
         assert(result);
         assert.strictEqual(result.rowsAffected, 1);
         assert.ok(result.rows[0].id > 0);
@@ -130,7 +129,7 @@ describe('Client', function () {
     });
 
     it('should acquire(callback) acquire a new session and execute the callback', async function () {
-        await client.acquire(async (connection) => {
+        await client().acquire(async (connection) => {
             const result = await connection.execute('select * from customers', {
                 objectRows: false,
                 params: []
@@ -142,9 +141,9 @@ describe('Client', function () {
     });
 
     it('should acquire(callback) rollback transaction on error', async function () {
-        const c = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c = (await client().execute('select count(*) from customers')).rows[0].count;
         try {
-            await client.acquire(async (connection) => {
+            await client().acquire(async (connection) => {
                 await connection.startTransaction();
                 await connection.execute('insert into customers (given_name) values (:given)', {
                     params: {
@@ -159,14 +158,14 @@ describe('Client', function () {
         } catch (ignored) {
             //
         }
-        const c3 = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c3 = (await client().execute('select count(*) from customers')).rows[0].count;
         assert.strictEqual(c3, c);
     });
 
     it('should acquire(callback) rollback transaction if not committed', async function () {
-        const c = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c = (await client().execute('select count(*) from customers')).rows[0].count;
         try {
-            await client.acquire(async (connection) => {
+            await client().acquire(async (connection) => {
                 await connection.startTransaction();
                 await connection.execute('insert into customers (given_name) values (:given)', {
                     params: {
@@ -180,14 +179,14 @@ describe('Client', function () {
         } catch (ignored) {
             //
         }
-        const c3 = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c3 = (await client().execute('select count(*) from customers')).rows[0].count;
         assert.strictEqual(c3, c);
     });
 
     it('should commit can be called in execute(callback)', async function () {
-        const c = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c = (await client().execute('select count(*) from customers')).rows[0].count;
         const given = 'X' + Math.floor(Math.random() * 10000);
-        await client.acquire(async (connection) => {
+        await client().acquire(async (connection) => {
             await connection.execute(
                 Insert('customers', {given_name: Param('given')}),
                 {params: {given}});
@@ -195,13 +194,13 @@ describe('Client', function () {
             assert.strictEqual(c2, c + 1);
             await connection.commit();
         });
-        const c3 = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c3 = (await client().execute('select count(*) from customers')).rows[0].count;
         assert.strictEqual(c3, c + 1);
     });
 
     it('should rollback can be called in execute(callback)', async function () {
-        const c = (await client.execute('select count(*) from customers')).rows[0].count;
-        await client.acquire(async (connection) => {
+        const c = (await client().execute('select count(*) from customers')).rows[0].count;
+        await client().acquire(async (connection) => {
             await connection.startTransaction();
             const given = 'X' + Math.floor(Math.random() * 10000);
             await connection.execute(
@@ -209,12 +208,12 @@ describe('Client', function () {
                 {params: {given}});
             await connection.rollback();
         });
-        const c2 = (await client.execute('select count(*) from customers')).rows[0].count;
+        const c2 = (await client().execute('select count(*) from customers')).rows[0].count;
         assert.strictEqual(c2, c);
     });
 
     it('should get and set active schema of connection', async function () {
-        await client.acquire(async (connection) => {
+        await client().acquire(async (connection) => {
             const schema = await connection.getSchema();
             assert.ok(schema);
             await connection.setSchema('postgres');
@@ -225,64 +224,64 @@ describe('Client', function () {
     });
 
     it('should use defaults.objectRows option', async function () {
-        client.defaults.objectRows = false;
-        let result = await client.execute('select * from customers');
+        client().defaults.objectRows = false;
+        let result = await client().execute('select * from customers');
         assert(Array.isArray(result.rows[0]));
-        client.defaults.objectRows = null;
-        result = await client.execute('select * from customers');
+        client().defaults.objectRows = null;
+        result = await client().execute('select * from customers');
         assert(!Array.isArray(result.rows[0]));
     });
 
     it('should use defaults.fieldNaming option', async function () {
-        client.defaults.fieldNaming = 'lowercase';
-        let result = await client.execute('select 1 as test_field');
+        client().defaults.fieldNaming = 'lowercase';
+        let result = await client().execute('select 1 as test_field');
         assert(result && result.rows);
         assert(!Array.isArray(result.rows[0]));
         assert.strictEqual(result.rows[0].test_field, 1);
 
-        client.defaults.fieldNaming = 'uppercase';
-        result = await client.execute('select 1 as test_field');
+        client().defaults.fieldNaming = 'uppercase';
+        result = await client().execute('select 1 as test_field');
         assert(result && result.rows);
         assert(!Array.isArray(result.rows[0]));
         assert.strictEqual(result.rows[0].TEST_FIELD, 1);
 
-        client.defaults.fieldNaming = 'camelcase';
-        result = await client.execute('select 1 as test_field');
+        client().defaults.fieldNaming = 'camelcase';
+        result = await client().execute('select 1 as test_field');
         assert(result && result.rows);
         assert(!Array.isArray(result.rows[0]));
         assert.strictEqual(result.rows[0].testField, 1);
 
-        client.defaults.fieldNaming = 'pascalcase';
-        result = await client.execute('select 1 as test_field');
+        client().defaults.fieldNaming = 'pascalcase';
+        result = await client().execute('select 1 as test_field');
         assert(result && result.rows);
         assert(!Array.isArray(result.rows[0]));
         assert.strictEqual(result.rows[0].TestField, 1);
-        client.defaults.fieldNaming = undefined;
+        client().defaults.fieldNaming = undefined;
     });
 
     it('should set defaults.showSql option', async function () {
-        client.defaults.showSql = true;
-        const result = await client.execute('select * from customers');
+        client().defaults.showSql = true;
+        const result = await client().execute('select * from customers');
         assert.strictEqual(result.query.sql, 'select * from customers');
-        client.defaults.showSql = null;
+        client().defaults.showSql = null;
     });
 
     it('should set defaults.showSql option', async function () {
-        client.defaults.showSql = true;
-        client.defaults.autoCommit = true;
-        const result = await client.execute('select * from customers');
+        client().defaults.showSql = true;
+        client().defaults.autoCommit = true;
+        const result = await client().execute('select * from customers');
         assert.strictEqual(result.query.autoCommit, true);
-        client.defaults.showSql = null;
+        client().defaults.showSql = null;
     });
 
     it('should set defaults.ignoreNulls option', async function () {
-        client.defaults.ignoreNulls = true;
-        let result = await client.execute(
+        client().defaults.ignoreNulls = true;
+        let result = await client().execute(
             Select().from('customers').where({id: insertedIds[0]})
         );
         assert.strictEqual(result.rows[0].city, undefined);
-        client.defaults.ignoreNulls = null;
-        result = await client.execute(
+        client().defaults.ignoreNulls = null;
+        result = await client().execute(
             Select().from('customers').where({id: insertedIds[0]})
         );
         assert.strictEqual(result.rows[0].city, null);
@@ -291,8 +290,8 @@ describe('Client', function () {
     it('should emit `execute` event', async function () {
         let i = 0;
         const fn = () => i++;
-        client.once('execute', fn);
-        await client.execute('select * from customers');
+        client().once('execute', fn);
+        await client().execute('select * from customers');
         assert.strictEqual(i, 1);
     });
 

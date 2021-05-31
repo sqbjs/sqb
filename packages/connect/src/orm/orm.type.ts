@@ -1,10 +1,9 @@
-import type {AbstractElementMeta} from './metadata/abstract-element-meta';
 import {DataType, Type} from '..';
 
 /* Model related */
 export type ElementKind = 'data' | 'relation' | 'embedded';
 
-export type AssociationKind = 'has-one' | 'has-many' | 'belongs-to' | 'belongs-to-many';
+export type AssociationKind = 'to' | 'to-many' | 'from' | 'from-many';
 
 /**
  * Indicates auto generation strategy
@@ -12,15 +11,15 @@ export type AssociationKind = 'has-one' | 'has-many' | 'belongs-to' | 'belongs-t
 export type ColumnAutoGenerationStrategy = 'increment' | 'uuid' | 'rowid' |
     'timestamp' | 'custom';
 
-export type ColumnTransformFunction = (value: any, col: AbstractElementMeta, row: any) => any;
+export type ColumnTransformFunction = (value: any, name: string) => any;
 
-export type ConstructorResolver<T> = () => Type<T> | Promise<Type<T>>;
-export type ConstructorThunk<T = any> = Type<T> | ConstructorResolver<T>;
+export type TypeResolver<T> = () => Type<T> | Promise<Type<T>>;
+export type TypeThunk<T = any> = Type<T> | TypeResolver<T>;
 
 export type EnumValue = (FieldValue)[] | Object;
 
 export type FieldValue = string | number | boolean | Date | null;
-export type DefaultValueGetter = (obj?: any)=> FieldValue;
+export type DefaultValueGetter = (obj?: any) => FieldValue;
 
 export interface EntityConfig {
     /**
@@ -51,18 +50,15 @@ export interface IndexOptions {
     unique?: boolean;
 }
 
-export interface ForeignKeyOptions {
-    /**
-     *  Name of the index
-     */
-    name?: string;
-
-    keyColumn?: string;
-    targetColumn?: string;
-
+export interface AssociationSettings {
+    source: TypeThunk;
+    target: TypeThunk;
+    sourceKey?: string;
+    targetKey?: string;
+    kind?: AssociationKind;
 }
 
-export interface ColumnOptions {
+export interface DataPropertyOptions {
     /*
       JS type
      */
@@ -72,6 +68,11 @@ export interface ColumnOptions {
      * Column data type
      */
     dataType?: DataType;
+
+    /**
+     *
+     */
+    isArray?: boolean;
 
     /**
      * Field name in the database table. Default: property name
@@ -91,7 +92,7 @@ export interface ColumnOptions {
     /**
      * Column's default value
      */
-    defaultValue?: FieldValue | DefaultValueGetter;
+    default?: FieldValue | DefaultValueGetter;
 
     /**
      * The precision for a decimal field
@@ -142,8 +143,4 @@ export interface ColumnOptions {
 export interface EmbeddedTypeOptions {
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;
-}
-
-export interface RelationLink {
-
 }

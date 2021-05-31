@@ -21,7 +21,7 @@ CREATE TABLE ${schema}.continents
 (
     code character varying(5),
     name character varying(16),   
-    CONSTRAINT continents_pkey PRIMARY KEY (code)
+    CONSTRAINT pk_continents PRIMARY KEY (code)
 );
 
 CREATE TABLE ${schema}.countries
@@ -30,7 +30,8 @@ CREATE TABLE ${schema}.countries
     name character varying(16),
     phone_code character varying(8),
     continent_code character varying(2),
-    CONSTRAINT countries_pkey PRIMARY KEY (code),
+    has_market boolean not null default true,
+    CONSTRAINT pk_countries PRIMARY KEY (code),
     CONSTRAINT fk_countries_continent_code FOREIGN KEY (continent_code)
         REFERENCES ${schema}.continents (code) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -46,10 +47,11 @@ CREATE TABLE ${schema}.customers
     birth_date date,
     city character varying(32),
     country_code character varying(5),
-    active boolean default true,
+    active boolean not null default true,
+    vip boolean not null default false,
     created_at timestamp default NOW(),
     updated_at timestamp,
-    CONSTRAINT customers_pkey PRIMARY KEY (id),
+    CONSTRAINT pk_customers PRIMARY KEY (id),
     CONSTRAINT fk_customers_country_code FOREIGN KEY (country_code)
         REFERENCES ${schema}.countries (code) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -68,8 +70,20 @@ CREATE TABLE ${schema}.customer_details
     customer_id int4,
     notes character varying(256),
     alerts character varying(256),    
-    CONSTRAINT customer_details_pkey PRIMARY KEY (customer_id),
+    CONSTRAINT pk_customer_details PRIMARY KEY (customer_id),
     CONSTRAINT fk_customer_details_id FOREIGN KEY (customer_id)
+        REFERENCES ${schema}.customers (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+CREATE TABLE ${schema}.customer_vip_details
+(
+    customer_id int4,
+    rank int2 default 0,
+    notes character varying(256),       
+    CONSTRAINT customer_vip_details_pkey PRIMARY KEY (customer_id),
+    CONSTRAINT fk_customer_vip_details_id FOREIGN KEY (customer_id)
         REFERENCES ${schema}.customers (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
@@ -80,7 +94,7 @@ CREATE TABLE ${schema}.tags
     id SERIAL,
     name character varying(16),
     color character varying(16),
-    active boolean,
+    active boolean not null default true,
     CONSTRAINT tags_pkey PRIMARY KEY (id)  
 );
 
@@ -88,9 +102,9 @@ ALTER SEQUENCE ${schema}.tags_id_seq RESTART WITH 100;
 
 CREATE TABLE ${schema}.customer_tags
 (
-    customer_id int4,
-    tag_id int4,
-    deleted boolean default false,     
+    customer_id int4 not null,
+    tag_id int4 not null,
+    deleted boolean not null default false,     
     CONSTRAINT customer_tags_pkey PRIMARY KEY (customer_id, tag_id),
     CONSTRAINT fk_customer_tags_customer_id FOREIGN KEY (customer_id)
         REFERENCES ${schema}.customers (id) MATCH SIMPLE,
@@ -143,6 +157,7 @@ export async function createTestSchema() {
     try {
         await connection.execute(schemaSql);
         const dataFiles = getInsertSQLsForTestData({
+            dialect: 'postgres',
             schema,
             stringifyValueForSQL
         });

@@ -1,5 +1,5 @@
-import {IndexOptions} from '../types';
-import {EntityMeta} from '../metadata/entity-meta';
+import {IndexOptions} from '../orm.type';
+import {EntityModel} from '../model/entity-model';
 
 export function Index(fields: string | string[], options?: IndexOptions): ClassDecorator
 export function Index(options?: IndexOptions): PropertyDecorator
@@ -8,7 +8,7 @@ export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator
         if (typeof target === 'function') {
             if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
                 throw new Error(`You must specify index column(s)`);
-            const entity = EntityMeta.attachTo(target);
+            const entity = EntityModel.attachTo(target);
             entity.addIndex(arg0, arg1);
             return;
         }
@@ -16,7 +16,7 @@ export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator
             throw new Error('Property decorators can be used for class properties only');
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
-        const entity = EntityMeta.attachTo(target.constructor);
+        const entity = EntityModel.attachTo(target.constructor);
         entity.addIndex(propertyKey, arg0);
     };
 
