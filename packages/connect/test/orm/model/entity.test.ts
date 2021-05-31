@@ -5,10 +5,8 @@ import {
     BaseEntity,
     Column,
     DataType,
-    NoInsert,
-    NoUpdate,
     Entity,
-    HasOne,
+    LinkToOne,
     PrimaryKey,
     getDataColumnNames, getElementNames, getInsertColumnNames, getUpdateColumnNames
 } from '@sqb/connect';
@@ -73,7 +71,7 @@ describe('Entity', function () {
         const baseMeta = Entity.getMetadata(Base);
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        assert.ok(meta.getElement('id'));
+        assert.ok(meta.getProperty('id'));
         assert.ok(meta.primaryIndex);
         assert.deepStrictEqual(meta.primaryIndex.columns, baseMeta.primaryIndex.columns);
     });
@@ -148,7 +146,7 @@ describe('Entity', function () {
             @Column()
             name: number;
 
-            @HasOne()
+            @LinkToOne()
             country: Country;
 
         }
@@ -178,7 +176,7 @@ describe('Entity', function () {
             @Column()
             name: number;
 
-            @HasOne()
+            @LinkToOne()
             country: Country;
 
         }
@@ -202,15 +200,13 @@ describe('Entity', function () {
         @Entity()
         class BaseCustomer extends BaseEntity<BaseCustomer> {
 
-            @Column()
-            @NoInsert
+            @Column({noInsert: true})
             id: string;
 
-            @Column()
-            @NoUpdate
+            @Column({noUpdate: true})
             name: number;
 
-            @HasOne()
+            @LinkToOne()
             country: Country;
 
         }
@@ -234,15 +230,13 @@ describe('Entity', function () {
         @Entity()
         class BaseCustomer extends BaseEntity<BaseCustomer> {
 
-            @Column()
-            @NoInsert
+            @Column({noInsert: true})
             id: string;
 
-            @Column()
-            @NoUpdate
+            @Column({noUpdate: true})
             name: number;
 
-            @HasOne()
+            @LinkToOne()
             country: Country;
 
         }

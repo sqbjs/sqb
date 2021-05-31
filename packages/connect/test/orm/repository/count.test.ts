@@ -1,7 +1,7 @@
 import '../../_support/env';
 import assert from 'assert';
 import {initClient} from '../../_support/init-client';
-import {Country} from '../../_support/countries.entity';
+import {Country} from '../../_support/country.entity';
 
 describe('count()', function () {
 
@@ -26,9 +26,8 @@ describe('count()', function () {
         const repo = client().getRepository<Country>(Country);
         const c = await repo.count();
         const c2 = await repo.count({filter: {'continent.code': 'AM'}});
-        assert.ok(c > 0);
-        assert.ok(c2 > 0);
-        assert.ok(c > c2);
+        assert.strictEqual(c, 4);
+        assert.strictEqual(c2, 2);
     });
 
     it('should filter by one-2-many relation element', async function () {

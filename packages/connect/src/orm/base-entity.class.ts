@@ -1,13 +1,13 @@
-import {REPOSITORY_KEY} from './consts';
-import type {Repository} from './repository';
-import {EntityMeta} from './metadata/entity-meta';
+import {REPOSITORY_KEY} from './orm.const';
+import type {Repository} from './repository.class';
+import {EntityModel} from './model/entity-model';
 import {PickWritable, Type} from '../types';
 
 export abstract class BaseEntity<T> {
     private [REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial: Partial<T>) {
-        const elements = EntityMeta.getColumnNames(Object.getPrototypeOf(this).constructor);
+        const elements = EntityModel.getColumnNames(Object.getPrototypeOf(this).constructor);
         if (elements && partial) {
             for (const k of elements)
                 if (partial[k] !== undefined)
@@ -32,17 +32,17 @@ export abstract class BaseEntity<T> {
 }
 
 export function getElementNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
-    return (EntityMeta.getElementNames(classRef) || []) as K[];
+    return (EntityModel.getElementNames(classRef) || []) as K[];
 }
 
 export function getDataColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
-    return (EntityMeta.getColumnNames(classRef) || []) as K[];
+    return (EntityModel.getColumnNames(classRef) || []) as K[];
 }
 
 export function getInsertColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
-    return (EntityMeta.getInsertColumnNames(classRef) || []) as K[];
+    return (EntityModel.getInsertColumnNames(classRef) || []) as K[];
 }
 
 export function getUpdateColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
-    return (EntityMeta.getUpdateColumnNames(classRef) || []) as K[];
+    return (EntityModel.getUpdateColumnNames(classRef) || []) as K[];
 }

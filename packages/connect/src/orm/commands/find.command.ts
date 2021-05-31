@@ -1,122 +1,306 @@
-import {
-    And, Eq, In, LeftOuterJoin,
-    LogicalOperator,
-    Param, Raw, Select, JoinStatement
-} from '@sqb/builder';
+import {And, Select, In, Param} from '@sqb/builder';
 import type {QueryExecutor} from '../../client/types';
-import type {Repository} from '../repository';
-import type {EntityMeta} from '../metadata/entity-meta';
-import {prepareFilter} from '../util/prepare-filter';
-import type {ColumnElementMeta} from '../metadata/column-element-meta';
-import type {AssociationElementMeta} from '../metadata/association-element-meta';
-import {RowTransformModel} from '../util/row-transform-model';
-import {AssociationNode} from '../metadata/association-node';
-import {isColumnElement, isEmbeddedElement, isAssociationElement} from '../helpers';
-
-interface JoinInfo {
-    association: AssociationNode;
-    targetEntity: EntityMeta;
-    joinAlias: string;
-    join: JoinStatement
-}
+import type {Repository} from '../repository.class';
+import type {EntityModel} from '../model/entity-model';
+import type {EntityDataProperty} from '../model/entity-data-property';
+import {RowConverter} from './row-converter';
+import {AssociationNode} from '../model/association-node';
+import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
+import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
 
 export type FindCommandArgs = {
-    entity: EntityMeta;
+    entity: EntityModel;
     connection: QueryExecutor
 } & Repository.FindAllOptions;
-
-type FindCommandContext = {
-    entity: EntityMeta;
-    model: RowTransformModel;
-    sqlColumns: Record<string, {
-        sqlStatement: string;
-        column: ColumnElementMeta;
-    }>;
-    joins?: JoinInfo[];
-    requestElements?: string[];
-    excludeElements?: string[];
-    maxEagerFetch?: number;
-    maxRelationLevel: number;
-}
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 
 export class FindCommand {
+    maxEagerFetch: number = 100000;
+    maxSubQueries: number = 5;
+    readonly mainEntity: EntityModel;
+    readonly resultEntity: EntityModel;
+    readonly converter: RowConverter;
+    readonly mainAlias: string = 'T';
+    resultAlias: string = 'T';
+    private _joins: JoinInfo[] = [];
+    private _selectColumns: Record<string, {
+        statement: string;
+        element: EntityDataProperty;
+    }> = {};
+    private _filter = And();
+    private _sort?: string[];
 
-    protected constructor() {
-        throw new Error('This class is abstract');
+    protected constructor(selectEntity: EntityModel, outputEntity: EntityModel) {
+        this.mainEntity = selectEntity;
+        this.resultEntity = outputEntity;
+        this.converter = new RowConverter(outputEntity.ctor);
+    }
+
+    static async create(source: EntityModel | AssociationNode, opts: {
+        maxSubQueries?: number;
+        maxEagerFetch?: number;
+    } = {}): Promise<FindCommand> {
+        let command: FindCommand;
+        let listingEntity: EntityModel;
+        if (source instanceof AssociationNode) {
+            const node = source;
+            listingEntity = await node.resolveTarget();
+            const resultEntity = await node.getLast().resolveTarget();
+            command = new FindCommand(listingEntity, resultEntity);
+            if (node.conditions)
+                await command.filter(node.conditions);
+            if (node.next) {
+                const join = await joinAssociationGetLast(command._joins, node.next, command.mainAlias);
+                command.resultAlias = join.joinAlias;
+            }
+        } else {
+            listingEntity = source;
+            command = new FindCommand(listingEntity, listingEntity);
+        }
+        if (!listingEntity.tableName)
+            throw new Error(`${listingEntity.ctor.name} is not decorated with @Entity decorator`);
+        if (typeof opts.maxSubQueries === 'number')
+            command.maxSubQueries = opts.maxSubQueries;
+        if (typeof opts.maxEagerFetch === 'number')
+            command.maxEagerFetch = opts.maxEagerFetch;
+        return command;
     }
 
     static async execute(args: FindCommandArgs): Promise<any[]> {
-        const {entity} = args;
-        const tableName = entity.tableName;
-        if (!tableName)
-            throw new Error(`${entity.ctor.name} is not decorated with @Entity decorator`);
+        const command = await FindCommand.create(args.entity, {
+            maxSubQueries: args.maxSubQueries,
+            maxEagerFetch: args.maxEagerFetch,
+        });
 
-        // Create a context
-        const ctx: FindCommandContext = {
-            entity,
-            model: new RowTransformModel(entity),
-            sqlColumns: {},
-            maxEagerFetch: args.maxEagerFetch || 100000,
-            maxRelationLevel: typeof args.maxRelationLevel === 'number' ? args.maxRelationLevel : 5
-        }
+        await command.addElements({
+            elements: args.elements,
+            include: args.include,
+            exclude: args.exclude,
+            sort: args.sort
+        });
 
-        // Prepare list of included element names
-        if (args.elements && args.elements.length)
-            ctx.requestElements = args.elements.map(x => x.toLowerCase());
-        // Add included elements to requestElements array
-        if (args.include && args.include.length) {
-            const requestElements = ctx.requestElements = ctx.requestElements ||
-                entity.getColumnElementNames().map(x => x.toLowerCase());
-            for (const k of args.include) {
-                if (!requestElements.includes(k.toLowerCase()))
-                    requestElements.push(k.toLowerCase());
+        if (args.filter)
+            await command.filter(args.filter);
+        if (args.sort)
+            await command.sort(args.sort);
+
+        return await command.execute(args);
+    }
+
+    async addElements(opts: {
+                          tableAlias?: string;
+                          converter?: RowConverter;
+                          entity?: EntityModel;
+                          elements?: string[];
+                          include?: string[];
+                          exclude?: string[];
+                          sort?: string[];
+                      } = {}
+    ): Promise<void> {
+        const tableAlias = opts.tableAlias || this.resultAlias;
+        const entity = opts.entity || this._getEntityFromAlias(tableAlias);
+        const converter = opts.converter || this.converter;
+
+        const requestElements = opts.elements && opts.elements.length ?
+            opts.elements.map(x => x.toLowerCase()) : undefined;
+        const includeElements = opts.include && opts.include.length ?
+            opts.include.map(x => x.toLowerCase()) : undefined;
+        const excludeElements = opts.exclude && opts.exclude.length ?
+            opts.exclude.map(x => x.toLowerCase()) : undefined;
+        const sortElements = opts.sort && opts.sort.length ?
+            opts.sort.map(x => x.toLowerCase()) : undefined;
+
+        for (const key of entity.propertyKeys) {
+            const col = entity.getProperty(key);
+            if (!col)
+                continue;
+            const colNameLower = col.name.toLowerCase();
+
+            // Ignore element if in excluded list
+            if (excludeElements && excludeElements.includes(colNameLower))
+                continue;
+
+            if (!(
+                // Non association elements are visible by default
+                (!requestElements && !isAssociationElement(col)) ||
+                // If element in include or request list
+                (requestElements && requestElements.find(x => x === colNameLower || x.startsWith(colNameLower + '.'))) ||
+                (includeElements && includeElements.find(
+                    (x: string) => x === colNameLower || x.startsWith(colNameLower + '.')))
+            )) continue;
+
+            // Add field to select list if element is a column
+            if (isDataProperty(col)) {
+                const fieldAlias = this._selectColumn(tableAlias, col);
+                // Add column to converter
+                if (!col.hidden)
+                    converter.addValueProperty({name: col.name, fieldAlias, parse: col.parse});
+                continue;
+            }
+
+            if (isObjectProperty(col)) {
+                const typ = await col.resolveType();
+                const subConverter = converter.addObjectProperty({
+                    name: col.name,
+                    type: typ.ctor
+                }).converter;
+                await this.addElements({
+                    tableAlias,
+                    converter: subConverter,
+                    entity: typ,
+                    elements: extractSubElements(colNameLower, requestElements),
+                    exclude: extractSubElements(colNameLower, excludeElements),
+                    sort: extractSubElements(colNameLower, sortElements),
+                });
+                continue;
+            }
+
+            if (isAssociationElement(col)) {
+
+                // OtO relation
+                if (!col.association.returnsMany()) {
+                    const joinInfo = await joinAssociationGetLast(this._joins, col.association, tableAlias);
+                    const subConverter = converter.addObjectProperty({
+                        name: col.name,
+                        type: joinInfo.targetEntity.ctor
+                    }).converter;
+                    // Add join fields to select columns list
+                    await this.addElements({
+                        tableAlias: joinInfo.joinAlias,
+                        converter: subConverter,
+                        entity: joinInfo.targetEntity,
+                        elements: extractSubElements(colNameLower, requestElements),
+                        exclude: extractSubElements(colNameLower, excludeElements),
+                        sort: extractSubElements(colNameLower, sortElements),
+                    });
+                    continue;
+                }
+
+                // One-2-Many Eager relation
+                if (this.maxSubQueries > 0) {
+                    const targetCol = await col.association.resolveTargetProperty();
+                    const sourceCol = await col.association.resolveSourceProperty();
+                    // We need to know key value to filter sub query.
+                    // So add key field into select columns
+                    const parentField = this._selectColumn(tableAlias, sourceCol);
+
+                    const findCommand = await FindCommand.create(col.association, {
+                        maxSubQueries: this.maxSubQueries - 1,
+                        maxEagerFetch: this.maxEagerFetch
+                    });
+                    await findCommand.filter(In(targetCol.name, Param(parentField)));
+                    const sort = sortElements && extractSubElements(colNameLower, sortElements);
+                    await findCommand.addElements({
+                        elements: extractSubElements(colNameLower, requestElements),
+                        include: extractSubElements(colNameLower, includeElements),
+                        exclude: extractSubElements(colNameLower, excludeElements),
+                        sort,
+                    });
+                    if (sort)
+                        await findCommand.sort(sort);
+                    const keyField = findCommand._selectColumn(findCommand.mainAlias, targetCol);
+
+                    const resultType = await col.association.getLast().resolveTarget();
+                    converter.addNestedProperty({
+                        name: col.name,
+                        type: resultType.ctor,
+                        findCommand,
+                        parentField,
+                        keyField,
+                        sort: extractSubElements(colNameLower, sortElements)
+                    });
+                }
             }
         }
-        if (ctx.requestElements) {
-            ctx.requestElements.forEach(s => {
-                const m = s.match(/\./);
-                if (m && m.length > ctx.maxRelationLevel)
-                    throw new Error(`Requested element ${s} exceeds maximum sub query limit`);
-            })
+    }
+
+    private _selectColumn(tableAlias: string, el: EntityDataProperty): string {
+        const fieldAlias = tableAlias + '_' + el.name.toUpperCase();
+        this._selectColumns[fieldAlias] = {
+            element: el,
+            statement: tableAlias + '.' + el.fieldName + ' as ' + fieldAlias
+        };
+        return fieldAlias;
+    }
+
+    async filter(filter: any): Promise<void> {
+        await prepareFilter(this.mainEntity, filter, this._filter);
+    }
+
+    async sort(sortElements: string[]): Promise<void> {
+        const orderColumns: string[] = [];
+        for (const item of sortElements) {
+            const m = item.match(SORT_ORDER_PATTERN);
+            if (!m)
+                throw new Error(`"${item}" is not a valid order expression`);
+
+            let elName = m[2];
+            let prefix = '';
+            let suffix = '';
+            let _entityDef = this.resultEntity;
+            let tableAlias = this.resultAlias;
+            if (elName.includes('.')) {
+                const a: string[] = elName.split('.');
+                while (a.length > 1) {
+                    const col = _entityDef.getProperty(a.shift() || '');
+                    if (isObjectProperty(col)) {
+                        _entityDef = await col.resolveType();
+                        if (col.fieldNamePrefix)
+                            prefix += col.fieldNamePrefix;
+                        if (col.fieldNameSuffix)
+                            suffix = col.fieldNameSuffix + suffix;
+                    } else if (isAssociationElement(col)) {
+                        if (col.association.returnsMany()) {
+                            elName = '';
+                            break;
+                        }
+                        const joinInfo = await joinAssociationGetLast(this._joins, col.association, tableAlias);
+                        tableAlias = joinInfo.joinAlias;
+                        _entityDef = joinInfo.targetEntity;
+                    } else throw new Error(`Invalid column (${elName}) declared in sort property`);
+                }
+                if (!elName)
+                    continue;
+                elName = a.shift() || '';
+            }
+            const col = _entityDef.getProperty(elName);
+            if (!col)
+                throw new Error(`Unknown element (${elName}) declared in sort property`);
+            if (!isDataProperty(col))
+                throw new Error(`Can not sort by "${elName}", because it is not a data column`);
+
+            const dir = m[1] || '+';
+            orderColumns.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
         }
-        // Prepare list of excluded element names
-        if (args.exclude && args.exclude.length)
-            ctx.excludeElements = args.exclude.map(x => x.toLowerCase());
+        this._sort = orderColumns;
+    }
 
-        //
-        await this._addEntityElements(ctx, entity, ctx.model, 'T');
-
-        // Wrap search filter to operator instances
-        let where: LogicalOperator | undefined;
-        if (args.filter) {
-            where = And();
-            await prepareFilter(entity, args.filter, where);
-        }
-
+    async execute(args:
+                      Pick<FindCommandArgs, 'connection' | 'distinct' |
+                          'offset' | 'limit' | 'params' | 'onTransformRow'>
+    ): Promise<any[]> {
         // Generate select query
-        const columnSqls = Object.keys(ctx.sqlColumns)
-            .map(x => ctx.sqlColumns[x].sqlStatement);
+        const columnSqls = Object.keys(this._selectColumns)
+            .map(x => this._selectColumns[x].statement);
 
         const query = Select(...columnSqls)
-            .from(entity.tableName + ' as T');
+            .from(this.mainEntity.tableName + ' as ' + this.mainAlias);
 
         if (args.distinct)
             query.distinct();
 
-        if (where)
-            query.where(...where._items);
-        if (args.sort) {
-            const sort = await this._prepareSort(ctx, entity, 'T', args.sort);
-            query.orderBy(...sort);
+        query.where(...this._filter._items);
+
+        if (this._sort) {
+            query.orderBy(...this._sort);
         }
         if (args.offset)
             query.offset(args.offset);
 
         // joins must be added last
-        if (ctx.joins)
-            for (const j of ctx.joins) {
+        if (this._joins)
+            for (const j of this._joins) {
                 query.join(j.join);
             }
 
@@ -128,190 +312,25 @@ export class FindCommand {
             cursor: false
         });
 
-        // Create rows
+        // Create objects
         const rows: any[] = [];
         if (resp.rows && resp.fields) {
-            const fields = resp.fields;
-            return ctx.model.transform(args.connection, fields, resp.rows)
+            return this.converter.transform(args.connection, resp.fields, resp.rows, args.onTransformRow);
         }
         return rows;
     }
 
-    private static async _addEntityElements(ctx: FindCommandContext,
-                                            entity: EntityMeta,
-                                            model: RowTransformModel,
-                                            tableAlias: string): Promise<void> {
-
-        const {excludeElements, requestElements} = ctx;
-
-        for (const key of entity.elementKeys) {
-            const col = entity.getElement(key);
-            if (!col)
-                continue;
-            const colNameLower = col.name.toLowerCase();
-
-            // Ignore element if in excluded list
-            if (excludeElements && excludeElements.includes(colNameLower))
-                continue;
-
-            // Ignore element if not requested
-            // Relational elements must be explicitly requested.
-            if (!requestElements && isAssociationElement(col))
-                continue;
-            if (requestElements && !requestElements.find(
-                x => x === colNameLower || x.startsWith(colNameLower + '.')
-            )) continue;
-
-            // Add field to select list
-            if (isColumnElement(col)) {
-                const fieldAlias = this._addSelectColumn(ctx, tableAlias, col);
-                // Add column to transform model
-                if (!col.hidden)
-                    model.addDataElement(col, fieldAlias);
-                continue;
-            }
-
-            if (isEmbeddedElement(col)) {
-                const typ = await col.resolveType();
-                const subModel = new RowTransformModel(typ, model);
-                await this._addEntityElements({
-                    ...ctx,
-                    requestElements: extractSubElements(colNameLower, requestElements),
-                    excludeElements: extractSubElements(colNameLower, excludeElements)
-                }, typ, subModel, tableAlias);
-                model.addNode(col, subModel);
-                continue;
-            }
-
-            if (isAssociationElement(col)) {
-
-                // OtO relation
-                if (!col.association.returnsMany()) {
-                    const joinInfo = await this._joinLinks(ctx, tableAlias, col);
-                    const subModel = new RowTransformModel(joinInfo.targetEntity, model);
-                    model.addNode(col, subModel);
-                    // Add join fields to select columns list
-                    await this._addEntityElements({
-                            ...ctx,
-                            requestElements: extractSubElements(colNameLower, requestElements),
-                            excludeElements: extractSubElements(colNameLower, excludeElements)
-                        },
-                        joinInfo.targetEntity,
-                        subModel, joinInfo.joinAlias);
-                    continue;
-                }
-
-                // One-2-Many Eager relation
-                const link = col.association;
-                const sourceCol = await link.resolveSourceColumn();
-                // We need to know key value to filter sub query.
-                // So add key field into select columns
-                const fieldAlias = this._addSelectColumn(ctx, tableAlias, sourceCol);
-                model.addDataElement(sourceCol, fieldAlias);
-
-                const filterCol = await link.resolveTargetColumn();
-                const prepareOptions = {
-                    elements: extractSubElements(colNameLower, requestElements),
-                    exclude: extractSubElements(colNameLower, excludeElements),
-                    filter: In(filterCol.name, Param(fieldAlias)),
-                    maxEagerFetch: ctx.maxEagerFetch,
-                    maxRelationLevel: ctx.maxRelationLevel - 1
-                }
-                model.addOne2ManyElement(col, fieldAlias, prepareOptions);
-            }
-
+    private _getEntityFromAlias(tableAlias: string): EntityModel {
+        if (tableAlias === this.mainAlias)
+            return this.mainEntity;
+        if (tableAlias === this.resultAlias)
+            return this.resultEntity;
+        if (this._joins) {
+            const join = this._joins.find(j => j.joinAlias === tableAlias);
+            if (join)
+                return join.targetEntity;
         }
-    }
-
-    private static _addSelectColumn(ctx: FindCommandContext, tableAlias: string, column: ColumnElementMeta): string {
-        const fieldAlias = tableAlias + '_' + column.name.toUpperCase();
-        ctx.sqlColumns[fieldAlias] = {
-            column,
-            sqlStatement: tableAlias + '.' + column.fieldName + ' as ' + fieldAlias
-        };
-        return fieldAlias;
-    }
-
-    private static async _joinLinks(ctx: FindCommandContext, tableAlias: string,
-                                    column: AssociationElementMeta): Promise<JoinInfo> {
-        let ring = column.association;
-        while (ring) {
-            const joinInfo = await this._addJoin(ctx, tableAlias, ring);
-            if (!ring.next)
-                return joinInfo;
-            tableAlias = joinInfo.joinAlias;
-            ring = ring.next;
-        }
-        throw new Error('Column association is undefined');
-    }
-
-    private static async _addJoin(ctx: FindCommandContext, tableAlias: string,
-                                  association: AssociationNode): Promise<JoinInfo> {
-        ctx.joins = ctx.joins || [];
-        let joinInfo = ctx.joins.find(j => j.association === association);
-        if (joinInfo)
-            return joinInfo;
-        const targetEntity = await association.resolveTarget();
-        const keyCol = await association.resolveSourceColumn();
-        const targetCol = await association.resolveTargetColumn();
-
-        const joinAlias = 'J' + (ctx.joins.length + 1);
-        const join = LeftOuterJoin(targetEntity.tableName + ' as ' + joinAlias);
-        join.on(Eq(joinAlias + '.' + targetCol.fieldName,
-            Raw(tableAlias + '.' + keyCol.fieldName)))
-
-        joinInfo = {
-            association,
-            targetEntity,
-            joinAlias,
-            join
-        }
-        ctx.joins.push(joinInfo);
-        return joinInfo;
-    }
-
-    private static async _prepareSort(ctx: FindCommandContext,
-                                      entityDef: EntityMeta,
-                                      tableAlias: string,
-                                      sort: string[]) {
-        const orderColumns: string[] = [];
-        for (const item of sort) {
-            const m = item.match(SORT_ORDER_PATTERN);
-            if (!m)
-                throw new Error(`"${item}" is not a valid order expression`);
-
-            let elName = m[2];
-            let prefix = '';
-            let suffix = '';
-            let _entityDef = entityDef;
-            if (elName.includes('.')) {
-                const a: string[] = elName.split('.');
-                while (a.length > 1) {
-                    const col = _entityDef.getElement(a.shift() || '');
-                    if (isEmbeddedElement(col)) {
-                        _entityDef = await col.resolveType();
-                        if (col.fieldNamePrefix)
-                            prefix += col.fieldNamePrefix;
-                        if (col.fieldNameSuffix)
-                            suffix = col.fieldNameSuffix + suffix;
-                    } else if (isAssociationElement(col) && !col.association.returnsMany()) {
-                        const joinInfo = await this._joinLinks(ctx, 'T', col);
-                        tableAlias = joinInfo.joinAlias;
-                        _entityDef = joinInfo.targetEntity;
-                    } else throw new Error(`Invalid column (${elName}) declared in sort property`);
-                }
-                elName = a.shift() || '';
-            }
-            const col = _entityDef.getElement(elName);
-            if (!col)
-                throw new Error(`Unknown element (${elName}) declared in sort property`);
-            if (!isColumnElement(col))
-                throw new Error(`Can not sort by "${elName}", because it is not a data column`);
-
-            const dir = m[1] || '+';
-            orderColumns.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
-        }
-        return orderColumns;
+        throw new Error(`Unknown table alias "${tableAlias}"`);
     }
 
 }
@@ -326,3 +345,5 @@ function extractSubElements(colNameLower: string, elements?: string[]): string[]
     }, [] as string[]);
     return result.length ? result : undefined;
 }
+
+

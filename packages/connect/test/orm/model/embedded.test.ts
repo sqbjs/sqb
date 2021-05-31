@@ -3,7 +3,7 @@ import '../../_support/env';
 import * as assert from 'assert';
 import {Column, Embedded, Entity} from '@sqb/connect';
 
-describe('Nested object element', function () {
+describe('Embedded object element', function () {
 
     class PersonName {
         @Column()
@@ -12,7 +12,7 @@ describe('Nested object element', function () {
         family: string
     }
 
-    it(`should define nested element metadata`, () => {
+    it(`should define embedded element metadata`, () => {
         class MyEntity {
             @Embedded(PersonName)
             name: PersonName;
@@ -21,7 +21,7 @@ describe('Nested object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getEmbeddedElement('name');
+        const name = meta.getObjectProperty('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
     });
@@ -38,7 +38,7 @@ describe('Nested object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getEmbeddedElement('name');
+        const name = meta.getObjectProperty('name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
         assert.strictEqual(name.fieldNamePrefix, 'prefix');

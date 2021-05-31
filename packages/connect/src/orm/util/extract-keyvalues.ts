@@ -1,18 +1,18 @@
-import {EntityMeta} from '../metadata/entity-meta';
-import {isColumnElement} from '../helpers';
+import {EntityModel} from '../model/entity-model';
+import {isDataProperty} from '../orm.helper';
 
 export function extractKeyValues<T>(
-    entityDef: EntityMeta,
+    entityDef: EntityModel,
     valueOrInstance: any | Record<string, any> | T): Record<string, any> {
     const primaryIndex = entityDef.primaryIndex;
     if (!primaryIndex)
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
     const validateCol = (k) => {
-        const col = entityDef.getElement(k);
+        const col = entityDef.getProperty(k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
-        if (!isColumnElement(col))
+        if (!isDataProperty(col))
             throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
     }
 

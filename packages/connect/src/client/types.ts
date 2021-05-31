@@ -97,6 +97,7 @@ export interface ClientDefaults {
     objectRows?: boolean;
     fieldNaming?: FieldNaming;
     showSql?: boolean;
+    prettyPrint?: boolean;
     ignoreNulls?: boolean;
 
     /**
@@ -173,6 +174,8 @@ export interface QueryExecuteOptions {
      */
     showSql?: boolean
 
+    prettyPrint?: boolean;
+
     action?: string;
 
     fetchAsString?: DataType[];
@@ -209,6 +212,7 @@ export interface QueryRequest {
     fieldNaming?: FieldNaming;
     transform?: ValueTransformFunction;
     showSql?: boolean;
+    prettyPrint?: boolean;
     action?: string;
     fetchAsString?: DataType[];
     executeHooks?: ExecuteHookFunction[];

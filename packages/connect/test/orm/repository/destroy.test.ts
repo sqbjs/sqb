@@ -1,6 +1,6 @@
 import '../../_support/env';
 import assert from 'assert';
-import {Customer} from '../../_support/customers.entity';
+import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 
 describe('destroy()', function () {

@@ -31,37 +31,37 @@
     },
     {
       "id": 2,
-      "tag": "medium",
+      "name": "medium",
       "color": "orange",
       "active": true
     },
     {
       "id": 3,
-      "tag": "large",
+      "name": "large",
       "color": "orange",
       "active": true
     },
     {
       "id": 4,
-      "tag": "enterprise",
+      "name": "enterprise",
       "color": "brown",
       "active": true
     },
     {
       "id": 5,
-      "tag": "generous",
+      "name": "generous",
       "color": "green",
       "active": true
     },
     {
       "id": 6,
-      "tag": "stingy",
+      "name": "stingy",
       "color": "red",
       "active": true
     },
     {
       "id": 7,
-      "tag": "rich",
+      "name": "rich",
       "color": "blue",
       "active": true
     }

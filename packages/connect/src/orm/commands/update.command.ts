@@ -1,18 +1,18 @@
 import {And, Param, Update} from '@sqb/builder';
 import {QueryExecutor} from '../../client/types';
-import {EntityMeta} from '../metadata/entity-meta';
-import {Repository} from '../repository';
-import {prepareFilter} from '../util/prepare-filter';
-import {isColumnElement, isEmbeddedElement} from '../helpers';
+import {EntityModel} from '../model/entity-model';
+import {Repository} from '../repository.class';
+import {prepareFilter} from './command.helper';
+import {isDataProperty, isObjectProperty} from '../orm.helper';
 
 export type UpdateCommandArgs = {
-    entity: EntityMeta;
+    entity: EntityModel;
     connection: QueryExecutor;
     values: any;
 } & Repository.UpdateAllOptions;
 
 type UpdateCommandContext = {
-    entity: EntityMeta;
+    entity: EntityModel;
     queryParams: any;
     queryValues: any;
     queryFilter: any[];
@@ -67,11 +67,11 @@ export class UpdateCommand {
     }
 
     protected static async _prepareParams(ctx: UpdateCommandContext,
-                                          entity: EntityMeta, values: any) {
+                                          entity: EntityModel, values: any) {
         let v;
-        for (const col of entity.elements.values()) {
+        for (const col of entity.properties.values()) {
             v = values[col.name];
-            if (isColumnElement(col)) {
+            if (isDataProperty(col)) {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')
@@ -89,7 +89,7 @@ export class UpdateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isEmbeddedElement(col)) {
+            } else if (v != null && isObjectProperty(col)) {
                 const type = await col.resolveType();
                 await this._prepareParams(ctx, type, v);
             }

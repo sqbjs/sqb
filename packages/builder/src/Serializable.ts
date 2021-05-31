@@ -76,6 +76,14 @@ export function serializeObject(ctx, v): string {
         return serializeFallback(ctx, SerializationType.STRING_VALUE, v,
             () => serializeStringValue(v));
     }
+    if (typeof v === 'boolean') {
+        return serializeFallback(ctx, SerializationType.BOOLEAN_VALUE, v,
+            () => serializeBooleanValue(v));
+    }
+    if (typeof v === 'number') {
+        return serializeFallback(ctx, SerializationType.NUMBER_VALUE, v,
+            () => serializeNumberValue(v));
+    }
     if (v instanceof Serializable)
         return v._serialize(ctx);
     return v;
@@ -86,6 +94,20 @@ export function serializeObject(ctx, v): string {
  */
 export function serializeStringValue(val: string): string {
     return '\'' + String(val).replace(/'/g, '\'\'') + '\'';
+}
+
+/**
+ *
+ */
+export function serializeBooleanValue(val: any): string {
+    return val ? 'true' : 'false';
+}
+
+/**
+ *
+ */
+export function serializeNumberValue(val: any): string {
+    return '' + val;
 }
 
 /**

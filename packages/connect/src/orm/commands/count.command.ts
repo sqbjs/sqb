@@ -1,11 +1,11 @@
 import {And, Count, LogicalOperator, Select} from '@sqb/builder';
-import {prepareFilter} from '../util/prepare-filter';
+import {prepareFilter} from './command.helper';
 import {QueryExecutor} from '../../';
-import {EntityMeta} from '../metadata/entity-meta';
-import {Repository} from '../repository';
+import {EntityModel} from '../model/entity-model';
+import {Repository} from '../repository.class';
 
 export type CountCommandArgs = {
-    entity: EntityMeta;
+    entity: EntityModel;
     connection: QueryExecutor;
 } & Repository.CountOptions;
 

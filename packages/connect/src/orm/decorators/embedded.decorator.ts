@@ -1,12 +1,12 @@
-import {EmbeddedTypeOptions, ConstructorThunk} from '../types';
-import {EntityMeta} from '../metadata/entity-meta';
+import {EmbeddedTypeOptions, TypeThunk} from '../orm.type';
+import {EntityModel} from '../model/entity-model';
 
-export function Embedded(type?: ConstructorThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
+export function Embedded(type?: TypeThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
-        const el = EntityMeta.attachTo(target.constructor)
-            .defineEmbeddedElement(propertyKey, type);
+        const el = EntityModel.attachTo(target.constructor)
+            .defineObjectProperty(propertyKey, type);
         if (options?.fieldNamePrefix)
             el.fieldNamePrefix = options.fieldNamePrefix;
         if (options?.fieldNameSuffix)

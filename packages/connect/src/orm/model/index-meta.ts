@@ -1,13 +1,13 @@
-import {EntityMeta} from './entity-meta';
-import {IndexOptions} from '../types';
+import {EntityModel} from './entity-model';
+import {IndexOptions} from '../orm.type';
 
 export class IndexMeta {
-    entity: EntityMeta;
+    entity: EntityModel;
     columns: string[];
     name?: string;
     unique?: boolean;
 
-    constructor(entity: EntityMeta, column: string | string[], options?: IndexOptions) {
+    constructor(entity: EntityModel, column: string | string[], options?: IndexOptions) {
         this.entity = entity;
         this.columns = Array.isArray(column) ? column : [column];
         if (options) {

@@ -1,6 +1,6 @@
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
-import {EntityMeta} from './metadata/entity-meta';
+import {EntityModel} from './model/entity-model';
 import {QueryExecutor} from '../client/types';
 import {Maybe, PartialWritable} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
@@ -9,8 +9,11 @@ import {CreateCommand} from './commands/create.command';
 import {FindCommand} from './commands/find.command';
 import {DestroyCommand} from './commands/destroy.command';
 import {UpdateCommand} from './commands/update.command';
+import {FieldInfoMap} from '../client/FieldInfoMap';
 
 export namespace Repository {
+
+    export type TransformRowFunction = (fields: FieldInfoMap, row: object, obj: object) => void;
 
     export interface CommandOptions {
         connection?: QueryExecutor;
@@ -35,12 +38,13 @@ export namespace Repository {
         sort?: string[];
         offset?: number;
         distinct?: boolean;
+        onTransformRow?: TransformRowFunction;
     }
 
     export interface FindAllOptions extends FindOneOptions {
         limit?: number;
         maxEagerFetch?: number;
-        maxRelationLevel?: number;
+        maxSubQueries?: number;
     }
 
     export interface GetOptions extends CommandOptions {
@@ -58,9 +62,9 @@ export namespace Repository {
 
 export class Repository<T> {
     private readonly _connection: QueryExecutor;
-    private readonly _entity: EntityMeta;
+    private readonly _entity: EntityModel;
 
-    constructor(entityDef: EntityMeta, executor: SqbClient | SqbConnection) {
+    constructor(entityDef: EntityModel, executor: SqbClient | SqbConnection) {
         this._connection = executor;
         this._entity = entityDef;
     }

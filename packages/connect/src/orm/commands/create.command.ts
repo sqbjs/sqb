@@ -1,17 +1,17 @@
 import {Insert, Param} from '@sqb/builder';
 import type {QueryExecutor} from '../../client/types';
-import type {EntityMeta} from '../metadata/entity-meta';
-import {isColumnElement, isEmbeddedElement} from '../helpers';
+import type {EntityModel} from '../model/entity-model';
+import {isDataProperty, isObjectProperty} from '../orm.helper';
 
 export type CreateCommandArgs = {
-    entity: EntityMeta;
+    entity: EntityModel;
     connection: QueryExecutor;
     values: any;
     returning?: boolean;
 }
 
 type CreateCommandContext = {
-    entity: EntityMeta;
+    entity: EntityModel;
     queryParams: any;
     queryValues: any;
     colCount: number;
@@ -56,7 +56,7 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const el = entity.getColumnElementByFieldName(f.fieldName);
+                const el = entity.getDataPropertyByFieldName(f.fieldName);
                 if (el)
                     keyValues[el.name] = qr.rows[0][f.index];
             }
@@ -65,11 +65,11 @@ export class CreateCommand {
     }
 
     protected static async _prepareParams(ctx: CreateCommandContext,
-                                          entity: EntityMeta, values: any) {
+                                          entity: EntityModel, values: any) {
         let v;
-        for (const col of entity.elements.values()) {
+        for (const col of entity.properties.values()) {
             v = values[col.name];
-            if (isColumnElement(col)) {
+            if (isDataProperty(col)) {
                 if (col.noInsert)
                     continue;
                 if (v == null && col.defaultValue !== undefined) {
@@ -92,7 +92,7 @@ export class CreateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isEmbeddedElement(col)) {
+            } else if (v != null && isObjectProperty(col)) {
                 const type = await col.resolveType();
                 await this._prepareParams(ctx, type, v);
             }

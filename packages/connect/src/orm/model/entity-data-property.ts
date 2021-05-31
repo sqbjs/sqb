@@ -1,15 +1,15 @@
 import 'reflect-metadata';
 import _ from 'lodash';
 import {DataType} from '@sqb/builder';
-import type {EntityMeta} from './entity-meta';
+import type {EntityModel} from './entity-model';
 import {
     ElementKind,
     ColumnAutoGenerationStrategy,
-    ColumnTransformFunction, ColumnOptions, EnumValue, FieldValue, DefaultValueGetter,
-} from '../types';
-import {AbstractElementMeta} from './abstract-element-meta';
+    ColumnTransformFunction, DataPropertyOptions, EnumValue, FieldValue, DefaultValueGetter,
+} from '../orm.type';
+import {AbstractEntityProperty} from './abstract-entity-property';
 
-export class ColumnElementMeta extends AbstractElementMeta {
+export class EntityDataProperty extends AbstractEntityProperty {
     readonly kind: ElementKind = 'data';
     fieldName: string;
     dataType?: DataType;
@@ -23,7 +23,7 @@ export class ColumnElementMeta extends AbstractElementMeta {
     /**
      * Column's default value
      */
-    defaultValue?: FieldValue | DefaultValueGetter;
+    default?: FieldValue | DefaultValueGetter;
 
     /**
      * Indicates if column data is an array
@@ -83,14 +83,14 @@ export class ColumnElementMeta extends AbstractElementMeta {
     parse?: ColumnTransformFunction;
     serialize?: ColumnTransformFunction;
 
-    constructor(entity: EntityMeta, name: string, options: ColumnOptions = {}) {
+    constructor(entity: EntityModel, name: string, options: DataPropertyOptions = {}) {
         super(entity, name);
         this.fieldName = name;
         if (options)
             this.assign(options);
     }
 
-    assign(options: ColumnOptions) {
+    assign(options: DataPropertyOptions) {
         Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
     }
 

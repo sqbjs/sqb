@@ -4,11 +4,11 @@ import * as assert from 'assert';
 import {
     Column,
     Entity,
-    Association,
-    HasOne,
-    PrimaryKey, hasOne, HasMany
+    Link,
+    LinkToOne,
+    PrimaryKey, linkToOne, LinkToMany
 } from '@sqb/connect';
-import {isAssociationElement} from '@sqb/connect/src/orm/helpers';
+import {isAssociationElement} from '../../../src/orm/orm.helper';
 
 class Country {
     @PrimaryKey()
@@ -28,18 +28,18 @@ class BaseCustomer {
     countryCode: string;
 }
 
-describe('Association element', function () {
+describe('Nested element', function () {
 
-    it(`should @Association() decorator define association element`, function () {
+    it(`should @Nested() decorator define association element`, function () {
 
         class Customer extends BaseCustomer {
-            @Association(hasOne(Country))
+            @Link(linkToOne(Country))
             country: Country;
         }
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = meta.getAssociationProperty('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -50,13 +50,13 @@ describe('Association element', function () {
     it(`should @HasOne() decorator define association element`, function () {
 
         class Customer extends BaseCustomer {
-            @HasOne(Country)
+            @LinkToOne(Country)
             country: Country;
         }
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = meta.getAssociationProperty('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -67,13 +67,13 @@ describe('Association element', function () {
     it(`should @HasOne() determine type from reflection`, function () {
 
         class Customer extends BaseCustomer {
-            @HasOne()
+            @LinkToOne()
             country: Country;
         }
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = meta.getAssociationProperty('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -83,13 +83,13 @@ describe('Association element', function () {
     it(`should @HasMany() decorator define association element`, function () {
 
         class Customer extends BaseCustomer {
-            @HasMany(Country)
+            @LinkToMany(Country)
             countries: Country[];
         }
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('countries');
+        const col = meta.getAssociationProperty('countries');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'countries');
         assert.strictEqual(col.association.source, Customer);
@@ -103,7 +103,7 @@ describe('Association element', function () {
             // noinspection JSUnusedLocalSymbols
             class Customer {
 
-                @HasMany(Country)
+                @LinkToMany(Country)
                 countries: Country;
             }
         }, /must be an array/)
