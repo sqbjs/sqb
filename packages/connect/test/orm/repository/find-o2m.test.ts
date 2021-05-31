@@ -46,6 +46,40 @@ describe('find() one to many relations', function () {
             }
         });
 
+        it('sort associated instances', async function () {
+            const repo = client().getRepository(Country);
+            const rows = await repo.findAll({
+                elements: ['code', 'customers'],
+                sort: ['code', 'customers.givenName']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            const sortedCountries = [...rows];
+            sortedCountries.sort((a, b) => {
+                if (a.code < b.code) return -1
+                if (a.code > b.code) return 1
+                return 0;
+            });
+
+            for (let i = 0; i < rows.length; i++) {
+                const country = rows[i];
+                assert.strictEqual(country.code, sortedCountries[i].code);
+                if (!country.customers)
+                    continue;
+                assert.ok(Array.isArray(country.customers));
+                const sortedCustomers = [...country.customers];
+                sortedCustomers.sort((a, b) => {
+                    if (a.givenName < b.givenName) return -1
+                    if (a.givenName > b.givenName) return 1
+                    return 0;
+                });
+                for (let k = 0; k < country.customers.length; k++) {
+                    const customer = country.customers[k];
+                    assert.strictEqual(customer.givenName, sortedCustomers[k].givenName);
+                }
+            }
+        });
+
         it('query indirect associations', async function () {
             const repo = client().getRepository(Continent);
             const rows = await repo.findAll({
