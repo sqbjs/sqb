@@ -56,8 +56,8 @@ describe('find() one to many relations', function () {
             assert.ok(rows.length);
             const sortedCountries = [...rows];
             sortedCountries.sort((a, b) => {
-                if (a.code < b.code) return -1
-                if (a.code > b.code) return 1
+                if (a.code.toLowerCase() < b.code.toLowerCase()) return -1
+                if (a.code.toLowerCase() > b.code.toLowerCase()) return 1
                 return 0;
             });
 
@@ -67,16 +67,10 @@ describe('find() one to many relations', function () {
                 if (!country.customers)
                     continue;
                 assert.ok(Array.isArray(country.customers));
-                const sortedCustomers = [...country.customers];
-                sortedCustomers.sort((a, b) => {
-                    if (a.givenName < b.givenName) return -1
-                    if (a.givenName > b.givenName) return 1
-                    return 0;
-                });
-                for (let k = 0; k < country.customers.length; k++) {
-                    const customer = country.customers[k];
-                    assert.strictEqual(customer.givenName, sortedCustomers[k].givenName);
-                }
+                const arr1 = country.customers.map(x => x.givenName);
+                const arr2 = country.customers.map(x => x.givenName);
+                arr2.sort();
+                assert.deepStrictEqual(arr1, arr2);
             }
         });
 
