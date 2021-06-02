@@ -1,5 +1,6 @@
 import './env';
 import {Connection} from 'postgresql-client';
+import '@sqb/postgres';
 
 let created = false;
 
