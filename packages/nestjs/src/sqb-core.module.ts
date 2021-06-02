@@ -8,7 +8,7 @@ import {
     Type,
 } from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
-import {defer, lastValueFrom} from 'rxjs';
+import {defer} from 'rxjs';
 import {SqbClient} from '@sqb/connect';
 import {
     generateString,
@@ -128,19 +128,20 @@ export class SqbCoreModule implements OnApplicationShutdown {
         options: SqbModuleOptions,
     ): Promise<SqbClient> {
         const connectionToken = options.name || DEFAULT_CONNECTION_NAME;
-        const pipe = defer(async () => {
+        return await defer(async () => {
             const client = new SqbClient(options);
             await client.test();
             return client;
-        }).pipe(
-            handleRetry(
-                options.retryAttempts,
-                options.retryDelay,
-                connectionToken,
-                options.verboseRetryLog,
-                options.toRetry,
-            ),
-        );
-        return await lastValueFrom(pipe);
+        })
+            .pipe(
+                handleRetry(
+                    options.retryAttempts,
+                    options.retryDelay,
+                    connectionToken,
+                    options.verboseRetryLog,
+                    options.toRetry,
+                ),
+            )
+            .toPromise();
     }
 }
