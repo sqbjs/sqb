@@ -43,8 +43,8 @@ describe('destroy()', function () {
         let c = 0;
         return client().acquire(async (connection) => {
             const values = {
-                givenName: 'abc',
-                familyName: 'def',
+                givenName: 'Abc',
+                familyName: 'Def',
                 countryCode: 'DE'
             };
             const repo = connection.getRepository<Customer>(Customer);

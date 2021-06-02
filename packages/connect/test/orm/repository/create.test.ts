@@ -109,8 +109,8 @@ describe('create()', function () {
         let c = 0;
         return client().acquire(async (connection) => {
             const values = {
-                givenName: 'abc',
-                familyName: 'def',
+                givenName: 'Abc',
+                familyName: 'Def',
                 countryCode: 'DE'
             };
             const repo = connection.getRepository<Customer>(Customer);
@@ -134,8 +134,8 @@ describe('createOnly()', function () {
     it('should not generate "returning" sql query for fast execution', async function () {
         return client().acquire(async (connection) => {
             const values = {
-                givenName: 'abc',
-                familyName: 'def',
+                givenName: 'Abc',
+                familyName: 'Def',
                 countryCode: 'DE'
             };
             const repo = connection.getRepository(Customer);

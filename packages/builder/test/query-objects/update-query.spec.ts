@@ -48,13 +48,13 @@ describe('Serialize update query', function () {
         const result = query.generate(Object.assign({
             params: {
                 id: 1,
-                name: 'abc'
+                name: 'Abc'
             }, ...options
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
         assert.deepStrictEqual(result.params, {
             id: 1,
-            name: 'abc'
+            name: 'Abc'
         });
     });
 
@@ -62,20 +62,20 @@ describe('Serialize update query', function () {
         const query = Update('table1', {id: Param('id'), name: Param('name')})
             .values({
                 id: 1,
-                name: 'abc'
+                name: 'Abc'
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
         assert.deepStrictEqual(result.params, {
             id: 1,
-            name: 'abc'
+            name: 'Abc'
         });
     });
 
     it('should validate query.params', function () {
         assert.throws(() =>
                 Update('table1', {id: Param('id'), name: /name/})
-                    .values([1, 'abc']),
+                    .values([1, 'Abc']),
             /Invalid argument/);
     });
 
