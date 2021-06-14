@@ -67,8 +67,8 @@ describe('find() one to many relations', function () {
                 if (!country.customers)
                     continue;
                 assert.ok(Array.isArray(country.customers));
-                const arr1 = country.customers.map(x => x.givenName);
-                const arr2 = country.customers.map(x => x.givenName);
+                const arr1 = country.customers.map(x => x.givenName.toLowerCase());
+                const arr2 = country.customers.map(x => x.givenName.toLowerCase());
                 arr2.sort();
                 assert.deepStrictEqual(arr1, arr2);
             }

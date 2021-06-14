@@ -39,6 +39,14 @@ export function getDataColumnNames<T, K extends keyof PickWritable<T>>(classRef:
     return (EntityModel.getColumnNames(classRef) || []) as K[];
 }
 
+export function getAssociationElementNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityModel.getAssociationElementNames(classRef) || []) as K[];
+}
+
+export function getEmbeddedElementNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
+    return (EntityModel.getEmbeddedElementNames(classRef) || []) as K[];
+}
+
 export function getInsertColumnNames<T, K extends keyof PickWritable<T>>(classRef: Type<T>): K[] {
     return (EntityModel.getInsertColumnNames(classRef) || []) as K[];
 }

@@ -287,6 +287,18 @@ export class EntityModel {
             return meta.getColumnElementNames() as (K[]);
     }
 
+    static getAssociationElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+        const meta = this.get(ctor);
+        if (meta)
+            return meta.getAssociationElementNames() as (K[]);
+    }
+
+    static getEmbeddedElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+        const meta = this.get(ctor);
+        if (meta)
+            return meta.getEmbeddedElementNames() as (K[]);
+    }
+
     static getInsertColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const meta = this.get(ctor);
         if (meta)

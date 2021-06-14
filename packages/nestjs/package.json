@@ -1,7 +1,7 @@
 {
   "name": "@sqb/nestjs",
   "description": "Nestjs module for data connection using SQB",
-  "version": "4.0.1-beta.7",
+  "version": "4.0.1-beta.8",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -35,8 +35,8 @@
   "peerDependencies": {
     "@nestjs/common": "^7.6.7",
     "@nestjs/core": "^7.6.7",
-    "@sqb/builder": "^4.0.1-beta.7",
-    "@sqb/connect": "^4.0.1-beta.7",
+    "@sqb/builder": "^4.0.1-beta.8",
+    "@sqb/connect": "^4.0.1-beta.8",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3"
   },
