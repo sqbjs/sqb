@@ -2,7 +2,7 @@ import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
 import {TransactionFunction} from '../client/types';
-import {Maybe, PartialWritable} from '../types';
+import {Maybe, PartialWritable, Type} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
 import {CreateCommand} from './commands/create.command';
@@ -79,6 +79,10 @@ export class Repository<T> {
         this._executor = executor;
         this._entity = entityDef;
         this._schema = schema;
+    }
+
+    get type(): Type<T> {
+        return this._entity.ctor;
     }
 
     create(values: PartialWritable<T>,
