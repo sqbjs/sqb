@@ -10,7 +10,6 @@ import {FindCommand} from './commands/find.command';
 import {DestroyCommand} from './commands/destroy.command';
 import {UpdateCommand} from './commands/update.command';
 import {FieldInfoMap} from '../client/FieldInfoMap';
-import CommandOptions = Repository.CommandOptions;
 
 export namespace Repository {
 
@@ -18,6 +17,11 @@ export namespace Repository {
 
     export interface CommandOptions {
         connection?: SqbConnection;
+    }
+
+    export interface CreateOptions extends CommandOptions {
+        filter?: any;
+        params?: any;
     }
 
     export interface CountOptions extends CommandOptions {
@@ -30,7 +34,7 @@ export namespace Repository {
         params?: any;
     }
 
-    export interface DestroyAllOptions extends CommandOptions {
+    export interface DestroyOptions extends CommandOptions {
         filter?: any;
         params?: any;
     }
@@ -86,14 +90,14 @@ export class Repository<T> {
     }
 
     create(values: PartialWritable<T>,
-           options?: Repository.CommandOptions): Promise<T> {
+           options?: Repository.CreateOptions): Promise<T> {
         return this._execute(async (connection) => {
             return this._create(values, {...options, connection});
         }, options);
     }
 
     createOnly(values: PartialWritable<T>,
-               options?: Repository.CommandOptions): Promise<void> {
+               options?: Repository.CreateOptions): Promise<void> {
         return this._execute(async (connection) => {
             return this._createOnly(values, {...options, connection});
         }, options);
@@ -129,13 +133,13 @@ export class Repository<T> {
         }, options);
     }
 
-    destroy(keyValue: any, options?: Repository.CommandOptions): Promise<boolean> {
+    destroy(keyValue: any, options?: Repository.DestroyOptions): Promise<boolean> {
         return this._execute(async (connection) => {
             return this._destroy(keyValue, {...options, connection});
         }, options);
     }
 
-    destroyAll(options?: Repository.DestroyAllOptions): Promise<number> {
+    destroyAll(options?: Repository.DestroyOptions): Promise<number> {
         return this._execute(async (connection) => {
             return this._destroyAll({...options, connection});
         }, options);
@@ -166,7 +170,7 @@ export class Repository<T> {
     }
 
     protected async _execute(fn: TransactionFunction,
-                             opts?: CommandOptions): Promise<any> {
+                             opts?: Repository.CommandOptions): Promise<any> {
         let connection = opts?.connection;
         if (!connection && this._executor instanceof SqbConnection)
             connection = this._executor;
@@ -183,7 +187,7 @@ export class Repository<T> {
     }
 
     protected async _create(values: PartialWritable<T>,
-                            options: Repository.CommandOptions & { connection: SqbConnection }): Promise<T> {
+                            options: Repository.CreateOptions & { connection: SqbConnection }): Promise<T> {
         const keyValues = await CreateCommand.execute({
             ...options,
             entity: this._entity,
@@ -197,7 +201,7 @@ export class Repository<T> {
     }
 
     protected async _createOnly(values: PartialWritable<T>,
-                                options: Repository.CommandOptions & { connection: SqbConnection }): Promise<void> {
+                                options: Repository.CreateOptions & { connection: SqbConnection }): Promise<void> {
         await CreateCommand.execute({
             ...options,
             entity: this._entity,
@@ -259,15 +263,22 @@ export class Repository<T> {
     }
 
     protected async _destroy(keyValue: any,
-                             options: Repository.CommandOptions & { connection: SqbConnection }): Promise<boolean> {
+                             options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<boolean> {
+        const keyValues = extractKeyValues(this._entity, keyValue);
+        const filter = [keyValues];
+        if (options && options.filter) {
+            if (Array.isArray(options.filter))
+                filter.push(...options.filter);
+            else filter.push(options.filter);
+        }
         return !!(await DestroyCommand.execute({
             ...options,
+            filter,
             entity: this._entity,
-            filter: extractKeyValues(this._entity, keyValue)
         }));
     }
 
-    protected async _destroyAll(options: Repository.DestroyAllOptions & { connection: SqbConnection }): Promise<number> {
+    protected async _destroyAll(options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<number> {
         return DestroyCommand.execute({
             ...options,
             entity: this._entity,

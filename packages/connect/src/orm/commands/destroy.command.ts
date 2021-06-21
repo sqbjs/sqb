@@ -7,7 +7,7 @@ import {SqbConnection} from '../../client/SqbConnection';
 export type DestroyCommandArgs = {
     entity: EntityModel;
     connection: SqbConnection;
-} & Repository.DestroyAllOptions;
+} & Repository.DestroyOptions;
 
 export class DestroyCommand {
 
