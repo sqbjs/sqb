@@ -9,7 +9,6 @@ import {
     QueryResult,
     ClientDefaults,
     ConnectionOptions,
-    QueryExecutor,
     QueryRequest,
 } from './types';
 import {Adapter} from './Adapter';
@@ -24,7 +23,7 @@ import {Maybe} from '../types';
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
 
-export class SqbClient extends SafeEventEmitter implements QueryExecutor {
+export class SqbClient extends SafeEventEmitter {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
@@ -179,7 +178,7 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
         }
     }
 
-    getRepository<T>(entity: Type<T> | string): Repository<T> {
+    getRepository<T>(entity: Type<T> | string, opts?: { schema?: string }): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
             ctor = this.getEntity<T>(entity);
@@ -189,7 +188,7 @@ export class SqbClient extends SafeEventEmitter implements QueryExecutor {
         const entityDef = EntityModel.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
-        return new Repository<T>(entityDef, this);
+        return new Repository<T>(entityDef, this, opts?.schema);
     }
 
     getEntity<T>(name: string): Maybe<Type<T>> {

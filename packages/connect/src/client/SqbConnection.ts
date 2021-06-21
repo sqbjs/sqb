@@ -7,7 +7,7 @@ import {SqbClient} from './SqbClient';
 import {
     ConnectionOptions, ExecuteHookFunction, FetchFunction,
     FieldNaming,
-    QueryExecuteOptions, QueryExecutor, QueryRequest,
+    QueryExecuteOptions, QueryRequest,
     QueryResult
 } from './types';
 import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
@@ -20,7 +20,7 @@ import {EntityModel} from '../orm/model/entity-model';
 
 const debug = _debug('sqb:connection');
 
-export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
+export class SqbConnection extends SafeEventEmitter {
 
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
@@ -113,7 +113,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
         return this._tasks.enqueue(() => this._execute(query, options));
     }
 
-    getRepository<T>(entity: Type<T> | string): Repository<T> {
+    getRepository<T>(entity: Type<T> | string, opts?: { schema?: string }): Repository<T> {
         let ctor;
         if (typeof entity === 'string') {
             ctor = this.client.getEntity<T>(entity);
@@ -123,7 +123,7 @@ export class SqbConnection extends SafeEventEmitter implements QueryExecutor {
         const entityDef = EntityModel.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
-        return new Repository<T>(entityDef, this);
+        return new Repository<T>(entityDef, this, opts?.schema);
     }
 
     async getSchema(): Promise<string> {

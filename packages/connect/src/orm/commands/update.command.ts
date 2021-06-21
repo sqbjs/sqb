@@ -1,13 +1,13 @@
 import {And, Param, Update} from '@sqb/builder';
-import {QueryExecutor} from '../../client/types';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
 import {prepareFilter} from './command.helper';
 import {isDataProperty, isObjectProperty} from '../orm.helper';
+import {SqbConnection} from '../../client/SqbConnection';
 
 export type UpdateCommandArgs = {
     entity: EntityModel;
-    connection: QueryExecutor;
+    connection: SqbConnection;
     values: any;
 } & Repository.UpdateAllOptions;
 

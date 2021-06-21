@@ -1,12 +1,12 @@
 import {And, Delete, LogicalOperator} from '@sqb/builder';
-import {QueryExecutor} from '../../client/types';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
 import {prepareFilter} from './command.helper';
+import {SqbConnection} from '../../client/SqbConnection';
 
 export type DestroyCommandArgs = {
     entity: EntityModel;
-    connection: QueryExecutor;
+    connection: SqbConnection;
 } & Repository.DestroyAllOptions;
 
 export class DestroyCommand {

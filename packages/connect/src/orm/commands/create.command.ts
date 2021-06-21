@@ -1,11 +1,11 @@
 import {Insert, Param} from '@sqb/builder';
-import type {QueryExecutor} from '../../client/types';
 import type {EntityModel} from '../model/entity-model';
 import {isDataProperty, isObjectProperty} from '../orm.helper';
+import {SqbConnection} from '../../client/SqbConnection';
 
 export type CreateCommandArgs = {
     entity: EntityModel;
-    connection: QueryExecutor;
+    connection: SqbConnection;
     values: any;
     returning?: boolean;
 }

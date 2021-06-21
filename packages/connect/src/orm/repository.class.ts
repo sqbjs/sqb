@@ -1,7 +1,7 @@
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
-import {QueryExecutor} from '../client/types';
+import {TransactionFunction} from '../client/types';
 import {Maybe, PartialWritable} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
@@ -10,13 +10,14 @@ import {FindCommand} from './commands/find.command';
 import {DestroyCommand} from './commands/destroy.command';
 import {UpdateCommand} from './commands/update.command';
 import {FieldInfoMap} from '../client/FieldInfoMap';
+import CommandOptions = Repository.CommandOptions;
 
 export namespace Repository {
 
     export type TransformRowFunction = (fields: FieldInfoMap, row: object, obj: object) => void;
 
     export interface CommandOptions {
-        connection?: QueryExecutor;
+        connection?: SqbConnection;
     }
 
     export interface CountOptions extends CommandOptions {
@@ -70,41 +71,139 @@ export namespace Repository {
 }
 
 export class Repository<T> {
-    private readonly _connection: QueryExecutor;
+    private readonly _executor: SqbClient | SqbConnection;
     private readonly _entity: EntityModel;
+    private readonly _schema?: string
 
-    constructor(entityDef: EntityModel, executor: SqbClient | SqbConnection) {
-        this._connection = executor;
+    constructor(entityDef: EntityModel, executor: SqbClient | SqbConnection, schema?: string) {
+        this._executor = executor;
         this._entity = entityDef;
+        this._schema = schema;
     }
 
-    async create(values: PartialWritable<T>,
-                 options?: Repository.CommandOptions): Promise<T> {
+    create(values: PartialWritable<T>,
+           options?: Repository.CommandOptions): Promise<T> {
+        return this._execute(async (connection) => {
+            return this._create(values, {...options, connection});
+        }, options);
+    }
+
+    createOnly(values: PartialWritable<T>,
+               options?: Repository.CommandOptions): Promise<void> {
+        return this._execute(async (connection) => {
+            return this._createOnly(values, {...options, connection});
+        }, options);
+    }
+
+    exists(keyValue: any, options?: Repository.ExistsOptions): Promise<boolean> {
+        return this._execute(async (connection) => {
+            return this._exists(keyValue, {...options, connection});
+        }, options);
+    }
+
+    count(options?: Repository.CountOptions): Promise<number> {
+        return this._execute(async (connection) => {
+            return this._count({...options, connection});
+        }, options);
+    }
+
+    findAll(options?: Repository.FindAllOptions): Promise<T[]> {
+        return this._execute(async (connection) => {
+            return this._findAll({...options, connection});
+        }, options);
+    }
+
+    findOne(options?: Repository.FindOneOptions): Promise<Maybe<T>> {
+        return this._execute(async (connection) => {
+            return this._findOne({...options, connection});
+        }, options);
+    }
+
+    findByPk(keyValue: any, options?: Repository.GetOptions): Promise<Maybe<T>> {
+        return this._execute(async (connection) => {
+            return this._findByPk(keyValue, {...options, connection});
+        }, options);
+    }
+
+    destroy(keyValue: any, options?: Repository.CommandOptions): Promise<boolean> {
+        return this._execute(async (connection) => {
+            return this._destroy(keyValue, {...options, connection});
+        }, options);
+    }
+
+    destroyAll(options?: Repository.DestroyAllOptions): Promise<number> {
+        return this._execute(async (connection) => {
+            return this._destroyAll({...options, connection});
+        }, options);
+    }
+
+    update(values: PartialWritable<T>,
+           options?: Repository.UpdateOptions): Promise<T | undefined> {
+        return this._execute(async (connection) => {
+            const opts = {...options, connection};
+            const keyValues = await this._update(values, opts);
+            if (keyValues)
+                return this._findByPk(keyValues, opts);
+        }, options);
+    }
+
+    updateOnly(values: PartialWritable<T>,
+               options?: Repository.UpdateOptions): Promise<any> {
+        return this._execute(async (connection) => {
+            return !!(await this._update(values, {...options, connection}));
+        }, options);
+    }
+
+    updateAll(values: PartialWritable<T>,
+              options?: Repository.UpdateAllOptions): Promise<number> {
+        return this._execute(async (connection) => {
+            return this._updateAll(values, {...options, connection});
+        })
+    }
+
+    protected async _execute(fn: TransactionFunction,
+                             opts?: CommandOptions): Promise<any> {
+        let connection = opts?.connection;
+        if (!connection && this._executor instanceof SqbConnection)
+            connection = this._executor;
+        if (connection) {
+            if (this._schema)
+                await connection.setSchema(this._schema);
+            return fn(connection);
+        }
+        return (this._executor as SqbClient).acquire(async (conn) => {
+            if (this._schema)
+                await conn.setSchema(this._schema);
+            return fn(conn);
+        });
+    }
+
+    protected async _create(values: PartialWritable<T>,
+                            options: Repository.CommandOptions & { connection: SqbConnection }): Promise<T> {
         const keyValues = await CreateCommand.execute({
-            entity: this._entity,
-            connection: this._connection,
             ...options,
+            entity: this._entity,
             values,
             returning: true
         });
-        const result = keyValues && (await this.findByPk(keyValues));
+        const result = keyValues && (await this.findByPk(keyValues, options));
         if (!result)
             throw new Error('Unable to insert new row');
         return result;
     }
 
-    async createOnly(values: PartialWritable<T>,
-                     options?: Repository.CommandOptions): Promise<void> {
+    protected async _createOnly(values: PartialWritable<T>,
+                                options: Repository.CommandOptions & { connection: SqbConnection }): Promise<void> {
         await CreateCommand.execute({
-            entity: this._entity,
-            connection: this._connection,
             ...options,
+            entity: this._entity,
             values,
             returning: false
         });
     }
 
-    async exists(keyValue: any, options?: Repository.ExistsOptions): Promise<boolean> {
+    protected async _exists(keyValue: any,
+                            options: Repository.ExistsOptions & { connection: SqbConnection }): Promise<boolean> {
         const keyValues = extractKeyValues(this._entity, keyValue);
         const filter = [keyValues];
         if (options && options.filter) {
@@ -113,32 +212,28 @@ export class Repository<T> {
             else filter.push(options.filter);
         }
         return !!(await CountCommand.execute({
-            connection: this._connection,
             ...options,
             filter,
             entity: this._entity
         }));
     }
 
-    count(options?: Repository.CountOptions): Promise<number> {
+    protected async _count(options: Repository.CountOptions & { connection: SqbConnection }): Promise<number> {
         return CountCommand.execute({
-            connection: this._connection,
             ...options,
             entity: this._entity
         });
     }
 
-    async findAll(options?: Repository.FindAllOptions): Promise<T[]> {
+    protected async _findAll(options: Repository.FindAllOptions & { connection: SqbConnection }): Promise<T[]> {
         return await FindCommand.execute({
-            connection: this._connection,
             ...options,
             entity: this._entity,
         });
     }
 
-    async findOne(options?: Repository.FindOneOptions): Promise<Maybe<T>> {
+    protected async _findOne(options: Repository.FindOneOptions & { connection: SqbConnection }): Promise<Maybe<T>> {
         const rows = await FindCommand.execute({
-            connection: this._connection,
             ...options,
             entity: this._entity,
             limit: 1
@@ -146,8 +241,9 @@ export class Repository<T> {
         return rows && rows[0];
     }
 
-    async findByPk(keyValue: any, options?: Repository.GetOptions): Promise<Maybe<T>> {
-        const opts: Repository.FindAllOptions = {...options};
+    protected async _findByPk(keyValue: any,
+                              options: Repository.GetOptions & { connection: SqbConnection }): Promise<Maybe<T>> {
+        const opts: Repository.FindAllOptions & { connection: SqbConnection } = {...options};
         opts.filter = [extractKeyValues(this._entity, keyValue)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
@@ -155,21 +251,20 @@ export class Repository<T> {
             else opts.filter.push(options.filter);
         }
         delete opts.offset;
-        return await this.findOne(opts);
+        return await this._findOne(opts);
     }
 
-    async destroy(keyValue: any, options?: Repository.CommandOptions): Promise<boolean> {
+    protected async _destroy(keyValue: any,
+                             options: Repository.CommandOptions & { connection: SqbConnection }): Promise<boolean> {
         return !!(await DestroyCommand.execute({
-            connection: this._connection,
             ...options,
             entity: this._entity,
             filter: extractKeyValues(this._entity, keyValue)
         }));
     }
 
-    async destroyAll(options?: Repository.DestroyAllOptions): Promise<number> {
+    protected async _destroyAll(options: Repository.DestroyAllOptions & { connection: SqbConnection }): Promise<number> {
         return DestroyCommand.execute({
-            connection: this._connection,
             ...options,
             entity: this._entity,
             filter: options?.filter,
@@ -177,53 +272,37 @@ export class Repository<T> {
         });
     }
 
-    async update(values: PartialWritable<T>,
-                 options?: Repository.UpdateOptions): Promise<T | undefined> {
-
-        const keyValues = await this._update(values, options);
-        if (keyValues)
-            return this.findByPk(keyValues);
-    }
-
-    async updateOnly(values: PartialWritable<T>,
-                     options?: Repository.UpdateOptions): Promise<any> {
-        return !!(await this._update(values, options));
-    }
-
-    async updateAll(values: PartialWritable<T>,
-                    options?: Repository.UpdateAllOptions): Promise<number> {
-        return await UpdateCommand.execute({
-            entity: this._entity,
-            connection: this._connection,
-            ...options,
-            values
-        });
-    }
-
     protected async _update(values: PartialWritable<T>,
-                            options?: Repository.UpdateOptions): Promise<any> {
+                            options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<any> {
         const primaryKeys = this._entity.primaryIndex?.columns;
         if (!(primaryKeys && primaryKeys.length))
             throw new Error(`To run the update command, You must define primary key(s) for ${this._entity.ctor.name} entity.`);
 
         const keyValues = extractKeyValues(this._entity, values);
         const filter = [keyValues];
-        if (options && options.filter) {
+        if (options.filter) {
             if (Array.isArray(options.filter))
                 filter.push(...options.filter);
             else filter.push(options.filter);
         }
         const updateValues = {...values};
         primaryKeys.forEach(k => delete updateValues[k]);
-
         const rowsAffected = await UpdateCommand.execute({
-            entity: this._entity,
-            connection: this._connection,
             ...options,
+            entity: this._entity,
             values: updateValues,
             filter
         });
         return rowsAffected ? keyValues : undefined;
+    }
+
+    protected async _updateAll(values: PartialWritable<T>,
+                               options: Repository.UpdateAllOptions & { connection: SqbConnection }): Promise<number> {
+        return await UpdateCommand.execute({
+            ...options,
+            entity: this._entity,
+            values
+        });
     }
 
 }

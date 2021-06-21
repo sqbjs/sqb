@@ -1,9 +1,9 @@
-import type {QueryExecutor} from '../../client/types';
 import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {FindCommand} from './find.command';
 import type {Repository} from '../repository.class';
 import {ColumnTransformFunction} from '../orm.type';
 import {Type} from '../../types';
+import {SqbConnection} from '../../client/SqbConnection';
 
 export interface ValueProperty {
     fieldAlias: string;
@@ -95,7 +95,7 @@ export class RowConverter {
         return this._propertyKeys;
     }
 
-    async transform(connection: QueryExecutor, fields: FieldInfoMap, rows: any,
+    async transform(connection: SqbConnection, fields: FieldInfoMap, rows: any,
                     onTransform?: Repository.TransformRowFunction): Promise<any[]> {
 
         const rowLen = rows.length;
@@ -118,7 +118,7 @@ export class RowConverter {
         return result.filter(x => !!x);
     }
 
-    private _rowToObject(executor: QueryExecutor, fields: FieldInfoMap, row: any[]): any {
+    private _rowToObject(executor: SqbConnection, fields: FieldInfoMap, row: any[]): any {
         // Cache keys for better performance
         const elementKeys = this.keys;
         const elementLen = elementKeys.length;
@@ -159,7 +159,7 @@ export class RowConverter {
         return result;
     }
 
-    private async _iterateForNested(node: RowConverter, connection: QueryExecutor,
+    private async _iterateForNested(node: RowConverter, connection: SqbConnection,
                                     fields: FieldInfoMap, rows: any, result: object[]): Promise<void> {
 
         // Fetch one-2-many related rows and merge with result rows

@@ -1,5 +1,4 @@
 import {And, Select, In, Param} from '@sqb/builder';
-import type {QueryExecutor} from '../../client/types';
 import type {Repository} from '../repository.class';
 import type {EntityModel} from '../model/entity-model';
 import type {EntityDataProperty} from '../model/entity-data-property';
@@ -7,10 +6,11 @@ import {RowConverter} from './row-converter';
 import {AssociationNode} from '../model/association-node';
 import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
 import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
+import {SqbConnection} from '../../client/SqbConnection';
 
 export type FindCommandArgs = {
     entity: EntityModel;
-    connection: QueryExecutor
+    connection: SqbConnection
 } & Repository.FindAllOptions;
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
