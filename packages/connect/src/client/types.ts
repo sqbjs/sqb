@@ -1,4 +1,3 @@
-import type {classes} from '@sqb/builder';
 import type {SqbConnection} from './SqbConnection';
 import type {FieldInfoMap} from './FieldInfoMap';
 import type {Cursor} from './Cursor';
@@ -21,10 +20,6 @@ export type ObjectRow = Record<string, any>;
 export type ArrayRow = any[];
 export type ObjectRowset = ObjectRow[];
 export type ArrayRowset = ArrayRow[];
-
-export interface QueryExecutor {
-    execute(query: string | classes.Query, options?: QueryExecuteOptions): Promise<QueryResult>;
-}
 
 export interface ClientConfiguration {
 
