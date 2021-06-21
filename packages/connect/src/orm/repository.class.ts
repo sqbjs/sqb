@@ -59,6 +59,8 @@ export namespace Repository {
     }
 
     export interface UpdateOptions extends CommandOptions {
+        filter?: any;
+        params?: any;
     }
 
     export interface UpdateAllOptions extends CommandOptions {
@@ -205,6 +207,12 @@ export class Repository<T> {
             throw new Error(`To run the update command, You must define primary key(s) for ${this._entity.ctor.name} entity.`);
 
         const keyValues = extractKeyValues(this._entity, values);
+        const filter = [keyValues];
+        if (options && options.filter) {
+            if (Array.isArray(options.filter))
+                filter.push(...options.filter);
+            else filter.push(options.filter);
+        }
         const updateValues = {...values};
         primaryKeys.forEach(k => delete updateValues[k]);
 
@@ -213,7 +221,7 @@ export class Repository<T> {
             connection: this._connection,
             ...options,
             values: updateValues,
-            filter: keyValues
+            filter
         });
         return rowsAffected ? keyValues : undefined;
     }
