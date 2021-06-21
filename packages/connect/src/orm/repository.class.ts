@@ -24,6 +24,11 @@ export namespace Repository {
         params?: any;
     }
 
+    export interface ExistsOptions extends CommandOptions {
+        filter?: any;
+        params?: any;
+    }
+
     export interface DestroyAllOptions extends CommandOptions {
         filter?: any;
         params?: any;
@@ -49,6 +54,8 @@ export namespace Repository {
 
     export interface GetOptions extends CommandOptions {
         elements?: string[];
+        filter?: any;
+        params?: any;
     }
 
     export interface UpdateOptions extends CommandOptions {
@@ -95,12 +102,18 @@ export class Repository<T> {
         });
     }
 
-    async exists(keyValue: any, options?: Repository.CommandOptions): Promise<boolean> {
+    async exists(keyValue: any, options?: Repository.ExistsOptions): Promise<boolean> {
         const keyValues = extractKeyValues(this._entity, keyValue);
+        const filter = [keyValues];
+        if (options && options.filter) {
+            if (Array.isArray(options.filter))
+                filter.push(...options.filter);
+            else filter.push(options.filter);
+        }
         return !!(await CountCommand.execute({
             connection: this._connection,
             ...options,
-            filter: keyValues,
+            filter,
             entity: this._entity
         }));
     }
@@ -134,6 +147,11 @@ export class Repository<T> {
     async findByPk(keyValue: any, options?: Repository.GetOptions): Promise<Maybe<T>> {
         const opts: Repository.FindAllOptions = {...options};
         opts.filter = [extractKeyValues(this._entity, keyValue)];
+        if (options && options.filter) {
+            if (Array.isArray(options.filter))
+                opts.filter.push(...options.filter);
+            else opts.filter.push(options.filter);
+        }
         delete opts.offset;
         return await this.findOne(opts);
     }
