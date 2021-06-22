@@ -3,6 +3,7 @@ export * from './types';
 export * from './client/types';
 export * from './client/Adapter';
 export * from './client/SqbClient';
+export * from './client/SqbConnection';
 export * from './client/Cursor';
 export {registerAdapter, unRegisterAdapter} from './client/extensions';
 
