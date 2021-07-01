@@ -5,8 +5,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
-    "noEmit": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
       "@sqb/builder": ["../src"]

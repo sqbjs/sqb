@@ -1,17 +1,14 @@
 {
   "extends": "../../tsconfig-base.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test"],
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "sourceMap": true,
-    "baseUrl": "./",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../[!nestjs.]*"]
+      "@sqb/builder": ["../builder/src"],
+      "@sqb/connect": ["../connect/src"]
     }
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "test"]
+  }
 }

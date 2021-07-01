@@ -7,7 +7,8 @@ const {deleteFolderRecursive} = require('../common');
 module.exports = {
   ...packages.createTasks('clean', async (pkg) => {
         console.log(`clean '${colors.cyan(pkg.name)}'`);
-        await pkg.execSh('ts-cleanup -d dist --remove-dirs --all');
+        deleteFolderRecursive(path.join(pkg.dirname, 'dist'));
+        deleteFolderRecursive(path.join(pkg.dirname, 'node_modules'));
         await pkg.execSh('ts-cleanup -s src --all');
         await pkg.execSh('ts-cleanup -s test');
       }
@@ -20,7 +21,7 @@ module.exports = {
   ),
   ...packages.createTasks('clean:dist', async (pkg) => {
         console.log(`clean:dist '${colors.cyan(pkg.name)}'`);
-        await pkg.execSh('ts-cleanup -d dist --remove-dirs --all');
+        deleteFolderRecursive(path.join(pkg.dirname, 'dist'));
       }
   ),
   ...packages.createTasks('clean:coverage', async (pkg) => {

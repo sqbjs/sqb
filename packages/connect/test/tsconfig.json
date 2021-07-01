@@ -6,12 +6,12 @@
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "strict": false,
-    "noEmit": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
+      "@sqb/builder": ["../../builder/src"],
       "@sqb/connect": ["../src"],
-      "@sqb/*": ["../../*"]
+      "@sqb/postgres": ["../../postgres/src"],
+      "@sqb/postgres-dialect": ["../../postgres-dialect/src"]
     }
   }
 }
