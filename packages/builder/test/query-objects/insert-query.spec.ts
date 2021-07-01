@@ -47,13 +47,13 @@ describe('Serialize insert query', function () {
     it('should serialize params with "values" argument', function () {
         const query = Insert('table1', {id: Param('id'), name: Param('name')});
         const result = query.generate(Object.assign({
-            params: {
+            values: {
                 id: 1,
                 name: 'Abc'
             }
         }, options));
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-        assert.deepStrictEqual(result.params, {
+        assert.deepStrictEqual(result.values, {
             id: 1,
             name: 'Abc'
         });
@@ -67,7 +67,7 @@ describe('Serialize insert query', function () {
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'insert into table1 (id, name) values (:id, :name)');
-        assert.deepStrictEqual(result.params, {
+        assert.deepStrictEqual(result.values, {
             id: 1,
             name: 'Abc'
         });
