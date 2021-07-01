@@ -57,10 +57,10 @@ describe('MSSqlSerializer', function () {
         const query = Select().from('table1').where({'ID': Param('ID')});
         const result = query.generate({
             dialect: 'mssql',
-            values: {ID: 5}
+            params: {ID: 5}
         });
         assert.strictEqual(result.sql, 'select * from table1 where ID = @ID');
-        assert.deepStrictEqual(result.values, {ID: 5});
+        assert.deepStrictEqual(result.params, {ID: 5});
     });
 
 });

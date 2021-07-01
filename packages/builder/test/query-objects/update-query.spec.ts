@@ -46,13 +46,13 @@ describe('Serialize update query', function () {
     it('should serialize params with "values" argument: COLON', function () {
         const query = Update('table1', {id: Param('id'), name: Param('name')});
         const result = query.generate(Object.assign({
-            values: {
+            params: {
                 id: 1,
                 name: 'Abc'
             }, ...options
         }, options));
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'Abc'
         });
@@ -66,7 +66,7 @@ describe('Serialize update query', function () {
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.values, {
+        assert.deepStrictEqual(result.params, {
             id: 1,
             name: 'Abc'
         });

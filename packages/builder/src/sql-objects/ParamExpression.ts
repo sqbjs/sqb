@@ -39,7 +39,7 @@ export class ParamExpression extends Serializable {
                                      dataType?: DataType,
                                      isArray?: boolean
                                  }): string {
-        let prmValue = ctx.values && ctx.values[o.name];
+        let prmValue = ctx.params && ctx.params[o.name];
         if (o.isArray && !Array.isArray(prmValue))
             prmValue = [prmValue];
         ctx.queryParams = ctx.queryParams || {};

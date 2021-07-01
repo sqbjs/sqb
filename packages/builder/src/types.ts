@@ -12,7 +12,7 @@ export interface GenerateOptions {
      */
     dialect?: string;
     prettyPrint?: boolean;
-    values?: Record<string, any>;
+    params?: Record<string, any>;
     dialectVersion?: string;
     strictParams?: boolean;
 }
@@ -24,9 +24,9 @@ export interface SerializeContext extends GenerateOptions {
     strictParamGenId?: number;
 }
 
-export interface GeneratedQuery {
+export interface GenerateResult {
     sql: string;
-    values?: any;
+    params?: any;
     returningFields?: { field: string, alias?: string }[];
 }
 

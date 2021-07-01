@@ -30,8 +30,8 @@ export abstract class CompOperator extends Operator {
             ctx.strictParamGenId = ctx.strictParamGenId || 0;
             const name = 'strictParam$' + ++ctx.strictParamGenId;
             right = Param(name);
-            ctx.values = ctx.values || {};
-            ctx.values[name] = this._value;
+            ctx.params = ctx.params || {};
+            ctx.params[name] = this._value;
         }
         const o: any = {
             operatorType: this._operatorType,
