@@ -258,12 +258,12 @@ export class SqbConnection extends SafeEventEmitter {
                 .generate({
                     dialect: request.dialect,
                     dialectVersion: request.dialectVersion,
-                    params: options.params,
+                    values: options.params,
                     strictParams: true,
                     prettyPrint: request.prettyPrint
                 });
             request.sql = q.sql;
-            request.params = q.params;
+            request.params = q.values;
             if (q.returningFields)
                 request.returningFields = q.returningFields;
             if (query.listenerCount('execute'))
