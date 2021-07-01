@@ -136,9 +136,9 @@ describe('serialize "Operators"', function () {
             const query = Select()
                 .from('table1')
                 .where(Eq('id', Param('id')));
-            const result = query.generate(Object.assign({values: {id: 1}}, options));
+            const result = query.generate(Object.assign({params: {id: 1}}, options));
             assert.strictEqual(result.sql, 'select * from table1 where id = :id');
-            assert.strictEqual(result.values.id, 1);
+            assert.strictEqual(result.params.id, 1);
         });
 
         it('should wrap native objects to operators', function () {
@@ -180,9 +180,9 @@ describe('serialize "Operators"', function () {
             const query = Select()
                 .from('table1')
                 .where(Ne('id', Param('id')));
-            const result = query.generate(Object.assign({values: {id: 1}}, options));
+            const result = query.generate(Object.assign({params: {id: 1}}, options));
             assert.strictEqual(result.sql, 'select * from table1 where id != :id');
-            assert.strictEqual(result.values.id, 1);
+            assert.strictEqual(result.params.id, 1);
         });
 
         it('should wrap native objects to operators', function () {
@@ -344,14 +344,14 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Between('id', Param('id1'), Param('id2')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id1: 1,
                     id2: 5
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id between :id1 and :id2');
-            assert.strictEqual(result.values.id1, 1);
-            assert.strictEqual(result.values.id2, 5);
+            assert.strictEqual(result.params.id1, 1);
+            assert.strictEqual(result.params.id2, 5);
         });
 
         it('should wrap native objects to operators', function () {
@@ -403,14 +403,14 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotBetween('id', Param('id1'), Param('id2')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id1: 1,
                     id2: 5
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id not between :id1 and :id2');
-            assert.strictEqual(result.values.id1, 1);
-            assert.strictEqual(result.values.id2, 5);
+            assert.strictEqual(result.params.id1, 1);
+            assert.strictEqual(result.params.id2, 5);
         });
 
         it('should wrap native objects to operators', function () {
@@ -447,12 +447,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Like('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name like :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -489,12 +489,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotLike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name not like :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -531,12 +531,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Ilike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name ilike :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -573,12 +573,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotILike('name', Param('name')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     name: 'John'
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where name not ilike :name');
-            assert.strictEqual(result.values.name, 'John');
+            assert.strictEqual(result.params.name, 'John');
         });
 
         it('should wrap native objects to operators', function () {
@@ -614,12 +614,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(In('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: [1, 2, 3]
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id in :id');
-            assert.deepStrictEqual(result.values.id, [1, 2, 3]);
+            assert.deepStrictEqual(result.params.id, [1, 2, 3]);
         });
 
         it('should wrap native objects to operators', function () {
@@ -664,12 +664,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(NotIn('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: [1, 2, 3]
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id not in :id');
-            assert.deepStrictEqual(result.values.id, [1, 2, 3]);
+            assert.deepStrictEqual(result.params.id, [1, 2, 3]);
         });
 
         it('should wrap native objects to operators', function () {
@@ -854,12 +854,12 @@ describe('serialize "Operators"', function () {
                 .from('table1')
                 .where(Eq('id', Param('id')));
             const result = query.generate(Object.assign({
-                values: {
+                params: {
                     id: null
                 }
             }, options));
             assert.strictEqual(result.sql, 'select * from table1 where id = :id');
-            assert.strictEqual(result.values.id, null);
+            assert.strictEqual(result.params.id, null);
         });
 
         it('should validate when wrapping native objects to operators', function () {

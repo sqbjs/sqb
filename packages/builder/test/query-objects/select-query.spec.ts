@@ -127,9 +127,9 @@ describe('serialize "SelectQuery"', function () {
         const query = Select()
             .from('table1')
             .where({id: Param('id')})
-        const result = query.generate({...options, values: {id: 1}});
+        const result = query.generate({...options, params: {id: 1}});
         assert.strictEqual(result.sql, 'select * from table1 where id = __id');
-        assert.strictEqual(result.values.id, 1);
+        assert.strictEqual(result.params.id, 1);
     });
 
     it('should force using params if strictParams=true', function () {
@@ -138,7 +138,7 @@ describe('serialize "SelectQuery"', function () {
             .where({id: 1})
         const result = query.generate({...options, strictParams: true});
         assert.strictEqual(result.sql, 'select * from table1 where id = __strictParam$1');
-        assert.strictEqual(result.values.strictParam$1, 1);
+        assert.strictEqual(result.params.strictParam$1, 1);
     });
 
     it('should serialize distinct query', function () {

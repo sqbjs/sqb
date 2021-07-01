@@ -17,7 +17,7 @@ export class TestSerializer {
     }
 
     private _serializeParameter(ctx: SerializeContext, o: any): string {
-        const prmValue = ctx.values && ctx.values[o.name];
+        const prmValue = ctx.params && ctx.params[o.name];
         ctx.queryParams = ctx.queryParams || {};
         if (prmValue !== undefined)
             ctx.queryParams[o.name] = prmValue;

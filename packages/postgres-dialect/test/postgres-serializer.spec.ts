@@ -79,10 +79,10 @@ describe('PostgresSerializer', function () {
         const query = Select().from('table1').where({ID: Param('ID')});
         const result = query.generate({
             dialect: 'postgres',
-            values: {ID: 5}
+            params: {ID: 5}
         });
         assert.strictEqual(result.sql, 'select * from table1 where ID = $1');
-        assert.deepStrictEqual(result.values, [5]);
+        assert.deepStrictEqual(result.params, [5]);
     });
 
     it('Should serialize array params for "in" operator', function () {
@@ -91,7 +91,7 @@ describe('PostgresSerializer', function () {
             .values({id: [1, 2, 3]});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID = ANY($1)');
-        assert.deepStrictEqual(result.values, [[1, 2, 3]]);
+        assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
     it('Should serialize array for "in" operator', function () {
@@ -99,7 +99,7 @@ describe('PostgresSerializer', function () {
             .where({'ID in': [1, 2, 3]});
         const result = query.generate({
             dialect: 'postgres',
-            values: {ID: 5}
+            params: {ID: 5}
         });
         assert.strictEqual(result.sql, 'select * from table1 where ID in (1,2,3)');
     });
@@ -110,7 +110,7 @@ describe('PostgresSerializer', function () {
             .values({id: [1, 2, 3]});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID != ANY($1)');
-        assert.deepStrictEqual(result.values, [[1, 2, 3]]);
+        assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
     it('Should serialize array for "not in" operator', function () {

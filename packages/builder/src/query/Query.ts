@@ -2,14 +2,14 @@ import {EventEmitter} from 'events';
 import merge from 'putil-merge';
 import flattenText from 'putil-flattentext';
 import {Serializable} from '../Serializable';
-import {SerializeContext, GenerateOptions, GeneratedQuery} from '../types';
+import {SerializeContext, GenerateOptions, GenerateResult} from '../types';
 
 export declare interface Query extends EventEmitter {
 }
 
 export abstract class Query extends Serializable {
 
-    protected _values?: Record<string, any>;
+    protected _params?: Record<string, any>;
 
     constructor() {
         super();
@@ -19,17 +19,17 @@ export abstract class Query extends Serializable {
     /**
      * Generates Sql script
      */
-    generate(options?: GenerateOptions): GeneratedQuery {
+    generate(options?: GenerateOptions): GenerateResult {
         const ctx: SerializeContext = {...options};
-        if (this._values)
-            ctx.values = {...ctx.values, ...this._values};
+        if (this._params)
+            ctx.params = {...ctx.params, ...this._params};
         ctx.serializeHooks = this.listeners('serialize');
 
         /* generate output */
         const sql = this._serialize(ctx);
         return {
             sql: flattenText(sql, {noWrap: !ctx.prettyPrint}),
-            values: ctx.queryParams,
+            params: ctx.queryParams,
             returningFields: ctx.returningFields
         }
     }
@@ -37,7 +37,7 @@ export abstract class Query extends Serializable {
     values(obj: any): this {
         if (typeof obj !== 'object' || Array.isArray(obj))
             throw new TypeError('Invalid argument');
-        this._values = obj;
+        this._params = obj;
         return this;
     }
 
