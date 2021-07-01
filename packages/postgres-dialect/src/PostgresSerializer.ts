@@ -24,7 +24,7 @@ export class PostgresSerializer implements SerializerExtension {
             case SerializationType.COMPARISON_EXPRESSION:
                 return this._serializeComparison(ctx, o, defFn);
             case SerializationType.EXTERNAL_PARAMETER:
-                return this._serializeParameter(ctx, o);
+                return this._serializeParameter(ctx, o, defFn);
         }
     }
 
@@ -64,14 +64,9 @@ export class PostgresSerializer implements SerializerExtension {
         return defFn(ctx, o);
     }
 
-    private _serializeParameter(ctx: SerializeContext, o: any): string {
-        let prmValue = ctx.params && ctx.params[o.name];
-        if (prmValue === undefined)
-            return 'null';
-        if (o.isArray && !Array.isArray(prmValue))
-            prmValue = [prmValue];
+    private _serializeParameter(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         ctx.queryParams = ctx.queryParams || [];
-        ctx.queryParams.push(prmValue);
+        defFn(ctx, o);
         return '$' + ctx.queryParams.length;
     }
 }
