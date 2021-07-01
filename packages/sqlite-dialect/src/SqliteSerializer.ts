@@ -14,8 +14,6 @@ export class SqliteSerializer implements SerializerExtension {
         switch (type) {
             case SerializationType.SELECT_QUERY:
                 return this._serializeSelect(ctx, o, defFn);
-            case SerializationType.EXTERNAL_PARAMETER:
-                return this._serializeParameter(ctx, o);
             case SerializationType.RETURNING_BLOCK:
                 return this._serializeReturning(ctx, o, defFn);
         }
@@ -30,13 +28,6 @@ export class SqliteSerializer implements SerializerExtension {
         if (offset)
             out += (!limit ? '\n' : ' ') + 'OFFSET ' + offset;
         return out;
-    }
-
-    private _serializeParameter(ctx: SerializeContext, o: any): string {
-        const prmValue = ctx.params && ctx.params[o.name];
-        ctx.queryParams = ctx.queryParams || {};
-        ctx.queryParams[o.name] = prmValue;
-        return ':' + o.name;
     }
 
     // noinspection JSUnusedLocalSymbols

@@ -22,7 +22,7 @@ export class MSSqlSerializer implements SerializerExtension {
             case SerializationType.SELECT_QUERY:
                 return this._serializeSelect(ctx, o, defFn);
             case SerializationType.EXTERNAL_PARAMETER:
-                return this._serializeParameter(ctx, o);
+                return this._serializeParameter(ctx, o, defFn);
         }
     }
 
@@ -37,11 +37,8 @@ export class MSSqlSerializer implements SerializerExtension {
         return out;
     }
 
-    private _serializeParameter(ctx: SerializeContext, o: any): string {
-        const prmValue = ctx.params && ctx.params[o.name];
-        ctx.queryParams = ctx.queryParams || {};
-        if (prmValue !== undefined)
-            ctx.queryParams[o.name] = prmValue;
+    private _serializeParameter(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
+        defFn(ctx, o);
         return '@' + o.name;
     }
 

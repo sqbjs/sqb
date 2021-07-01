@@ -43,8 +43,12 @@ export class ParamExpression extends Serializable {
         if (o.isArray && !Array.isArray(prmValue))
             prmValue = [prmValue];
         ctx.queryParams = ctx.queryParams || {};
-        if (prmValue !== undefined)
-            ctx.queryParams[o.name] = prmValue;
+        if (prmValue !== undefined) {
+            if (Array.isArray(ctx.queryParams))
+                ctx.queryParams.push(prmValue);
+            else
+                ctx.queryParams[o.name] = prmValue;
+        }
         return ':' + o.name;
     }
 
