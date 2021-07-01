@@ -6,12 +6,13 @@
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "strict": false,
-    "noEmit": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
       "@sqb/nestjs": ["../src"],
-      "@sqb/*": ["../../*"]
+      "@sqb/builder": ["../../builder/src"],
+      "@sqb/connect": ["../../connect/src"],
+      "@sqb/postgres": ["../../postgres/src"],
+      "@sqb/postgres-dialect": ["../../postgres-dialect/src"]
     }
   }
 }

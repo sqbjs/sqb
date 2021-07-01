@@ -6,13 +6,11 @@
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "strict": false,
-    "noEmit": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/oracledb": ["../src"],
-      "@sqb/*": ["../../*"]
-
+      "@sqb/builder": ["../../builder/src"],
+      "@sqb/connect": ["../../connect/src"],
+      "@sqb/oracle-dialect": ["../../oracle-dialect/src"]
     }
   }
 }

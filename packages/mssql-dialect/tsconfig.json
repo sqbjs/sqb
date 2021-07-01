@@ -1,15 +1,11 @@
 {
   "extends": "../../tsconfig-base.json",
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "test"],
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "declaration": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/*": ["../[!mssql-dialect.]*"]
+      "@sqb/builder": ["../builder/src"]
     }
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "test"]
+  }
 }

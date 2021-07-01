@@ -2,6 +2,17 @@
   "extends": "./tsconfig.json",
   "exclude": ["test/**", "**/*.spec.ts"],
   "compilerOptions": {
-    "sourceMap": false
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": false,
+    "declaration": true,
+    "noEmit": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "@sqb/builder": ["../builder"],
+      "@sqb/connect": ["../connect"]
+    }
   }
 }

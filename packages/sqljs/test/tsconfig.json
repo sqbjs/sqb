@@ -6,12 +6,11 @@
     "emitDecoratorMetadata": true,
     "strictNullChecks": false,
     "strict": false,
-    "noEmit": true,
-    "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/sqljs": ["../src"],
-      "@sqb/*": ["../../*"]
+      "@sqb/builder": ["../../builder/src"],
+      "@sqb/connect": ["../../connect/src"],
+      "@sqb/sqlite-dialect": ["../../sqlite-dialect/src"]
     }
   }
 }
