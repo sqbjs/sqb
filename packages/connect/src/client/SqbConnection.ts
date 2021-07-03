@@ -264,6 +264,7 @@ export class SqbConnection extends SafeEventEmitter {
                 });
             request.sql = q.sql;
             request.params = q.params;
+            request.paramOptions = q.paramOptions;
             if (q.returningFields)
                 request.returningFields = q.returningFields;
             if (query.listenerCount('execute'))

@@ -1,6 +1,7 @@
 import assert from 'assert';
-import {Adapter, QueryRequest, DataType} from '@sqb/connect';
-import {Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions} from 'postgresql-client';
+import {Adapter, DataType, QueryRequest} from '@sqb/connect';
+import {Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions, BindParam} from 'postgresql-client';
+import {dataTypeToOID} from './datatype-map';
 
 const SqbDataTypToOIDMap = {
     [DataType.BOOL]: DataTypeOIDs.bool,
@@ -88,9 +89,19 @@ export class PgConnection implements Adapter.Connection {
     async execute(query: QueryRequest): Promise<Adapter.Response> {
         assert.ok(this.intlcon, 'Can not execute query with a closed db session');
 
+        const params = query.params?.map((v, i) => {
+            const paramOpts = Array.isArray(query.paramOptions) ? query.paramOptions[i] : undefined;
+            if (v != null && paramOpts && paramOpts.dataType) {
+                const oid = dataTypeToOID(paramOpts.dataType, paramOpts.isArray);
+                if (oid)
+                    return new BindParam(oid, v);
+            }
+            return v;
+        });
+
         const opts: QueryOptions = {
             autoCommit: query.autoCommit,
-            params: query.params,
+            params,
             cursor: query.cursor,
             fetchCount: query.fetchRows,
             objectRows: query.objectRows

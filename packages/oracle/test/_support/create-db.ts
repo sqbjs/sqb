@@ -82,6 +82,7 @@ CREATE TABLE ${schema}.customers
   country_code  VARCHAR2(5),
   active smallint default 1,
   vip smallint default 0,
+  custom_data clob,
   created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
 )`, `

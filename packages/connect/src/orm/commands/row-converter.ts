@@ -4,9 +4,11 @@ import type {Repository} from '../repository.class';
 import {ColumnTransformFunction} from '../orm.type';
 import {Type} from '../../types';
 import {SqbConnection} from '../../client/SqbConnection';
+import {DataType} from '@sqb/builder';
 
 export interface ValueProperty {
     fieldAlias: string;
+    dataType?: DataType;
     parse?: ColumnTransformFunction;
 }
 
@@ -44,10 +46,16 @@ export class RowConverter {
     constructor(public resultType: Type, public parent?: RowConverter) {
     }
 
-    addValueProperty(args: { name: string, fieldAlias: string, parse?: ColumnTransformFunction }): ValueProperty {
+    addValueProperty(args: {
+        name: string,
+        fieldAlias: string,
+        dataType?: DataType,
+        parse?: ColumnTransformFunction
+    }): ValueProperty {
         this._propertyKeys = undefined;
         const item: ValueProperty = {
             fieldAlias: args.fieldAlias,
+            dataType: args.dataType,
             parse: args.parse
         };
         this._properties[args.name] = item;
@@ -134,6 +142,8 @@ export class RowConverter {
                         v = prop.parse(v, elKey);
                     if (v != null) {
                         result = result || {};
+                        if (prop.dataType === DataType.JSON && typeof v === 'string')
+                            v = JSON.parse(v);
                         result[elKey] = v;
                     }
                 }

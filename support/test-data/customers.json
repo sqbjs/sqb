@@ -45,6 +45,11 @@
       "fieldName": "vip",
       "dataType": "boolean",
       "jsType": "boolean"
+    },
+    {
+      "fieldName": "custom_data",
+      "dataType": "json",
+      "jsType": "object"
     }
   ],
   "rows": [
@@ -57,7 +62,8 @@
       "city": "Norman",
       "country_code": "US",
       "active": true,
-      "vip": true
+      "vip": true,
+      "custom_data": "{\"test\": 1}"
     },
     {
       "ID": 2,

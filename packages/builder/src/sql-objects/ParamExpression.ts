@@ -1,6 +1,6 @@
 import {Serializable, serializeFallback} from '../Serializable';
 import {DataType, SerializationType} from '../enums';
-import {SerializeContext} from '../types';
+import {ParamOptions, SerializeContext} from '../types';
 
 export class ParamExpression extends Serializable {
     _name: string;
@@ -39,16 +39,25 @@ export class ParamExpression extends Serializable {
                                      dataType?: DataType,
                                      isArray?: boolean
                                  }): string {
-        let prmValue = ctx.params && ctx.params[o.name];
-        if (o.isArray && !Array.isArray(prmValue))
+        let prmValue = (ctx.params && ctx.params[o.name]) ?? null;
+        if (prmValue != null && o.isArray && !Array.isArray(prmValue))
             prmValue = [prmValue];
-        ctx.queryParams = ctx.queryParams || {};
-        if (prmValue !== undefined) {
-            if (Array.isArray(ctx.queryParams))
-                ctx.queryParams.push(prmValue);
-            else
-                ctx.queryParams[o.name] = prmValue;
+        ctx.preparedParams = ctx.preparedParams || {};
+        if (Array.isArray(ctx.preparedParams))
+            ctx.preparedParams.push(prmValue);
+        else
+            ctx.preparedParams[o.name] = prmValue;
+
+        const paramOps: ParamOptions = {
+            dataType: this._dataType,
+            isArray: this._isArray,
         }
+        ctx.paramOptions = ctx.paramOptions ||
+            (Array.isArray(ctx.preparedParams) ? [] : {});
+        if (Array.isArray(ctx.paramOptions))
+            ctx.paramOptions.push(paramOps);
+        else
+            ctx.paramOptions[o.name] = paramOps;
         return ':' + o.name;
     }
 

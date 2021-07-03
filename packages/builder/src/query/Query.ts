@@ -29,7 +29,8 @@ export abstract class Query extends Serializable {
         const sql = this._serialize(ctx);
         return {
             sql: flattenText(sql, {noWrap: !ctx.prettyPrint}),
-            params: ctx.queryParams,
+            params: ctx.preparedParams,
+            paramOptions: ctx.paramOptions,
             returningFields: ctx.returningFields
         }
     }

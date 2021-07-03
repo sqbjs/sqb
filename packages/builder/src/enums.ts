@@ -81,5 +81,6 @@ export enum DataType {
     TIME = 'TIME',
     BINARY = 'BINARY',
     TEXT = 'TEXT',
-    GUID = 'GUID'
+    GUID = 'GUID',
+    JSON = 'JSON'
 }

@@ -4,7 +4,7 @@ import type {Cursor} from './Cursor';
 import type {PoolConfiguration} from 'lightning-pool';
 import type {Adapter} from './Adapter';
 import type {Maybe} from '../types';
-import {DataType} from '@sqb/builder';
+import {DataType, ParamOptions} from '@sqb/builder';
 
 export {DataType} from '@sqb/builder';
 
@@ -198,6 +198,7 @@ export interface QueryRequest {
     dialectVersion?: string;
     sql: string;
     params?: any;
+    paramOptions?: Record<string, ParamOptions> | ParamOptions[];
     returningFields?: {field: string, alias?: string}[];
     autoCommit?: boolean;
     cursor?: boolean;

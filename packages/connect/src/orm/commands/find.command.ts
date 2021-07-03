@@ -135,7 +135,12 @@ export class FindCommand {
                 const fieldAlias = this._selectColumn(tableAlias, col);
                 // Add column to converter
                 if (!col.hidden)
-                    converter.addValueProperty({name: col.name, fieldAlias, parse: col.parse});
+                    converter.addValueProperty({
+                        name: col.name,
+                        fieldAlias,
+                        dataType: col.dataType,
+                        parse: col.parse
+                    });
                 continue;
             }
 

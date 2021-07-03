@@ -76,6 +76,9 @@ export class Customer extends BaseEntity<Customer> {
     @Column()
     vip: boolean;
 
+    @Column({fieldName: 'custom_data', dataType: DataType.JSON})
+    customData: object;
+
     @LinkToOne()
     readonly country?: Country;
 
