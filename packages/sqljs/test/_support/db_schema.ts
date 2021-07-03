@@ -27,6 +27,7 @@ CREATE TABLE customers
     country_code text,
     active INTEGER default 1,
     vip integer,
+    custom_data text,
     created_at text,
     updated_at text,
     FOREIGN KEY (country_code) REFERENCES countries (code)

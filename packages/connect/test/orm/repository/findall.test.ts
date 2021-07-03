@@ -40,6 +40,14 @@ describe('findAll()', function () {
         assert.deepStrictEqual(Object.keys(rows[0].name), ['given']);
     });
 
+    it('should return json field as embedded element', async function () {
+        const repo = client().getRepository(Customer);
+        const row = await repo.findByPk(1, {elements: ['customData']});
+        assert.ok(row);
+        assert.ok(row.customData);
+        assert.strictEqual(typeof row.customData, 'object');
+    });
+
     it('should return requested elements if "elements" option set', async function () {
         const repo = client().getRepository(Customer);
         const rows = await repo.findAll({

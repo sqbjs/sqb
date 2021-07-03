@@ -70,6 +70,14 @@ export function Count(): CountStatement {
     return new CountStatement();
 }
 
-export function Param(arg: string | { name: string, dataType?: DataType, isArray?: boolean }): ParamExpression {
-    return new ParamExpression(arg);
+export function Param(name: string, dataType?: DataType, isArray?: boolean): ParamExpression
+export function Param(args: { name: string, dataType?: DataType, isArray?: boolean }): ParamExpression
+export function Param(arg0: any, arg1?: any, arg2?: any): ParamExpression {
+    if (typeof arg0 === 'object')
+        return new ParamExpression(arg0);
+    return new ParamExpression({
+        name: arg0,
+        dataType: arg1,
+        isArray: arg2
+    });
 }

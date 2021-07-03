@@ -49,6 +49,7 @@ CREATE TABLE ${schema}.customers
     country_code character varying(5),
     active boolean not null default true,
     vip boolean not null default false,
+    custom_data json,
     created_at timestamp default NOW(),
     updated_at timestamp,
     CONSTRAINT pk_customers PRIMARY KEY (id),

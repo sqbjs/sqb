@@ -65,8 +65,8 @@ export class PostgresSerializer implements SerializerExtension {
     }
 
     private _serializeParameter(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-        ctx.queryParams = ctx.queryParams || [];
+        ctx.preparedParams = ctx.preparedParams || [];
         defFn(ctx, o);
-        return '$' + ctx.queryParams.length;
+        return '$' + ctx.preparedParams.length;
     }
 }

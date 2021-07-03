@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import '../_support/env';
 import assert from 'assert';
-import {Insert, Param, Select} from '@sqb/builder';
+import {DataType, Insert, Param, Select} from '@sqb/builder';
 import {SqbClient} from '@sqb/connect';
 import {initClient} from '../_support/init-client';
 
@@ -101,6 +101,24 @@ describe('Client', function () {
         assert.strictEqual(result.rows.length, 2);
         assert(Array.isArray(result.rows[0]));
         assert(result.rows[0][0] === 1);
+    });
+
+    it('execute a query with parameters', async function () {
+        const query = Select().from('customers').where({id: Param('id')});
+        const result = await client().execute(query, {params: {id: 1}});
+        assert(result && result.rows);
+        assert.strictEqual(result.rows.length, 1);
+        assert(!Array.isArray(result.rows[0]));
+        assert(result.rows[0].id === 1);
+    });
+
+    it('execute a query with typed parameters', async function () {
+        const query = Select().from('customers').where({id: Param('id', DataType.INTEGER)});
+        const result = await client().execute(query, {params: {id: '1'}});
+        assert(result && result.rows);
+        assert.strictEqual(result.rows.length, 1);
+        assert(!Array.isArray(result.rows[0]));
+        assert(result.rows[0].id === 1);
     });
 
     it('should insert record', async function () {

@@ -18,7 +18,6 @@ export class Customer2 {
 }
 
 let client: () => SqbClient;
-const ids: number[] = [];
 
 const createCustomer = async function (values?: any): Promise<Customer> {
     const v = {
@@ -37,12 +36,11 @@ describe('update()', function () {
 
     it('should update and return updated columns', async function () {
         const old = await createCustomer();
-        ids.push(old.id);
 
         const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         const updated = await repo.update({
-            id: ids[0],
+            id: old.id,
             givenName: newGivenName
         });
 
@@ -51,7 +49,7 @@ describe('update()', function () {
         assert.strictEqual(updated.givenName, newGivenName);
         assert.notStrictEqual(updated.givenName, old.givenName);
 
-        const c2 = await repo.findByPk(ids[0]);
+        const c2 = await repo.findByPk(old.id);
         assert.ok(c2);
         assert.strictEqual(c2.id, old.id);
         assert.strictEqual(c2.givenName, newGivenName);
@@ -59,8 +57,7 @@ describe('update()', function () {
     });
 
     it('should update even element name and field name differs', async function () {
-        const customer = await createCustomer();
-        ids.push(customer.id);
+        const old = await createCustomer();
 
         const repo = client().getRepository(Customer2);
         let sql = '';
@@ -69,17 +66,17 @@ describe('update()', function () {
         });
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         const updated = await repo.update({
-            pk: ids[0],
+            pk: old.id,
             given: newGivenName
         });
 
         assert.ok(updated);
         assert.strictEqual(sql, 'update customers T set given_name = $1 where T.id = $2');
-        assert.strictEqual(updated.pk, ids[0]);
+        assert.strictEqual(updated.pk, old.id);
         assert.strictEqual(updated.given, newGivenName);
-        assert.notStrictEqual(updated.given, customer.givenName);
+        assert.notStrictEqual(updated.given, old.givenName);
 
-        const c2 = await repo.findByPk(ids[0]);
+        const c2 = await repo.findByPk(old.id);
         assert.ok(c2);
         assert.strictEqual(updated.pk, c2.pk);
         assert.strictEqual(updated.given, c2.given);
@@ -87,40 +84,37 @@ describe('update()', function () {
 
     it('should apply serialize function', async function () {
         const old = await createCustomer();
-        ids.push(old.id);
 
         const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         const updated = await repo.update({
-            id: ids[0],
+            id: old.id,
             givenName: newGivenName,
             gender: 'Female'
         });
-        const c2 = await repo.findByPk(ids[0]);
+        const c2 = await repo.findByPk(old.id);
         assert.ok(c2);
         assert.strictEqual(updated.id, c2.id);
         assert.strictEqual(updated.gender, 'Female');
-
     });
 
     it('should work within transaction', async function () {
         return client().acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
-            const c1 = await repo.findByPk(ids[0]);
-            assert.ok(c1);
+            const old = await createCustomer();
 
             await connection.startTransaction();
             const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
             const updated = await repo.update({
-                id: ids[0],
+                id: old.id,
                 givenName: newGivenName
             });
             assert.strictEqual(updated.givenName, newGivenName);
 
             await connection.rollback();
-            const c2 = await repo.findByPk(ids[0]);
+            const c2 = await repo.findByPk(old.id);
             assert.ok(c2);
-            assert.strictEqual(c2.givenName, c1.givenName);
+            assert.strictEqual(c2.givenName, old.givenName);
         });
     });
 
@@ -145,9 +139,10 @@ describe('updateOnly()', function () {
 
     it('should return "true" if update success', async function () {
         const repo = client().getRepository(Customer);
+        const old = await createCustomer();
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
         let success = await repo.updateOnly({
-            id: ids[0],
+            id: old.id,
             givenName: newGivenName
         });
         assert.strictEqual(success, true);
@@ -158,21 +153,22 @@ describe('updateOnly()', function () {
         });
         assert.strictEqual(success, false);
 
-        const c2 = await repo.findByPk(ids[0]);
+        const c2 = await repo.findByPk(old.id);
         assert.ok(c2);
-        assert.strictEqual(c2.id, ids[0]);
+        assert.strictEqual(c2.id, old.id);
         assert.strictEqual(c2.givenName, newGivenName);
     });
 
     it('should not fetch after update for fast execution', async function () {
         return client().acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
+            const old = await createCustomer();
             let sql = '';
             connection.on('execute', req => {
                 sql = req.sql;
             });
             await repo.updateOnly({
-                id: ids[0],
+                id: old.id,
                 givenName: 'any name'
             });
             assert.ok(!sql.includes('select'));
@@ -181,20 +177,22 @@ describe('updateOnly()', function () {
 
     it('should map embedded elements into fields', async function () {
         const repo = client().getRepository(Customer);
+        const old = await createCustomer();
         const newName = {given: 'G' + Math.trunc(Math.random() * 10000)};
         const c1 = await repo.update({
-            id: ids[0],
+            id: old.id,
             name: newName
         });
         assert.ok(c1);
         assert.ok(c1 instanceof Customer);
-        assert.strictEqual(c1.id, ids[0]);
+        assert.strictEqual(c1.id, old.id);
         assert.strictEqual(c1.name.given, newName.given);
+        assert.notStrictEqual(c1.name.given, old.name.given);
 
-        const c2 = await repo.findByPk(ids[0]);
+        const c2 = await repo.findByPk(old.id);
         assert.ok(c2);
         assert.ok(c2 instanceof Customer);
-        assert.strictEqual(c2.id, ids[0]);
+        assert.strictEqual(c2.id, old.id);
         assert.strictEqual(c2.name.given, newName.given);
     });
 
@@ -206,6 +204,7 @@ describe('updateAll()', function () {
 
     it('should update multiple rows', async function () {
         const oldCity = 'C' + Math.trunc(Math.random() * 10000);
+        const ids: number[] = [];
         for (let i = 0; i < 10; i++) {
             const customer = await createCustomer({city: oldCity});
             ids.push(customer.id);

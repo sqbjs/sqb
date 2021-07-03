@@ -1,4 +1,4 @@
-import {SerializationType} from './enums';
+import {DataType, SerializationType} from './enums';
 
 export interface SerializerExtension {
     dialect: string;
@@ -17,9 +17,15 @@ export interface GenerateOptions {
     strictParams?: boolean;
 }
 
+export interface ParamOptions {
+    dataType?: DataType;
+    isArray?: boolean;
+}
+
 export interface SerializeContext extends GenerateOptions {
     serializeHooks?: Function[];
-    queryParams?: Record<string, any> | any[];
+    paramOptions?: Record<string, ParamOptions> | ParamOptions[];
+    preparedParams?: Record<string, any> | any[];
     returningFields?: { field: string, alias?: string }[];
     strictParamGenId?: number;
 }
@@ -27,6 +33,7 @@ export interface SerializeContext extends GenerateOptions {
 export interface GenerateResult {
     sql: string;
     params?: any;
+    paramOptions?: Record<string, ParamOptions> | ParamOptions[];
     returningFields?: { field: string, alias?: string }[];
 }
 
