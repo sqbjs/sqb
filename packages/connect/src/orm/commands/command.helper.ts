@@ -143,12 +143,11 @@ export async function prepareFilter(
                             _curAlias = 'K';
                         } else node = col.association;
 
-                        let joinIdx = 1;
                         while (node) {
                             const targetEntity = await node.resolveTarget();
                             const sourceColumn = await node.resolveSourceProperty();
                             const targetColumn = await node.resolveTargetProperty();
-                            const joinAlias = 'J' + (joinIdx++);
+                            const joinAlias = 'J' + (((subSelect?._joins?.length) || 0) + 1);
                             subSelect.join(
                                 InnerJoin(targetEntity.tableName + ' ' + joinAlias)
                                     .on(Eq(joinAlias + '.' + targetColumn.fieldName,
