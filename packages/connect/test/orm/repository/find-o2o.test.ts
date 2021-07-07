@@ -5,7 +5,7 @@ import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 
 function toJSON(obj: any): any {
-    return JSON.parse(JSON.stringify(obj));
+    return obj ? JSON.parse(JSON.stringify(obj)): undefined;
 }
 
 describe('find() one to one relations', function () {
@@ -38,6 +38,24 @@ describe('find() one to one relations', function () {
             const rows = await repo.findAll({
                 filter: [Eq('id', 1)],
                 elements: ['id', 'country.continent']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].id, 1);
+            assert.deepStrictEqual(toJSON(rows[0].country), {
+                continent: {
+                    code: 'AM',
+                    name: 'America'
+                }
+            });
+        });
+
+        it('query sub associations (include)', async function () {
+            const repo = client().getRepository(Customer);
+            const rows = await repo.findAll({
+                filter: [Eq('id', 1)],
+                elements: ['id'],
+                include: ['country.continent']
             });
             assert.ok(rows);
             assert.ok(rows.length);

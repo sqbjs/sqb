@@ -7,6 +7,7 @@ import {AssociationNode} from '../model/association-node';
 import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
 import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
 import {SqbConnection} from '../../client/SqbConnection';
+import {getDataColumnNames, getEmbeddedElementNames} from '../base-entity.class';
 
 export type FindCommandArgs = {
     entity: EntityModel;
@@ -102,10 +103,12 @@ export class FindCommand {
         const entity = opts.entity || this._getEntityFromAlias(tableAlias);
         const converter = opts.converter || this.converter;
 
-        const requestElements = opts.elements && opts.elements.length ?
-            opts.elements.map(x => x.toLowerCase()) : undefined;
-        const includeElements = opts.include && opts.include.length ?
-            opts.include.map(x => x.toLowerCase()) : undefined;
+        let requestElements: string[] = opts.elements && opts.elements.length ?
+            [...opts.elements] :
+            [...getDataColumnNames(entity.ctor), ...getEmbeddedElementNames(entity.ctor)];
+        if (opts.include && opts.include.length)
+            requestElements.push(...opts.include);
+        requestElements = requestElements.map(x => x.toLowerCase());
         const excludeElements = opts.exclude && opts.exclude.length ?
             opts.exclude.map(x => x.toLowerCase()) : undefined;
         const sortElements = opts.sort && opts.sort.length ?
@@ -121,14 +124,10 @@ export class FindCommand {
             if (excludeElements && excludeElements.includes(colNameLower))
                 continue;
 
-            if (!(
-                // Non association elements are visible by default
-                (!requestElements && !isAssociationElement(col)) ||
-                // If element in include or request list
-                (requestElements && requestElements.find(x => x === colNameLower || x.startsWith(colNameLower + '.'))) ||
-                (includeElements && includeElements.find(
-                    (x: string) => x === colNameLower || x.startsWith(colNameLower + '.')))
-            )) continue;
+            // Check if element request list
+            if (!requestElements.find(
+                (x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))
+            ) continue;
 
             // Add field to select list if element is a column
             if (isDataProperty(col)) {
@@ -198,7 +197,6 @@ export class FindCommand {
                     const sort = sortElements && extractSubElements(colNameLower, sortElements);
                     await findCommand.addElements({
                         elements: extractSubElements(colNameLower, requestElements),
-                        include: extractSubElements(colNameLower, includeElements),
                         exclude: extractSubElements(colNameLower, excludeElements),
                         sort,
                     });
@@ -341,14 +339,13 @@ export class FindCommand {
 }
 
 function extractSubElements(colNameLower: string, elements?: string[]): string[] | undefined {
-    if (!elements)
-        return;
-    const result = elements.reduce((trg: string[], v: string) => {
+    if (!elements || !elements.length)
+        return elements;
+    return elements.reduce((trg: string[], v: string) => {
         if (v.startsWith(colNameLower + '.'))
             trg.push(v.substring(colNameLower.length + 1).toLowerCase())
         return trg;
     }, [] as string[]);
-    return result.length ? result : undefined;
 }
 
 
