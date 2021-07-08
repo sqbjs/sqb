@@ -27,4 +27,6 @@ export * from './orm/model/entity-association-property';
 export * from './orm/model/association';
 export * from './orm/model/index-meta';
 
-export {isDataProperty, isObjectProperty, isAssociationElement, isEntityClass} from './orm/orm.helper';
+export * from './orm/util/entity-mapping';
+
+export {isDataProperty, isObjectProperty, isAssociationElement, isEntityClass} from './orm/util/orm.helper';

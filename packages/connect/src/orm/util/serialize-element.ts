@@ -1,6 +1,6 @@
 import {DataType} from '@sqb/builder';
 import {AbstractEntityProperty} from '../model/abstract-entity-property';
-import {isDataProperty} from '../orm.helper';
+import {isDataProperty} from './orm.helper';
 
 export function serializeColumn(col: AbstractEntityProperty, v: any): any {
     if (isDataProperty(col)) {

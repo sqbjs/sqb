@@ -12,12 +12,12 @@ import {EntityObjectProperty} from './entity-object-property';
 import {EntityAssociationProperty} from './entity-association-property';
 import {serializeColumn} from '../util/serialize-element';
 import {AssociationNode} from './association-node';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
+import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
 
 export type EntityProperty = EntityDataProperty | EntityObjectProperty | EntityAssociationProperty;
 
 export class EntityModel {
-    private _propertyKeys: string[] = []; // cache
+    private _propertyKeys?: string[]; // cache
     readonly name: string;
     tableName?: string;
     schema?: string;
@@ -252,6 +252,15 @@ export class EntityModel {
                     entity.properties.set(k.toLowerCase(), col);
                 }
             }
+            for (const fk of base.foreignKeys) {
+                const newFk = new Association(fk.name, {...fk, source: ctor as Type});
+                entity.foreignKeys.push(newFk);
+            }
+            for (const idx of base.indexes) {
+                const newIdx = new IndexMeta(entity, idx.columns, idx);
+                entity.indexes.push(newIdx);
+            }
+            entity.eventListeners.push(...base.eventListeners);
         }
         if (base.primaryIndex)
             entity.setPrimaryIndex([...base.primaryIndex.columns]);

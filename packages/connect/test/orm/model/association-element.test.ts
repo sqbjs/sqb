@@ -8,7 +8,7 @@ import {
     LinkToOne,
     PrimaryKey, linkToOne, LinkToMany
 } from '@sqb/connect';
-import {isAssociationElement} from '../../../src/orm/orm.helper';
+import {isAssociationElement} from '../../../src/orm/util/orm.helper';
 
 class Country {
     @PrimaryKey()

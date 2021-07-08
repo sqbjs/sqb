@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.0.1-beta.15",
+  "version": "4.0.1-beta.16",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -28,7 +28,7 @@
   },
   "peerDependencies": {
     "oracledb": "^5.0.0",
-    "@sqb/oracle-dialect": "^4.0.1-beta.15"
+    "@sqb/oracle-dialect": "^4.0.1-beta.16"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -48,8 +48,6 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "scripts": {
-    "_test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
-    "_cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
     "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",
     "lint": "eslint src/** --no-error-on-unmatched-pattern"
