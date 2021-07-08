@@ -1,7 +1,7 @@
 {
   "name": "@sqb/connect",
   "description": "Multi-dialect database connection framework written with TypeScript",
-  "version": "4.0.1-beta.18",
+  "version": "4.0.1-beta.19",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -29,22 +29,22 @@
     "mysql"
   ],
   "dependencies": {
-    "debug": "^4.3.1",
-    "lightning-pool": "^3.1.0",
-    "lodash": "^4.17.20",
-    "putil-isplainobject": "^1.1.3",
-    "putil-merge": "^3.6.2",
-    "putil-promisify": "^1.8.2",
-    "putil-taskqueue": "^2.5.1",
-    "putil-varhelpers": "^1.6.0",
+    "debug": "^4.3.2",
+    "lightning-pool": "^3.1.3",
+    "lodash": "^4.17.21",
+    "putil-isplainobject": "^1.1.4",
+    "putil-merge": "^3.7.0",
+    "putil-promisify": "^1.8.4",
+    "putil-taskqueue": "^2.5.3",
+    "putil-varhelpers": "^1.6.1",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.5",
-    "@types/lodash": "^4.14.168"
+    "@types/debug": "^4.1.6",
+    "@types/lodash": "^4.14.171"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.0.1-beta.18"
+    "@sqb/builder": "^4.0.1-beta.19"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
