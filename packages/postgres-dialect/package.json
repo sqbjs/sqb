@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres-dialect",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.0.1-beta.15",
+  "version": "4.0.1-beta.16",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -45,7 +45,7 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "scripts": {
-    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
     "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
     "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",

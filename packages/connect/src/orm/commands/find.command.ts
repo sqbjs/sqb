@@ -4,7 +4,7 @@ import type {EntityModel} from '../model/entity-model';
 import type {EntityDataProperty} from '../model/entity-data-property';
 import {RowConverter} from './row-converter';
 import {AssociationNode} from '../model/association-node';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
+import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
 import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
 import {SqbConnection} from '../../client/SqbConnection';
 import {getDataColumnNames, getEmbeddedElementNames} from '../base-entity.class';

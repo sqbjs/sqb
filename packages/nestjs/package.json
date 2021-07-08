@@ -1,7 +1,7 @@
 {
   "name": "@sqb/nestjs",
   "description": "Nestjs module for data connection using SQB",
-  "version": "4.0.1-beta.15",
+  "version": "4.0.1-beta.16",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -35,8 +35,8 @@
   "peerDependencies": {
     "@nestjs/common": "^7.6.7",
     "@nestjs/core": "^7.6.7",
-    "@sqb/builder": "^4.0.1-beta.15",
-    "@sqb/connect": "^4.0.1-beta.15",
+    "@sqb/builder": "^4.0.1-beta.16",
+    "@sqb/connect": "^4.0.1-beta.16",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3"
   },
@@ -58,7 +58,7 @@
     "temp-dir": "./coverage/.nyc_output"
   },
   "scripts": {
-    "test": "ts-mocha -p test/tsconfig.json --paths --reporter spec test/**/*.spec.ts",
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
     "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
     "build": "tsc -b tsconfig-build.json",
     "compile": "tsc -b tsconfig.json",

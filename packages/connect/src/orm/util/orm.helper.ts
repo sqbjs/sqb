@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import type {TypeResolver, TypeThunk} from './orm.type';
-import type {Type} from '../types';
-import type {EntityModel} from './model/entity-model';
-import type {EntityDataProperty} from './model/entity-data-property';
-import type {EntityObjectProperty} from './model/entity-object-property';
-import type {EntityAssociationProperty} from './model/entity-association-property';
-import {ENTITY_DEFINITION_KEY} from './orm.const';
+import type {TypeResolver, TypeThunk} from '../orm.type';
+import type {Type} from '../../types';
+import type {EntityModel} from '../model/entity-model';
+import type {EntityDataProperty} from '../model/entity-data-property';
+import type {EntityObjectProperty} from '../model/entity-object-property';
+import type {EntityAssociationProperty} from '../model/entity-association-property';
+import {ENTITY_DEFINITION_KEY} from '../orm.const';
 
 export function isClass(fn: any): fn is Type {
     return typeof fn === 'function' && /^\s*class/.test(fn.toString());

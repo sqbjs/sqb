@@ -1,7 +1,7 @@
 import {camelCase} from 'putil-varhelpers';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
 import {EntityModel} from './entity-model';
-import {resolveEntityMeta} from '../orm.helper';
+import {resolveEntityMeta} from '../util/orm.helper';
 import {EntityDataProperty} from './entity-data-property';
 
 export class Association {

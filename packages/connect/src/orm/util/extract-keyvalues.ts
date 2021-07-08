@@ -1,5 +1,5 @@
 import {EntityModel} from '../model/entity-model';
-import {isDataProperty} from '../orm.helper';
+import {isDataProperty} from './orm.helper';
 
 export function extractKeyValues<T>(
     entityDef: EntityModel,

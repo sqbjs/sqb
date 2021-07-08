@@ -1,6 +1,6 @@
 import {Insert, Param} from '@sqb/builder';
 import type {EntityModel} from '../model/entity-model';
-import {isDataProperty, isObjectProperty} from '../orm.helper';
+import {isDataProperty, isObjectProperty} from '../util/orm.helper';
 import {SqbConnection} from '../../client/SqbConnection';
 
 export type CreateCommandArgs = {

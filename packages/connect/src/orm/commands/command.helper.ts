@@ -3,7 +3,7 @@ import {
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
 import {EntityModel} from '../model/entity-model';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../orm.helper';
+import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
 import {AssociationNode} from '../model/association-node';
 
 export interface JoinInfo {
