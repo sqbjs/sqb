@@ -5,6 +5,8 @@ const npmRunPath = require('npm-run-path');
 const minimist = require('minimist');
 const colors = require('colors');
 
+const rootDir = path.resolve(__dirname, '../..');
+
 const argv = minimist(process.argv.slice(2), {
   string: ['package'],
   boolean: ['dev'],
@@ -69,6 +71,7 @@ function deleteFolderRecursive(dir) {
 
 module.exports = {
   argv,
+  rootDir,
   execSh,
   deleteFolderRecursive
 };
