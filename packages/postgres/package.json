@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.0.1-beta.17",
+  "version": "4.0.1-beta.18",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -31,7 +31,7 @@
   },
   "peerDependencies": {
     "postgresql-client": "^1.13.0",
-    "@sqb/postgres-dialect": "^4.0.1-beta.17"
+    "@sqb/postgres-dialect": "^4.0.1-beta.18"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
