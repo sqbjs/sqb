@@ -3,23 +3,36 @@ import {EntityModel} from '../model/entity-model';
 import {Association} from '../model/association';
 import {IndexMeta} from '../model/index-meta';
 
-export function mixinEntities<A, B>(derived: Type, classARef: Type<A>, classBRef: Type<B>): Type<A & B> {
-    const aModel = EntityModel.get(classARef);
-    const bModel = EntityModel.get(classBRef);
-
+export function mixinEntities<A, B, C, D, E, F>(
+    derived: Type, classARef: Type<A>, classBRef: Type<B>, classCRef: Type<C>,
+    classDRef: Type<D>, classERef: Type<E>, classFRef: Type<F>): Type<A & B & C & D & E & F>
+export function mixinEntities<A, B, C, D, E>(
+    derived: Type, classARef: Type<A>, classBRef: Type<B>, classCRef: Type<C>,
+    classDRef: Type<D>, classERef: Type<E>): Type<A & B & C & D & E>
+export function mixinEntities<A, B, C, D>(
+    derived: Type, classARef: Type<A>, classBRef: Type<B>, classCRef: Type<C>,
+    classDRef: Type<D>): Type<A & B & C & D>
+export function mixinEntities<A, B, C>(derived: Type, classARef: Type<A>, classBRef: Type<B>, classCRef: Type<C>): Type<A & B & C>
+export function mixinEntities<A, B>(derived: Type, classARef: Type<A>, classBRef: Type<B>): Type<A & B>
+export function mixinEntities<A, B>(derived: Type, classARef: Type<A>, classBRef: Type<B>): Type<A & B>
+export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, classCRef?: Type,
+                              classDRef?: Type, classERef?: Type, classFRef?: Type) {
     const entity = EntityModel.attachTo(derived);
-    for (const fk of [...aModel.foreignKeys, ...bModel.foreignKeys]) {
-        const newFk = new Association(fk.name, {...fk, source: derived});
-        entity.foreignKeys.push(newFk);
+    for (const classRef of [classARef, classBRef, classCRef, classDRef, classERef, classFRef]) {
+        if (!classRef)
+            continue;
+        const model = EntityModel.get(classRef);
+        for (const fk of model.foreignKeys) {
+            const newFk = new Association(fk.name, {...fk, source: derived});
+            entity.foreignKeys.push(newFk);
+        }
+        for (const idx of model.indexes) {
+            const newIdx = new IndexMeta(entity, idx.columns, idx);
+            entity.indexes.push(newIdx);
+        }
+        entity.eventListeners.push(...model.eventListeners);
+        model.properties.forEach((p, n) => entity.properties.set(n, p));
     }
-    for (const idx of [...aModel.indexes, ...bModel.indexes]) {
-        const newIdx = new IndexMeta(entity, idx.columns, idx);
-        entity.indexes.push(newIdx);
-    }
-    entity.eventListeners.push(...aModel.eventListeners);
-    entity.eventListeners.push(...bModel.eventListeners);
-    aModel.properties.forEach((p, n) => entity.properties.set(n, p));
-    bModel.properties.forEach((p, n) => entity.properties.set(n, p));
     return derived;
 }
 

@@ -33,12 +33,12 @@
     "supertest": "^6.1.3"
   },
   "peerDependencies": {
-    "@nestjs/common": "^7.x.x | ^8.x.x",
-    "@nestjs/core": "^7.x.x | ^8.x.x",
+    "@nestjs/common": "^8.x.x",
+    "@nestjs/core": "^8.x.x",
     "@sqb/builder": "^4.0.1-beta.19",
     "@sqb/connect": "^4.0.1-beta.19",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.x.x | ^7.x.x"
+    "rxjs": "^7.x.x"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
