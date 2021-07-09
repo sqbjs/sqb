@@ -8,7 +8,8 @@ import {
     Type,
 } from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
-import {defer, lastValueFrom} from 'rxjs';
+import {defer} from 'rxjs';
+import * as rxjs from 'rxjs';
 import {SqbClient} from '@sqb/connect';
 import {
     generateString,
@@ -128,19 +129,41 @@ export class SqbCoreModule implements OnApplicationShutdown {
         options: SqbModuleOptions,
     ): Promise<SqbClient> {
         const connectionToken = options.name || DEFAULT_CONNECTION_NAME;
-        return await lastValueFrom(
-            defer(async () => {
+        // NestJS 8
+        // @ts-ignore
+        if (rxjs.lastValueFrom) {
+            // @ts-ignore
+            return await rxjs.lastValueFrom(
+                defer(async () => {
+                    const client = new SqbClient(options);
+                    await client.test();
+                    return client;
+                }).pipe(
+                    handleRetry(
+                        options.retryAttempts,
+                        options.retryDelay,
+                        connectionToken,
+                        options.verboseRetryLog,
+                        options.toRetry,
+                    ),
+                ));
+        } else {
+            // NestJS 7
+            return await defer(async () => {
                 const client = new SqbClient(options);
                 await client.test();
                 return client;
-            }).pipe(
-                handleRetry(
-                    options.retryAttempts,
-                    options.retryDelay,
-                    connectionToken,
-                    options.verboseRetryLog,
-                    options.toRetry,
-                ),
-            ));
+            })
+                .pipe(
+                    handleRetry(
+                        options.retryAttempts,
+                        options.retryDelay,
+                        connectionToken,
+                        options.verboseRetryLog,
+                        options.toRetry,
+                    ),
+                )
+                .toPromise();
+        }
     }
 }
