@@ -149,6 +149,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
                 ));
         } else {
             // NestJS 7
+            // @ts-ignore
             return await defer(async () => {
                 const client = new SqbClient(options);
                 await client.test();
