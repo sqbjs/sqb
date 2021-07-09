@@ -22,6 +22,9 @@ export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, 
         if (!classRef)
             continue;
         const model = EntityModel.get(classRef);
+        if (!entity.primaryIndex && model.primaryIndex) {
+            entity.primaryIndex = new IndexMeta(entity, model.primaryIndex.columns, model.primaryIndex);
+        }
         for (const fk of model.foreignKeys) {
             const newFk = new Association(fk.name, {...fk, source: derived});
             entity.foreignKeys.push(newFk);
@@ -31,7 +34,12 @@ export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, 
             entity.indexes.push(newIdx);
         }
         entity.eventListeners.push(...model.eventListeners);
-        model.properties.forEach((p, n) => entity.properties.set(n, p));
+        model.properties.forEach((p, n) => {
+            const o: any = Object.assign({}, p);
+            o.entity = entity;
+            Object.setPrototypeOf(o, Object.getPrototypeOf(p));
+            entity.properties.set(n, o);
+        });
     }
     return derived;
 }

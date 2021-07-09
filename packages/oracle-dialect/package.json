@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle-dialect",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.0.1-beta.23",
+  "version": "4.0.1-beta.24",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"

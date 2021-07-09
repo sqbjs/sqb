@@ -3,10 +3,10 @@ import type {Repository} from './repository.class';
 import {EntityModel} from './model/entity-model';
 import {PickWritable, Type} from '../types';
 
-export abstract class BaseEntity<T> {
+export abstract class BaseEntity {
     private [REPOSITORY_KEY]: Repository<any>;
 
-    constructor(partial: Partial<T>) {
+    constructor(partial: any) {
         const elements = EntityModel.getColumnNames(Object.getPrototypeOf(this).constructor);
         if (elements && partial) {
             for (const k of elements)
