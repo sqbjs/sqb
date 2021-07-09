@@ -138,7 +138,7 @@ describe('Entity', function () {
         }
 
         @Entity()
-        class BaseCustomer extends BaseEntity<BaseCustomer> {
+        class BaseCustomer extends BaseEntity {
 
             @Column()
             id: string;
@@ -168,7 +168,7 @@ describe('Entity', function () {
         }
 
         @Entity()
-        class BaseCustomer extends BaseEntity<BaseCustomer> {
+        class BaseCustomer extends BaseEntity {
 
             @Column()
             id: string;
@@ -198,7 +198,7 @@ describe('Entity', function () {
         }
 
         @Entity()
-        class BaseCustomer extends BaseEntity<BaseCustomer> {
+        class BaseCustomer extends BaseEntity {
 
             @Column({noInsert: true})
             id: string;
@@ -228,7 +228,7 @@ describe('Entity', function () {
         }
 
         @Entity()
-        class BaseCustomer extends BaseEntity<BaseCustomer> {
+        class BaseCustomer extends BaseEntity {
 
             @Column({noInsert: true})
             id: string;

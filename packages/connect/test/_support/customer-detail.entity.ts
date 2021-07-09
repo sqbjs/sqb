@@ -8,7 +8,7 @@ import {
 import type {Customer} from './customer.entity';
 
 @Entity('customer_details')
-export class CustomerDetail extends BaseEntity<CustomerDetail> {
+export class CustomerDetail extends BaseEntity {
     @PrimaryKey()
     @Column({fieldName: 'customer_id'})
     customerId?: number;

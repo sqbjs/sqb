@@ -2,7 +2,7 @@ import {BaseEntity, Column, DataType, Entity, LinkToOne, PrimaryKey,} from '@sqb
 import type {Customer} from './customer.entity';
 
 @Entity('customer_vip_details')
-export class CustomerVip extends BaseEntity<CustomerVip> {
+export class CustomerVip extends BaseEntity {
     @PrimaryKey()
     @Column({fieldName: 'customer_id'})
     customerId?: number;
