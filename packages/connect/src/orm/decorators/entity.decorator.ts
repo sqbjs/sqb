@@ -15,7 +15,7 @@ export function Entity(options?: EntityConfig | string): ClassDecorator {
 }
 
 export namespace Entity {
-    export function getMetadata(ctor: Function): EntityModel {
+    export function getMetadata(ctor: Function): EntityModel | undefined {
         return EntityModel.get(ctor);
     }
 }
