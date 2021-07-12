@@ -2,6 +2,7 @@ import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolS
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
 import _debug from 'debug';
 import {classes} from '@sqb/builder';
+import StrictEventEmitter from 'strict-event-emitter-types';
 import {
     ClientConfiguration,
     QueryExecuteOptions,
@@ -23,13 +24,25 @@ import {Maybe} from '../types';
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
 
-export class SqbClient extends SafeEventEmitter {
+interface Events {
+    execute: (request: QueryRequest, connection: SqbConnection) => void;
+    error: (error: Error, connection: SqbConnection) => void;
+    closing: () => void;
+    close: () => void;
+    acquire: (connection: SqbConnection) => void;
+    terminate: () => void;
+}
+
+type SqbClientEmitter = StrictEventEmitter<SafeEventEmitter, Events>;
+
+export class SqbClient extends (SafeEventEmitter as Type<SqbClientEmitter>) {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
     private readonly _entities: Record<string, Type> = {};
 
     constructor(config: ClientConfiguration) {
+        // eslint-disable-next-line constructor-super
         super();
         if (!(config && typeof config === 'object'))
             throw new TypeError('Configuration object required');
@@ -202,138 +215,6 @@ export class SqbClient extends SafeEventEmitter {
 
     [inspect]() {
         return this.toString();
-    }
-
-    addListener(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    addListener(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    addListener(event: 'error', listener: (error: Error) => void): this;
-    addListener(event: 'closing', listener: () => void): this;
-    addListener(event: 'close', listener: () => void): this;
-    addListener(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    addListener(event: 'terminate', listener: () => void): this;
-    addListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.addListener(event, listener);
-    }
-
-    removeListener(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    removeListener(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    removeListener(event: 'error', listener: (error: Error) => void): this;
-    removeListener(event: 'closing', listener: () => void): this;
-    removeListener(event: 'close', listener: () => void): this;
-    removeListener(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    removeListener(event: 'terminate', listener: () => void): this;
-    removeListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.removeListener(event, listener);
-    }
-
-    emit(event: 'execute', request: QueryRequest, connection: SqbConnection): boolean;
-    emit(event: 'error', error: Error, connection: SqbConnection): boolean;
-    emit(event: 'error', error: Error): boolean;
-    emit(event: 'closing'): boolean;
-    emit(event: 'close'): boolean;
-    emit(event: 'acquire', connection: SqbConnection): boolean;
-    emit(event: 'terminate'): boolean;
-    emit(event: string | symbol, ...args: any[]): boolean {
-        return super.emit(event, ...args);
-    }
-
-    on(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    on(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    on(event: 'error', listener: (error: Error) => void): this;
-    on(event: 'closing', listener: () => void): this;
-    on(event: 'close', listener: () => void): this;
-    on(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    on(event: 'terminate', listener: () => void): this;
-    on(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.on(event, listener);
-    }
-
-    once(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    once(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    once(event: 'error', listener: (error: Error) => void): this;
-    once(event: 'closing', listener: () => void): this;
-    once(event: 'close', listener: () => void): this;
-    once(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    once(event: 'terminate', listener: () => void): this;
-    once(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.once(event, listener);
-    }
-
-    off(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    off(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    off(event: 'error', listener: (error: Error) => void): this;
-    off(event: 'closing', listener: () => void): this;
-    off(event: 'close', listener: () => void): this;
-    off(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    off(event: 'terminate', listener: () => void): this;
-    off(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.off(event, listener);
-    }
-
-    removeAllListeners(event: 'execute'): this;
-    removeAllListeners(event: 'error'): this;
-    removeAllListeners(event: 'error'): this;
-    removeAllListeners(event: 'closing'): this;
-    removeAllListeners(event: 'close'): this;
-    removeAllListeners(event: 'acquire'): this;
-    removeAllListeners(event: 'terminate'): this;
-    removeAllListeners(event: string | symbol): this {
-        return super.removeAllListeners(event);
-    }
-
-    listeners(event: 'execute'): Function[];
-    listeners(event: 'error'): Function[];
-    listeners(event: 'error'): Function[];
-    listeners(event: 'closing'): Function[];
-    listeners(event: 'close'): Function[];
-    listeners(event: 'acquire'): Function[];
-    listeners(event: 'terminate'): Function[];
-    listeners(event: string | symbol): Function[] {
-        return super.listeners(event);
-    }
-
-    rawListeners(event: 'execute'): Function[];
-    rawListeners(event: 'error'): Function[];
-    rawListeners(event: 'error'): Function[];
-    rawListeners(event: 'closing'): Function[];
-    rawListeners(event: 'close'): Function[];
-    rawListeners(event: 'acquire'): Function[];
-    rawListeners(event: 'terminate'): Function[];
-    rawListeners(event: string | symbol): Function[] {
-        return super.rawListeners(event);
-    }
-
-    listenerCount(event: 'execute'): number;
-    listenerCount(event: 'error'): number;
-    listenerCount(event: 'error'): number;
-    listenerCount(event: 'closing'): number;
-    listenerCount(event: 'close'): number;
-    listenerCount(event: 'acquire'): number;
-    listenerCount(event: 'terminate'): number;
-    listenerCount(event: string | symbol): number {
-        return super.listenerCount(event);
-    }
-
-    prependListener(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    prependListener(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    prependListener(event: 'error', listener: (error: Error) => void): this;
-    prependListener(event: 'closing', listener: () => void): this;
-    prependListener(event: 'close', listener: () => void): this;
-    prependListener(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    prependListener(event: 'terminate', listener: () => void): this;
-    prependListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.prependListener(event, listener);
-    }
-
-    prependOnceListener(event: 'execute', listener: (request: QueryRequest, connection: SqbConnection) => void): this;
-    prependOnceListener(event: 'error', listener: (error: Error, connection: SqbConnection) => void): this;
-    prependOnceListener(event: 'error', listener: (error: Error) => void): this;
-    prependOnceListener(event: 'closing', listener: () => void): this;
-    prependOnceListener(event: 'close', listener: () => void): this;
-    prependOnceListener(event: 'acquire', listener: (connection: SqbConnection) => void): this;
-    prependOnceListener(event: 'terminate', listener: () => void): this;
-    prependOnceListener(event: string | symbol, listener: (...args: any[]) => void): this {
-        return super.prependOnceListener(event, listener);
     }
 
 }

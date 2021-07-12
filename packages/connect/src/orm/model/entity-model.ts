@@ -33,7 +33,7 @@ export class EntityModel {
     }
 
     get propertyKeys(): string[] {
-        if (!this._propertyKeys)
+        if (!(this._propertyKeys && this.hasOwnProperty('_propertyKeys')))
             this._propertyKeys = Array.from(this.properties.keys());
         return this._propertyKeys;
     }
@@ -231,16 +231,16 @@ export class EntityModel {
         }
     }
 
-    static get(ctor: Function): EntityModel {
-        return ctor.hasOwnProperty(ENTITY_DEFINITION_KEY) &&
-            ctor[ENTITY_DEFINITION_KEY];
+    static get(ctor: Function): Maybe<EntityModel> {
+        if (ctor.hasOwnProperty(ENTITY_DEFINITION_KEY))
+            return ctor[ENTITY_DEFINITION_KEY];
     }
 
-    static attachTo(ctor: Function) {
-        let entity: EntityModel = this.get(ctor);
-        if (entity)
-            return entity;
-        ctor[ENTITY_DEFINITION_KEY] = entity = new EntityModel(ctor as Type);
+    static attachTo(ctor: Function): EntityModel {
+        const current = this.get(ctor);
+        if (current)
+            return current;
+        const entity = ctor[ENTITY_DEFINITION_KEY] = new EntityModel(ctor as Type);
         // Merge base entity columns into this one
         const baseCtor = Object.getPrototypeOf(ctor);
         const base = EntityModel.get(baseCtor);
@@ -261,9 +261,9 @@ export class EntityModel {
                 entity.indexes.push(newIdx);
             }
             entity.eventListeners.push(...base.eventListeners);
+            if (base.primaryIndex)
+                entity.setPrimaryIndex([...base.primaryIndex.columns]);
         }
-        if (base.primaryIndex)
-            entity.setPrimaryIndex([...base.primaryIndex.columns]);
 
         ctor.prototype.toJSON = function (): Object {
             const obj = {};

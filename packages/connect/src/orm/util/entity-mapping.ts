@@ -17,88 +17,103 @@ export function mixinEntities<A, B>(derived: Type, classARef: Type<A>, classBRef
 export function mixinEntities<A, B>(derived: Type, classARef: Type<A>, classBRef: Type<B>): Type<A & B>
 export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, classCRef?: Type,
                               classDRef?: Type, classERef?: Type, classFRef?: Type) {
-    const entity = EntityModel.attachTo(derived);
+    const trg = EntityModel.attachTo(derived);
     for (const classRef of [classARef, classBRef, classCRef, classDRef, classERef, classFRef]) {
         if (!classRef)
             continue;
-        const model = EntityModel.get(classRef);
-        if (!entity.primaryIndex && model.primaryIndex) {
-            entity.primaryIndex = new IndexMeta(entity, model.primaryIndex.columns, model.primaryIndex);
+        const src = EntityModel.get(classRef);
+        if (!src)
+            return derived;
+        if (!trg.primaryIndex && src.primaryIndex) {
+            trg.primaryIndex = new IndexMeta(trg, src.primaryIndex.columns, src.primaryIndex);
         }
-        for (const fk of model.foreignKeys) {
-            const newFk = new Association(fk.name, {...fk, source: derived});
-            entity.foreignKeys.push(newFk);
+        if (src.foreignKeys) {
+            trg.foreignKeys = trg.foreignKeys || [];
+            for (const fk of src.foreignKeys) {
+                const newFk = new Association(fk.name, {...fk, source: derived});
+                trg.foreignKeys.push(newFk);
+            }
         }
-        for (const idx of model.indexes) {
-            const newIdx = new IndexMeta(entity, idx.columns, idx);
-            entity.indexes.push(newIdx);
+        if (src.indexes) {
+            trg.indexes = trg.indexes || [];
+            for (const idx of src.indexes) {
+                const newIdx = new IndexMeta(trg, idx.columns, idx);
+                trg.indexes.push(newIdx);
+            }
         }
-        entity.eventListeners.push(...model.eventListeners);
-        model.properties.forEach((p, n) => {
+        if (src.eventListeners) {
+            trg.eventListeners = trg.eventListeners || [];
+            trg.eventListeners.push(...src.eventListeners);
+        }
+        src.properties.forEach((p, n) => {
             const o: any = Object.assign({}, p);
-            o.entity = entity;
+            o.entity = trg;
             Object.setPrototypeOf(o, Object.getPrototypeOf(p));
-            entity.properties.set(n, o);
+            trg.properties.set(n, o);
         });
     }
     return derived;
 }
 
-export function pickCloneEntity<T, K extends keyof T>(
-    derived: Type,
-    classRef: Type<T>, keys: readonly K[]): Type<Pick<T, typeof keys[number]>> {
-
-    const srcModel = EntityModel.get(classRef);
-
-    const entity = EntityModel.attachTo(derived);
-    const pickKeys = (keys as unknown as string[]);
-    for (const fk of srcModel.foreignKeys) {
-        if (fk.sourceKey && pickKeys.includes(fk.sourceKey)) {
+export function pickEntityInto<T, K extends keyof T>(
+    derived: Type, classRef: Type<T>, keys: readonly K[]): Type<Pick<T, typeof keys[number]>> {
+    const trg = EntityModel.attachTo(derived);
+    const src = EntityModel.get(classRef);
+    if (!src)
+        return derived;
+    const pickKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
+    for (const fk of src.foreignKeys) {
+        if (fk.sourceKey && pickKeys.includes(fk.sourceKey.toLowerCase())) {
             const newFk = new Association(fk.name, {...fk, source: derived});
-            entity.foreignKeys.push(newFk);
+            trg.foreignKeys.push(newFk);
         }
     }
-    for (const idx of srcModel.indexes) {
-        if (!idx.columns.find(x => !pickKeys.includes(x))) {
-            const newIdx = new IndexMeta(entity, idx.columns, idx);
-            entity.indexes.push(newIdx);
+    for (const idx of src.indexes) {
+        if (!idx.columns.find(x => !pickKeys.includes(x.toLowerCase()))) {
+            const newIdx = new IndexMeta(trg, idx.columns, idx);
+            trg.indexes.push(newIdx);
         }
     }
-    entity.eventListeners.push(...srcModel.eventListeners);
-    srcModel.properties.forEach((p, n) => {
+    trg.eventListeners.push(...src.eventListeners);
+    src.properties.forEach((p, n) => {
         if (pickKeys.includes(n))
-            entity.properties.set(n, p)
+            trg.properties.set(n, p)
     });
 
-    return derived as Type<Pick<T, typeof keys[number]>>;
+    return derived;
 }
 
-export function omitCloneEntity<T, K extends keyof T>(
+export function omitEntityInto<T, K extends keyof T>(
     derived: Type,
     classRef: Type<T>, keys: readonly K[]): Type<Omit<T, typeof keys[number]>> {
 
-    const srcModel = EntityModel.get(classRef);
-
-    const entity = EntityModel.attachTo(derived);
-    const omitKeys = (keys as unknown as string[]);
-    for (const fk of srcModel.foreignKeys) {
-        if (!(fk.sourceKey && omitKeys.includes(fk.sourceKey))) {
+    const trg = EntityModel.attachTo(derived);
+    const src = EntityModel.get(classRef);
+    if (!src)
+        return derived;
+    const omitKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
+    for (const fk of src.foreignKeys) {
+        if (!(fk.sourceKey && omitKeys.includes(fk.sourceKey.toLowerCase()))) {
             const newFk = new Association(fk.name, {...fk, source: derived});
-            entity.foreignKeys.push(newFk);
+            trg.foreignKeys.push(newFk);
         }
     }
-    for (const idx of srcModel.indexes) {
-        if (!idx.columns.find(x => omitKeys.includes(x))) {
-            const newIdx = new IndexMeta(entity, idx.columns, idx);
-            entity.indexes.push(newIdx);
+    for (const idx of src.indexes) {
+        if (!idx.columns.find(x => omitKeys.includes(x.toLowerCase()))) {
+            const newIdx = new IndexMeta(trg, idx.columns, idx);
+            trg.indexes.push(newIdx);
         }
     }
-    entity.eventListeners.push(...srcModel.eventListeners);
-    srcModel.properties.forEach((p, n) => {
-        if (!omitKeys.includes(n))
-            entity.properties.set(n, p)
+    trg.eventListeners.push(...src.eventListeners);
+    src.properties.forEach((p, n) => {
+        if (!omitKeys.includes(n.toLowerCase()))
+            trg.properties.set(n.toLowerCase(), p)
     });
-    return derived as Type<Omit<T, typeof keys[number]>>;
+    trg.properties.forEach((p, n) => {
+        if (omitKeys.includes(n.toLowerCase()))
+            trg.properties.delete(n.toLowerCase())
+    });
+    return derived;
 }
 
 export function UnionEntity<A, B>(classARef: Type<A>, classBRef: Type<B>): Type<A & B> {
@@ -119,7 +134,7 @@ export function PickEntity<T, K extends keyof T>(classRef: Type<T>, keys: readon
         }
     }
 
-    return pickCloneEntity(PickEntityClass, classRef, keys);
+    return pickEntityInto(PickEntityClass, classRef, keys);
 }
 
 export function OmitEntity<T, K extends keyof T>(
@@ -131,7 +146,7 @@ export function OmitEntity<T, K extends keyof T>(
         }
     }
 
-    return omitCloneEntity(OmitEntityClass, classRef, keys);
+    return omitEntityInto(OmitEntityClass, classRef, keys);
 }
 
 function inheritPropertyInitializers(

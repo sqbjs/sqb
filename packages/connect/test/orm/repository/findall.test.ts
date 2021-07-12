@@ -59,7 +59,7 @@ describe('findAll()', function () {
     });
 
     it('should return data columns plus elements specified in "include" option', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,
             include: ['country']
@@ -71,7 +71,7 @@ describe('findAll()', function () {
     });
 
     it('should exclude returning elements specified in "exclude" option', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,
             include: ['country'],
@@ -115,7 +115,7 @@ describe('findAll()', function () {
     });
 
     it('should filter if field name different than property name', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             filter: {
                 givenName: Param('givenName'),
@@ -130,7 +130,7 @@ describe('findAll()', function () {
     });
 
     it('should filter by embedded sub element', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             filter: {
                 'name.given': Param('givenName'),
@@ -145,7 +145,7 @@ describe('findAll()', function () {
     });
 
     it('should limit result rows', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             sort: ['id'],
             limit: 5
@@ -157,7 +157,7 @@ describe('findAll()', function () {
     });
 
     it('should start from given offset', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             sort: ['id'],
             limit: 5,
@@ -170,7 +170,7 @@ describe('findAll()', function () {
     });
 
     it('should sort result rows', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({sort: ['-id']});
         const arr1 = rows.map(x => x.id);
         const arr2 = [...arr1];
@@ -179,14 +179,14 @@ describe('findAll()', function () {
     });
 
     it('should sort by data columns only ', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         return assert.rejects(() =>
                 repo.findAll({sort: ['country']}),
             /Can not sort by/);
     });
 
     it('should sort by embedded sub element', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({sort: ['name.given', 'name.family']});
         const arr1 = rows.map(x => x.name.given);
         const arr2 = [...arr1];
@@ -201,7 +201,7 @@ describe('findAll()', function () {
     });
 
     it('should return distinct results', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             elements: ['countryCode'],
             distinct: true
@@ -214,7 +214,7 @@ describe('findAll()', function () {
     });
 
     it('should apply "parse"', async function () {
-        const repo = client().getRepository<Customer>(Customer);
+        const repo = client().getRepository(Customer);
         const rows = await repo.findAll({sort: ['id'], limit: 10});
         assert.strictEqual(rows[0].gender, 'Male');
         assert.strictEqual(rows[1].gender, 'Female');
