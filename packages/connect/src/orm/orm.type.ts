@@ -1,7 +1,7 @@
 import {DataType, Type} from '..';
 
 /* Model related */
-export type ElementKind = 'data' | 'relation' | 'embedded';
+export type ElementKind = 'column' | 'object' | 'association';
 
 export type AssociationKind = 'to' | 'to-many' | 'from' | 'from-many';
 

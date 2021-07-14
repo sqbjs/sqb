@@ -1,13 +1,13 @@
 import {And, Select, In, Param} from '@sqb/builder';
 import type {Repository} from '../repository.class';
 import type {EntityModel} from '../model/entity-model';
-import type {EntityDataProperty} from '../model/entity-data-property';
+import type {EntityColumnElement} from '../model/entity-column-element';
 import {RowConverter} from './row-converter';
 import {AssociationNode} from '../model/association-node';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
+import {isColumnElement, isObjectElement, isAssociationElement} from '../util/orm.helper';
 import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
 import {SqbConnection} from '../../client/SqbConnection';
-import {getDataColumnNames, getEmbeddedElementNames} from '../base-entity.class';
+import {getNonAssociationElementNames} from '../base-entity.class';
 
 export type FindCommandArgs = {
     entity: EntityModel;
@@ -27,7 +27,7 @@ export class FindCommand {
     private _joins: JoinInfo[] = [];
     private _selectColumns: Record<string, {
         statement: string;
-        element: EntityDataProperty;
+        element: EntityColumnElement;
     }> = {};
     private _filter = And();
     private _sort?: string[];
@@ -104,8 +104,7 @@ export class FindCommand {
         const converter = opts.converter || this.converter;
 
         let requestElements: string[] = opts.elements && opts.elements.length ?
-            [...opts.elements] :
-            [...getDataColumnNames(entity.ctor), ...getEmbeddedElementNames(entity.ctor)];
+            [...opts.elements] : getNonAssociationElementNames(entity.ctor);
         if (opts.include && opts.include.length)
             requestElements.push(...opts.include);
         requestElements = requestElements.map(x => x.toLowerCase());
@@ -114,8 +113,8 @@ export class FindCommand {
         const sortElements = opts.sort && opts.sort.length ?
             opts.sort.map(x => x.toLowerCase()) : undefined;
 
-        for (const key of entity.propertyKeys) {
-            const col = entity.getProperty(key);
+        for (const key of entity.elementKeys) {
+            const col = entity.getElement(key);
             if (!col)
                 continue;
             const colNameLower = col.name.toLowerCase();
@@ -130,7 +129,7 @@ export class FindCommand {
             ) continue;
 
             // Add field to select list if element is a column
-            if (isDataProperty(col)) {
+            if (isColumnElement(col)) {
                 const fieldAlias = this._selectColumn(tableAlias, col);
                 // Add column to converter
                 if (!col.hidden)
@@ -143,7 +142,7 @@ export class FindCommand {
                 continue;
             }
 
-            if (isObjectProperty(col)) {
+            if (isObjectElement(col)) {
                 const typ = await col.resolveType();
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
@@ -218,7 +217,7 @@ export class FindCommand {
         }
     }
 
-    private _selectColumn(tableAlias: string, el: EntityDataProperty): string {
+    private _selectColumn(tableAlias: string, el: EntityColumnElement): string {
         const fieldAlias = tableAlias + '_' + el.name.toUpperCase();
         this._selectColumns[fieldAlias] = {
             element: el,
@@ -246,8 +245,8 @@ export class FindCommand {
             if (elName.includes('.')) {
                 const a: string[] = elName.split('.');
                 while (a.length > 1) {
-                    const col = _entityDef.getProperty(a.shift() || '');
-                    if (isObjectProperty(col)) {
+                    const col = _entityDef.getElement(a.shift() || '');
+                    if (isObjectElement(col)) {
                         _entityDef = await col.resolveType();
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
@@ -267,10 +266,10 @@ export class FindCommand {
                     continue;
                 elName = a.shift() || '';
             }
-            const col = _entityDef.getProperty(elName);
+            const col = _entityDef.getElement(elName);
             if (!col)
                 throw new Error(`Unknown element (${elName}) declared in sort property`);
-            if (!isDataProperty(col))
+            if (!isColumnElement(col))
                 throw new Error(`Can not sort by "${elName}", because it is not a data column`);
 
             const dir = m[1] || '+';
@@ -279,13 +278,14 @@ export class FindCommand {
         this._sort = orderColumns;
     }
 
-    async execute(args:
-                      Pick<FindCommandArgs, 'connection' | 'distinct' |
-                          'offset' | 'limit' | 'params' | 'onTransformRow'>
+    async execute(args: Pick<FindCommandArgs, 'connection' | 'distinct' |
+        'offset' | 'limit' | 'params' | 'onTransformRow'>
     ): Promise<any[]> {
         // Generate select query
         const columnSqls = Object.keys(this._selectColumns)
             .map(x => this._selectColumns[x].statement);
+        if (!columnSqls.length)
+            return [];
 
         const query = Select(...columnSqls)
             .from(this.mainEntity.tableName + ' as ' + this.mainAlias);

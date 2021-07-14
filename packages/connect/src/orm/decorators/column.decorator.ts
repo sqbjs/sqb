@@ -10,6 +10,6 @@ export function Column(arg0?: DataType | DataPropertyOptions): PropertyDecorator
             throw new Error('Symbol properties are not accepted');
         const options = typeof arg0 === 'string' ? {dataType: arg0} : arg0;
         EntityModel.attachTo(target.constructor)
-            .defineDataProperty(propertyKey, options);
+            .defineColumnElement(propertyKey, options);
     }
 }

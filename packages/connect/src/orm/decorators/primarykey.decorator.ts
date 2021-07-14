@@ -17,7 +17,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
         const entity = EntityModel.attachTo(target.constructor);
-        entity.defineDataProperty(propertyKey, {notNull: true});
+        entity.defineColumnElement(propertyKey, {notNull: true});
         entity.setPrimaryIndex(propertyKey, arg0);
     };
 }

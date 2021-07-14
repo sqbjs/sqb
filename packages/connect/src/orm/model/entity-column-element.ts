@@ -7,10 +7,10 @@ import {
     ColumnAutoGenerationStrategy,
     ColumnTransformFunction, DataPropertyOptions, EnumValue, FieldValue, DefaultValueGetter,
 } from '../orm.type';
-import {AbstractEntityProperty} from './abstract-entity-property';
+import {AbstractEntityelement} from './abstract-entityelement';
 
-export class EntityDataProperty extends AbstractEntityProperty {
-    readonly kind: ElementKind = 'data';
+export class EntityColumnElement extends AbstractEntityelement {
+    readonly kind: ElementKind = 'column';
     fieldName: string;
     dataType?: DataType;
     type?: Function;

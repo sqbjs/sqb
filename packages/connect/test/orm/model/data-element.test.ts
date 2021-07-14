@@ -19,7 +19,7 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getDataProperty('id');
+        const idColumn = meta.getColumnElement('id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.name, 'id');
     });
@@ -32,7 +32,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        const idColumn = meta.getDataProperty('id');
+        const idColumn = meta.getColumnElement('id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.dataType, DataType.GUID);
     });
@@ -61,7 +61,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        const idColumn = meta.getDataProperty('id');
+        const idColumn = meta.getColumnElement('id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.type, Number);
         assert.strictEqual(idColumn.dataType, DataType.NUMBER);
@@ -102,22 +102,22 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        let col = meta.getDataProperty('col1');
+        let col = meta.getColumnElement('col1');
         assert.strictEqual(col.type, String);
         assert.strictEqual(col.dataType, DataType.VARCHAR);
-        col = meta.getDataProperty('col2');
+        col = meta.getColumnElement('col2');
         assert.strictEqual(col.type, Number);
         assert.strictEqual(col.dataType, DataType.NUMBER);
-        col = meta.getDataProperty('col3');
+        col = meta.getColumnElement('col3');
         assert.strictEqual(col.type, Boolean);
         assert.strictEqual(col.dataType, DataType.BOOL);
-        col = meta.getDataProperty('col4');
+        col = meta.getColumnElement('col4');
         assert.strictEqual(col.type, Date);
         assert.strictEqual(col.dataType, DataType.TIMESTAMP);
-        col = meta.getDataProperty('col5');
+        col = meta.getColumnElement('col5');
         assert.strictEqual(col.type, Buffer);
         assert.strictEqual(col.dataType, DataType.BINARY);
-        col = meta.getDataProperty('col6');
+        col = meta.getColumnElement('col6');
         assert.strictEqual(col.type, String);
         assert.strictEqual(col.dataType, DataType.VARCHAR);
         assert.strictEqual(col.isArray, true);

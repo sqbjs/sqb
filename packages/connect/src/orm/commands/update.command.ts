@@ -2,7 +2,7 @@ import {And, Param, Update} from '@sqb/builder';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
 import {prepareFilter} from './command.helper';
-import {isDataProperty, isObjectProperty} from '../util/orm.helper';
+import {isColumnElement, isObjectElement} from '../util/orm.helper';
 import {SqbConnection} from '../../client/SqbConnection';
 
 export type UpdateCommandArgs = {
@@ -69,9 +69,9 @@ export class UpdateCommand {
     protected static async _prepareParams(ctx: UpdateCommandContext,
                                           entity: EntityModel, values: any) {
         let v;
-        for (const col of entity.properties.values()) {
+        for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (isDataProperty(col)) {
+            if (isColumnElement(col)) {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')
@@ -89,7 +89,7 @@ export class UpdateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isObjectProperty(col)) {
+            } else if (v != null && isObjectElement(col)) {
                 const type = await col.resolveType();
                 await this._prepareParams(ctx, type, v);
             }

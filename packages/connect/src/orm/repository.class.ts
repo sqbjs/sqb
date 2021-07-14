@@ -145,20 +145,20 @@ export class Repository<T> {
         }, options);
     }
 
-    update(values: PartialWritable<T>,
+    update(keyValue: any, values: PartialWritable<T>,
            options?: Repository.UpdateOptions): Promise<T | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
-            const keyValues = await this._update(values, opts);
+            const keyValues = await this._update(keyValue, values, opts);
             if (keyValues)
                 return this._findByPk(keyValues, opts);
         }, options);
     }
 
-    updateOnly(values: PartialWritable<T>,
+    updateOnly(keyValue: any, values: PartialWritable<T>,
                options?: Repository.UpdateOptions): Promise<any> {
         return this._execute(async (connection) => {
-            return !!(await this._update(values, {...options, connection}));
+            return !!(await this._update(keyValue, values, {...options, connection}));
         }, options);
     }
 
@@ -287,13 +287,10 @@ export class Repository<T> {
         });
     }
 
-    protected async _update(values: PartialWritable<T>,
+    protected async _update(keyValue: any,
+                            values: PartialWritable<T>,
                             options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<any> {
-        const primaryKeys = this._entity.primaryIndex?.columns;
-        if (!(primaryKeys && primaryKeys.length))
-            throw new Error(`To run the update command, You must define primary key(s) for ${this._entity.ctor.name} entity.`);
-
-        const keyValues = extractKeyValues(this._entity, values);
+        const keyValues = extractKeyValues(this._entity, keyValue);
         const filter = [keyValues];
         if (options.filter) {
             if (Array.isArray(options.filter))
@@ -301,7 +298,7 @@ export class Repository<T> {
             else filter.push(options.filter);
         }
         const updateValues = {...values};
-        primaryKeys.forEach(k => delete updateValues[k]);
+        Object.keys(keyValues).forEach(k => delete updateValues[k]);
         const rowsAffected = await UpdateCommand.execute({
             ...options,
             entity: this._entity,

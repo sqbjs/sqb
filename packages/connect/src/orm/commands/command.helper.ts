@@ -3,7 +3,7 @@ import {
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
 import {EntityModel} from '../model/entity-model';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
+import {isColumnElement, isObjectElement, isAssociationElement} from '../util/orm.helper';
 import {AssociationNode} from '../model/association-node';
 
 export interface JoinInfo {
@@ -104,19 +104,19 @@ export async function prepareFilter(
                 let subSelect: SelectQuery | undefined;
                 for (let i = 0; i < l; i++) {
                     pt = itemPath[i];
-                    const col = _curEntity.getProperty(pt);
+                    const col = _curEntity.getElement(pt);
                     if (!col)
                         throw new Error(`Unknown property (${item._expression}) defined in filter`);
                     // if last item on path
                     if (i === l - 1) {
-                        if (!isDataProperty(col))
+                        if (!isColumnElement(col))
                             throw new Error(`Invalid column expression (${item._expression}) defined in filter`);
                         const ctor = Object.getPrototypeOf(item).constructor;
                         trgOp.add(new ctor(_curAlias + '.' + col.fieldName, item._value));
                     } else {
-                        if (isDataProperty(col))
+                        if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
-                        if (isObjectProperty(col)) {
+                        if (isObjectElement(col)) {
                             _curEntity = await col.resolveType();
                             continue;
                         }

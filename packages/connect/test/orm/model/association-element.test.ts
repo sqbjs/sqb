@@ -39,7 +39,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationProperty('country');
+        const col = meta.getAssociationElement('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -56,7 +56,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationProperty('country');
+        const col = meta.getAssociationElement('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -73,7 +73,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationProperty('country');
+        const col = meta.getAssociationElement('country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -89,7 +89,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationProperty('countries');
+        const col = meta.getAssociationElement('countries');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'countries');
         assert.strictEqual(col.association.source, Customer);
