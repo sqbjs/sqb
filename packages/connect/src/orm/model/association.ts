@@ -2,7 +2,7 @@ import {camelCase} from 'putil-varhelpers';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
 import {EntityModel} from './entity-model';
 import {resolveEntityMeta} from '../util/orm.helper';
-import {EntityDataProperty} from './entity-data-property';
+import {EntityColumnElement} from './entity-column-element';
 
 export class Association {
     private _resolved?: boolean;
@@ -10,8 +10,8 @@ export class Association {
     private _target?: EntityModel;  // cached value
     private _sourceKey?: string | null; // cached value
     private _targetKey?: string | null; // cached value
-    private _sourceProperty?: EntityDataProperty;
-    private _targetProperty?: EntityDataProperty;
+    private _sourceProperty?: EntityColumnElement;
+    private _targetProperty?: EntityColumnElement;
     name: string;
     readonly source: TypeThunk;
     readonly target: TypeThunk;
@@ -48,7 +48,7 @@ export class Association {
         return this._sourceKey;
     }
 
-    async resolveSourceProperty(): Promise<EntityDataProperty> {
+    async resolveSourceProperty(): Promise<EntityColumnElement> {
         await this._resolveKeys();
         // @ts-ignore
         return this._sourceProperty;
@@ -60,7 +60,7 @@ export class Association {
         return this._targetKey;
     }
 
-    async resolveTargetProperty(): Promise<EntityDataProperty> {
+    async resolveTargetProperty(): Promise<EntityColumnElement> {
         await this._resolveKeys();
         // @ts-ignore
         return this._targetProperty;
@@ -131,7 +131,7 @@ export class Association {
             if (!masterKey) {
                 // snake-case
                 masterKey = detail.name[0].toLowerCase() + detail.name.substring(1) + '_' + detailKey;
-                if (!master.getDataProperty(masterKey))
+                if (!master.getColumnElement(masterKey))
                     masterKey = camelCase(masterKey);
             }
             if (this.sourceBelongsToTarget) {
@@ -142,10 +142,10 @@ export class Association {
                 sourceKey = masterKey;
             }
         }
-        this._targetProperty = target.getDataProperty(targetKey);
+        this._targetProperty = target.getColumnElement(targetKey);
         if (!this._targetProperty)
             throw new Error(`Can't determine target key of ${this.name}`);
-        this._sourceProperty = source.getDataProperty(sourceKey);
+        this._sourceProperty = source.getColumnElement(sourceKey);
         if (!this._sourceProperty)
             throw new Error(`Can't determine source key of ${this.name}`);
         this._targetKey = targetKey;

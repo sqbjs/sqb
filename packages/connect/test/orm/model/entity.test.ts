@@ -8,7 +8,7 @@ import {
     Entity,
     LinkToOne,
     PrimaryKey,
-    getDataColumnNames, getElementNames, getInsertColumnNames, getUpdateColumnNames
+    getColumnNames, getElementNames, getInsertColumnNames, getUpdateColumnNames
 } from '@sqb/connect';
 
 describe('Entity', function () {
@@ -71,7 +71,7 @@ describe('Entity', function () {
         const baseMeta = Entity.getMetadata(Base);
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        assert.ok(meta.getProperty('id'));
+        assert.ok(meta.getElement('id'));
         assert.ok(meta.primaryIndex);
         assert.deepStrictEqual(meta.primaryIndex.columns, baseMeta.primaryIndex.columns);
     });
@@ -187,7 +187,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(getDataColumnNames(Customer), ['id', 'name', 'code']);
+        assert.deepStrictEqual(getColumnNames(Customer), ['id', 'name', 'code']);
     });
 
     it(`should getInsertColumnNames() return only data column names to insert`, function () {

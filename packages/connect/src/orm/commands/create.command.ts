@@ -1,6 +1,6 @@
 import {Insert, Param} from '@sqb/builder';
 import type {EntityModel} from '../model/entity-model';
-import {isDataProperty, isObjectProperty} from '../util/orm.helper';
+import {isColumnElement, isObjectElement} from '../util/orm.helper';
 import {SqbConnection} from '../../client/SqbConnection';
 
 export type CreateCommandArgs = {
@@ -56,7 +56,7 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const el = entity.getDataPropertyByFieldName(f.fieldName);
+                const el = entity.getColumnElementByFieldName(f.fieldName);
                 if (el)
                     keyValues[el.name] = qr.rows[0][f.index];
             }
@@ -67,9 +67,9 @@ export class CreateCommand {
     protected static async _prepareParams(ctx: CreateCommandContext,
                                           entity: EntityModel, values: any) {
         let v;
-        for (const col of entity.properties.values()) {
+        for (const col of entity.elements.values()) {
             v = values[col.name];
-            if (isDataProperty(col)) {
+            if (isColumnElement(col)) {
                 if (col.noInsert)
                     continue;
                 if (v == null && col.default !== undefined) {
@@ -92,7 +92,7 @@ export class CreateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isObjectProperty(col)) {
+            } else if (v != null && isObjectElement(col)) {
                 const type = await col.resolveType();
                 await this._prepareParams(ctx, type, v);
             }

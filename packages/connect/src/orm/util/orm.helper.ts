@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import type {TypeResolver, TypeThunk} from '../orm.type';
 import type {Type} from '../../types';
 import type {EntityModel} from '../model/entity-model';
-import type {EntityDataProperty} from '../model/entity-data-property';
-import type {EntityObjectProperty} from '../model/entity-object-property';
-import type {EntityAssociationProperty} from '../model/entity-association-property';
+import type {EntityColumnElement} from '../model/entity-column-element';
+import type {EntityObjectElement} from '../model/entity-object-element';
+import type {EntityAssociationElement} from '../model/entity-association-element';
 import {ENTITY_DEFINITION_KEY} from '../orm.const';
 
 export function isClass(fn: any): fn is Type {
@@ -15,16 +15,16 @@ export function isEntityClass(fn: any): fn is Type {
     return !!(isClass(fn) && fn[ENTITY_DEFINITION_KEY]);
 }
 
-export function isDataProperty(f: any): f is EntityDataProperty {
-    return !!(f && f.entity && f.kind === 'data');
+export function isColumnElement(f: any): f is EntityColumnElement {
+    return !!(f && f.entity && f.kind === 'column');
 }
 
-export const isObjectProperty = (f: any): f is EntityObjectProperty => {
-    return !!(f && f.entity && f.kind === 'embedded');
+export const isObjectElement = (f: any): f is EntityObjectElement => {
+    return !!(f && f.entity && f.kind === 'object');
 }
 
-export const isAssociationElement = (f: any): f is EntityAssociationProperty => {
-    return !!(f && f.entity && f.kind === 'relation');
+export const isAssociationElement = (f: any): f is EntityAssociationElement => {
+    return !!(f && f.entity && f.kind === 'association');
 }
 
 export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefined> {

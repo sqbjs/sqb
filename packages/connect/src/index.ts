@@ -21,12 +21,12 @@ export * from './orm/decorators/transform.decorator';
 
 export * from './orm/repository.class';
 export * from './orm/model/entity-model';
-export * from './orm/model/entity-data-property';
-export * from './orm/model/entity-object-property';
-export * from './orm/model/entity-association-property';
+export * from './orm/model/entity-column-element';
+export * from './orm/model/entity-object-element';
+export * from './orm/model/entity-association-element';
 export * from './orm/model/association';
 export * from './orm/model/index-meta';
 
 export * from './orm/util/entity-mapping';
 
-export {isDataProperty, isObjectProperty, isAssociationElement, isEntityClass} from './orm/util/orm.helper';
+export {isColumnElement, isObjectElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';

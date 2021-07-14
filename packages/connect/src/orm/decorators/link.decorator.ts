@@ -14,7 +14,7 @@ export function Link(chain: LinkChain<any>): PropertyDecorator {
         // @ts-ignore
         // noinspection JSConstantReassignment
         chain.first.source = entity.ctor;
-        entity.defineAssociationProperty(propertyKey, chain.first);
+        entity.defineAssociationElement(propertyKey, chain.first);
     }
 }
 

@@ -45,11 +45,11 @@ export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, 
             trg.eventListeners = trg.eventListeners || [];
             trg.eventListeners.push(...src.eventListeners);
         }
-        src.properties.forEach((p, n) => {
+        src.elements.forEach((p, n) => {
             const o: any = Object.assign({}, p);
             o.entity = trg;
             Object.setPrototypeOf(o, Object.getPrototypeOf(p));
-            trg.properties.set(n, o);
+            trg.elements.set(n, o);
         });
     }
     return derived;
@@ -75,9 +75,9 @@ export function pickEntityInto<T, K extends keyof T>(
         }
     }
     trg.eventListeners.push(...src.eventListeners);
-    src.properties.forEach((p, n) => {
+    src.elements.forEach((p, n) => {
         if (pickKeys.includes(n))
-            trg.properties.set(n, p)
+            trg.elements.set(n, p)
     });
 
     return derived;
@@ -105,13 +105,13 @@ export function omitEntityInto<T, K extends keyof T>(
         }
     }
     trg.eventListeners.push(...src.eventListeners);
-    src.properties.forEach((p, n) => {
+    src.elements.forEach((p, n) => {
         if (!omitKeys.includes(n.toLowerCase()))
-            trg.properties.set(n.toLowerCase(), p)
+            trg.elements.set(n.toLowerCase(), p)
     });
-    trg.properties.forEach((p, n) => {
+    trg.elements.forEach((p, n) => {
         if (omitKeys.includes(n.toLowerCase()))
-            trg.properties.delete(n.toLowerCase())
+            trg.elements.delete(n.toLowerCase())
     });
     return derived;
 }
@@ -157,13 +157,13 @@ function inheritPropertyInitializers(
 ) {
     try {
         const tempInstance = new sourceClass(...constructorArgs);
-        const propertyKeys = Object.getOwnPropertyNames(tempInstance);
-        for (const propertyKey of propertyKeys) {
-            const srcDesc = Object.getOwnPropertyDescriptor(tempInstance, propertyKey);
-            const trgDesc = Object.getOwnPropertyDescriptor(target, propertyKey);
-            if (!srcDesc || trgDesc || (isPropertyInherited && !isPropertyInherited(propertyKey)))
+        const keys = Object.getOwnPropertyNames(tempInstance);
+        for (const key of keys) {
+            const srcDesc = Object.getOwnPropertyDescriptor(tempInstance, key);
+            const trgDesc = Object.getOwnPropertyDescriptor(target, key);
+            if (!srcDesc || trgDesc || (isPropertyInherited && !isPropertyInherited(key)))
                 continue;
-            Object.defineProperty(target, propertyKey, srcDesc);
+            Object.defineProperty(target, key, srcDesc);
         }
     } catch {
         //

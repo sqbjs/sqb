@@ -7,23 +7,23 @@ import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../orm.const';
 import {IndexMeta} from './index-meta';
 import {Association} from './association';
-import {EntityDataProperty} from './entity-data-property';
-import {EntityObjectProperty} from './entity-object-property';
-import {EntityAssociationProperty} from './entity-association-property';
+import {EntityColumnElement} from './entity-column-element';
+import {EntityObjectElement} from './entity-object-element';
+import {EntityAssociationElement} from './entity-association-element';
 import {serializeColumn} from '../util/serialize-element';
 import {AssociationNode} from './association-node';
-import {isDataProperty, isObjectProperty, isAssociationElement} from '../util/orm.helper';
+import {isColumnElement, isObjectElement, isAssociationElement} from '../util/orm.helper';
 
-export type EntityProperty = EntityDataProperty | EntityObjectProperty | EntityAssociationProperty;
+export type EntityElement = EntityColumnElement | EntityObjectElement | EntityAssociationElement;
 
 export class EntityModel {
-    private _propertyKeys?: string[]; // cache
+    private _elementKeys?: string[]; // cache
     readonly name: string;
     tableName?: string;
     schema?: string;
     comment?: string;
     primaryIndex?: IndexMeta;
-    properties = new Map<string, EntityProperty>();
+    elements = new Map<string, EntityElement>();
     indexes: IndexMeta[] = [];
     foreignKeys: Association[] = [];
     eventListeners: { event: string, fn: Function }[] = [];
@@ -32,53 +32,53 @@ export class EntityModel {
         this.name = ctor.name;
     }
 
-    get propertyKeys(): string[] {
-        if (!(this._propertyKeys && this.hasOwnProperty('_propertyKeys')))
-            this._propertyKeys = Array.from(this.properties.keys());
-        return this._propertyKeys;
+    get elementKeys(): string[] {
+        if (!(this._elementKeys && this.hasOwnProperty('_elementKeys')))
+            this._elementKeys = Array.from(this.elements.keys());
+        return this._elementKeys;
     }
 
-    getProperty(name: string): Maybe<EntityProperty> {
+    getElement(name: string): Maybe<EntityElement> {
         if (!name)
             return;
-        return this.properties.get(name.toLowerCase());
+        return this.elements.get(name.toLowerCase());
     }
 
-    getDataProperty(name: string): Maybe<EntityDataProperty> {
+    getColumnElement(name: string): Maybe<EntityColumnElement> {
         if (!name)
             return;
-        const prop = this.properties.get(name.toLowerCase());
-        return isDataProperty(prop) ? prop : undefined;
+        const prop = this.elements.get(name.toLowerCase());
+        return isColumnElement(prop) ? prop : undefined;
     }
 
-    getDataPropertyByFieldName(fieldName: string): Maybe<EntityDataProperty> {
+    getColumnElementByFieldName(fieldName: string): Maybe<EntityColumnElement> {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
-        for (const prop of this.properties.values()) {
-            if (isDataProperty(prop) && prop.fieldName.toLowerCase() === fieldName)
+        for (const prop of this.elements.values()) {
+            if (isColumnElement(prop) && prop.fieldName.toLowerCase() === fieldName)
                 return prop;
         }
     }
 
-    getObjectProperty(name: string): Maybe<EntityObjectProperty> {
+    getObjectElement(name: string): Maybe<EntityObjectElement> {
         if (!name)
             return;
-        const col = this.properties.get(name.toLowerCase());
-        return isObjectProperty(col) ? col : undefined;
+        const col = this.elements.get(name.toLowerCase());
+        return isObjectElement(col) ? col : undefined;
     }
 
-    getAssociationProperty(name: string): Maybe<EntityAssociationProperty> {
+    getAssociationElement(name: string): Maybe<EntityAssociationElement> {
         if (!name)
             return;
-        const col = this.properties.get(name.toLowerCase());
+        const col = this.elements.get(name.toLowerCase());
         return isAssociationElement(col) ? col : undefined;
     }
 
-    defineDataProperty(propertyKey: string, options?: DataPropertyOptions): EntityDataProperty {
-        let prop = this.getProperty(propertyKey);
-        if (!prop || !isDataProperty(prop)) {
-            prop = new EntityDataProperty(this, propertyKey, options);
+    defineColumnElement(propertyKey: string, options?: DataPropertyOptions): EntityColumnElement {
+        let prop = this.getElement(propertyKey);
+        if (!prop || !isColumnElement(prop)) {
+            prop = new EntityColumnElement(this, propertyKey, options);
             if (!prop.type) {
                 const typ = Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
                 if (typ === Array) {
@@ -104,38 +104,38 @@ export class EntityModel {
             if (options?.isArray)
                 prop.isArray = true;
 
-            if (!this.properties.has(propertyKey.toLowerCase()))
-                this.propertyKeys.push(propertyKey);
-            this.properties.set(propertyKey.toLowerCase(), prop);
+            if (!this.elements.has(propertyKey.toLowerCase()))
+                this.elementKeys.push(propertyKey);
+            this.elements.set(propertyKey.toLowerCase(), prop);
         } else if (options)
             prop.assign(options);
         return prop;
     }
 
-    defineAssociationProperty(propertyKey: string, association: AssociationNode): EntityAssociationProperty {
-        const prop = new EntityAssociationProperty(this, propertyKey, association);
+    defineAssociationElement(propertyKey: string, association: AssociationNode): EntityAssociationElement {
+        const prop = new EntityAssociationElement(this, propertyKey, association);
         let l: AssociationNode | undefined = association;
         let i = 1;
         while (l) {
             l.name = this.name + '.' + propertyKey + '#' + (i++) + ')';
             l = l.next;
         }
-        if (!this.properties.has(propertyKey.toLowerCase()))
-            this.propertyKeys.push(propertyKey);
-        this.properties.set(propertyKey.toLowerCase(), prop);
+        if (!this.elements.has(propertyKey.toLowerCase()))
+            this.elementKeys.push(propertyKey);
+        this.elements.set(propertyKey.toLowerCase(), prop);
         return prop;
     }
 
-    defineObjectProperty(propertyKey: string, type?: TypeThunk): EntityObjectProperty {
+    defineObjectElement(propertyKey: string, type?: TypeThunk): EntityObjectElement {
         type = type || Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
-        let prop = this.getProperty(propertyKey);
-        if (!prop || !isObjectProperty(prop)) {
-            prop = new EntityObjectProperty(this, propertyKey, type);
-            if (!this.properties.has(propertyKey.toLowerCase()))
-                this.propertyKeys.push(propertyKey);
-            this.properties.set(propertyKey.toLowerCase(), prop);
+        let prop = this.getElement(propertyKey);
+        if (!prop || !isObjectElement(prop)) {
+            prop = new EntityObjectElement(this, propertyKey, type);
+            if (!this.elements.has(propertyKey.toLowerCase()))
+                this.elementKeys.push(propertyKey);
+            this.elements.set(propertyKey.toLowerCase(), prop);
         }
 
         return prop;
@@ -169,11 +169,11 @@ export class EntityModel {
         this.eventListeners.push({event: 'after-' + event, fn});
     }
 
-    getPrimaryIndexColumns(): EntityDataProperty[] {
-        const out: EntityDataProperty[] = [];
+    getPrimaryIndexColumns(): EntityColumnElement[] {
+        const out: EntityColumnElement[] = [];
         if (this.primaryIndex) {
             for (const k of this.primaryIndex.columns) {
-                const col = this.getDataProperty(k);
+                const col = this.getColumnElement(k);
                 if (!col)
                     throw new Error(`Data column "${k}" in primary index of ${this.name} does not exists`)
                 out.push(col);
@@ -182,33 +182,37 @@ export class EntityModel {
         return out;
     }
 
-    getElementNames(fn: (el: EntityProperty) => boolean): string[] {
+    getElementNames(fn: (el: EntityElement) => boolean): string[] {
         const out: string[] = [];
-        for (const k of this.propertyKeys) {
-            const el = this.getProperty(k);
+        for (const k of this.elementKeys) {
+            const el = this.getElement(k);
             if (el && (!fn || fn(el)))
                 out.push(k);
         }
         return out;
     }
 
-    getColumnElementNames(): string[] {
-        return this.getElementNames(isDataProperty);
+    getColumnNames(): string[] {
+        return this.getElementNames(isColumnElement);
     }
 
-    getEmbeddedElementNames(): string[] {
-        return this.getElementNames(isObjectProperty);
+    getObjectElementNames(): string[] {
+        return this.getElementNames(isObjectElement);
     }
 
     getAssociationElementNames(): string[] {
         return this.getElementNames(isAssociationElement);
     }
 
+    getNonAssociationElementNames(): string[] {
+        return this.getElementNames(x => !isAssociationElement(x));
+    }
+
     getInsertColumnNames(): string[] {
         const out: string[] = [];
-        for (const k of this.propertyKeys) {
-            const col = this.getProperty(k);
-            if (isDataProperty(col) && !col.noInsert)
+        for (const k of this.elementKeys) {
+            const col = this.getElement(k);
+            if (isColumnElement(col) && !col.noInsert)
                 out.push(k);
         }
         return out;
@@ -216,9 +220,9 @@ export class EntityModel {
 
     getUpdateColumnNames(): string[] {
         const out: string[] = [];
-        for (const k of this.propertyKeys) {
-            const col = this.getProperty(k);
-            if (isDataProperty(col) && !col.noUpdate)
+        for (const k of this.elementKeys) {
+            const col = this.getElement(k);
+            if (isColumnElement(col) && !col.noUpdate)
                 out.push(k);
         }
         return out;
@@ -245,11 +249,11 @@ export class EntityModel {
         const baseCtor = Object.getPrototypeOf(ctor);
         const base = EntityModel.get(baseCtor);
         if (base) {
-            for (const k of base.propertyKeys) {
-                const col = base.properties.get(k.toLowerCase());
+            for (const k of base.elementKeys) {
+                const col = base.elements.get(k.toLowerCase());
                 if (col) {
-                    entity.propertyKeys.push(k);
-                    entity.properties.set(k.toLowerCase(), col);
+                    entity.elementKeys.push(k);
+                    entity.elements.set(k.toLowerCase(), col);
                 }
             }
             for (const fk of base.foreignKeys) {
@@ -267,7 +271,7 @@ export class EntityModel {
 
         ctor.prototype.toJSON = function (): Object {
             const obj = {};
-            const elementKeys = entity.propertyKeys;
+            const elementKeys = entity.elementKeys;
             const l = elementKeys.length;
             let key;
             let v;
@@ -276,7 +280,7 @@ export class EntityModel {
                 v = this[key];
                 if (v === undefined)
                     continue;
-                const col = entity.getProperty(key);
+                const col = entity.getElement(key);
                 if (col)
                     obj[key] = serializeColumn(col, v);
             }
@@ -287,13 +291,13 @@ export class EntityModel {
 
     static getElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const meta = this.get(ctor);
-        return meta && [...meta.propertyKeys] as K[];
+        return meta && [...meta.elementKeys] as K[];
     }
 
     static getColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const meta = this.get(ctor);
         if (meta)
-            return meta.getColumnElementNames() as (K[]);
+            return meta.getColumnNames() as (K[]);
     }
 
     static getAssociationElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
@@ -302,10 +306,16 @@ export class EntityModel {
             return meta.getAssociationElementNames() as (K[]);
     }
 
-    static getEmbeddedElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+    static getNonAssociationElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
         const meta = this.get(ctor);
         if (meta)
-            return meta.getEmbeddedElementNames() as (K[]);
+            return meta.getNonAssociationElementNames() as (K[]);
+    }
+
+    static getObjectElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
+        const meta = this.get(ctor);
+        if (meta)
+            return meta.getObjectElementNames() as (K[]);
     }
 
     static getInsertColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {

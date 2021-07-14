@@ -6,7 +6,7 @@ export function Embedded(type?: TypeThunk, options?: EmbeddedTypeOptions): Prope
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
         const el = EntityModel.attachTo(target.constructor)
-            .defineObjectProperty(propertyKey, type);
+            .defineObjectElement(propertyKey, type);
         if (options?.fieldNamePrefix)
             el.fieldNamePrefix = options.fieldNamePrefix;
         if (options?.fieldNameSuffix)

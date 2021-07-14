@@ -31,8 +31,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(meta.getProperty('id'));
-            assert.ok(meta.getProperty('name'));
+            assert.ok(meta.getElement('id'));
+            assert.ok(meta.getElement('name'));
         });
 
         it(`should combine foreign keys`, () => {
@@ -112,8 +112,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(meta.getProperty('id'));
-            assert.ok(!meta.getProperty('name'));
+            assert.ok(meta.getElement('id'));
+            assert.ok(!meta.getElement('name'));
         });
 
         it(`should pick foreign keys for only given keys`, () => {
@@ -192,8 +192,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(!meta.getProperty('id'));
-            assert.ok(meta.getProperty('name'));
+            assert.ok(!meta.getElement('id'));
+            assert.ok(meta.getElement('name'));
         });
 
         it(`should omit foreign keys for only given keys`, () => {

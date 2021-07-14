@@ -1,5 +1,5 @@
 import {EntityModel} from '../model/entity-model';
-import {isDataProperty} from './orm.helper';
+import {isColumnElement} from './orm.helper';
 
 export function extractKeyValues<T>(
     entityDef: EntityModel,
@@ -9,10 +9,10 @@ export function extractKeyValues<T>(
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
     const validateCol = (k) => {
-        const col = entityDef.getProperty(k);
+        const col = entityDef.getElement(k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
-        if (!isDataProperty(col))
+        if (!isColumnElement(col))
             throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
     }
 

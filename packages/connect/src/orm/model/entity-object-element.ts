@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import {ElementKind, TypeThunk, DataPropertyOptions} from '../orm.type';
-import {AbstractEntityProperty} from './abstract-entity-property';
+import {AbstractEntityelement} from './abstract-entityelement';
 import {EntityModel} from './entity-model';
 import {resolveEntityMeta} from '../util/orm.helper';
 
-export class EntityObjectProperty extends AbstractEntityProperty {
-    kind: ElementKind = 'embedded';
+export class EntityObjectElement extends AbstractEntityelement {
+    kind: ElementKind = 'object';
     type: TypeThunk;
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;

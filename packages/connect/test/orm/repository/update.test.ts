@@ -39,8 +39,7 @@ describe('update()', function () {
 
         const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.update({
-            id: old.id,
+        const updated = await repo.update(old.id, {
             givenName: newGivenName
         });
 
@@ -65,8 +64,7 @@ describe('update()', function () {
             sql = request.sql;
         });
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.update({
-            pk: old.id,
+        const updated = await repo.update(old.id, {
             given: newGivenName
         });
 
@@ -87,8 +85,7 @@ describe('update()', function () {
 
         const repo = client().getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.update({
-            id: old.id,
+        const updated = await repo.update(old.id, {
             givenName: newGivenName,
             gender: 'Female'
         });
@@ -105,8 +102,7 @@ describe('update()', function () {
 
             await connection.startTransaction();
             const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-            const updated = await repo.update({
-                id: old.id,
+            const updated = await repo.update(old.id, {
                 givenName: newGivenName
             });
             assert.strictEqual(updated.givenName, newGivenName);
@@ -120,13 +116,13 @@ describe('update()', function () {
 
     it('should check enum value', async function () {
         const repo = client().getRepository(Tag);
-        await assert.rejects(() => repo.update({id: 1, name: 'small', color: 'pink'}),
+        await assert.rejects(() => repo.update(1, {name: 'small', color: 'pink'}),
             /value must be one of/);
     });
 
     it('should column is required', async function () {
         const repo = client().getRepository(Customer);
-        await assert.rejects(() => repo.update({id: 1, countryCode: null}),
+        await assert.rejects(() => repo.update(1, {countryCode: null}),
             /is required/);
     });
 
@@ -141,14 +137,12 @@ describe('updateOnly()', function () {
         const repo = client().getRepository(Customer);
         const old = await createCustomer();
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        let success = await repo.updateOnly({
-            id: old.id,
+        let success = await repo.updateOnly(old.id, {
             givenName: newGivenName
         });
         assert.strictEqual(success, true);
 
-        success = await repo.updateOnly({
-            id: 0,
+        success = await repo.updateOnly(0, {
             givenName: newGivenName
         });
         assert.strictEqual(success, false);
@@ -167,8 +161,7 @@ describe('updateOnly()', function () {
             connection.on('execute', req => {
                 sql = req.sql;
             });
-            await repo.updateOnly({
-                id: old.id,
+            await repo.updateOnly(old.id, {
                 givenName: 'any name'
             });
             assert.ok(!sql.includes('select'));
@@ -179,8 +172,7 @@ describe('updateOnly()', function () {
         const repo = client().getRepository(Customer);
         const old = await createCustomer();
         const newName = {given: 'G' + Math.trunc(Math.random() * 10000)};
-        const c1 = await repo.update({
-            id: old.id,
+        const c1 = await repo.update(old.id, {
             name: newName
         });
         assert.ok(c1);
