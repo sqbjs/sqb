@@ -24,6 +24,7 @@ export function mixinEntities(derived: Type, classARef: Type, classBRef?: Type, 
         const src = EntityModel.get(classRef);
         if (!src)
             return derived;
+        trg.tableName = src.tableName;
         if (!trg.primaryIndex && src.primaryIndex) {
             trg.primaryIndex = new IndexMeta(trg, src.primaryIndex.columns, src.primaryIndex);
         }
@@ -61,6 +62,7 @@ export function pickEntityInto<T, K extends keyof T>(
     const src = EntityModel.get(classRef);
     if (!src)
         return derived;
+    trg.tableName = src.tableName;
     const pickKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
     for (const fk of src.foreignKeys) {
         if (fk.sourceKey && pickKeys.includes(fk.sourceKey.toLowerCase())) {
@@ -91,6 +93,7 @@ export function omitEntityInto<T, K extends keyof T>(
     const src = EntityModel.get(classRef);
     if (!src)
         return derived;
+    trg.tableName = src.tableName;
     const omitKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
     for (const fk of src.foreignKeys) {
         if (!(fk.sourceKey && omitKeys.includes(fk.sourceKey.toLowerCase()))) {

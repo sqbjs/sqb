@@ -244,32 +244,32 @@ export class EntityModel {
     }
 
     static attachTo(ctor: Function): EntityModel {
-        const current: EntityModel | undefined = this.hasOwn(ctor) ? this.get(ctor) : undefined;
-        if (current)
-            return current;
+        const own: EntityModel | undefined = this.hasOwn(ctor) ? this.get(ctor) : undefined;
+        if (own)
+            return own;
+        const current = this.get(ctor);
         const entity = ctor[ENTITY_DEFINITION_KEY] = new EntityModel(ctor as Type);
         // Merge base entity columns into this one
-        const baseCtor = Object.getPrototypeOf(ctor);
-        const base = EntityModel.get(baseCtor);
-        if (base) {
-            for (const k of base.elementKeys) {
-                const col = base.elements.get(k.toLowerCase());
+        if (current) {
+            entity.tableName = current.tableName;
+            for (const k of current.elementKeys) {
+                const col = current.elements.get(k.toLowerCase());
                 if (col) {
                     entity.elementKeys.push(k);
                     entity.elements.set(k.toLowerCase(), col);
                 }
             }
-            for (const fk of base.foreignKeys) {
+            for (const fk of current.foreignKeys) {
                 const newFk = new Association(fk.name, {...fk, source: ctor as Type});
                 entity.foreignKeys.push(newFk);
             }
-            for (const idx of base.indexes) {
+            for (const idx of current.indexes) {
                 const newIdx = new IndexMeta(entity, idx.columns, idx);
                 entity.indexes.push(newIdx);
             }
-            entity.eventListeners.push(...base.eventListeners);
-            if (base.primaryIndex)
-                entity.setPrimaryIndex([...base.primaryIndex.columns]);
+            entity.eventListeners.push(...current.eventListeners);
+            if (current.primaryIndex)
+                entity.setPrimaryIndex([...current.primaryIndex.columns]);
         }
 
         ctor.prototype.toJSON = function (): Object {
