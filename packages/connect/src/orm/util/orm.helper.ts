@@ -38,6 +38,5 @@ export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefi
 
 export async function resolveEntityMeta(ctorThunk: TypeThunk): Promise<EntityModel | undefined> {
     const ctor = await resolveEntity(ctorThunk);
-    return ctor && ctor.hasOwnProperty(ENTITY_DEFINITION_KEY) &&
-        ctor[ENTITY_DEFINITION_KEY];
+    return ctor && ctor[ENTITY_DEFINITION_KEY];
 }

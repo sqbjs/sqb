@@ -59,6 +59,8 @@ export namespace Repository {
 
     export interface GetOptions extends CommandOptions {
         elements?: string[];
+        include?: string[];
+        exclude?: string[];
         filter?: any;
         params?: any;
     }
