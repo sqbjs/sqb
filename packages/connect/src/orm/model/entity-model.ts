@@ -236,12 +236,15 @@ export class EntityModel {
     }
 
     static get(ctor: Function): Maybe<EntityModel> {
-        if (ctor.hasOwnProperty(ENTITY_DEFINITION_KEY))
-            return ctor[ENTITY_DEFINITION_KEY];
+        return ctor[ENTITY_DEFINITION_KEY];
+    }
+
+    static hasOwn(ctor: Function): boolean {
+        return ctor.hasOwnProperty(ENTITY_DEFINITION_KEY);
     }
 
     static attachTo(ctor: Function): EntityModel {
-        const current = this.get(ctor);
+        const current: EntityModel | undefined = this.hasOwn(ctor) ? this.get(ctor) : undefined;
         if (current)
             return current;
         const entity = ctor[ENTITY_DEFINITION_KEY] = new EntityModel(ctor as Type);
