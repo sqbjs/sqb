@@ -61,6 +61,7 @@
         "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-misused-promises": "off",
         "arrow-parens": [
           "off",
           "as-needed"

@@ -23,7 +23,7 @@
     "database"
   ],
   "dependencies": {
-    "putil-promisify": "^1.8.4"
+    "putil-promisify": "^1.8.5"
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.2",

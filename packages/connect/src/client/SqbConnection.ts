@@ -1,9 +1,9 @@
 import {classes} from '@sqb/builder';
+import {AsyncEventEmitter} from 'strict-typed-events';
 import assert from 'assert';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
-import StrictEventEmitter from 'strict-event-emitter-types';
 import {SqbClient} from './SqbClient';
 import {
     ConnectionOptions, ExecuteHookFunction, FetchFunction,
@@ -14,14 +14,13 @@ import {
 import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
-import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Type} from '../types';
 import {Repository} from '../orm/repository.class';
 import {EntityModel} from '../orm/model/entity-model';
 
 const debug = _debug('sqb:connection');
 
-interface Events {
+interface SqbConnectionEvents {
     close: () => void;
     execute: (request: QueryRequest) => void;
     error: (error: Error) => void;
@@ -32,21 +31,17 @@ interface Events {
     rollback: () => void;
 }
 
-type SqbConnectionEmitter = StrictEventEmitter<SafeEventEmitter, Events>;
-
-export class SqbConnection extends (SafeEventEmitter as Type<SqbConnectionEmitter>) {
+export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
 
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
     private readonly _options?: ConnectionOptions;
-    private readonly _closeHooks = new Set<() => Promise<void>>();
     private _inTransaction = false;
     private _refCount = 1;
 
     constructor(public readonly client: SqbClient,
                 adapterConnection: Adapter.Connection,
                 options?: ConnectionOptions) {
-        // eslint-disable-next-line constructor-super
         super();
         this._intlcon = adapterConnection;
         this._options = options || {};
@@ -106,14 +101,7 @@ export class SqbConnection extends (SafeEventEmitter as Type<SqbConnectionEmitte
     async close(): Promise<void> {
         if (!this._intlcon)
             return;
-        this.emit('close');
-        for (const hook of this._closeHooks.values()) {
-            try {
-                await hook();
-            } catch {
-                // ignore errors
-            }
-        }
+        await this.emitAsync('close');
         const intlcon = this._intlcon;
         this._intlcon = undefined;
         this.client.pool.release(intlcon)
@@ -198,8 +186,8 @@ export class SqbConnection extends (SafeEventEmitter as Type<SqbConnectionEmitte
                 } else if (response.cursor) {
                     const cursor = result.cursor = new Cursor(this, result.fields, response.cursor, request);
                     const hook = () => cursor.close();
-                    cursor.once('close', () => this._closeHooks.delete(hook))
-                    this._closeHooks.add(hook);
+                    cursor.once('close', () => this.off('close', hook))
+                    this.on('close', hook);
                 }
             }
 

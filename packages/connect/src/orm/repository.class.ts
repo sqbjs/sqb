@@ -1,7 +1,8 @@
+import {AsyncEventEmitter} from 'strict-typed-events';
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
-import {TransactionFunction} from '../client/types';
+import {QueryRequest, TransactionFunction} from '../client/types';
 import {Maybe, PartialWritable, Type} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
@@ -76,12 +77,19 @@ export namespace Repository {
     }
 }
 
-export class Repository<T> {
+interface RepositoryEvents {
+    execute: (request: QueryRequest, connection: SqbConnection) => void;
+    error: (error: Error, connection: SqbConnection) => void;
+    acquire: (connection: SqbConnection) => void;
+}
+
+export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     private readonly _executor: SqbClient | SqbConnection;
     private readonly _entity: EntityModel;
-    private readonly _schema?: string
+    private readonly _schema?: string;
 
     constructor(entityDef: EntityModel, executor: SqbClient | SqbConnection, schema?: string) {
+        super();
         this._executor = executor;
         this._entity = entityDef;
         this._schema = schema;
@@ -184,6 +192,7 @@ export class Repository<T> {
         return (this._executor as SqbClient).acquire(async (conn) => {
             if (this._schema)
                 await conn.setSchema(this._schema);
+            await this.emitAsync({event: 'acquire', serial: true}, conn);
             return fn(conn);
         });
     }
