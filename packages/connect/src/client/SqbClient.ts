@@ -1,8 +1,8 @@
 import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolState} from 'lightning-pool';
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
+import {AsyncEventEmitter} from 'strict-typed-events';
 import _debug from 'debug';
 import {classes} from '@sqb/builder';
-import StrictEventEmitter from 'strict-event-emitter-types';
 import {
     ClientConfiguration,
     QueryExecuteOptions,
@@ -15,7 +15,6 @@ import {
 import {Adapter} from './Adapter';
 import {SqbConnection} from './SqbConnection';
 import {adapters} from './extensions';
-import {SafeEventEmitter} from '../SafeEventEmitter';
 import {Type} from '../types';
 import {Repository} from '../orm/repository.class';
 import {EntityModel} from '../orm/model/entity-model';
@@ -24,7 +23,7 @@ import {Maybe} from '../types';
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
 
-interface Events {
+interface SqbClientEvents {
     execute: (request: QueryRequest, connection: SqbConnection) => void;
     error: (error: Error, connection: SqbConnection) => void;
     closing: () => void;
@@ -33,16 +32,13 @@ interface Events {
     terminate: () => void;
 }
 
-type SqbClientEmitter = StrictEventEmitter<SafeEventEmitter, Events>;
-
-export class SqbClient extends (SafeEventEmitter as Type<SqbClientEmitter>) {
+export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
     private readonly _entities: Record<string, Type> = {};
 
     constructor(config: ClientConfiguration) {
-        // eslint-disable-next-line constructor-super
         super();
         if (!(config && typeof config === 'object'))
             throw new TypeError('Configuration object required');

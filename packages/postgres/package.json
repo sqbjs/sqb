@@ -24,7 +24,7 @@
     "database"
   ],
   "dependencies": {
-    "putil-promisify": "^1.8.4"
+    "putil-promisify": "^1.8.5"
   },
   "devDependencies": {
     "postgresql-client": "^1.16.7"
