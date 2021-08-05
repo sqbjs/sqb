@@ -16,6 +16,7 @@ import {Continent} from '../_support/continent.entity';
 import {CustomerTag} from '../_support/customer-tag.entity';
 import {Tag} from '../_support/tags.entity';
 import {CustomerVip} from '../_support/customer-vip.entity';
+import {Address} from './address';
 
 const GenderMap = {
     M: 'Male',
@@ -61,6 +62,9 @@ export class Customer extends BaseEntity {
     @Parse((v) => GenderMap[v] || 'Unknown')
     @Serialize((v) => ('' + v).charAt(0))
     gender: string;
+
+    @Embedded(Address, {fieldNamePrefix: 'address_'})
+    address: Address;
 
     @Column({
         fieldName: 'updated_at',

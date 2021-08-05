@@ -82,6 +82,9 @@ CREATE TABLE ${schema}.customers
   country_code  VARCHAR2(5),
   active smallint default 1,
   vip smallint default 0,
+  address_city varchar(32),
+  address_street varchar(256),
+  address_zip_code varchar(8),
   custom_data clob,
   created_at timestamp default CURRENT_TIMESTAMP,
   updated_at timestamp
