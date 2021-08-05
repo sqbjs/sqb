@@ -26,7 +26,7 @@ describe('Embedded object element', function () {
         assert.strictEqual(name.type, PersonName);
     });
 
-    it(`should define prefix ans suffix`, () => {
+    it(`should define prefix and suffix`, () => {
         class MyEntity {
             @Embedded(PersonName, {
                 fieldNamePrefix: 'prefix',

@@ -31,6 +31,16 @@ describe('findAll()', function () {
         assert.ok(rows[0].name.family);
     });
 
+    it('should return embedded elements with prefix', async function () {
+        const repo = client().getRepository(Customer);
+        const rows = await repo.findAll({filter: {id: 1}});
+        assert.ok(rows);
+        assert.ok(rows.length);
+        assert.ok(rows[0].address);
+        assert.ok(rows[0].address.city);
+        assert.ok(rows[0].address.street);
+    });
+
     it('should return embedded sub elements', async function () {
         const repo = client().getRepository(Customer);
         const rows = await repo.findAll({limit: 1, elements: ['name.given']});

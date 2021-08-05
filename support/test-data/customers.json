@@ -50,6 +50,21 @@
       "fieldName": "custom_data",
       "dataType": "json",
       "jsType": "object"
+    },
+    {
+      "fieldName": "address_city",
+      "dataType": "varchar",
+      "jsType": "string"
+    },
+    {
+      "fieldName": "address_street",
+      "dataType": "varchar",
+      "jsType": "string"
+    },
+    {
+      "fieldName": "address_address_zip_code",
+      "dataType": "varchar",
+      "jsType": "string"
     }
   ],
   "rows": [
@@ -63,7 +78,10 @@
       "country_code": "US",
       "active": true,
       "vip": true,
-      "custom_data": "{\"test\": 1}"
+      "custom_data": "{\"test\": 1}",
+      "address_city": "Norman",
+      "address_street": "53. Street",
+      "address_zip_code": "12345"
     },
     {
       "ID": 2,
@@ -72,7 +90,10 @@
       "family_name": "Fowler",
       "birth_date": "2018-06-18T00:01:49-07:00",
       "city": "Diyarbakır",
-      "country_code": "TR"
+      "country_code": "TR",
+      "address_city": "Diyarbakır",
+      "address_street": "Ataturk Cd.",
+      "address_zip_code": "12424"
     },
     {
       "ID": 3,
@@ -82,7 +103,10 @@
       "birth_date": "1996-02-06T04:20:46-08:00",
       "city": "Erciş",
       "country_code": "TR",
-      "vip": true
+      "vip": true,
+      "address_city": "Erciş",
+      "address_street": "Cumhuriyet Cd",
+      "address_zip_code": "3432"
     },
     {
       "ID": 4,
@@ -93,7 +117,10 @@
       "city": "Dallas",
       "country_code": "US",
       "active": false,
-      "vip": true
+      "vip": true,
+      "address_city": "Dallas",
+      "address_street": "Kennedy St.",
+      "address_zip_code": "22542"
     },
     {
       "ID": 5,

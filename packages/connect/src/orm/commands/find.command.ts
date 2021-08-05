@@ -97,6 +97,8 @@ export class FindCommand {
                           include?: string[];
                           exclude?: string[];
                           sort?: string[];
+                          prefix?: string;
+                          suffix?: string;
                       } = {}
     ): Promise<void> {
         const tableAlias = opts.tableAlias || this.resultAlias;
@@ -112,6 +114,8 @@ export class FindCommand {
             opts.exclude.map(x => x.toLowerCase()) : undefined;
         const sortElements = opts.sort && opts.sort.length ?
             opts.sort.map(x => x.toLowerCase()) : undefined;
+        const prefix = opts.prefix || '';
+        const suffix = opts.suffix || '';
 
         for (const key of entity.elementKeys) {
             const col = entity.getElement(key);
@@ -130,7 +134,7 @@ export class FindCommand {
 
             // Add field to select list if element is a column
             if (isColumnElement(col)) {
-                const fieldAlias = this._selectColumn(tableAlias, col);
+                const fieldAlias = this._selectColumn(tableAlias, col, prefix, suffix);
                 // Add column to converter
                 if (!col.hidden)
                     converter.addValueProperty({
@@ -152,6 +156,8 @@ export class FindCommand {
                     tableAlias,
                     converter: subConverter,
                     entity: typ,
+                    prefix: col.fieldNamePrefix,
+                    suffix: col.fieldNameSuffix,
                     elements: extractSubElements(colNameLower, requestElements),
                     exclude: extractSubElements(colNameLower, excludeElements),
                     sort: extractSubElements(colNameLower, sortElements),
@@ -217,11 +223,15 @@ export class FindCommand {
         }
     }
 
-    private _selectColumn(tableAlias: string, el: EntityColumnElement): string {
-        const fieldAlias = tableAlias + '_' + el.name.toUpperCase();
+    private _selectColumn(tableAlias: string, el: EntityColumnElement,
+                          prefix?: string, suffix?: string): string {
+        const fieldName = (prefix || '').toLowerCase() +
+            el.fieldName.toUpperCase() +
+            (suffix || '').toLowerCase();
+        const fieldAlias = tableAlias + '_' + fieldName;
         this._selectColumns[fieldAlias] = {
             element: el,
-            statement: tableAlias + '.' + el.fieldName + ' as ' + fieldAlias
+            statement: tableAlias + '.' + fieldName + ' as ' + fieldAlias
         };
         return fieldAlias;
     }
