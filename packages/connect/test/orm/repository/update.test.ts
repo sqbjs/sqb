@@ -188,6 +188,28 @@ describe('updateOnly()', function () {
         assert.strictEqual(c2.name.given, newName.given);
     });
 
+    it('should map embedded elements with prefix into fields', async function () {
+        const repo = client().getRepository(Customer);
+        const old = await createCustomer({
+            address: {city: Math.trunc(Math.random() * 10000)}
+        });
+        const newAddress = {city: 'G' + Math.trunc(Math.random() * 10000)};
+        const c1 = await repo.update(old.id, {
+            address: newAddress
+        });
+        assert.ok(c1);
+        assert.ok(c1 instanceof Customer);
+        assert.strictEqual(c1.id, old.id);
+        assert.strictEqual(c1.address.city, newAddress.city);
+        assert.notStrictEqual(c1.address.city, old.address.city);
+
+        const c2 = await repo.findByPk(old.id);
+        assert.ok(c2);
+        assert.ok(c2 instanceof Customer);
+        assert.strictEqual(c2.id, old.id);
+        assert.strictEqual(c2.address.city, newAddress.city);
+    });
+
 });
 
 describe('updateAll()', function () {
