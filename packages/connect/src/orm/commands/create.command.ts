@@ -65,8 +65,13 @@ export class CreateCommand {
     }
 
     protected static async _prepareParams(ctx: CreateCommandContext,
-                                          entity: EntityModel, values: any) {
+                                          entity: EntityModel,
+                                          values: any,
+                                          prefix?: string,
+                                          suffix?: string) {
         let v;
+        prefix = prefix || '';
+        suffix = suffix || '';
         for (const col of entity.elements.values()) {
             v = values[col.name];
             if (isColumnElement(col)) {
@@ -84,8 +89,9 @@ export class CreateCommand {
                     continue;
                 }
                 col.checkEnumValue(v);
-                const k = '$input_' + col.fieldName;
-                ctx.queryValues[col.fieldName] = Param({
+                const fieldName = prefix + col.fieldName + suffix;
+                const k = '$input_' + fieldName;
+                ctx.queryValues[fieldName] = Param({
                     name: k,
                     dataType: col.dataType,
                     isArray: col.isArray
@@ -94,7 +100,7 @@ export class CreateCommand {
                 ctx.colCount++;
             } else if (v != null && isObjectElement(col)) {
                 const type = await col.resolveType();
-                await this._prepareParams(ctx, type, v);
+                await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }
         }
     }

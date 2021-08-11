@@ -112,7 +112,7 @@ describe('create()', function () {
             /value must be one of/);
     });
 
-    it('should column is required', async function () {
+    it('should check column is required', async function () {
         const repo = client().getRepository(Customer);
         await assert.rejects(() => repo.create({givenName: 'aa', familyName: 'bb'}),
             /is required/);

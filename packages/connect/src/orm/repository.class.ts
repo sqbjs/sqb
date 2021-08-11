@@ -3,7 +3,7 @@ import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
 import {QueryRequest, TransactionFunction} from '../client/types';
-import {Maybe, PartialWritable, Type} from '../types';
+import {Maybe, InstanceValues, Type} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
 import {CreateCommand} from './commands/create.command';
@@ -99,14 +99,14 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return this._entity.ctor;
     }
 
-    create(values: PartialWritable<T>,
+    create(values: InstanceValues<T>,
            options?: Repository.CreateOptions): Promise<T> {
         return this._execute(async (connection) => {
             return this._create(values, {...options, connection});
         }, options);
     }
 
-    createOnly(values: PartialWritable<T>,
+    createOnly(values: InstanceValues<T>,
                options?: Repository.CreateOptions): Promise<void> {
         return this._execute(async (connection) => {
             return this._createOnly(values, {...options, connection});
@@ -155,7 +155,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    update(keyValue: any, values: PartialWritable<T>,
+    update(keyValue: any, values: InstanceValues<T>,
            options?: Repository.UpdateOptions): Promise<T | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
@@ -165,14 +165,14 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    updateOnly(keyValue: any, values: PartialWritable<T>,
+    updateOnly(keyValue: any, values: InstanceValues<T>,
                options?: Repository.UpdateOptions): Promise<any> {
         return this._execute(async (connection) => {
             return !!(await this._update(keyValue, values, {...options, connection}));
         }, options);
     }
 
-    updateAll(values: PartialWritable<T>,
+    updateAll(values: InstanceValues<T>,
               options?: Repository.UpdateAllOptions): Promise<number> {
         return this._execute(async (connection) => {
             return this._updateAll(values, {...options, connection});
@@ -197,7 +197,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         });
     }
 
-    protected async _create(values: PartialWritable<T>,
+    protected async _create(values: InstanceValues<T>,
                             options: Repository.CreateOptions & { connection: SqbConnection }): Promise<T> {
         const keyValues = await CreateCommand.execute({
             ...options,
@@ -211,7 +211,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return result;
     }
 
-    protected async _createOnly(values: PartialWritable<T>,
+    protected async _createOnly(values: InstanceValues<T>,
                                 options: Repository.CreateOptions & { connection: SqbConnection }): Promise<void> {
         await CreateCommand.execute({
             ...options,
@@ -299,7 +299,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     protected async _update(keyValue: any,
-                            values: PartialWritable<T>,
+                            values: InstanceValues<T>,
                             options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<any> {
         const keyValues = extractKeyValues(this._entity, keyValue);
         const filter = [keyValues];
@@ -319,7 +319,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return rowsAffected ? keyValues : undefined;
     }
 
-    protected async _updateAll(values: PartialWritable<T>,
+    protected async _updateAll(values: InstanceValues<T>,
                                options: Repository.UpdateAllOptions & { connection: SqbConnection }): Promise<number> {
         return await UpdateCommand.execute({
             ...options,
