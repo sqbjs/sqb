@@ -95,7 +95,7 @@ export class EntityColumnElement extends AbstractEntityelement {
     }
 
     checkEnumValue(v: FieldValue) {
-        if (v === undefined || !this.enum)
+        if (v === undefined || !this.enum || (v == null && !this.notNull))
             return;
         const enumKeys = Array.isArray(this.enum) ? this.enum : Object.keys(this.enum);
         if (!enumKeys.includes(v))

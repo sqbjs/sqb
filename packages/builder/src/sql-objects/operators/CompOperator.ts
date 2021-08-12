@@ -3,7 +3,7 @@ import {Serializable, serializeFallback, serializeObject} from '../../Serializab
 import {SerializeContext} from '../../types';
 import {SerializationType} from '../../enums';
 import {isSelectQuery, isSerializable} from '../../typeguards';
-import {Param} from '../sqlobject.initializers';
+import {Param} from '../../sqlobject.initializers';
 
 export abstract class CompOperator extends Operator {
 
