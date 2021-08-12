@@ -1,14 +1,14 @@
-import {DataType, JoinType} from '../enums';
-import {Serializable} from '../Serializable';
-import {SelectQuery} from '../query/SelectQuery';
-import {InsertQuery} from '../query/InsertQuery';
-import {UpdateQuery} from '../query/UpdateQuery';
-import {DeleteQuery} from '../query/DeleteQuery';
-import {RawStatement} from './RawStatement';
-import {JoinStatement} from './JoinStatement';
-import {CaseStatement} from './CaseStatement';
-import {CountStatement} from './CountStatement';
-import {ParamExpression} from './ParamExpression';
+import {DataType, JoinType} from './enums';
+import {Serializable} from './Serializable';
+import {SelectQuery} from './query/SelectQuery';
+import {InsertQuery} from './query/InsertQuery';
+import {UpdateQuery} from './query/UpdateQuery';
+import {DeleteQuery} from './query/DeleteQuery';
+import {RawStatement} from './sql-objects/RawStatement';
+import {JoinStatement} from './sql-objects/JoinStatement';
+import {CaseStatement} from './sql-objects/CaseStatement';
+import {CountStatement} from './sql-objects/CountStatement';
+import {ParamExpression} from './sql-objects/ParamExpression';
 
 export function Raw(text: string): RawStatement {
     return new RawStatement(text);

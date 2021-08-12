@@ -1,4 +1,4 @@
-import {isReservedWord, serializeFallback} from '../Serializable';
+import {escapeReserved, isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {Column} from './Column';
 import {SerializeContext} from '../types';
@@ -37,9 +37,10 @@ export class SelectColumn extends Column {
             isReservedWord: !!(this._field && isReservedWord(ctx, this._field))
         };
         return serializeFallback(ctx, this._type, o, () => {
-            return (this._schema ? this._schema + '.' : '') +
-                (this._table ? this._table + '.' : '') +
-                (o.isReservedWord ? '"' + this._field + '"' : this._field) +
+            const prefix = escapeReserved(ctx, this._schema ? this._schema + '.' : '') +
+                (this._table ? this._table + '.' : '');
+            return prefix +
+                (!prefix && o.isReservedWord ? '"' + this._field + '"' : this._field) +
                 (this._alias ? ' as ' + this._alias : '');
         });
     }
