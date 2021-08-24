@@ -38,18 +38,18 @@ export class SqbCoreModule implements OnApplicationShutdown {
     }
 
     static forRoot(options: SqbModuleOptions = {}): DynamicModule {
-        const sqbModuleOptions = {
+        const optionsProvider = {
             provide: SQB_MODULE_OPTIONS,
             useValue: options,
         };
         const connectionProvider = {
             provide: getConnectionToken(options as SqbModuleOptions) as string,
-            useFactory: async () => await this.createConnectionFactory(options),
+            useFactory: () => this.createConnectionFactory(options),
         };
 
         return {
             module: SqbCoreModule,
-            providers: [connectionProvider, sqbModuleOptions],
+            providers: [connectionProvider, optionsProvider],
             exports: [connectionProvider],
         };
     }
@@ -95,14 +95,13 @@ export class SqbCoreModule implements OnApplicationShutdown {
         if (options.useExisting || options.useFactory)
             return [this.createAsyncOptionsProvider(options)];
 
-        const useClass = options.useClass as Type<SqbOptionsFactory>;
-        return [
-            this.createAsyncOptionsProvider(options),
-            {
-                provide: useClass,
-                useClass,
-            }
-        ];
+        if (options.useClass)
+            return [
+                this.createAsyncOptionsProvider(options),
+                {provide: options.useClass, useClass: options.useClass}
+            ];
+
+        throw new Error('Invalid configuration. Must provide useFactory, useClass or useExisting');
     }
 
     private static createAsyncOptionsProvider(options: SqbModuleAsyncOptions): Provider {
@@ -113,16 +112,16 @@ export class SqbCoreModule implements OnApplicationShutdown {
                 inject: options.inject || [],
             };
         }
-        // `as Type<SqbOptionsFactory>` is a workaround for microsoft/TypeScript#31603
-        const inject = [
-            (options.useClass || options.useExisting) as Type<SqbOptionsFactory>,
-        ];
-        return {
-            provide: SQB_MODULE_OPTIONS,
-            useFactory: async (optionsFactory: SqbOptionsFactory) =>
-                await optionsFactory.createSqbOptions(options.name),
-            inject,
-        };
+        const useClass = options.useClass || options.useExisting;
+        if (useClass) {
+            return {
+                provide: SQB_MODULE_OPTIONS,
+                useFactory: async (optionsFactory: SqbOptionsFactory) =>
+                    await optionsFactory.createSqbOptions(options.name),
+                inject: [useClass],
+            };
+        }
+        throw new Error('Invalid configuration. Must provide useFactory, useClass or useExisting');
     }
 
     private static async createConnectionFactory(
