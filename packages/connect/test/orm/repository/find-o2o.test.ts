@@ -5,7 +5,7 @@ import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 
 function toJSON(obj: any): any {
-    return obj ? JSON.parse(JSON.stringify(obj)): undefined;
+    return obj ? JSON.parse(JSON.stringify(obj)) : undefined;
 }
 
 describe('find() one to one relations', function () {
@@ -306,7 +306,7 @@ describe('find() one to one relations', function () {
             assert.ok(a.length > 0);
             for (const customer of rows) {
                 if (customer.vvipDetails)
-                    assert.ok(customer.vvipDetails.rank >= 5);
+                    assert.ok(customer.vvipDetails.rank >= 5, customer.vvipDetails.rank + '!=5');
             }
         });
 

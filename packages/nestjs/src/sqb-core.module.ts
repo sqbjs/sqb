@@ -57,14 +57,14 @@ export class SqbCoreModule implements OnApplicationShutdown {
     static forRootAsync(options: SqbModuleAsyncOptions): DynamicModule {
         const connectionProvider = {
             provide: getConnectionToken(options as SqbModuleOptions) as string,
+            inject: [SQB_MODULE_OPTIONS],
             useFactory: async (sqbOptions: SqbModuleOptions) => {
                 const name = options.name || sqbOptions.name;
                 return await this.createConnectionFactory({
                     ...sqbOptions,
                     name
                 });
-            },
-            inject: [SQB_MODULE_OPTIONS],
+            }
         };
 
         const asyncProviders = this.createAsyncProviders(options);
@@ -98,7 +98,10 @@ export class SqbCoreModule implements OnApplicationShutdown {
         if (options.useClass)
             return [
                 this.createAsyncOptionsProvider(options),
-                {provide: options.useClass, useClass: options.useClass}
+                {
+                    provide: options.useClass,
+                    useClass: options.useClass
+                }
             ];
 
         throw new Error('Invalid configuration. Must provide useFactory, useClass or useExisting');
