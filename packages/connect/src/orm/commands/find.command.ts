@@ -295,7 +295,7 @@ export class FindCommand {
         const columnSqls = Object.keys(this._selectColumns)
             .map(x => this._selectColumns[x].statement);
         if (!columnSqls.length)
-            return [];
+            columnSqls.push('1');
 
         const query = Select(...columnSqls)
             .from(this.mainEntity.tableName + ' as ' + this.mainAlias);

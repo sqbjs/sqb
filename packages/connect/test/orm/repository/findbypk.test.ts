@@ -8,7 +8,7 @@ describe('findByPk()', function () {
 
     const client = initClient();
 
-    it('should return single instance by key value', async function () {
+    it.only('should return single instance by key value', async function () {
         const repo = client().getRepository<Country>(Country);
         const row = await repo.findByPk('TR');
         assert.ok(row);
