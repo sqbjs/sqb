@@ -110,11 +110,9 @@ export class RowConverter {
         const result: any[] = [];
         for (let rowIdx = 0; rowIdx < rowLen; rowIdx++) {
             const row = rows[rowIdx];
-            const o = await this._rowToObject(connection, fields, row);
-            if (o) {
-                if (onTransform)
-                    onTransform(fields, row, o);
-            }
+            const o = (await this._rowToObject(connection, fields, row)) || {};
+            if (onTransform)
+                onTransform(fields, row, o);
             result.push(o);
         }
         if (!this.keys)

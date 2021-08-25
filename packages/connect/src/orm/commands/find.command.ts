@@ -326,11 +326,10 @@ export class FindCommand {
         });
 
         // Create objects
-        const rows: any[] = [];
         if (resp.rows && resp.fields) {
             return this.converter.transform(args.connection, resp.fields, resp.rows, args.onTransformRow);
         }
-        return rows;
+        return [];
     }
 
     private _getEntityFromAlias(tableAlias: string): EntityModel {
