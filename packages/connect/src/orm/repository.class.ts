@@ -3,7 +3,7 @@ import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
 import {QueryRequest, TransactionFunction} from '../client/types';
-import {Maybe, InstanceValues, Type} from '../types';
+import {InstanceValues, Type, DeepPartial} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
 import {CreateCommand} from './commands/create.command';
@@ -104,7 +104,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     create(values: InstanceValues<T>,
-           options?: Repository.CreateOptions): Promise<T> {
+           options?: Repository.CreateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return this._create(values, {...options, connection});
         }, options);
@@ -129,19 +129,19 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    findAll(options?: Repository.FindAllOptions): Promise<T[]> {
+    findAll(options?: Repository.FindAllOptions): Promise<DeepPartial<T>[]> {
         return this._execute(async (connection) => {
             return this._findAll({...options, connection});
         }, options);
     }
 
-    findOne(options?: Repository.FindOneOptions): Promise<Maybe<T>> {
+    findOne(options?: Repository.FindOneOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             return this._findOne({...options, connection});
         }, options);
     }
 
-    findByPk(keyValue: any, options?: Repository.GetOptions): Promise<Maybe<T>> {
+    findByPk(keyValue: any, options?: Repository.GetOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             return this._findByPk(keyValue, {...options, connection});
         }, options);
@@ -160,7 +160,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     update(keyValue: any, values: InstanceValues<T>,
-           options?: Repository.UpdateOptions): Promise<T | undefined> {
+           options?: Repository.UpdateOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
             const keyValues = await this._update(keyValue, values, opts);
@@ -170,7 +170,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     updateOnly(keyValue: any, values: InstanceValues<T>,
-               options?: Repository.UpdateOptions): Promise<any> {
+               options?: Repository.UpdateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return !!(await this._update(keyValue, values, {...options, connection}));
         }, options);
@@ -202,7 +202,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     protected async _create(values: InstanceValues<T>,
-                            options: Repository.CreateOptions & { connection: SqbConnection }): Promise<T> {
+                            options: Repository.CreateOptions & { connection: SqbConnection }): Promise<DeepPartial<T>> {
         const keyValues = await CreateCommand.execute({
             ...options,
             entity: this._entity,
@@ -248,14 +248,14 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         });
     }
 
-    protected async _findAll(options: Repository.FindAllOptions & { connection: SqbConnection }): Promise<T[]> {
+    protected async _findAll(options: Repository.FindAllOptions & { connection: SqbConnection }): Promise<DeepPartial<T>[]> {
         return await FindCommand.execute({
             ...options,
             entity: this._entity,
         });
     }
 
-    protected async _findOne(options: Repository.FindOneOptions & { connection: SqbConnection }): Promise<Maybe<T>> {
+    protected async _findOne(options: Repository.FindOneOptions & { connection: SqbConnection }): Promise<DeepPartial<T> | undefined> {
         const rows = await FindCommand.execute({
             ...options,
             entity: this._entity,
@@ -265,7 +265,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
     }
 
     protected async _findByPk(keyValue: any,
-                              options: Repository.GetOptions & { connection: SqbConnection }): Promise<Maybe<T>> {
+                              options: Repository.GetOptions & { connection: SqbConnection }): Promise<DeepPartial<T> | undefined> {
         const opts: Repository.FindAllOptions & { connection: SqbConnection } = {...options};
         opts.filter = [extractKeyValues(this._entity, keyValue)];
         if (options && options.filter) {
@@ -304,7 +304,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
 
     protected async _update(keyValue: any,
                             values: InstanceValues<T>,
-                            options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<any> {
+                            options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<Record<string, any> | undefined> {
         const keyValues = extractKeyValues(this._entity, keyValue);
         const filter = [keyValues];
         if (options.filter) {
