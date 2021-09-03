@@ -34,7 +34,7 @@ describe('destroy()', function () {
         const customer = await repo.create(values);
         let c2 = await repo.count();
         assert.strictEqual(c2, c + 1);
-        await repo.destroy(customer);
+        await repo.destroy(customer.id);
         c2 = await repo.count();
         assert.strictEqual(c2, c);
     });
@@ -51,7 +51,7 @@ describe('destroy()', function () {
             const customer = await repo.create(values);
             c = await repo.count();
             await connection.startTransaction();
-            await repo.destroy(customer);
+            await repo.destroy(customer.id);
             let c2 = await repo.count();
             assert.strictEqual(c2, c - 1);
             await connection.rollback();
@@ -59,7 +59,6 @@ describe('destroy()', function () {
             assert.strictEqual(c2, c);
         });
     });
-
 
 });
 
