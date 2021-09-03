@@ -24,7 +24,7 @@ export class SqljsConnection implements Adapter.Connection {
         try {
             this.intlcon.exec('BEGIN TRANSACTION;');
         } catch (e) {
-            if (e.message.match(/within a transaction/))
+            if (e instanceof Error && e.message.match(/within a transaction/))
                 return;
             throw e;
         }
@@ -34,7 +34,7 @@ export class SqljsConnection implements Adapter.Connection {
         try {
             this.intlcon.exec('COMMIT;');
         } catch (e) {
-            if (e.message.match(/no transaction/))
+            if (e instanceof Error && e.message.match(/no transaction/))
                 return;
             throw e;
         }
@@ -44,7 +44,7 @@ export class SqljsConnection implements Adapter.Connection {
         try {
             this.intlcon.exec('ROLLBACK;');
         } catch (e) {
-            if (e.message.match(/no transaction/))
+            if (e instanceof Error && e.message.match(/no transaction/))
                 return;
             throw e;
         }
