@@ -14,7 +14,7 @@ const debug = _debug('sqb:cursor');
 
 interface CursorEvents {
     close: () => void;
-    error: (error: Error) => void;
+    error: (error: unknown) => void;
     eof: () => void;
     reset: () => void;
     move: (row: any, rowNum: number) => void;

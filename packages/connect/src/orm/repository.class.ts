@@ -99,6 +99,10 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         this._schema = schema;
     }
 
+    get entity(): EntityModel {
+        return this._entity;
+    }
+
     get type(): Type<T> {
         return this._entity.ctor;
     }
