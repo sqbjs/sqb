@@ -145,7 +145,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    findByPk(keyValue: any, options?: Repository.GetOptions): Promise<DeepPartial<T> | undefined> {
+    findByPk(keyValue: any | Record<string, any>, options?: Repository.GetOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             return this._findByPk(keyValue, {...options, connection});
         }, options);
@@ -268,10 +268,10 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return rows && rows[0];
     }
 
-    protected async _findByPk(keyValue: any,
+    protected async _findByPk(keyValue: any | Record<string, any>,
                               options: Repository.GetOptions & { connection: SqbConnection }): Promise<DeepPartial<T> | undefined> {
         const opts: Repository.FindAllOptions & { connection: SqbConnection } = {...options};
-        opts.filter = [extractKeyValues(this._entity, keyValue)];
+        opts.filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
                 opts.filter.push(...options.filter);

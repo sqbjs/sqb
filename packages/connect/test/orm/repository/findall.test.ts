@@ -95,17 +95,6 @@ describe('findAll()', function () {
         assert.ok(rows[0].country.name);
     });
 
-    it('should return empty array if there is no element to return', async function () {
-        const repo = client().getRepository(Customer);
-        const rows = await repo.findAll({
-            limit: 1,
-            elements: ['id'],
-            exclude: ['id']
-        });
-        assert.ok(rows);
-        assert.strictEqual(rows.length, 0);
-    });
-
     it('should exclude hidden elements', async function () {
         const repo = client().getRepository(Country);
         let rows = await repo.findAll({limit: 1});

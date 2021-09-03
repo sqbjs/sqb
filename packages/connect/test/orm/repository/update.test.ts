@@ -1,7 +1,7 @@
 import '../../_support/env';
 import assert from 'assert';
 import {DataType, In} from '@sqb/builder';
-import {Column, Entity, PrimaryKey, SqbClient} from '@sqb/connect';
+import {Column, DeepPartial, Entity, PrimaryKey, SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 import {Tag} from '../../_support/tags.entity';
@@ -19,7 +19,7 @@ export class Customer2 {
 
 let client: () => SqbClient;
 
-const createCustomer = async function (values?: any): Promise<Customer> {
+const createCustomer = async function (values?: any): Promise<DeepPartial<Customer>> {
     const v = {
         givenName: 'G' + Math.trunc(Math.random() * 10000),
         familyName: 'F' + Math.trunc(Math.random() * 10000),

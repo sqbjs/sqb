@@ -11,7 +11,7 @@ import {
     QueryExecuteOptions, QueryRequest,
     QueryResult
 } from './types';
-import {callFetchHooks, wrapAdapterFields, normalizeRows} from './helpers';
+import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows, wrapAdapterFields} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
 import {Type} from '../types';
@@ -181,7 +181,9 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
                 result.rowType = response.rowType;
 
                 if (response.rows) {
-                    result.rows = normalizeRows(result.fields, response.rowType, response.rows, request);
+                    result.rows = request.objectRows ?
+                        normalizeRowsToObjectRows(result.fields, response.rowType, response.rows, request) :
+                        normalizeRowsToArrayRows(result.fields, response.rowType, response.rows, request);
                     callFetchHooks(result.rows, request);
                 } else if (response.cursor) {
                     const cursor = result.cursor = new Cursor(this, result.fields, response.cursor, request);
