@@ -50,9 +50,23 @@ export function wrapAdapterFields(oldFields: Adapter.Field[],
     return result;
 }
 
-export function normalizeRows(fields: FieldInfoMap, rowType: 'array' | 'object',
-                              oldRows: ObjectRowset | ArrayRowset,
-                              options: Pick<QueryRequest, 'objectRows' | 'ignoreNulls' | 'transform'>
+export function normalizeRowsToObjectRows(
+    fields: FieldInfoMap, rowType: 'array' | 'object', oldRows: ObjectRowset | ArrayRowset,
+    options?: Pick<QueryRequest, 'ignoreNulls' | 'transform'>
+): Record<string, any>[] {
+    return normalizeRows(fields, rowType, oldRows, {...options, objectRows: true}) as Record<string, any>[];
+}
+
+export function normalizeRowsToArrayRows(
+    fields: FieldInfoMap, rowType: 'array' | 'object', oldRows: ObjectRowset | ArrayRowset,
+    options?: Pick<QueryRequest, 'ignoreNulls' | 'transform'>
+): any[][] {
+    return normalizeRows(fields, rowType, oldRows, {...options, objectRows: false}) as any[][];
+}
+
+function normalizeRows(
+    fields: FieldInfoMap, rowType: 'array' | 'object', oldRows: ObjectRowset | ArrayRowset,
+    options: Pick<QueryRequest, 'objectRows' | 'ignoreNulls' | 'transform'>
 ): Record<string, any>[] | any[][] {
 
     const ignoreNulls = options.ignoreNulls && options.objectRows;

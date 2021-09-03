@@ -188,6 +188,16 @@ export interface QueryResult {
     cursor?: Cursor;
 }
 
+export interface ObjectQueryResult extends QueryResult {
+    rows?: Record<string, any>[];
+    rowType?: 'object';
+}
+
+export interface ArrayQueryResult extends QueryResult {
+    rows?: any[][];
+    rowType?: 'array';
+}
+
 export type FieldInfo = {
     index: number;
     name: string;

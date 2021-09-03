@@ -24,7 +24,7 @@ describe('create()', function () {
         assert.strictEqual(customer.givenName, values.givenName);
         assert.strictEqual(customer.familyName, values.familyName);
         assert.strictEqual(customer.countryCode, values.countryCode);
-        const x = await repo.findByPk(customer, {
+        const x = await repo.findByPk(customer.id, {
             elements: ['id', 'givenName', 'familyName', 'countryCode', 'country']
         });
         const c2 = await repo.count();
@@ -60,7 +60,7 @@ describe('create()', function () {
         const repo = client().getRepository<Customer>(Customer);
         const customer = await repo.create(values);
         assert.ok(customer);
-        const x = await repo.findByPk(customer, {elements: ['id', 'gender']});
+        const x = await repo.findByPk(customer.id, {elements: ['id', 'gender']});
         assert.ok(x);
         assert.strictEqual(x.id, customer.id);
         assert.strictEqual(x.gender, 'Male');
@@ -82,7 +82,7 @@ describe('create()', function () {
         assert.ok(customer.id);
         assert.ok(customer.id > 0);
         assert.deepStrictEqual({...customer.name}, values.name);
-        const x = await repo.findByPk(customer, {
+        const x = await repo.findByPk(customer.id, {
             elements: ['id', 'name']
         });
         const c2 = await repo.count();

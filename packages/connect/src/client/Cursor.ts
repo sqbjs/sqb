@@ -6,7 +6,7 @@ import DoublyLinked from 'doublylinked';
 import TaskQueue from 'putil-taskqueue';
 import _debug from 'debug';
 import {coerceToInt} from 'putil-varhelpers';
-import {callFetchHooks, normalizeRows} from './helpers';
+import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows} from './helpers';
 import {ObjectRow, QueryRequest} from './types';
 import {CursorStream, CursorStreamOptions} from './CursorStream';
 
@@ -54,7 +54,7 @@ export class Cursor extends AsyncEventEmitter<CursorEvents> {
     get connection() {
         return this._connection;
     }
-    
+
     /**
      * Returns if cursor is before first record.
      */
@@ -277,10 +277,9 @@ export class Cursor extends AsyncEventEmitter<CursorEvents> {
         if (rows && rows.length) {
             debug('Fetched %d rows from database', rows.length);
             // Normalize rows
-            rows = normalizeRows(this._fields, this._intlcur.rowType, rows, {
-                objectRows: this._request.objectRows,
-                ignoreNulls: this._request.ignoreNulls,
-            });
+            rows = this._request.objectRows ?
+                normalizeRowsToObjectRows(this._fields, this._intlcur.rowType, rows, this._request) :
+                normalizeRowsToArrayRows(this._fields, this._intlcur.rowType, rows, this._request);
             callFetchHooks(rows, this._request);
             for (const [idx, row] of rows.entries()) {
                 this.emit('fetch', row, (this._rowNum + idx + 1));

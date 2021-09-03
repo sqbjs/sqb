@@ -10,7 +10,7 @@ import {
     QueryResult,
     ClientDefaults,
     ConnectionOptions,
-    QueryRequest,
+    QueryRequest, ObjectQueryResult, ArrayQueryResult,
 } from './types';
 import {Adapter} from './Adapter';
 import {SqbConnection} from './SqbConnection';
@@ -159,8 +159,10 @@ export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
     /**
      * Executes a query or callback with a new acquired connection.
      */
-    async execute(query: string | classes.Query,
-                  options?: QueryExecuteOptions): Promise<QueryResult> {
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions & {objectRows: true}): Promise<ObjectQueryResult>
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions & {objectRows: false}): Promise<ArrayQueryResult>
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions): Promise<ObjectQueryResult | ArrayQueryResult>
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions): Promise<ObjectQueryResult | ArrayQueryResult> {
         debug('execute');
         const connection = await this.acquire();
         try {

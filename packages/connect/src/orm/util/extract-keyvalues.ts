@@ -3,7 +3,9 @@ import {isColumnElement} from './orm.helper';
 
 export function extractKeyValues<T>(
     entityDef: EntityModel,
-    valueOrInstance: any | Record<string, any> | T): Record<string, any> {
+    valueOrInstance: any | Record<string, any> | T,
+    keepOther?: boolean
+): Record<string, any> {
     const primaryIndex = entityDef.primaryIndex;
     if (!primaryIndex)
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
@@ -16,7 +18,7 @@ export function extractKeyValues<T>(
             throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
     }
 
-    // if entities primary key has more than one key field
+    // if entity's primary key has more than one key field
     if (primaryIndex.columns.length > 1) {
         if (typeof valueOrInstance !== 'object')
             throw new Error(`"${entityDef.name}" entity` +
@@ -33,6 +35,13 @@ export function extractKeyValues<T>(
             validateCol(k);
             out[k] = valueOrInstance[valueKeys[i]];
         }
+        if (keepOther) {
+            for (let i = 0; i < valueKeys.length; i++) {
+                if (primaryIndex.columns.find(x => x.toUpperCase() === valueKeysUpper[i]))
+                    continue;
+                out[valueKeys[i]] = valueOrInstance[valueKeys[i]];
+            }
+        }
         return out;
     }
 
@@ -41,10 +50,18 @@ export function extractKeyValues<T>(
     if (typeof valueOrInstance === 'object') {
         const valueKeys = Object.keys(valueOrInstance);
         const valueKeysUpper = valueKeys.map(x => x.toUpperCase());
-        const i = valueKeysUpper.indexOf(primaryColumnName.toUpperCase());
-        if (i < 0)
+        const k = valueKeysUpper.indexOf(primaryColumnName.toUpperCase());
+        if (k < 0)
             throw new Error(`Value of key field "${entityDef.name}.${primaryColumnName}" required to perform this operation`);
-        return {[primaryColumnName]: valueOrInstance[valueKeys[i]]};
+        const out = {[primaryColumnName]: valueOrInstance[valueKeys[k]]};
+        if (keepOther) {
+            for (let i = 0; i < valueKeys.length; i++) {
+                if (primaryIndex.columns.find(x => x.toUpperCase() === valueKeysUpper[i]))
+                    continue;
+                out[valueKeys[i]] = valueOrInstance[valueKeys[i]];
+            }
+        }
+        return out;
     }
 
     return {[primaryColumnName]: valueOrInstance};

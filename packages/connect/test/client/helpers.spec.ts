@@ -1,7 +1,12 @@
 /* eslint-disable camelcase */
 import '../_support/env';
 import assert from 'assert';
-import {applyNamingStrategy, wrapAdapterFields, normalizeRows} from '../../src/client/helpers';
+import {
+    applyNamingStrategy,
+    normalizeRowsToArrayRows,
+    normalizeRowsToObjectRows,
+    wrapAdapterFields
+} from '../../src/client/helpers';
 import {Adapter, ArrayRowset, ObjectRowset} from '@sqb/connect';
 
 describe('Helpers', function () {
@@ -75,12 +80,11 @@ describe('Helpers', function () {
 
     });
 
+    describe('normalizeRowsToObjectRows', function () {
 
-    describe('normalizeRows', function () {
-
-        it('should convert array rows to object rows if objectRows = true', function () {
+        it('should convert array rows to object rows', function () {
             const fields = wrapAdapterFields(adapterFields);
-            const rows = normalizeRows(fields, 'array', arrayRows as any, {objectRows: true});
+            const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
             assert(Array.isArray(rows));
             assert.strictEqual(rows.length, arrayRows.length);
             assert(!Array.isArray(rows[0]));
@@ -90,9 +94,9 @@ describe('Helpers', function () {
             assert.strictEqual(rows[0].field_name3, null);
         });
 
-        it('should keep object rows if objectRows = true', function () {
+        it('should keep object rows', function () {
             const fields = wrapAdapterFields(adapterFields);
-            const rows = normalizeRows(fields, 'object', objectRows, {objectRows: true});
+            const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
             assert(Array.isArray(rows));
             assert.strictEqual(rows.length, objectRows.length);
             assert(!Array.isArray(rows[0]));
@@ -100,33 +104,11 @@ describe('Helpers', function () {
             assert.strictEqual(rows[0].field_name1, 'a');
             assert.strictEqual(rows[0].field_name2, 'b');
             assert.strictEqual(rows[0].field_name3, null);
-        });
-
-        it('should convert object rows to array rows if objectRows = false', function () {
-            const fields = wrapAdapterFields(adapterFields);
-            const rows = normalizeRows(fields, 'object', objectRows, {objectRows: false});
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, objectRows.length);
-            assert(Array.isArray(rows[0]));
-            assert.strictEqual(rows[0][0], 'a');
-            assert.strictEqual(rows[0][1], 'b');
-            assert.strictEqual(rows[0][2], null);
-        });
-
-        it('should keep to array rows if objectRows = false', function () {
-            const fields = wrapAdapterFields(adapterFields);
-            const rows = normalizeRows(fields, 'array', arrayRows as any, {objectRows: false});
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, arrayRows.length);
-            assert(Array.isArray(rows[0]));
-            assert.strictEqual(rows[0][0], 'a');
-            assert.strictEqual(rows[0][1], 'b');
-            assert.strictEqual(rows[0][2], null);
         });
 
         it('should apply naming strategy to fields in rows (object rows source)', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
-            const rows = normalizeRows(fields, 'object', objectRows, {objectRows: true});
+            const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
             assert(Array.isArray(rows));
             assert.strictEqual(rows.length, arrayRows.length);
             assert(!Array.isArray(rows[0]));
@@ -138,7 +120,7 @@ describe('Helpers', function () {
 
         it('should apply naming strategy to fields in rows (array rows source)', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
-            const rows = normalizeRows(fields, 'array', arrayRows as any, {objectRows: true});
+            const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
             assert(Array.isArray(rows));
             assert.strictEqual(rows.length, arrayRows.length);
             assert(!Array.isArray(rows[0]));
@@ -150,10 +132,7 @@ describe('Helpers', function () {
 
         it('should remove null field values ignoreNulls == true', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
-            const rows = normalizeRows(fields, 'object', objectRows, {
-                objectRows: true,
-                ignoreNulls: true
-            });
+            const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, {ignoreNulls: true});
             assert.strictEqual(rows[0].fieldName1, 'a');
             assert.strictEqual(rows[0].fieldName2, 'b');
             assert.strictEqual(rows[0].fieldName3, undefined);
@@ -161,11 +140,37 @@ describe('Helpers', function () {
 
         it('should apply value transform ', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
-            const rows = normalizeRows(fields, 'object', objectRows, {
-                objectRows: true, transform: x => '$' + x
+            const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, {
+                transform: x => '$' + x
             });
             assert.strictEqual(rows[0].fieldName1, '$a');
             assert.strictEqual(rows[0].fieldName2, '$b');
+        });
+
+    })
+
+    describe('normalizeRowsToArrayRows', function () {
+
+        it('should convert object rows to array rows if objectRows = false', function () {
+            const fields = wrapAdapterFields(adapterFields);
+            const rows = normalizeRowsToArrayRows(fields, 'object', objectRows);
+            assert(Array.isArray(rows));
+            assert.strictEqual(rows.length, objectRows.length);
+            assert(Array.isArray(rows[0]));
+            assert.strictEqual(rows[0][0], 'a');
+            assert.strictEqual(rows[0][1], 'b');
+            assert.strictEqual(rows[0][2], null);
+        });
+
+        it('should keep to array rows if objectRows = false', function () {
+            const fields = wrapAdapterFields(adapterFields);
+            const rows = normalizeRowsToArrayRows(fields, 'array', arrayRows as any);
+            assert(Array.isArray(rows));
+            assert.strictEqual(rows.length, arrayRows.length);
+            assert(Array.isArray(rows[0]));
+            assert.strictEqual(rows[0][0], 'a');
+            assert.strictEqual(rows[0][1], 'b');
+            assert.strictEqual(rows[0][2], null);
         });
 
     });
