@@ -107,21 +107,19 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return this._entity.ctor;
     }
 
-    create(values: InstanceValues<T>,
-           options?: Repository.CreateOptions): Promise<DeepPartial<T>> {
+    create(values: InstanceValues<T>, options?: Repository.CreateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return this._create(values, {...options, connection});
         }, options);
     }
 
-    createOnly(values: InstanceValues<T>,
-               options?: Repository.CreateOptions): Promise<void> {
+    createOnly(values: InstanceValues<T>, options?: Repository.CreateOptions): Promise<void> {
         return this._execute(async (connection) => {
             return this._createOnly(values, {...options, connection});
         }, options);
     }
 
-    exists(keyValue: any, options?: Repository.ExistsOptions): Promise<boolean> {
+    exists(keyValue: any | Record<string, any>, options?: Repository.ExistsOptions): Promise<boolean> {
         return this._execute(async (connection) => {
             return this._exists(keyValue, {...options, connection});
         }, options);
@@ -151,7 +149,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    destroy(keyValue: any, options?: Repository.DestroyOptions): Promise<boolean> {
+    destroy(keyValue: any | Record<string, any>, options?: Repository.DestroyOptions): Promise<boolean> {
         return this._execute(async (connection) => {
             return this._destroy(keyValue, {...options, connection});
         }, options);
@@ -163,7 +161,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    update(keyValue: any, values: InstanceValues<T>,
+    update(keyValue: any | Record<string, any>, values: InstanceValues<T>,
            options?: Repository.UpdateOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
@@ -173,7 +171,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         }, options);
     }
 
-    updateOnly(keyValue: any, values: InstanceValues<T>,
+    updateOnly(keyValue: any | Record<string, any>, values: InstanceValues<T>,
                options?: Repository.UpdateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return !!(await this._update(keyValue, values, {...options, connection}));
@@ -229,10 +227,9 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         });
     }
 
-    protected async _exists(keyValue: any,
+    protected async _exists(keyValue: any | Record<string, any>,
                             options: Repository.ExistsOptions & { connection: SqbConnection }): Promise<boolean> {
-        const keyValues = extractKeyValues(this._entity, keyValue);
-        const filter = [keyValues];
+        const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
                 filter.push(...options.filter);
@@ -270,21 +267,18 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
 
     protected async _findByPk(keyValue: any | Record<string, any>,
                               options: Repository.GetOptions & { connection: SqbConnection }): Promise<DeepPartial<T> | undefined> {
-        const opts: Repository.FindAllOptions & { connection: SqbConnection } = {...options};
-        opts.filter = [extractKeyValues(this._entity, keyValue, true)];
+        const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
-                opts.filter.push(...options.filter);
-            else opts.filter.push(options.filter);
+                filter.push(...options.filter);
+            else filter.push(options.filter);
         }
-        delete opts.offset;
-        return await this._findOne(opts);
+        return await this._findOne({...options, filter, offset: 0});
     }
 
-    protected async _destroy(keyValue: any,
+    protected async _destroy(keyValue: any | Record<string, any>,
                              options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<boolean> {
-        const keyValues = extractKeyValues(this._entity, keyValue);
-        const filter = [keyValues];
+        const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
                 filter.push(...options.filter);
@@ -306,10 +300,10 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         });
     }
 
-    protected async _update(keyValue: any,
+    protected async _update(keyValue: any | Record<string, any>,
                             values: InstanceValues<T>,
                             options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<Record<string, any> | undefined> {
-        const keyValues = extractKeyValues(this._entity, keyValue);
+        const keyValues = extractKeyValues(this._entity, keyValue, true);
         const filter = [keyValues];
         if (options.filter) {
             if (Array.isArray(options.filter))
