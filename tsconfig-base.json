@@ -1,19 +1,16 @@
 {
+  "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
     "incremental": false,
     "module": "commonjs",
-    "target": "es2017",
-    "declaration": true,
     "moduleResolution": "Node",
+    "declaration": true,
     "noImplicitAny": false,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "noUnusedLocals": false,
     "removeComments": false,
-    "noLib": false,
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false,
-    "strict": true,
     "strictNullChecks": true,
     "sourceMap": true,
     "noEmit": true

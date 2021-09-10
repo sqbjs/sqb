@@ -99,7 +99,7 @@ export class Customer extends BaseEntity {
     @LinkFromOne(CustomerDetail)
     readonly details: CustomerDetail;
 
-    @Link(linkFromMany(CustomerTag).linkToMany(Tag))
+    @Link(linkFromMany(CustomerTag).linkToOne(Tag))
     readonly tags?: Tag[];
 
 }

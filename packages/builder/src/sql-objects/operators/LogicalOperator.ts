@@ -6,6 +6,8 @@ import {SerializeContext} from '../../types';
 import {isCompOperator, isLogicalOperator, isRawStatement} from '../../typeguards';
 
 export const WrapOps = {};
+// noinspection RegExpUnnecessaryNonCapturingGroup
+const COMPARE_LEFT_PATTERN = /^([\w\\.$]+(?:\[])?) *(.*)$/;
 
 export abstract class LogicalOperator extends Operator {
 
@@ -67,9 +69,9 @@ export abstract class LogicalOperator extends Operator {
             if (['exists', '!exists'].includes(n))
                 result.push(WrapOps[n](obj[n]));
             else {
-                const m = n.match(/^([\w\\.$]+) *(.*)$/);
+                const m = n.match(COMPARE_LEFT_PATTERN);
                 if (!m)
-                    throw new TypeError(`"${n}" is not a valid definition`);
+                    throw new TypeError(`"${n}" is not a valid expression definition`);
                 op = WrapOps[m[2] || 'eq'];
                 if (!op)
                     throw new Error(`Unknown operator "${m[2]}"`);

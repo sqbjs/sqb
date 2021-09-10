@@ -42,4 +42,19 @@ describe('find() many to many relations', function () {
         }
     });
 
+    it('should filter by m2m relation', async function () {
+        const repo = client().getRepository(Customer);
+        const rows = await repo.findAll({
+            include: ['tags'],
+            filter: {'tags.color': 'yellow'}
+        });
+        assert.ok(rows);
+        assert.strictEqual(rows.length, 1);
+        for (const customer of rows) {
+            assert.ok(Array.isArray(customer.tags));
+            assert.ok(customer.tags.length);
+            assert.ok(customer.tags.find(tag => tag.color === 'yellow'));
+        }
+    });
+
 });

@@ -85,7 +85,7 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [5]);
     });
 
-    it('Should serialize array params for "in" operator', function () {
+    it('Should compare array params using "in" operator', function () {
         const query = Select().from('table1')
             .where({'ID in': Param('id')})
             .values({id: [1, 2, 3]});
@@ -94,7 +94,7 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
-    it('Should serialize array for "in" operator', function () {
+    it('Should compare array value using "in" operator', function () {
         const query = Select().from('table1')
             .where({'ID in': [1, 2, 3]});
         const result = query.generate({
@@ -113,7 +113,7 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
-    it('Should serialize array for "not in" operator', function () {
+    it('Should compare array using "not in" operator', function () {
         const query = Select().from('table1')
             .where({'ID !in': [1, 2, 3]});
         const result = query.generate({dialect: 'postgres',});
@@ -125,6 +125,24 @@ describe('PostgresSerializer', function () {
             .where({'ID ne': 0});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID != 0');
+    });
+
+    it('Should compare if both expression and value is array', function () {
+        const query = Select().from('table1')
+            .where({'ids[] in': Param('ids')})
+            .values({ids: [1, 2, 3]});
+        const result = query.generate({dialect: 'postgres',});
+        assert.strictEqual(result.sql, 'select * from table1 where ids && ANY($1)');
+        assert.deepStrictEqual(result.params, [[1, 2, 3]]);
+    });
+
+    it('Should compare if expression is array and but value', function () {
+        const query = Select().from('table1')
+            .where({'ids[] in': Param('id')})
+            .values({id: 1});
+        const result = query.generate({dialect: 'postgres',});
+        assert.strictEqual(result.sql, 'select * from table1 where $1 = ANY(ids)');
+        assert.deepStrictEqual(result.params, [1]);
     });
 
     it('Should serialize update returning query', function () {

@@ -117,7 +117,7 @@ export class EntityModel {
         let l: AssociationNode | undefined = association;
         let i = 1;
         while (l) {
-            l.name = this.name + '.' + propertyKey + '#' + (i++) + ')';
+            l.name = this.name + '.' + propertyKey + '#' + (i++);
             l = l.next;
         }
         if (!this.elements.has(propertyKey.toLowerCase()))
