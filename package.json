@@ -1,7 +1,7 @@
 {
   "name": "sqb.v4",
   "private": true,
-  "version": "4.0.1-beta.36",
+  "version": "4.0.1-beta.43",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,6 +16,7 @@
     "@types/node": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
+    "@tsconfig/recommended": "^1.0.1",
     "colors": "^1.4.0",
     "eslint": "^7.18.0",
     "eslint-config-google": "^0.14.0",

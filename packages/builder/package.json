@@ -1,7 +1,7 @@
 {
   "name": "@sqb/builder",
   "description": "Extensible multi-dialect SQL query builder written with TypeScript",
-  "version": "4.0.1-beta.36",
+  "version": "4.0.1-beta.43",
   "author": "Panates Ltd.",
   "private": false,
   "contributors": [
@@ -37,7 +37,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
-    "node": ">= 10.0"
+    "node": ">= 14.0"
   },
   "directories": {
     "lib": "dist",

@@ -7,7 +7,6 @@ import {
     ClientConfiguration,
     QueryExecuteOptions,
     TransactionFunction,
-    QueryResult,
     ClientDefaults,
     ConnectionOptions,
     QueryRequest, ObjectQueryResult, ArrayQueryResult,

@@ -865,7 +865,7 @@ describe('serialize "Operators"', function () {
         it('should validate when wrapping native objects to operators', function () {
             assert.throws(() =>
                     Select().from('table1').where({'#id=': 3}),
-                /is not a valid definition/);
+                /is not a valid/);
         });
 
         it('should validate when wrapping native objects to operators', function () {

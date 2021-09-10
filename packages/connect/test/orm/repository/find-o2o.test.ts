@@ -33,6 +33,17 @@ describe('find() one to one relations', function () {
             });
         });
 
+        it('dont return associated if not explicitly requested', async function () {
+            const repo = client().getRepository(Customer);
+            const rows = await repo.findAll({
+                filter: [Eq('id', 1)]
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            assert.strictEqual(rows[0].id, 1);
+            assert.deepStrictEqual(rows[0].country, undefined);
+        });
+
         it('query sub associations', async function () {
             const repo = client().getRepository(Customer);
             const rows = await repo.findAll({
