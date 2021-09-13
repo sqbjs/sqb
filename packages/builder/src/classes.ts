@@ -4,11 +4,11 @@ export * from './query/SelectQuery';
 export * from './query/InsertQuery'
 export * from './query/UpdateQuery';
 export * from './query/DeleteQuery';
-export * from './sql-objects/SelectColumn';
+export * from './sql-objects/FieldExpression';
 export * from './sql-objects/TableName';
 export * from './sql-objects/OrderColumn';
 export * from './sql-objects/GroupColumn';
-export * from './sql-objects/Column';
+export * from './sql-objects/BaseField';
 export * from './sql-objects/Operator';
 export * from './sql-objects/CaseStatement';
 export * from './sql-objects/JoinStatement';

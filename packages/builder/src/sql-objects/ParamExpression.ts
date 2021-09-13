@@ -1,6 +1,7 @@
-import {Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {DataType, SerializationType} from '../enums';
-import {ParamOptions, SerializeContext} from '../types';
+import {ParamOptions} from '../types';
+import {SerializeContext} from '../SerializeContext';
 
 export class ParamExpression extends Serializable {
     _name: string;
@@ -29,7 +30,7 @@ export class ParamExpression extends Serializable {
             dataType: this._dataType,
             isArray: this._isArray,
         };
-        return serializeFallback(ctx, this._type, o,
+        return ctx.serialize(this._type, o,
             () => this.__defaultSerialize(ctx, o));
     }
 

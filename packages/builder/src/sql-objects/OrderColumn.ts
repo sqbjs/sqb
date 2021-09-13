@@ -1,11 +1,10 @@
-import {isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
-import {Column} from './Column';
-import {SerializeContext} from '../types';
+import {BaseField} from './BaseField';
+import {SerializeContext} from '../SerializeContext';
 
 const ORDER_COLUMN_PATTERN = /^([-+])?((?:[a-zA-Z][\w$]*\.){0,2})([a-zA-Z][\w$]*|\*) *(asc|dsc|desc|ascending|descending)?$/i;
 
-export class OrderColumn extends Column {
+export class OrderColumn extends BaseField {
 
     _descending?: boolean;
 
@@ -35,9 +34,9 @@ export class OrderColumn extends Column {
             table: this._table,
             field: this._field,
             descending: !!this._descending,
-            isReservedWord: !!(this._field && isReservedWord(ctx, this._field))
+            isReservedWord: !!(this._field && ctx.isReservedWord(this._field))
         };
-        return serializeFallback(ctx, this._type, o, () => {
+        return ctx.serialize(this._type, o, () => {
             return (o.schema ? o.schema + '.' : '') +
                 (o.table ? o.table + '.' : '') +
                 (o.isReservedWord ? '"' + o.field + '"' : o.field) +

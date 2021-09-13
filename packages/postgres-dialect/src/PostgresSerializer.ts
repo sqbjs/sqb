@@ -2,7 +2,7 @@ import {
     SerializerExtension,
     SerializeContext,
     DefaultSerializeFunction,
-    SerializationType
+    SerializationType, OperatorType
 } from '@sqb/builder';
 
 const reservedWords = ['comment'];
@@ -40,37 +40,45 @@ export class PostgresSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-        if (typeof o.right === 'string') {
-            if (o.operatorType === 'in' && o.right.toLowerCase() === 'null')
-                return defFn(ctx, {...o, symbol: '='});
-
-            if (o.right.startsWith('(')) {
+        if (o.right) {
+            if (o.right.expression.toLowerCase() === 'null') {
                 if (o.operatorType === 'eq')
-                    return defFn(ctx, {...o, symbol: 'in'});
+                    return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
                 if (o.operatorType === 'ne')
-                    return defFn(ctx, {...o, symbol: 'not in'});
+                    return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'is not'});
             }
 
-            if (o.right.substring(0, 1) === '$') {
-                if (o.paramValue == null) {
-                    const symbol = o.operatorType === 'eq' ? 'is' :
-                        (o.operatorType === 'ne' ? 'is not' : o.symbol)
-                    return defFn(ctx, {...o, symbol, right: 'null'});
-                }
-                if (o.isArray) {
-                    if (Array.isArray(o.paramValue))
-                        return defFn(ctx, {...o, symbol: '&&', right: 'ANY(' + o.right + ')'});
+            if (o.left.isParam && o.left.isArray && o.left.value != null && !Array.isArray(o.left.value))
+                o.left.value = [o.left.value];
+
+            if (o.right.isParam && o.right.isArray && o.right.value != null && !Array.isArray(o.right.value))
+                o.right.value = [o.right.value];
+
+            if ((o.operatorType === 'in' || o.operatorType === 'notIn')) {
+                if (o.left.isArray && !o.right.isArray && o.right.isParam) {
+                    const left = o.left;
+                    const right = o.right;
+                    left.expression = 'ANY(' + left.expression + ')';
                     return defFn(ctx, {
                         ...o,
-                        symbol: '=',
-                        left: o.right,
-                        right: 'ANY(' + o.left + ')'
-                    })
+                        operatorType: OperatorType.eq,
+                        symbol: o.operatorType === 'notIn' ? '!=' : '=',
+                        left: right,
+                        right: left
+                    });
                 }
-                const isInOp = (o.operatorType === 'in' || o.operatorType === 'notIn');
-                if (Array.isArray(o.paramValue) || isInOp) {
-                    o.symbol = o.operatorType === 'notIn' ? '!=' : '=';
-                    o.right = 'ANY(' + o.right + ')';
+                if (o.left.isArray && o.right.isArray) {
+                    if (o.operatorType === 'notIn')
+                        o.left.expression = 'not ' + o.left.expression;
+                    return defFn(ctx, {...o, symbol: '&&'});
+                }
+                if (!o.left.isArray && o.right.isArray && o.right.isParam) {
+                    o.right.expression = 'ANY(' + o.right.expression + ')';
+                    return defFn(ctx, {
+                        ...o,
+                        operatorType: OperatorType.eq,
+                        symbol: o.operatorType === 'notIn' ? '!=' : '='
+                    });
                 }
             }
 

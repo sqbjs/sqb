@@ -1,18 +1,28 @@
 import '../_support/env';
 import assert from 'assert';
-import {Select} from '@sqb/builder';
+import {DataType, Field, Select} from '@sqb/builder';
 
-describe('serialize "SelectColumn"', function () {
+describe('serialize "TableField"', function () {
 
     const options = {
         dialect: 'test',
         prettyPrint: false
     };
 
-    it('should serialize (field)', function () {
+    it('should initialize from string', function () {
         const query = Select('field1').from('table1');
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'select field1 from table1');
+    });
+
+    it('should initialize from constructor', function () {
+        const query = Select(Field('t.field1 f1', DataType.VARCHAR, false)).from('table1');
+        assert.ok(query._columns[0]);
+        assert.strictEqual((query._columns[0] as any)._field, 'field1');
+        assert.strictEqual((query._columns[0] as any)._table, 't');
+        assert.strictEqual((query._columns[0] as any)._alias, 'f1');
+        const result = query.generate(options);
+        assert.strictEqual(result.sql, 'select t.field1 as f1 from table1');
     });
 
     it('should serialize (field alias)', function () {

@@ -1,6 +1,7 @@
 import {CompOperator} from './CompOperator';
 import {OperatorType} from '../../enums';
 import {isSerializable} from '../../typeguards';
+import {SerializeContext} from '../../SerializeContext';
 
 export class OpIn extends CompOperator {
 
@@ -12,10 +13,10 @@ export class OpIn extends CompOperator {
             Array.isArray(right) || isSerializable(right) ? right : [right]);
     }
 
-    protected __serialize(ctx, o) {
-        if (Array.isArray(o.right) && !o.right.length)
+    _serialize(ctx: SerializeContext): string {
+        if (Array.isArray(this._value) && !this._value.length)
             return '';
-        return super.__serialize(ctx, o);
+        return super._serialize(ctx);
     }
 
 }

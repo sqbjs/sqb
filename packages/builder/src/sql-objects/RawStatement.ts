@@ -1,6 +1,6 @@
-import {Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
-import {SerializeContext} from '../types';
+import {SerializeContext} from '../SerializeContext';
 
 export class RawStatement extends Serializable {
 
@@ -16,6 +16,6 @@ export class RawStatement extends Serializable {
     }
 
     _serialize(ctx: SerializeContext): string {
-        return serializeFallback(ctx, this._type, this._text, () => this._text);
+        return ctx.serialize(this._type, this._text, () => this._text);
     }
 }

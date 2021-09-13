@@ -39,7 +39,8 @@ export enum SerializationType {
     STRING_VALUE = 'string_value',
     BOOLEAN_VALUE = 'boolean_value',
     NUMBER_VALUE = 'number_value',
-    EXTERNAL_PARAMETER = 'external_parameter'
+    EXTERNAL_PARAMETER = 'external_parameter',
+    ARRAY = 'array',
 }
 
 export enum OperatorType {

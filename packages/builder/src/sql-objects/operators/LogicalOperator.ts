@@ -1,9 +1,10 @@
 import {Operator} from '../Operator';
 import isPlainObject from 'putil-isplainobject';
 import {SerializationType} from '../../enums';
-import {printArray, Serializable, serializeFallback} from '../../Serializable';
-import {SerializeContext} from '../../types';
+import {Serializable} from '../../Serializable';
 import {isCompOperator, isLogicalOperator, isRawStatement} from '../../typeguards';
+import {SerializeContext} from '../../SerializeContext';
+import {printArray} from '../../helpers';
 
 export const WrapOps = {};
 // noinspection RegExpUnnecessaryNonCapturingGroup
@@ -48,7 +49,7 @@ export abstract class LogicalOperator extends Operator {
             if (s)
                 arr.push(isLogicalOperator(t) ? '(' + s + ')' : s);
         }
-        return serializeFallback(ctx, SerializationType.LOGICAL_EXPRESSION, arr, () => {
+        return ctx.serialize(SerializationType.LOGICAL_EXPRESSION, arr, () => {
             const s = printArray(arr, ' ' + String(this._operatorType));
             return (s.indexOf('\n') > 0) ? s.replace('\n', '\n\t') + '\b' : s;
         });

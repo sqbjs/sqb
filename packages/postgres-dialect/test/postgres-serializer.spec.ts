@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Param, Update,
+    Select, Param, Update, Raw,
 } from '@sqb/builder';
 import {PostgresSerializer} from '../src/PostgresSerializer';
 
@@ -85,12 +85,33 @@ describe('PostgresSerializer', function () {
         assert.deepStrictEqual(result.params, [5]);
     });
 
+    it('Should change "= null" to "is null"', function () {
+        const query = Select().from('table1').where({ID: Raw('null')});
+        const result = query.generate({dialect: 'postgres'});
+        assert.strictEqual(result.sql, 'select * from table1 where ID is null');
+    });
+
+    it('Should change "!= null" to "is not null"', function () {
+        const query = Select().from('table1').where({'ID !=': Raw('null')});
+        const result = query.generate({dialect: 'postgres'});
+        assert.strictEqual(result.sql, 'select * from table1 where ID is not null');
+    });
+
     it('Should compare array params using "in" operator', function () {
         const query = Select().from('table1')
             .where({'ID in': Param('id')})
             .values({id: [1, 2, 3]});
         const result = query.generate({dialect: 'postgres',});
         assert.strictEqual(result.sql, 'select * from table1 where ID = ANY($1)');
+        assert.deepStrictEqual(result.params, [[1, 2, 3]]);
+    });
+
+    it('Should compare array params using "nin" operator', function () {
+        const query = Select().from('table1')
+            .where({'ID !in': Param('id')})
+            .values({id: [1, 2, 3]});
+        const result = query.generate({dialect: 'postgres',});
+        assert.strictEqual(result.sql, 'select * from table1 where ID != ANY($1)');
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 
@@ -131,8 +152,8 @@ describe('PostgresSerializer', function () {
         const query = Select().from('table1')
             .where({'ids[] in': Param('ids')})
             .values({ids: [1, 2, 3]});
-        const result = query.generate({dialect: 'postgres',});
-        assert.strictEqual(result.sql, 'select * from table1 where ids && ANY($1)');
+        const result = query.generate({dialect: 'postgres'});
+        assert.strictEqual(result.sql, 'select * from table1 where ids && $1');
         assert.deepStrictEqual(result.params, [[1, 2, 3]]);
     });
 

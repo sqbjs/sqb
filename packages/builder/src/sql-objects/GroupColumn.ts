@@ -1,11 +1,10 @@
-import {isReservedWord, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
-import {Column} from './Column';
-import {SerializeContext} from '../types';
+import {BaseField} from './BaseField';
+import {SerializeContext} from '../SerializeContext';
 
 const GROUP_COLUMN_PATTERN = /^((?:[a-zA-Z][\w$]*\.){0,2})([\w$]*)$/;
 
-export class GroupColumn extends Column {
+export class GroupColumn extends BaseField {
 
     constructor(value: string) {
         super();
@@ -30,9 +29,9 @@ export class GroupColumn extends Column {
             schema: this._schema,
             table: this._table,
             field: this._field,
-            isReservedWord: !!(this._field && isReservedWord(ctx, this._field))
+            isReservedWord: !!(this._field && ctx.isReservedWord(this._field))
         };
-        return serializeFallback(ctx, this._type, o, () => {
+        return ctx.serialize(this._type, o, () => {
             return (this._schema ? this._schema + '.' : '') +
                 (this._table ? this._table + '.' : '') +
                 (o.isReservedWord ? '"' + this._field + '"' : this._field);

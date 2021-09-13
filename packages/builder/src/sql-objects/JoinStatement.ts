@@ -1,12 +1,12 @@
-import {Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {JoinType, SerializationType} from '../enums';
 import {TableName} from './TableName';
 import {SelectQuery} from '../query/SelectQuery';
 import {RawStatement} from './RawStatement';
 import {OpAnd} from './operators/OpAnd';
-import {SerializeContext} from '../types';
 import {LogicalOperator} from './operators/LogicalOperator';
 import {isRawStatement, isSelectQuery, isTableName} from '../typeguards';
+import {SerializeContext} from '../SerializeContext';
 
 export class JoinStatement extends Serializable {
 
@@ -40,7 +40,7 @@ export class JoinStatement extends Serializable {
             table: this._table._serialize(ctx),
             conditions: this.__serializeConditions(ctx, this)
         };
-        return serializeFallback(ctx, this._type, o, () => {
+        return ctx.serialize(this._type, o, () => {
             let out;
             switch (this._joinType) {
                 case JoinType.LEFT:
@@ -85,7 +85,7 @@ export class JoinStatement extends Serializable {
     protected __serializeConditions(ctx, join: JoinStatement) {
         if (join._conditions._items.length) {
             const s = join._conditions._serialize(ctx);
-            return serializeFallback(ctx, SerializationType.JOIN_CONDITIONS, s,
+            return ctx.serialize(SerializationType.JOIN_CONDITIONS, s,
                 () => s ? 'on ' + s : '');
         }
         return '';

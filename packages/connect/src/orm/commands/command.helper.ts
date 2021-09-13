@@ -1,5 +1,5 @@
 import {
-    And, Eq, Exists, InnerJoin, isCompOperator, isLogicalOperator, JoinStatement, LeftOuterJoin,
+    And, Eq, Exists, Field, InnerJoin, isCompOperator, isLogicalOperator, JoinStatement, LeftOuterJoin,
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
 import {EntityModel} from '../model/entity-model';
@@ -112,7 +112,7 @@ export async function prepareFilter(
                         if (!isColumnElement(col))
                             throw new Error(`Invalid column expression (${item._expression}) defined in filter`);
                         const ctor = Object.getPrototypeOf(item).constructor;
-                        trgOp.add(new ctor(_curAlias + '.' + col.fieldName, item._value));
+                        trgOp.add(new ctor(Field(_curAlias + '.' + col.fieldName, col.dataType, col.isArray), item._value));
                     } else {
                         if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._expression}) defined in filter`);
@@ -131,8 +131,8 @@ export async function prepareFilter(
                             subSelect = Select(Raw('1'))
                                 .from(_curEntity.tableName + ' K');
                             subSelect.where(
-                                Eq('K.' + targetCol.fieldName,
-                                    Raw(tableAlias + '.' + keyCol.fieldName))
+                                Eq(Field('K.' + targetCol.fieldName, targetCol.dataType, targetCol.isArray),
+                                    Field(tableAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray))
                             )
                             trgOp.add(Exists(subSelect));
                             trgOp = subSelect._where as LogicalOperator;
@@ -150,8 +150,8 @@ export async function prepareFilter(
                             const joinAlias = 'J' + (((subSelect?._joins?.length) || 0) + 1);
                             subSelect.join(
                                 InnerJoin(targetEntity.tableName + ' ' + joinAlias)
-                                    .on(Eq(joinAlias + '.' + targetColumn.fieldName,
-                                        Raw(_curAlias + '.' + sourceColumn.fieldName)))
+                                    .on(Eq(Field(joinAlias + '.' + targetColumn.fieldName, targetColumn.dataType, targetColumn.isArray),
+                                        Field(_curAlias + '.' + sourceColumn.fieldName, sourceColumn.dataType, sourceColumn.isArray)))
                             )
                             _curEntity = targetEntity;
                             _curAlias = joinAlias;

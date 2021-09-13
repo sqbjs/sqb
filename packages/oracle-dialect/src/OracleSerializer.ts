@@ -2,7 +2,7 @@ import {
     SerializerExtension,
     SerializeContext,
     DefaultSerializeFunction,
-    SerializationType
+    SerializationType, OperatorType
 } from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
 
@@ -73,11 +73,13 @@ export class OracleSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-        if (o.right === 'null') {
-            if (o.operatorType === 'eq')
-                o.symbol = 'is';
-            if (o.operatorType === 'ne')
-                o.symbol = 'is not';
+        if (o.right) {
+            if (o.right.expression.toLowerCase() === 'null') {
+                if (o.operatorType === 'eq')
+                    return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
+                if (o.operatorType === 'ne')
+                    return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'is not'});
+            }
         }
         return defFn(ctx, o);
     }

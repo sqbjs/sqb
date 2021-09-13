@@ -4,9 +4,9 @@ import {RawStatement} from '../sql-objects/RawStatement';
 import {TableName} from '../sql-objects/TableName';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../types';
-import {printArray, serializeFallback, serializeObject} from '../Serializable';
 import {isRawStatement} from '../typeguards';
+import {SerializeContext} from '../SerializeContext';
+import {printArray} from '../helpers';
 
 export class UpdateQuery extends ReturningQuery {
 
@@ -65,10 +65,10 @@ export class UpdateQuery extends ReturningQuery {
         for (const n of Object.getOwnPropertyNames(allValues)) {
             arr.push({
                 field: n,
-                value: serializeObject(ctx, allValues[n])
+                value: ctx.anyToSQL(allValues[n])
             });
         }
-        return serializeFallback(ctx, SerializationType.UPDATE_QUERY_VALUES, arr, () => {
+        return ctx.serialize(SerializationType.UPDATE_QUERY_VALUES, arr, () => {
             const a = arr.map(o => o.field + ' = ' + o.value);
             return printArray(a, ',');
         });
@@ -81,7 +81,7 @@ export class UpdateQuery extends ReturningQuery {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
+        return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });

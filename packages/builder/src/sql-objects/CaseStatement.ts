@@ -1,10 +1,10 @@
-import {Serializable, serializeFallback, serializeObject} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
 import {LogicalOperator} from './operators/LogicalOperator';
 import {OpAnd} from './operators/OpAnd';
-import {SerializeContext} from '../types';
 import {Operator} from './Operator';
 import {RawStatement} from './RawStatement';
+import {SerializeContext} from '../SerializeContext';
 
 export class CaseStatement extends Serializable {
 
@@ -73,17 +73,17 @@ export class CaseStatement extends Serializable {
         const q = {
             expressions: [] as any,
             elseValue: this._elseValue !== undefined ?
-                serializeObject(ctx, this._elseValue) : undefined
+                ctx.anyToSQL(this._elseValue) : undefined
         };
         for (const x of this._expressions) {
             const o = {
                 condition: x.condition._serialize(ctx),
-                value: serializeObject(ctx, x.value)
+                value: ctx.anyToSQL(x.value)
             };
             q.expressions.push(o);
         }
 
-        return serializeFallback(ctx, this._type, q,
+        return ctx.serialize(this._type, q,
             () => this.__defaultSerialize(ctx, q));
     }
 

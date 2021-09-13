@@ -9,6 +9,7 @@ import {JoinStatement} from './sql-objects/JoinStatement';
 import {CaseStatement} from './sql-objects/CaseStatement';
 import {CountStatement} from './sql-objects/CountStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
+import {FieldExpression} from './sql-objects/FieldExpression';
 
 export function Raw(text: string): RawStatement {
     return new RawStatement(text);
@@ -80,4 +81,12 @@ export function Param(arg0: any, arg1?: any, arg2?: any): ParamExpression {
         dataType: arg1,
         isArray: arg2
     });
+}
+
+export function Field(name: string, dataType?: DataType, isArray?: boolean): FieldExpression
+export function Field(args: { name: string, dataType?: DataType, isArray?: boolean }): FieldExpression
+export function Field(arg0: any, arg1?: any, arg2?: any): FieldExpression {
+    if (typeof arg0 === 'object')
+        return new FieldExpression(arg0);
+    return new FieldExpression(arg0, arg1, arg2);
 }
