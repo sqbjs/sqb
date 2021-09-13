@@ -14,7 +14,7 @@ export class OpIn extends CompOperator {
     }
 
     _serialize(ctx: SerializeContext): string {
-        if (Array.isArray(this._value) && !this._value.length)
+        if (Array.isArray(this._right) && !this._right.length)
             return '';
         return super._serialize(ctx);
     }

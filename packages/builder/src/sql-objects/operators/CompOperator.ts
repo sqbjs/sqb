@@ -11,8 +11,8 @@ const EXPRESSION_PATTERN = /^([\w\\.$]+)(\[])?/;
 
 export abstract class CompOperator extends Operator {
 
-    _expression: Serializable | string;
-    _value?: any | Serializable;
+    _left: Serializable | string;
+    _right?: any | Serializable;
     _symbol?: string;
     _isArray?: boolean;
 
@@ -22,11 +22,11 @@ export abstract class CompOperator extends Operator {
             const m = left.match(EXPRESSION_PATTERN);
             if (!m)
                 throw new TypeError(`"${left}" is not a valid expression definition`);
-            this._expression = m[1];
+            this._left = m[1];
             this._isArray = !!m[2];
         } else
-            this._expression = left;
-        this._value = right;
+            this._left = left;
+        this._right = right;
     }
 
     get _type(): SerializationType {
@@ -34,10 +34,10 @@ export abstract class CompOperator extends Operator {
     }
 
     _serialize(ctx: SerializeContext): string {
-        const left = this.__serializeItem(ctx, this._expression);
+        const left = this.__serializeItem(ctx, this._left);
         if (this._isArray)
             left.isArray = true;
-        const right = this.__serializeItem(ctx, this._value, true);
+        const right = this.__serializeItem(ctx, this._right, true);
         const o: any = {
             operatorType: this._operatorType,
             symbol: this._symbol,

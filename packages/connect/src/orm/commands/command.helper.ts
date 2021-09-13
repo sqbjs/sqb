@@ -48,8 +48,8 @@ export async function joinAssociation(joinInfos: JoinInfo[],
             const joinAlias = 'J' + (joinInfos.length + 1);
             const join = innerJoin ? InnerJoin(targetEntity.tableName + ' as ' + joinAlias) :
                 LeftOuterJoin(targetEntity.tableName + ' as ' + joinAlias);
-            join.on(Eq(joinAlias + '.' + targetCol.fieldName,
-                Raw(parentAlias + '.' + keyCol.fieldName)))
+            join.on(Eq(Field(joinAlias + '.' + targetCol.fieldName, targetCol.dataType, targetCol.isArray),
+                Field(parentAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray)))
             if (node.conditions)
                 await prepareFilter(targetEntity, node.conditions, join._conditions, joinAlias);
 
@@ -95,8 +95,8 @@ export async function prepareFilter(
             continue;
         }
         if (isCompOperator(item)) {
-            if (typeof item._expression === 'string') {
-                const itemPath = item._expression.split('.');
+            if (typeof item._left === 'string') {
+                const itemPath = item._left.split('.');
                 const l = itemPath.length;
                 let pt: string;
                 let _curEntity = entityDef;
@@ -106,22 +106,22 @@ export async function prepareFilter(
                     pt = itemPath[i];
                     const col = _curEntity.getElement(pt);
                     if (!col)
-                        throw new Error(`Unknown property (${item._expression}) defined in filter`);
+                        throw new Error(`Unknown property (${item._left}) defined in filter`);
                     // if last item on path
                     if (i === l - 1) {
                         if (!isColumnElement(col))
-                            throw new Error(`Invalid column expression (${item._expression}) defined in filter`);
+                            throw new Error(`Invalid column expression (${item._left}) defined in filter`);
                         const ctor = Object.getPrototypeOf(item).constructor;
-                        trgOp.add(new ctor(Field(_curAlias + '.' + col.fieldName, col.dataType, col.isArray), item._value));
+                        trgOp.add(new ctor(Field(_curAlias + '.' + col.fieldName, col.dataType, col.isArray), item._right));
                     } else {
                         if (isColumnElement(col))
-                            throw new Error(`Invalid column (${item._expression}) defined in filter`);
+                            throw new Error(`Invalid column (${item._left}) defined in filter`);
                         if (isObjectElement(col)) {
                             _curEntity = await col.resolveType();
                             continue;
                         }
                         if (!isAssociationElement(col))
-                            throw new Error(`Invalid column (${item._expression}) defined in filter`);
+                            throw new Error(`Invalid column (${item._left}) defined in filter`);
 
                         let node: AssociationNode | undefined;
                         _curEntity = await col.association.resolveTarget();

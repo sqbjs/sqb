@@ -16,7 +16,7 @@ export class OpExists extends CompOperator {
     }
 
     _serialize(ctx: SerializeContext): string {
-        const left = this.__serializeItem(ctx, this._expression);
+        const left = this.__serializeItem(ctx, this._left);
         if (this._isArray)
             left.isArray = true;
         const o: any = {
