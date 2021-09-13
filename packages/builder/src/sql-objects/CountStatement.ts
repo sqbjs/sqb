@@ -1,6 +1,6 @@
-import {Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
-import {SerializeContext} from '../types';
+import {SerializeContext} from '../SerializeContext';
 
 export class CountStatement extends Serializable {
     _alias?: string;
@@ -25,7 +25,7 @@ export class CountStatement extends Serializable {
      * @override
      */
     _serialize(ctx: SerializeContext): string {
-        return serializeFallback(ctx, this._type, undefined,
+        return ctx.serialize(this._type, undefined,
             () => this.__defaultSerialize(ctx, undefined));
     }
 

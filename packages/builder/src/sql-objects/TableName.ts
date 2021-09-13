@@ -1,6 +1,6 @@
-import {Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
-import {SerializeContext} from '../types';
+import {SerializeContext} from '../SerializeContext';
 
 export class TableName extends Serializable {
 
@@ -26,7 +26,7 @@ export class TableName extends Serializable {
     }
 
     _serialize(ctx: SerializeContext): string {
-        return serializeFallback(ctx, this._type, {
+        return ctx.serialize(this._type, {
                 schema: this.schema,
                 table: this.table,
                 alias: this.alias

@@ -2,7 +2,8 @@ import {EventEmitter} from 'events';
 import merge from 'putil-merge';
 import flattenText from 'putil-flattentext';
 import {Serializable} from '../Serializable';
-import {SerializeContext, GenerateOptions, GenerateResult} from '../types';
+import {GenerateOptions, GenerateResult} from '../types';
+import {SerializeContext} from '../SerializeContext';
 
 export declare interface Query extends EventEmitter {
 }
@@ -20,7 +21,7 @@ export abstract class Query extends Serializable {
      * Generates Sql script
      */
     generate(options?: GenerateOptions): GenerateResult {
-        const ctx: SerializeContext = {...options};
+        const ctx = new SerializeContext(options);
         if (this._params)
             ctx.params = {...ctx.params, ...this._params};
         ctx.serializeHooks = this.listeners('serialize');

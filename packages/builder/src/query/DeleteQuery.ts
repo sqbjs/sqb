@@ -4,9 +4,8 @@ import {SerializationType} from '../enums';
 import {TableName} from '../sql-objects/TableName';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../types';
-import {serializeFallback} from '../Serializable';
 import {isRawStatement} from '../typeguards';
+import {SerializeContext} from '../SerializeContext';
 
 export class DeleteQuery extends Query {
 
@@ -54,7 +53,7 @@ export class DeleteQuery extends Query {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
+        return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });

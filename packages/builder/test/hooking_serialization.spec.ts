@@ -26,7 +26,7 @@ describe('Hooking serialization', function () {
             .where(Eq('id', 1))
             .on('serialize', function (ctx, type, o) {
                 if (type === SerializationType.COMPARISON_EXPRESSION)
-                    o.left = 'new_id';
+                    o.left.expression = 'new_id';
             });
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'select * from table1 where new_id = 1');

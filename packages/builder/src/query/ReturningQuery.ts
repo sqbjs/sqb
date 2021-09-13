@@ -1,8 +1,8 @@
 import {Query} from './Query';
-import {SerializeContext} from '../types';
-import {printArray, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
 import {ReturningColumn} from '../sql-objects/ReturningColumn';
+import {SerializeContext} from '../SerializeContext';
+import {printArray} from '../helpers';
 
 export abstract class ReturningQuery extends Query {
 
@@ -38,7 +38,7 @@ export abstract class ReturningQuery extends Query {
             if (s)
                 arr.push(s);
         }
-        return serializeFallback(ctx, SerializationType.RETURNING_BLOCK, arr, () => {
+        return ctx.serialize(SerializationType.RETURNING_BLOCK, arr, () => {
             const s = printArray(arr);
             return s ? 'returning ' + s : '';
         });

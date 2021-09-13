@@ -1,7 +1,7 @@
 import {CompOperator} from './CompOperator';
-import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
+import {Serializable} from '../../Serializable';
 import {OperatorType} from '../../enums';
-import {SerializeContext} from '../../types';
+import {SerializeContext} from '../../SerializeContext';
 
 export class OpBetween extends CompOperator {
 
@@ -14,14 +14,26 @@ export class OpBetween extends CompOperator {
             right[1] = right[0];
     }
 
-    protected __serialize(ctx: SerializeContext, o: any): string {
-        o.right = o.right.map(x => serializeObject(ctx, x));
-        return serializeFallback(ctx, this._type, o,
-            (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
+    _serialize(ctx: SerializeContext): string {
+        if (!(this._value && this._value.length > 0))
+            return '';
+        const left = this.__serializeItem(ctx, this._expression);
+        const right = [
+            this.__serializeItem(ctx, this._value[0], true),
+            this.__serializeItem(ctx, this._value[1], true)
+        ];
+        const o: any = {
+            operatorType: this._operatorType,
+            symbol: this._symbol,
+            left,
+            right
+        };
+        return this.__serialize(ctx, o);
     }
 
     __defaultSerialize(ctx, o) {
-        return o.left + ' ' + o.symbol + ' ' + o.right[0] + ' and ' + o.right[1];
+        return o.left.expression + ' ' + o.symbol + ' ' +
+            o.right[0].expression + ' and ' + o.right[1].expression;
     }
 
 }

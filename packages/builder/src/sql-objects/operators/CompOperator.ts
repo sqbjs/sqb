@@ -1,10 +1,11 @@
 import {Operator} from '../Operator';
-import {Serializable, serializeFallback, serializeObject} from '../../Serializable';
-import {SerializeContext} from '../../types';
+import {Serializable} from '../../Serializable';
 import {SerializationType} from '../../enums';
-import {isSelectQuery, isSerializable} from '../../typeguards';
+import {isSelectQuery} from '../../typeguards';
 import {Param} from '../../sqlobject.initializers';
 import {ParamExpression} from '../ParamExpression';
+import {FieldExpression} from '../FieldExpression';
+import {SerializeContext} from '../../SerializeContext';
 
 const EXPRESSION_PATTERN = /^([\w\\.$]+)(\[])?/;
 
@@ -15,17 +16,17 @@ export abstract class CompOperator extends Operator {
     _symbol?: string;
     _isArray?: boolean;
 
-    protected constructor(expression: string | Serializable, value?: any) {
+    protected constructor(left: string | Serializable, right?: any) {
         super();
-        if (typeof expression === 'string') {
-            const m = expression.match(EXPRESSION_PATTERN);
+        if (typeof left === 'string') {
+            const m = left.match(EXPRESSION_PATTERN);
             if (!m)
-                throw new TypeError(`"${expression}" is not a valid expression definition`);
+                throw new TypeError(`"${left}" is not a valid expression definition`);
             this._expression = m[1];
             this._isArray = !!m[2];
         } else
-            this._expression = expression;
-        this._value = value;
+            this._expression = left;
+        this._value = right;
     }
 
     get _type(): SerializationType {
@@ -33,47 +34,65 @@ export abstract class CompOperator extends Operator {
     }
 
     _serialize(ctx: SerializeContext): string {
-        const left = this._expression instanceof Serializable ?
-            this._expression._serialize(ctx) : this._expression;
-        let right = this._value;
-        if (ctx.strictParams && !isSerializable(right) &&
-            typeof this._expression === 'string') {
-            ctx.strictParamGenId = ctx.strictParamGenId || 0;
-            const name = 'strictParam$' + ++ctx.strictParamGenId;
-            right = Param(name);
-            ctx.params = ctx.params || {};
-            ctx.params[name] = this._value;
-        }
-
+        const left = this.__serializeItem(ctx, this._expression);
+        if (this._isArray)
+            left.isArray = true;
+        const right = this.__serializeItem(ctx, this._value, true);
         const o: any = {
             operatorType: this._operatorType,
-            left: isSelectQuery(this._expression) ?
-                '(' + left + ')' : left,
             symbol: this._symbol,
-            right,
-            isArray: this._isArray,
-            paramValue: ctx.params ?
-                (right instanceof ParamExpression ?
-                    ctx.params[right._name] : ctx.params[left.toLowerCase()])
-                : undefined
+            left,
+            right
         };
-
         return this.__serialize(ctx, o);
     }
 
+    protected __serializeItem(ctx: SerializeContext, x: any, isRight?: boolean): any {
+        if (ctx.strictParams && !(x instanceof Serializable) &&
+            (typeof x !== 'string' || isRight)) {
+            ctx.strictParamGenId = ctx.strictParamGenId || 0;
+            const name = 'strictParam$' + ++ctx.strictParamGenId;
+            ctx.params = ctx.params || {};
+            ctx.params[name] = x;
+            x = Param(name);
+        }
+
+        if (x instanceof Serializable) {
+            const expression = x._serialize(ctx);
+            const result: any = {
+                expression: isSelectQuery(x) ? '(' + expression + ')' : expression
+            }
+            if (x instanceof FieldExpression) {
+                result.dataType = result._dataType;
+                result.isArray = x._isArray;
+            }
+            if (x instanceof ParamExpression) {
+                let value = ctx.params ? ctx.params[x._name] : undefined;
+                if (x._isArray && value != null)
+                    value = [value];
+                result.value = value;
+                result.isArray = x._isArray || Array.isArray(value);
+                result.isParam = true;
+            }
+            return result;
+        } else {
+            const result: any = {
+                expression: (isRight || typeof x !== 'string') ?
+                    ctx.anyToSQL(x) : x
+            }
+            if (isRight || typeof x !== 'string')
+                result.isArray = Array.isArray(x);
+            return result;
+        }
+    }
+
     protected __serialize(ctx: SerializeContext, o: any): string {
-        let value = serializeObject(ctx, o.right);
-        if (isSelectQuery(o.right))
-            value = '(' + value + ')';
-        o.right = value;
-        return serializeFallback(ctx, this._type, o,
+        return ctx.serialize(this._type, o,
             (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
     }
 
     protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-        return (Array.isArray(o.expression) ?
-                '(' + o.left.join(',') + ')' : o.left) +
-            ' ' + o.symbol + ' ' + o.right;
+        return o.left.expression + ' ' + o.symbol + ' ' + o.right.expression;
     }
 
 }

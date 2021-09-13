@@ -1,4 +1,10 @@
 import {DataType, SerializationType} from './enums';
+import type {SerializeContext} from './SerializeContext';
+
+export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
+                                 defFn: DefaultSerializeFunction) => string | undefined;
+export type DefaultSerializeFunction = (ctx: SerializeContext, o: any) => string;
+export type IsReservedWordFunction = (ctx: SerializeContext, s: string) => boolean;
 
 export interface SerializerExtension {
     dialect: string;
@@ -22,22 +28,9 @@ export interface ParamOptions {
     isArray?: boolean;
 }
 
-export interface SerializeContext extends GenerateOptions {
-    serializeHooks?: Function[];
-    paramOptions?: Record<string, ParamOptions> | ParamOptions[];
-    preparedParams?: Record<string, any> | any[];
-    returningFields?: { field: string, alias?: string }[];
-    strictParamGenId?: number;
-}
-
 export interface GenerateResult {
     sql: string;
     params?: any;
     paramOptions?: Record<string, ParamOptions> | ParamOptions[];
     returningFields?: { field: string, alias?: string }[];
 }
-
-export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
-                                 defFn: DefaultSerializeFunction) => string | undefined;
-export type DefaultSerializeFunction = (ctx: SerializeContext, o: any) => string;
-export type IsReservedWordFunction = (ctx: SerializeContext, s: string) => boolean;

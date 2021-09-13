@@ -1,11 +1,10 @@
-import {escapeReserved, serializeFallback} from '../Serializable';
 import {SerializationType} from '../enums';
-import {Column} from './Column';
-import {SerializeContext} from '../types';
+import {BaseField} from './BaseField';
+import {SerializeContext} from '../SerializeContext';
 
 const RETURNING_COLUMN_PATTERN = /^([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;
 
-export class ReturningColumn extends Column {
+export class ReturningColumn extends BaseField {
 
     _alias: string;
 
@@ -29,9 +28,9 @@ export class ReturningColumn extends Column {
         };
         ctx.returningFields = ctx.returningFields || [];
         ctx.returningFields.push(o);
-        return serializeFallback(ctx, this._type, o, () => {
-            return escapeReserved(ctx, o.field) +
-                (o.alias ? ' as ' + escapeReserved(ctx, o.alias) : '');
+        return ctx.serialize(this._type, o, () => {
+            return ctx.escapeReserved(o.field) +
+                (o.alias ? ' as ' + ctx.escapeReserved(o.alias) : '');
         });
     }
 

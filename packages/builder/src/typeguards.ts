@@ -10,7 +10,7 @@ import type {CaseStatement} from './sql-objects/CaseStatement';
 import type {ParamExpression} from './sql-objects/ParamExpression';
 import type {LogicalOperator} from './sql-objects/operators/LogicalOperator';
 import type {CompOperator} from './sql-objects/operators/CompOperator';
-import type {SelectColumn} from './sql-objects/SelectColumn';
+import type {FieldExpression} from './sql-objects/FieldExpression';
 import type {OrderColumn} from './sql-objects/OrderColumn';
 import type {GroupColumn} from './sql-objects/GroupColumn';
 import type {ReturningColumn} from './sql-objects/ReturningColumn';
@@ -65,7 +65,7 @@ export function isCompOperator(value: any): value is CompOperator {
     return isSerializable(value) && value._type === SerializationType.COMPARISON_EXPRESSION;
 }
 
-export function isSelectColumn(value: any): value is SelectColumn {
+export function isSelectColumn(value: any): value is FieldExpression {
     return isSerializable(value) && value._type === SerializationType.SELECT_COLUMN;
 }
 

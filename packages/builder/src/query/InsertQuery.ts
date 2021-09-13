@@ -1,10 +1,10 @@
 import {ReturningQuery} from './ReturningQuery';
 import {SerializationType} from '../enums';
 import {TableName} from '../sql-objects/TableName';
-import {printArray, serializeFallback, serializeObject} from '../Serializable';
 import type {RawStatement} from '../sql-objects/RawStatement';
-import type {SerializeContext} from '../types';
 import {isRawStatement, isSelectQuery, isSerializable} from '../typeguards';
+import {SerializeContext} from '../SerializeContext';
+import {printArray} from '../helpers';
 
 export class InsertQuery extends ReturningQuery {
 
@@ -62,7 +62,7 @@ export class InsertQuery extends ReturningQuery {
             }
         } else
             arr = Object.keys(this._input);
-        return serializeFallback(ctx, SerializationType.INSERT_QUERY_COLUMNS, arr,
+        return ctx.serialize(SerializationType.INSERT_QUERY_COLUMNS, arr,
             () => printArray(arr));
     }
 
@@ -76,11 +76,11 @@ export class InsertQuery extends ReturningQuery {
         const arr: string[] = [];
         const allValues = this._input;
         for (const n of Object.keys(allValues)) {
-            const s = serializeObject(ctx, allValues[n]);
+            const s = ctx.anyToSQL(allValues[n]);
             if (s)
                 arr.push(s);
         }
-        return serializeFallback(ctx, SerializationType.INSERT_QUERY_VALUES, arr,
+        return ctx.serialize(SerializationType.INSERT_QUERY_VALUES, arr,
             () => printArray(arr));
     }
 

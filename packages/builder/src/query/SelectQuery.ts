@@ -2,16 +2,17 @@ import {coerceToInt} from 'putil-varhelpers';
 import {Query} from './Query';
 import {RawStatement} from '../sql-objects/RawStatement';
 import {TableName} from '../sql-objects/TableName';
-import {SelectColumn} from '../sql-objects/SelectColumn';
+import {FieldExpression} from '../sql-objects/FieldExpression';
 import {SerializationType} from '../enums';
 import {JoinStatement} from '../sql-objects/JoinStatement';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {GroupColumn} from '../sql-objects/GroupColumn';
 import {OrderColumn} from '../sql-objects/OrderColumn';
-import {printArray, Serializable, serializeFallback} from '../Serializable';
+import {Serializable} from '../Serializable';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {SerializeContext} from '../types';
 import {isJoinStatement, isSerializable} from '../typeguards';
+import {SerializeContext} from '../SerializeContext';
+import {printArray} from '../helpers';
 
 export class SelectQuery extends Query {
 
@@ -47,7 +48,7 @@ export class SelectQuery extends Query {
             if (Array.isArray(arg))
                 self.addColumn(...arg);
             else
-                this._columns.push(isSerializable(arg) ? arg : new SelectColumn(arg));
+                this._columns.push(isSerializable(arg) ? arg : new FieldExpression(arg));
         }
         return this;
     }
@@ -168,7 +169,7 @@ export class SelectQuery extends Query {
             offset: this._offset
         };
 
-        return serializeFallback(ctx, this._type, o, () => {
+        return ctx.serialize(this._type, o, () => {
             let out = 'select';
             if (this._distinct) out += ' distinct';
             // columns part
@@ -223,7 +224,7 @@ export class SelectQuery extends Query {
                         arr.push(s);
                 }
             }
-        return serializeFallback(ctx, SerializationType.SELECT_QUERY_COLUMNS, arr,
+        return ctx.serialize(SerializationType.SELECT_QUERY_COLUMNS, arr,
             () => printArray(arr) || '*');
     }
 
@@ -245,7 +246,7 @@ export class SelectQuery extends Query {
                         arr.push(s);
                 }
             }
-        return serializeFallback(ctx, SerializationType.SELECT_QUERY_FROM, arr, () => {
+        return ctx.serialize(SerializationType.SELECT_QUERY_FROM, arr, () => {
             const s = arr.join(',');
             return s ? ('from' + (s.substring(0, 1) !== '\n' ? ' ' : '') + s) : '';
         });
@@ -263,7 +264,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, SerializationType.SELECT_QUERY_JOIN, arr, () => {
+        return ctx.serialize(SerializationType.SELECT_QUERY_JOIN, arr, () => {
             return arr.join('\n');
         });
     }
@@ -275,7 +276,7 @@ export class SelectQuery extends Query {
         if (!this._where)
             return '';
         const s = this._where._serialize(ctx);
-        return serializeFallback(ctx, SerializationType.CONDITIONS_BLOCK, s, () => {
+        return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
             /* istanbul ignore next */
             return s ? 'where ' + s : '';
         });
@@ -293,7 +294,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, SerializationType.SELECT_QUERY_GROUPBY, arr, () => {
+        return ctx.serialize(SerializationType.SELECT_QUERY_GROUPBY, arr, () => {
             const s = printArray(arr);
             return s ? 'group by ' + s : '';
         });
@@ -308,7 +309,7 @@ export class SelectQuery extends Query {
                 if (s)
                     arr.push(s);
             }
-        return serializeFallback(ctx, SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
+        return ctx.serialize(SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
             const s = printArray(arr);
             return s ? 'order by ' + s : '';
         });
