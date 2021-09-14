@@ -12,7 +12,7 @@ describe('find() one to many relations', function () {
 
     describe('linkToMany', function () {
 
-        it('return associated rows as array property', async function () {
+        it('return associated rows as array property', async () => {
             const repo = client().getRepository(Continent);
             const rows = await repo.findAll({
                 elements: ['code', 'countries']
@@ -28,7 +28,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('choice which elements will be returned by server', async function () {
+        it('choice which elements will be returned by server', async () => {
             const repo = client().getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
@@ -46,7 +46,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('sort associated instances', async function () {
+        it('sort associated instances', async () => {
             const repo = client().getRepository(Country);
             const rows = await repo.findAll({
                 elements: ['code', 'customers'],
@@ -74,7 +74,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('query indirect associations', async function () {
+        it('return sub elements of sub associated element', async () => {
             const repo = client().getRepository(Continent);
             const rows = await repo.findAll({
                 filter: {code: 'AM'},
@@ -95,7 +95,28 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('limit maximum sub queries', async function () {
+        it('include sub elements of sub associated element', async () => {
+            const repo = client().getRepository(Continent);
+            const rows = await repo.findAll({
+                filter: {code: 'AM'},
+                include: ['countries', 'countries.customers']
+            });
+            assert.ok(rows);
+            assert.ok(rows.length);
+            for (const continent of rows) {
+                assert.strictEqual(continent.code, 'AM');
+                assert.ok(Array.isArray(continent.countries));
+                for (const country of continent.countries) {
+                    assert.strictEqual(country.continentCode, continent.code);
+                    assert.ok(Array.isArray(country.customers));
+                    for (const customer of country.customers) {
+                        assert.strictEqual(customer.countryCode, country.code);
+                    }
+                }
+            }
+        });
+
+        it('limit maximum sub queries', async () => {
             const repo = client().getRepository(Country);
             let r = await repo.findAll({
                 elements: ['code', 'customers.id'],
@@ -116,7 +137,7 @@ describe('find() one to many relations', function () {
             assert.strictEqual(r[0].customers, undefined);
         });
 
-        it('limit maximum number of eager items', async function () {
+        it('limit maximum number of eager items', async () => {
             const repo = client().getRepository(Country);
             assert.rejects(async () => await repo.findAll({
                 elements: ['code', 'customers.id'],
@@ -124,7 +145,7 @@ describe('find() one to many relations', function () {
             }), /maximum/);
         });
 
-        it('detect circular queries', async function () {
+        it('detect circular queries', async () => {
             const repo1 = client().getRepository(Country);
             assert.rejects(() => repo1.findAll({
                 filter: {code: 'US'},
@@ -142,7 +163,7 @@ describe('find() one to many relations', function () {
 
     describe('linkFromMany', function () {
 
-        it('return associated rows as array property', async function () {
+        it('return associated rows as array property', async () => {
             const repo = client().getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
@@ -159,7 +180,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('query indirect associations', async function () {
+        it('query indirect associations', async () => {
             const repo = client().getRepository(Continent);
             const rows = await repo.findAll({
                 filter: {code: 'AM'},
@@ -180,7 +201,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('choice which elements will be returned by server', async function () {
+        it('choice which elements will be returned by server', async () => {
             const repo = client().getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
@@ -198,7 +219,7 @@ describe('find() one to many relations', function () {
             }
         });
 
-        it('limit maximum sub queries', async function () {
+        it('limit maximum sub queries', async () => {
             const repo = client().getRepository(Country);
             let r = await repo.findAll({
                 elements: ['code', 'customers.id'],
@@ -219,7 +240,7 @@ describe('find() one to many relations', function () {
             assert.strictEqual(r[0].customers, undefined);
         });
 
-        it('throw if eager rows exceeds limit', async function () {
+        it('throw if eager rows exceeds limit', async () => {
             const repo = client().getRepository(Country);
             assert.rejects(async () => await repo.findAll({
                 elements: ['code', 'customers.id'],
@@ -227,7 +248,7 @@ describe('find() one to many relations', function () {
             }), /maximum/);
         });
 
-        it('detect circular queries', async function () {
+        it('detect circular queries', async () => {
             const repo1 = client().getRepository(Country);
             assert.rejects(() => repo1.findAll({
                 filter: {code: 'US'},
@@ -244,7 +265,7 @@ describe('find() one to many relations', function () {
 
     describe('Association chain', function () {
 
-        it('associations with target conditions', async function () {
+        it('associations with target conditions', async () => {
             const repo = client().getRepository(Country);
             const rows = await repo.findAll({
                 filter: [Eq('code', 'US')],
