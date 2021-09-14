@@ -78,7 +78,7 @@ export class InsertQuery extends ReturningQuery {
         for (const n of Object.keys(allValues)) {
             const s = ctx.anyToSQL(allValues[n]);
             if (s)
-                arr.push(s);
+                arr.push(isSelectQuery(allValues[n]) ? '(' + s + ')' : s);
         }
         return ctx.serialize(SerializationType.INSERT_QUERY_VALUES, arr,
             () => printArray(arr));

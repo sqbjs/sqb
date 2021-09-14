@@ -148,6 +148,14 @@ describe('serialize "Operators"', function () {
             const result = query.generate(options);
             assert.strictEqual(result.sql, 'select * from table1 where a = 1 and b = 2 and c = 3');
         });
+
+        it('should use sub select sqls', function () {
+            const query = Select()
+                .from('table1')
+                .where({'a': Select('i').from('table2')});
+            const result = query.generate(options);
+            assert.strictEqual(result.sql, 'select * from table1 where a = (select i from table2)');
+        });
     });
 
     /*
