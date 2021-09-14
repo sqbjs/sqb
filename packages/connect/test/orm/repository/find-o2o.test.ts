@@ -71,10 +71,13 @@ describe('find() one to one relations', function () {
             assert.ok(rows);
             assert.ok(rows.length);
             assert.strictEqual(rows[0].id, 1);
-            assert.deepStrictEqual(toJSON(rows[0].country), {
-                continent: {
-                    code: 'AM',
-                    name: 'America'
+            assert.deepStrictEqual(toJSON(rows[0]), {
+                id: 1,
+                country: {
+                    continent: {
+                        code: 'AM',
+                        name: 'America'
+                    }
                 }
             });
         });

@@ -105,13 +105,18 @@ export class FindCommand {
         const entity = opts.entity || this._getEntityFromAlias(tableAlias);
         const converter = opts.converter || this.converter;
 
-        let requestElements: string[] = opts.elements && opts.elements.length ?
-            [...opts.elements] : getNonAssociationElementNames(entity.ctor);
-        if (opts.include && opts.include.length)
-            requestElements.push(...opts.include);
-        requestElements = requestElements.map(x => x.toLowerCase());
-        const excludeElements = opts.exclude && opts.exclude.length ?
+        const _elements = opts.elements ?
+            opts.elements.map(x => x.toLowerCase()) : undefined;
+        const _include = opts.include ?
+            opts.include.map(x => x.toLowerCase()) : undefined;
+        const _exclude = opts.exclude ?
             opts.exclude.map(x => x.toLowerCase()) : undefined;
+
+        const requestElements: string[] = _elements ? [..._elements] :
+            getNonAssociationElementNames(entity.ctor).map(x => x.toLowerCase());
+        if (_include)
+            requestElements.push(..._include);
+
         const sortElements = opts.sort && opts.sort.length ?
             opts.sort.map(x => x.toLowerCase()) : undefined;
         const prefix = opts.prefix || '';
@@ -124,7 +129,7 @@ export class FindCommand {
             const colNameLower = col.name.toLowerCase();
 
             // Ignore element if in excluded list
-            if (excludeElements && excludeElements.includes(colNameLower))
+            if (_exclude && _exclude.includes(colNameLower))
                 continue;
 
             // Check if element request list
@@ -158,8 +163,10 @@ export class FindCommand {
                     entity: typ,
                     prefix: col.fieldNamePrefix,
                     suffix: col.fieldNameSuffix,
-                    elements: extractSubElements(colNameLower, requestElements),
-                    exclude: extractSubElements(colNameLower, excludeElements),
+                    elements: _elements?.includes(colNameLower) ? undefined :
+                        extractSubElements(colNameLower, _elements),
+                    include: extractSubElements(colNameLower, _include),
+                    exclude: extractSubElements(colNameLower, _exclude),
                     sort: extractSubElements(colNameLower, sortElements),
                 });
                 continue;
@@ -179,8 +186,10 @@ export class FindCommand {
                         tableAlias: joinInfo.joinAlias,
                         converter: subConverter,
                         entity: joinInfo.targetEntity,
-                        elements: extractSubElements(colNameLower, requestElements),
-                        exclude: extractSubElements(colNameLower, excludeElements),
+                        elements: _elements?.includes(colNameLower) ? undefined :
+                            extractSubElements(colNameLower, _elements),
+                        include: extractSubElements(colNameLower, _include),
+                        exclude: extractSubElements(colNameLower, _exclude),
                         sort: extractSubElements(colNameLower, sortElements),
                     });
                     continue;
@@ -201,8 +210,10 @@ export class FindCommand {
                     await findCommand.filter(In(targetCol.name, Param(parentField)));
                     const sort = sortElements && extractSubElements(colNameLower, sortElements);
                     await findCommand.addElements({
-                        elements: extractSubElements(colNameLower, requestElements),
-                        exclude: extractSubElements(colNameLower, excludeElements),
+                        elements: _elements?.includes(colNameLower) ? undefined :
+                            extractSubElements(colNameLower, _elements),
+                        include: extractSubElements(colNameLower, _include),
+                        exclude: extractSubElements(colNameLower, _exclude),
                         sort,
                     });
                     if (sort)
@@ -348,13 +359,16 @@ export class FindCommand {
 }
 
 function extractSubElements(colNameLower: string, elements?: string[]): string[] | undefined {
-    if (!elements || !elements.length)
-        return elements;
-    return elements.reduce((trg: string[], v: string) => {
-        if (v.startsWith(colNameLower + '.'))
-            trg.push(v.substring(colNameLower.length + 1).toLowerCase())
-        return trg;
-    }, [] as string[]);
+    if (!(elements && elements.length))
+        return;
+    if (elements) {
+        return elements.reduce((trg: string[], v: string) => {
+            if (v.startsWith(colNameLower + '.'))
+                trg.push(v.substring(colNameLower.length + 1).toLowerCase())
+            return trg;
+        }, [] as string[]);
+    }
+
 }
 
 
