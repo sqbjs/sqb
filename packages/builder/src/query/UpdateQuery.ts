@@ -4,7 +4,7 @@ import {RawStatement} from '../sql-objects/RawStatement';
 import {TableName} from '../sql-objects/TableName';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
-import {isRawStatement} from '../typeguards';
+import {isRawStatement, isSelectQuery} from '../typeguards';
 import {SerializeContext} from '../SerializeContext';
 import {printArray} from '../helpers';
 
@@ -63,9 +63,10 @@ export class UpdateQuery extends ReturningQuery {
         const arr: { field: string, value: any }[] = [];
         const allValues = this._input;
         for (const n of Object.getOwnPropertyNames(allValues)) {
+            const value = ctx.anyToSQL(allValues[n]);
             arr.push({
                 field: n,
-                value: ctx.anyToSQL(allValues[n])
+                value: isSelectQuery(allValues[n]) ? '(' + value + ')' : value
             });
         }
         return ctx.serialize(SerializationType.UPDATE_QUERY_VALUES, arr, () => {

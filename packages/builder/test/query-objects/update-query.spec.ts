@@ -1,6 +1,6 @@
 import '../_support/env';
 import assert from 'assert';
-import {Eq, Param, Raw, SerializationType, Update} from '@sqb/builder';
+import {Eq, Param, Raw, Select, SerializationType, Update} from '@sqb/builder';
 
 describe('Serialize update query', function () {
 
@@ -26,6 +26,13 @@ describe('Serialize update query', function () {
             .where(Eq('id', 1));
         const result = query.generate(options);
         assert.strictEqual(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
+    });
+
+    it('should use select query as value', function () {
+        const query = Update('table1', {id: 2, name: Select('name').from('table2')})
+            .where(Eq('id', 1));
+        const result = query.generate(options);
+        assert.strictEqual(result.sql, 'update table1 set id = 2, name = (select name from table2) where id = 1');
     });
 
     it('should validate first (tableName) argument', function () {
