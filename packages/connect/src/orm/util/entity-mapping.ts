@@ -63,6 +63,9 @@ export function pickEntityInto<T, K extends keyof T>(
     if (!src)
         return derived;
     trg.tableName = src.tableName;
+    trg.schema = src.schema;
+    trg.comment = src.comment;
+    trg.primaryIndex = src.primaryIndex;
     const pickKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
     for (const fk of src.foreignKeys) {
         if (fk.sourceKey && pickKeys.includes(fk.sourceKey.toLowerCase())) {
@@ -94,6 +97,9 @@ export function omitEntityInto<T, K extends keyof T>(
     if (!src)
         return derived;
     trg.tableName = src.tableName;
+    trg.schema = src.schema;
+    trg.comment = src.comment;
+    trg.primaryIndex = src.primaryIndex;
     const omitKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
     for (const fk of src.foreignKeys) {
         if (!(fk.sourceKey && omitKeys.includes(fk.sourceKey.toLowerCase()))) {
