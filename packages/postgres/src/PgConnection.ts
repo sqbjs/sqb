@@ -1,4 +1,3 @@
-import assert from 'assert';
 import {Adapter, DataType, QueryRequest} from '@sqb/connect';
 import {Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions, BindParam} from 'postgresql-client';
 import {dataTypeToOID} from './datatype-map';
@@ -45,12 +44,14 @@ export class PgConnection implements Adapter.Connection {
     }
 
     async startTransaction(): Promise<void> {
-        assert.ok(this.intlcon, 'Can not start transaction for a closed db session');
+        if (!this.intlcon)
+            throw new Error('Can not start transaction for a closed db session');
         await this.intlcon.startTransaction();
     }
 
     async commit(): Promise<void> {
-        assert.ok(this.intlcon, 'Can not commit transaction for a closed db session');
+        if (!this.intlcon)
+            throw new Error('Can not commit transaction for a closed db session');
         await this.intlcon.commit();
     }
 
@@ -60,14 +61,38 @@ export class PgConnection implements Adapter.Connection {
         await this.intlcon.rollback();
     }
 
+    async setSavepoint(savepoint: string): Promise<void> {
+        if (!this.intlcon)
+            throw new Error('Can not set savepoint for a closed db session');
+        return this.intlcon.savepoint(savepoint);
+    }
+
+    async releaseSavepoint(savepoint: string): Promise<void> {
+        if (!this.intlcon)
+            throw new Error('Can not release savepoint for a closed db session');
+        return this.intlcon.releaseSavepoint(savepoint);
+    }
+
+    async rollbackSavepoint(savepoint: string): Promise<void> {
+        if (!this.intlcon)
+            throw new Error('Can not rollback to a savepoint for a closed db session');
+        return this.intlcon.rollbackToSavepoint(savepoint);
+    }
+
+    getInTransaction(): boolean {
+        return !!(this.intlcon && this.intlcon.inTransaction);
+    }
+
     async test(): Promise<void> {
-        assert.ok(this.intlcon, 'DB session is closed');
+        if (!this.intlcon)
+            throw new Error('DB session is closed');
         await this.intlcon.query('select 1');
     }
 
 
     async getSchema(): Promise<string> {
-        assert.ok(this.intlcon, 'DB session is closed');
+        if (!this.intlcon)
+            throw new Error('DB session is closed');
         const r = await this.intlcon.query('SHOW search_path');
         if (r && r.rows && r.rows[0])
             return (r.rows as any)[0][0] as string;
@@ -75,7 +100,8 @@ export class PgConnection implements Adapter.Connection {
     }
 
     async setSchema(schema: string): Promise<void> {
-        assert.ok(this.intlcon, 'Can not set schema of a closed db session');
+        if (!this.intlcon)
+            throw new Error('Can not set schema of a closed db session');
         await this.intlcon.execute('SET search_path TO ' + schema);
     }
 
@@ -87,7 +113,8 @@ export class PgConnection implements Adapter.Connection {
     }
 
     async execute(query: QueryRequest): Promise<Adapter.Response> {
-        assert.ok(this.intlcon, 'Can not execute query with a closed db session');
+        if (!this.intlcon)
+            throw new Error('Can not execute query with a closed db session');
 
         const params = query.params?.map((v, i) => {
             const paramOpts = Array.isArray(query.paramOptions) ? query.paramOptions[i] : undefined;

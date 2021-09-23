@@ -80,6 +80,14 @@ describe('findAll()', function () {
         assert.ok(rows[0].country);
     });
 
+    it('should exclude associated elements if not included', async function () {
+        const repo = client().getRepository(Customer);
+        const rows = await repo.findAll({limit: 1});
+        assert.ok(rows);
+        assert.ok(rows.length);
+        assert.strictEqual(rows[0].country, undefined);
+    });
+
     it('should exclude returning elements specified in "exclude" option', async function () {
         const repo = client().getRepository(Customer);
         const rows = await repo.findAll({

@@ -27,6 +27,9 @@ interface SqbConnectionEvents {
     retain: (refCount: number) => void;
     release: (refCount: number) => void;
     'start-transaction': () => void;
+    'set-savepoint': () => void;
+    'release-savepoint': () => void;
+    'rollback-savepoint': () => void;
     commit: () => void;
     rollback: () => void;
 }
@@ -36,7 +39,7 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
     private readonly _options?: ConnectionOptions;
-    private _inTransaction = false;
+    private _inTransaction: boolean = false;
     private _refCount = 1;
 
     constructor(public readonly client: SqbClient,
@@ -65,6 +68,9 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
      * Returns true if transaction started
      */
     get inTransaction(): boolean {
+        if (this._intlcon && typeof this._intlcon.getInTransaction === 'function') {
+            this._inTransaction = this._intlcon.getInTransaction();
+        }
         return this._inTransaction;
     }
 
@@ -224,6 +230,35 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
         await this._intlcon.rollback();
         this._inTransaction = false;
         this.emit('rollback');
+    }
+
+    async setSavepoint(savepoint: string): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call setSavepoint() on a released connection');
+        if (typeof this._intlcon.setSavepoint !== 'function')
+            throw new Error(this.client.driver + ' does not support setSavepoint method');
+        if (!this.inTransaction)
+            await this.startTransaction();
+        await this._intlcon.setSavepoint(savepoint);
+        this.emit('set-savepoint');
+    }
+
+    async releaseSavepoint(savepoint: string): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call releaseSavepoint() on a released connection');
+        if (typeof this._intlcon.releaseSavepoint !== 'function')
+            throw new Error(this.client.driver + ' does not support releaseSavepoint method');
+        await this._intlcon.releaseSavepoint(savepoint);
+        this.emit('release-savepoint');
+    }
+
+    async rollbackSavepoint(savepoint: string): Promise<void> {
+        if (!this._intlcon)
+            throw new Error('Can not call rollbackSavepoint() on a released connection');
+        if (typeof this._intlcon.rollbackSavepoint !== 'function')
+            throw new Error(this.client.driver + ' does not support rollbackSavepoint method');
+        await this._intlcon.rollbackSavepoint(savepoint);
+        this.emit('rollback-savepoint');
     }
 
     async test(): Promise<void> {
