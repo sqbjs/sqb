@@ -90,7 +90,8 @@ export function pickEntityInto<T, K extends keyof T>(
 
 export function omitEntityInto<T, K extends keyof T>(
     derived: Type,
-    classRef: Type<T>, keys: readonly K[]): Type<Omit<T, typeof keys[number]>> {
+    classRef: Type<T>, keys: readonly K[]
+): Type<Omit<T, typeof keys[number]>> {
 
     const trg = EntityModel.attachTo(derived);
     const src = EntityModel.get(classRef);
