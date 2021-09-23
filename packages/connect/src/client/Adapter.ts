@@ -27,11 +27,15 @@ export namespace Adapter {
         reset: () => Promise<void>;
         test: () => Promise<void>;
         startTransaction: () => Promise<void>;
+        setSavepoint?: (savepoint: string) => Promise<void>;
+        releaseSavepoint?: (savepoint: string) => Promise<void>;
+        rollbackSavepoint?: (savepoint: string) => Promise<void>;
         commit: () => Promise<void>;
         rollback: () => Promise<void>;
         setSchema?: (schema: string) => Promise<void>;
         getSchema?: () => Promise<string>;
         onGenerateQuery?: (request: QueryRequest, query: classes.Query) => void;
+        getInTransaction?: () => boolean;
     }
 
     export interface Cursor {
