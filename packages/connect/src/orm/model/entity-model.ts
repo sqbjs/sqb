@@ -248,7 +248,11 @@ export class EntityModel {
         if (own)
             return own;
         const current = this.get(ctor);
-        const entity = ctor[ENTITY_DEFINITION_KEY] = new EntityModel(ctor as Type);
+        const entity = new EntityModel(ctor as Type);
+        Object.defineProperty(ctor, ENTITY_DEFINITION_KEY, {
+            value: entity,
+            enumerable: false
+        })
         // Merge base entity columns into this one
         if (current) {
             entity.tableName = current.tableName;
