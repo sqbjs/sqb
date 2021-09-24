@@ -128,11 +128,20 @@ export async function prepareFilter(
                         if (!subSelect) {
                             const keyCol = await col.association.resolveSourceProperty();
                             const targetCol = await col.association.resolveTargetProperty();
+                            let leftFieldName = targetCol.fieldName;
+                            if (isObjectElement(col))
+                                leftFieldName = (col.fieldNamePrefix || '') + leftFieldName + (col.fieldNameSuffix || '');
+                            let rightFieldName = keyCol.fieldName;
+                            if (isObjectElement(keyCol))
+                                rightFieldName = (keyCol.fieldNamePrefix || '') + rightFieldName + (keyCol.fieldNameSuffix || '');
+
                             subSelect = Select(Raw('1'))
                                 .from(_curEntity.tableName + ' K');
+
                             subSelect.where(
-                                Eq(Field('K.' + targetCol.fieldName, targetCol.dataType, targetCol.isArray),
-                                    Field(tableAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray))
+                                Eq(
+                                    Field('K.' + leftFieldName, targetCol.dataType, targetCol.isArray),
+                                    Field(tableAlias + '.' + rightFieldName, keyCol.dataType, keyCol.isArray))
                             )
                             trgOp.add(Exists(subSelect));
                             trgOp = subSelect._where as LogicalOperator;
