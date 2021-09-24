@@ -101,6 +101,8 @@ export async function prepareFilter(
                 let pt: string;
                 let _curEntity = entityDef;
                 let _curAlias = tableAlias;
+                let _curPrefix = '';
+                let _curSuffix = '';
                 let subSelect: SelectQuery | undefined;
                 for (let i = 0; i < l; i++) {
                     pt = itemPath[i];
@@ -112,12 +114,14 @@ export async function prepareFilter(
                         if (!isColumnElement(col))
                             throw new Error(`Invalid column expression (${item._left}) defined in filter`);
                         const ctor = Object.getPrototypeOf(item).constructor;
-                        trgOp.add(new ctor(Field(_curAlias + '.' + col.fieldName, col.dataType, col.isArray), item._right));
+                        trgOp.add(new ctor(Field(_curAlias + '.' + _curPrefix + col.fieldName + _curSuffix, col.dataType, col.isArray), item._right));
                     } else {
                         if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
                         if (isObjectElement(col)) {
                             _curEntity = await col.resolveType();
+                            _curPrefix = _curPrefix + (col.fieldNamePrefix || '');
+                            _curSuffix = (col.fieldNameSuffix || '') + _curSuffix;
                             continue;
                         }
                         if (!isAssociationElement(col))
@@ -128,20 +132,13 @@ export async function prepareFilter(
                         if (!subSelect) {
                             const keyCol = await col.association.resolveSourceProperty();
                             const targetCol = await col.association.resolveTargetProperty();
-                            let leftFieldName = targetCol.fieldName;
-                            if (isObjectElement(col))
-                                leftFieldName = (col.fieldNamePrefix || '') + leftFieldName + (col.fieldNameSuffix || '');
-                            let rightFieldName = keyCol.fieldName;
-                            if (isObjectElement(keyCol))
-                                rightFieldName = (keyCol.fieldNamePrefix || '') + rightFieldName + (keyCol.fieldNameSuffix || '');
-
                             subSelect = Select(Raw('1'))
                                 .from(_curEntity.tableName + ' K');
 
                             subSelect.where(
                                 Eq(
-                                    Field('K.' + leftFieldName, targetCol.dataType, targetCol.isArray),
-                                    Field(tableAlias + '.' + rightFieldName, keyCol.dataType, keyCol.isArray))
+                                    Field('K.' +  targetCol.fieldName, targetCol.dataType, targetCol.isArray),
+                                    Field(tableAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray))
                             )
                             trgOp.add(Exists(subSelect));
                             trgOp = subSelect._where as LogicalOperator;

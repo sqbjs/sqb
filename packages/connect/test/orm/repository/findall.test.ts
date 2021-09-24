@@ -151,15 +151,14 @@ describe('findAll()', function () {
         const repo = client().getRepository(Customer);
         const rows = await repo.findAll({
             filter: {
-                'name.given': Param('givenName'),
-                'name.family': 'Marsh'
+                'address.city': Param('city')
             },
             params: {
-                givenName: 'Belle'
+                city: 'Dallas'
             }
         });
-        assert.strictEqual(rows.length, 1);
-        assert.strictEqual(rows[0].id, 3);
+        for (const row of rows)
+            assert.strictEqual(row.address.city, 'Dallas');
     });
 
     it('should limit result rows', async function () {
