@@ -1,3 +1,4 @@
+export {Type, Maybe, DeepPartial, DeepPickWritable, DeepBuildable} from 'ts-gems';
 export * from './types';
 
 export * from './client/types';

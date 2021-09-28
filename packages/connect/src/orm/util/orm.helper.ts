@@ -1,6 +1,6 @@
 import 'reflect-metadata';
+import {Type} from 'ts-gems';
 import type {TypeResolver, TypeThunk} from '../orm.type';
-import type {Type} from '../../types';
 import type {EntityModel} from '../model/entity-model';
 import type {EntityColumnElement} from '../model/entity-column-element';
 import type {EntityObjectElement} from '../model/entity-object-element';

@@ -1,4 +1,4 @@
-import {Type} from '../../types';
+import {Type} from 'ts-gems';
 import {EntityModel} from '../model/entity-model';
 import {Association} from '../model/association';
 import {IndexMeta} from '../model/index-meta';

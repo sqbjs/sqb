@@ -1,3 +1,4 @@
+import {Maybe} from 'ts-gems';
 import {classes} from '@sqb/builder';
 import {
     ClientConfiguration,
@@ -5,7 +6,6 @@ import {
     RowType,
     DataType
 } from './types';
-import {Maybe} from '../types';
 
 export interface Adapter {
     driver: string;

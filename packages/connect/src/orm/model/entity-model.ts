@@ -1,9 +1,9 @@
 import {DataType} from '@sqb/builder';
+import {Type, Maybe} from 'ts-gems';
 import {
     IndexOptions,
     TypeThunk, DataPropertyOptions,
 } from '../orm.type';
-import {Maybe, Type} from '../../types';
 import {ENTITY_DEFINITION_KEY} from '../orm.const';
 import {IndexMeta} from './index-meta';
 import {Association} from './association';

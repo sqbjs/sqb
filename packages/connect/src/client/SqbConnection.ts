@@ -4,6 +4,7 @@ import assert from 'assert';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
+import {Type} from 'ts-gems';
 import {SqbClient} from './SqbClient';
 import {
     ConnectionOptions, ExecuteHookFunction, FetchFunction,
@@ -14,7 +15,6 @@ import {
 import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows, wrapAdapterFields} from './helpers';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';
-import {Type} from '../types';
 import {Repository} from '../orm/repository.class';
 import {EntityModel} from '../orm/model/entity-model';
 
