@@ -38,12 +38,12 @@
     "putil-taskqueue": "^2.5.3",
     "putil-varhelpers": "^1.6.1",
     "reflect-metadata": "^0.1.13",
-    "strict-typed-events": "^1.0.4"
+    "strict-typed-events": "^1.0.4",
+    "ts-gems": "^0.0.2"
   },
   "devDependencies": {
     "@types/debug": "^4.1.6",
-    "@types/lodash": "^4.14.171",
-    "ts-gems": "^0.0.2"
+    "@types/lodash": "^4.14.171"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.0.2"
