@@ -112,8 +112,9 @@ export class FindCommand {
         const _exclude = opts.exclude ?
             opts.exclude.map(x => x.toLowerCase()) : undefined;
 
-        const requestElements: string[] = _elements ? [..._elements] :
-            getNonAssociationElementNames(entity.ctor).map(x => x.toLowerCase());
+        const requestElements = _elements ? [..._elements] :
+            (getNonAssociationElementNames(entity.ctor) as string[])
+                .map(x => x.toLowerCase());
         if (_include)
             requestElements.push(..._include);
 

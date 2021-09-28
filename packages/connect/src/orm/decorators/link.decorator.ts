@@ -1,7 +1,7 @@
+import {Type} from 'ts-gems';
 import {TypeThunk} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
 import {LinkChain} from '../model/link-chain';
-import {Type} from '../../types';
 
 export function Link(chain: LinkChain<any>): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

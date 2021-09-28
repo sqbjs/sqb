@@ -1,9 +1,10 @@
+import {DeepPartial, Type} from 'ts-gems';
 import {AsyncEventEmitter} from 'strict-typed-events';
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
 import {QueryRequest, TransactionFunction} from '../client/types';
-import {InstanceValues, Type, DeepPartial} from '../types';
+import {InstanceValues} from '../types';
 import {extractKeyValues} from './util/extract-keyvalues';
 import {CountCommand} from './commands/count.command';
 import {CreateCommand} from './commands/create.command';

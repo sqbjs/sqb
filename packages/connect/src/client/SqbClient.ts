@@ -2,6 +2,7 @@ import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolS
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
 import {AsyncEventEmitter} from 'strict-typed-events';
 import _debug from 'debug';
+import {Maybe, Type} from 'ts-gems';
 import {classes} from '@sqb/builder';
 import {
     ClientConfiguration,
@@ -14,10 +15,8 @@ import {
 import {Adapter} from './Adapter';
 import {SqbConnection} from './SqbConnection';
 import {adapters} from './extensions';
-import {Type} from '../types';
 import {Repository} from '../orm/repository.class';
 import {EntityModel} from '../orm/model/entity-model';
-import {Maybe} from '../types';
 
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');

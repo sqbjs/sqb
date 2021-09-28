@@ -1,8 +1,8 @@
+import {Type} from 'ts-gems';
 import type {FieldInfoMap} from '../../client/FieldInfoMap';
 import type {FindCommand} from './find.command';
 import type {Repository} from '../repository.class';
 import {ColumnTransformFunction} from '../orm.type';
-import {Type} from '../../types';
 import {SqbConnection} from '../../client/SqbConnection';
 import {DataType} from '@sqb/builder';
 

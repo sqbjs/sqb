@@ -1,10 +1,10 @@
+import {Maybe} from 'ts-gems';
+import {DataType, ParamOptions} from '@sqb/builder';
 import type {SqbConnection} from './SqbConnection';
 import type {FieldInfoMap} from './FieldInfoMap';
 import type {Cursor} from './Cursor';
 import type {PoolConfiguration} from 'lightning-pool';
 import type {Adapter} from './Adapter';
-import type {Maybe} from '../types';
-import {DataType, ParamOptions} from '@sqb/builder';
 
 export {DataType} from '@sqb/builder';
 

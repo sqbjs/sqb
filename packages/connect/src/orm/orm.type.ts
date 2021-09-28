@@ -1,4 +1,5 @@
-import {DataType, Type} from '..';
+import {Type} from 'ts-gems';
+import {DataType} from '..';
 
 /* Model related */
 export type ElementKind = 'column' | 'object' | 'association';

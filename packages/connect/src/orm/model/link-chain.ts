@@ -1,5 +1,5 @@
+import {Type} from 'ts-gems';
 import {AssociationKind, TypeResolver, TypeThunk} from '../orm.type';
-import {Type} from '../../types';
 import {AssociationNode} from './association-node';
 
 export class LinkChain<T> {
