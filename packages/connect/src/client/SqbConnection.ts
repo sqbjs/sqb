@@ -107,11 +107,11 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
     async close(): Promise<void> {
         if (!this._intlcon)
             return;
-        await this.emitAsync('close');
+        await this.emitAsync({event: 'close', serial: true});
         const intlcon = this._intlcon;
         this._intlcon = undefined;
         this.client.pool.release(intlcon)
-            .catch(e => this.client.emit('error', e, this));
+            .catch(e => this.client.emit('error', e));
         debug('[%s] closed', intlcon.sessionId);
     }
 

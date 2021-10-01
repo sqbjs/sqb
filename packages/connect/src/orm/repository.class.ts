@@ -83,9 +83,9 @@ export namespace Repository {
 }
 
 interface RepositoryEvents {
-    execute: (request: QueryRequest, connection: SqbConnection) => void;
-    error: (error: Error, connection: SqbConnection) => void;
-    acquire: (connection: SqbConnection) => void;
+    execute: (request: QueryRequest) => void;
+    error: (error: Error) => void;
+    acquire: (connection: SqbConnection) => Promise<void>;
 }
 
 export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
