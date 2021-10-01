@@ -22,11 +22,11 @@ const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');
 
 interface SqbClientEvents {
-    execute: (request: QueryRequest, connection: SqbConnection) => void;
-    error: (error: Error, connection: SqbConnection) => void;
+    execute: (request: QueryRequest) => void;
+    error: (error: Error) => void;
     closing: () => void;
     close: () => void;
-    acquire: (connection: SqbConnection) => void;
+    acquire: (connection: SqbConnection) => Promise<void>;
     terminate: () => void;
 }
 
@@ -138,11 +138,11 @@ export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
         const adapterConnection = await this._pool.acquire();
         const opts = {autoCommit: this.defaults.autoCommit, ...options}
         const connection = new SqbConnection(this, adapterConnection, opts);
-        this.emit('acquire', connection);
+        await this.emitAsync({event: 'acquire', serial: true}, connection);
         connection.on('execute', (request: QueryRequest) =>
-            this.emit('execute', request, connection));
+            this.emit('execute', request));
         connection.on('error', (error: Error) =>
-            this.emit('error', error, connection));
+            this.emit('error', error));
         return connection;
     }
 
@@ -157,8 +157,8 @@ export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
     /**
      * Executes a query or callback with a new acquired connection.
      */
-    async execute(query: string | classes.Query, options?: QueryExecuteOptions & {objectRows: true}): Promise<ObjectQueryResult>
-    async execute(query: string | classes.Query, options?: QueryExecuteOptions & {objectRows: false}): Promise<ArrayQueryResult>
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions & { objectRows: true }): Promise<ObjectQueryResult>
+    async execute(query: string | classes.Query, options?: QueryExecuteOptions & { objectRows: false }): Promise<ArrayQueryResult>
     async execute(query: string | classes.Query, options?: QueryExecuteOptions): Promise<ObjectQueryResult | ArrayQueryResult>
     async execute(query: string | classes.Query, options?: QueryExecuteOptions): Promise<ObjectQueryResult | ArrayQueryResult> {
         debug('execute');
