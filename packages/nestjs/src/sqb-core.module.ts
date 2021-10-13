@@ -1,28 +1,23 @@
+import * as crypto from 'crypto';
 import {
     DynamicModule,
     Global,
     Inject,
     Module,
     OnApplicationShutdown,
-    Provider,
-    Type,
+    Provider
 } from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
 import {defer} from 'rxjs';
 import * as rxjs from 'rxjs';
 import {SqbClient} from '@sqb/connect';
-import {
-    generateString,
-    getConnectionToken,
-    handleRetry,
-} from './common/sqb.utils';
+import {getSQBToken, handleRetry,} from './sqb.utils';
 import {
     SqbModuleAsyncOptions,
     SqbModuleOptions,
     SqbOptionsFactory,
-} from './interfaces/sqb-options.interface';
+} from './sqb.interface';
 import {
-    DEFAULT_CONNECTION_NAME,
     SQB_MODULE_ID,
     SQB_MODULE_OPTIONS,
 } from './sqb.constants';
@@ -43,8 +38,8 @@ export class SqbCoreModule implements OnApplicationShutdown {
             useValue: options,
         };
         const connectionProvider = {
-            provide: getConnectionToken(options as SqbModuleOptions) as string,
-            useFactory: () => this.createConnectionFactory(options),
+            provide: getSQBToken(options.name),
+            useFactory: () => this.createConnection(options),
         };
 
         return {
@@ -56,11 +51,11 @@ export class SqbCoreModule implements OnApplicationShutdown {
 
     static forRootAsync(options: SqbModuleAsyncOptions): DynamicModule {
         const connectionProvider = {
-            provide: getConnectionToken(options as SqbModuleOptions) as string,
+            provide: getSQBToken(options.name),
             inject: [SQB_MODULE_OPTIONS],
             useFactory: async (sqbOptions: SqbModuleOptions) => {
                 const name = options.name || sqbOptions.name;
-                return await this.createConnectionFactory({
+                return this.createConnection({
                     ...sqbOptions,
                     name
                 });
@@ -76,7 +71,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
                 connectionProvider,
                 {
                     provide: SQB_MODULE_ID,
-                    useValue: generateString(),
+                    useValue: crypto.randomUUID(),
                 },
             ],
             exports: [connectionProvider],
@@ -84,9 +79,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
     }
 
     async onApplicationShutdown() {
-        const client = this.moduleRef.get<SqbClient>(
-            getConnectionToken(this.options as SqbModuleOptions) as Type<SqbClient>,
-        );
+        const client = this.moduleRef.get<SqbClient>(getSQBToken(this.options.name));
         if (client)
             await client.close(this.options.shutdownWaitMs);
     }
@@ -119,18 +112,16 @@ export class SqbCoreModule implements OnApplicationShutdown {
         if (useClass) {
             return {
                 provide: SQB_MODULE_OPTIONS,
-                useFactory: async (optionsFactory: SqbOptionsFactory) =>
-                    await optionsFactory.createSqbOptions(options.name),
+                useFactory: (optionsFactory: SqbOptionsFactory) =>
+                    optionsFactory.createSqbOptions(options.name),
                 inject: [useClass],
             };
         }
         throw new Error('Invalid configuration. Must provide useFactory, useClass or useExisting');
     }
 
-    private static async createConnectionFactory(
-        options: SqbModuleOptions,
-    ): Promise<SqbClient> {
-        const connectionToken = options.name || DEFAULT_CONNECTION_NAME;
+    private static async createConnection(options: SqbModuleOptions): Promise<SqbClient> {
+        const connectionToken = options.name;
         // NestJS 8
         // @ts-ignore
         if (rxjs.lastValueFrom) {
@@ -142,9 +133,9 @@ export class SqbCoreModule implements OnApplicationShutdown {
                     return client;
                 }).pipe(
                     handleRetry(
+                        connectionToken,
                         options.retryAttempts,
                         options.retryDelay,
-                        connectionToken,
                         options.verboseRetryLog,
                         options.toRetry,
                     ),
@@ -159,9 +150,9 @@ export class SqbCoreModule implements OnApplicationShutdown {
             })
                 .pipe(
                     handleRetry(
+                        connectionToken,
                         options.retryAttempts,
                         options.retryDelay,
-                        connectionToken,
                         options.verboseRetryLog,
                         options.toRetry,
                     ),

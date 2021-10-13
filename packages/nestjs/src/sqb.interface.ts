@@ -42,9 +42,7 @@ export type SqbModuleOptions = {
 } & ClientConfiguration;
 
 export interface SqbOptionsFactory {
-    createSqbOptions(
-        connectionName?: string,
-    ): Promise<SqbModuleOptions> | SqbModuleOptions;
+    createSqbOptions(connectionName?: string): Promise<SqbModuleOptions> | SqbModuleOptions;
 }
 
 export interface SqbModuleAsyncOptions

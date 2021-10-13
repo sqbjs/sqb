@@ -1,3 +1,2 @@
-export const SQB_MODULE_OPTIONS = 'SqbModuleOptions';
-export const SQB_MODULE_ID = 'SqbModuleId';
-export const DEFAULT_CONNECTION_NAME = 'default';
+export const SQB_MODULE_OPTIONS = Symbol('SQB_MODULE_OPTIONS');
+export const SQB_MODULE_ID = Symbol('SQB_MODULE_ID');

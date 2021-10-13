@@ -2,7 +2,7 @@ import {DynamicModule, Module} from '@nestjs/common';
 import {
     SqbModuleAsyncOptions,
     SqbModuleOptions,
-} from './interfaces/sqb-options.interface';
+} from './sqb.interface';
 import {SqbCoreModule} from './sqb-core.module';
 
 @Module({})

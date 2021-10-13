@@ -1,4 +1,6 @@
-export * from './common/sqb.decorators';
-export * from './common/sqb.utils';
-export * from './interfaces/sqb-options.interface';
+export * from './sqb.decorators';
+export * from './sqb.interface';
 export * from './sqb.module';
+export * from './sqb.utils';
+
+export {SqbClient} from '@sqb/connect';

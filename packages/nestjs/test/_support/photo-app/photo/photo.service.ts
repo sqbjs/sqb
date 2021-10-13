@@ -1,12 +1,12 @@
 import {Injectable} from '@nestjs/common';
 import {SqbClient} from '@sqb/connect';
-import {InjectConnection} from '@sqb/nestjs';
+import {InjectSQB} from '@sqb/nestjs';
 import {Select, Insert} from '@sqb/builder';
 
 @Injectable()
 export class PhotoService {
     constructor(
-        @InjectConnection('db1')
+        @InjectSQB('db1')
         private readonly client: SqbClient
     ) {
     }
