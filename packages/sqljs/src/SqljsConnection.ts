@@ -1,10 +1,11 @@
+import {Database, Statement} from 'sql.js';
 import {Adapter, QueryRequest} from '@sqb/connect';
 import {SqljsCursor} from './SqljsCursor';
 
 export class SqljsConnection implements Adapter.Connection {
-    private readonly intlcon: any;
+    private intlcon?: Database;
 
-    constructor(db: any) {
+    constructor(db: Database, private _onClose: Function) {
         this.intlcon = db;
     }
 
@@ -13,7 +14,10 @@ export class SqljsConnection implements Adapter.Connection {
     }
 
     async close() {
-        // Dont close
+        if (this.intlcon) {
+            this.intlcon = undefined;
+            await this._onClose();
+        }
     }
 
     async reset() {
@@ -21,6 +25,7 @@ export class SqljsConnection implements Adapter.Connection {
     }
 
     async startTransaction(): Promise<void> {
+        assertDefined(this.intlcon);
         try {
             this.intlcon.exec('BEGIN TRANSACTION;');
         } catch (e) {
@@ -31,6 +36,7 @@ export class SqljsConnection implements Adapter.Connection {
     }
 
     async commit(): Promise<void> {
+        assertDefined(this.intlcon);
         try {
             this.intlcon.exec('COMMIT;');
         } catch (e) {
@@ -41,6 +47,7 @@ export class SqljsConnection implements Adapter.Connection {
     }
 
     async rollback(): Promise<void> {
+        assertDefined(this.intlcon);
         try {
             this.intlcon.exec('ROLLBACK;');
         } catch (e) {
@@ -51,17 +58,20 @@ export class SqljsConnection implements Adapter.Connection {
     }
 
     async test(): Promise<void> {
+        assertDefined(this.intlcon);
         this.intlcon.exec('select 1');
     }
 
     async execute(query: QueryRequest): Promise<Adapter.Response> {
+        assertDefined(this.intlcon);
         if (!query.autoCommit)
             await this.startTransaction();
         const out: Adapter.Response = {};
         let params;
         if (query.params) {
-            params = Object.keys(query.params).reduce((obj, k) => {
-                obj[':' + k] = query.params[k];
+            const prms = query.params;
+            params = Object.keys(prms).reduce((obj, k) => {
+                obj[':' + k] = prms[k];
                 return obj;
             }, {})
         }
@@ -98,7 +108,7 @@ export class SqljsConnection implements Adapter.Connection {
             }
         }
 
-        let stmt = this.intlcon.prepare(query.sql, query.params);
+        let stmt: Statement | undefined = this.intlcon.prepare(query.sql, query.params);
         try {
             const colNames = stmt.getColumnNames();
             if (colNames && colNames.length) {
@@ -119,7 +129,7 @@ export class SqljsConnection implements Adapter.Connection {
         }
     }
 
-    _convertFields(fields: string[]) {
+    private _convertFields(fields: string[]) {
         const result: any[] = [];
         for (let i = 0; i < fields.length; i++) {
             const v = fields[i];
@@ -136,3 +146,7 @@ export class SqljsConnection implements Adapter.Connection {
 
 }
 
+function assertDefined(d: unknown): asserts d {
+    if (d == null)
+        throw new Error("Invalid data");
+}

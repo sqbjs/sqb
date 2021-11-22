@@ -24,7 +24,7 @@
     "database"
   ],
   "dependencies": {
-    "compare-versions": "^3.6.0"
+    "compare-versions": "^4.1.1"
   },
   "devDependencies": {},
   "main": "dist/index.js",
