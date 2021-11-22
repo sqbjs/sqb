@@ -62,6 +62,7 @@
         "@typescript-eslint/unbound-method": "off",
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
         "arrow-parens": [
           "off",
           "as-needed"

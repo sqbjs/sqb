@@ -1,11 +1,14 @@
 import fs from 'fs';
-import path from 'path';
 import {Adapter, ClientConfiguration} from '@sqb/connect';
 import '@sqb/sqlite-dialect';
-import initSqlJs from 'sql.js';
+import initSqlJs, {Database} from 'sql.js';
 import {SqljsConnection} from './SqljsConnection';
+import path from 'path';
+import promisify from 'putil-promisify';
 
-const dbCache: Record<string, any> = {};
+type CachedDatabase = Database & { _refCount: number };
+
+const dbCache = new Map<string, CachedDatabase>();
 
 export class SqljsAdapter implements Adapter {
 
@@ -19,14 +22,53 @@ export class SqljsAdapter implements Adapter {
     async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
         if (!config.database)
             throw new Error('You must provide sqlite database file for sql.js driver');
-        const filename = path.resolve(process.cwd(), config.database);
-        if (dbCache[filename])
-            return new SqljsConnection(dbCache[filename]);
-        const filebuffer = fs.readFileSync(filename);
-        const SQL = await initSqlJs();
-        const db = new SQL.Database(filebuffer);
-        dbCache[filename] = db;
-        return new SqljsConnection(db);
+
+        let dbName = '';
+        let isMemory = false;
+
+        const m = config.database.match(/^(:memory:)(\w+)?$/);
+        if (m) {
+            isMemory = true;
+            dbName = config.database;
+        } else {
+            dbName = path.resolve(config.database);
+        }
+
+        let intlDb = dbCache.get(dbName);
+        if (intlDb) {
+            intlDb._refCount++;
+        } else {
+            const SQL = await initSqlJs();
+            if (isMemory) {
+                intlDb = new SQL.Database() as CachedDatabase;
+                intlDb._refCount = 0;
+            } else {
+                const buf = await promisify.fromCallback(cb => fs.readFile(dbName, cb));
+                intlDb = new SQL.Database(buf) as CachedDatabase;
+                intlDb._refCount = 1;
+            }
+            dbCache.set(dbName, intlDb);
+        }
+
+        const _intlDb = intlDb;
+        return new SqljsConnection(_intlDb, () => {
+            if (isMemory)
+                return;
+            if (--_intlDb._refCount <= 0) {
+                _intlDb.close();
+                dbCache.delete(dbName);
+            }
+        });
+
     }
 
+}
+
+export async function closeMemoryDatabase(name?: string): Promise<void> {
+    const memoryDbName = name || ':memory:';
+    const memDb = dbCache.get(memoryDbName);
+    if (memDb) {
+        dbCache.delete(memoryDbName);
+        memDb.close();
+    }
 }
