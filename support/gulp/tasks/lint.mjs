@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-const colors = require('colors');
-const {packages} = require('../package');
+import colors from 'colors';
+import {packages} from '../package.mjs';
 
-module.exports = {
+export default {
   ...packages.createTasks('lint', async (pkg) => {
         if (pkg.hasScript('lint')) {
           console.log(`lint '${colors.cyan(pkg.name)}'`);

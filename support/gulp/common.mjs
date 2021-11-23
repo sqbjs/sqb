@@ -1,13 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const {spawn} = require('child_process');
-const npmRunPath = require('npm-run-path');
-const minimist = require('minimist');
-const colors = require('colors');
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {spawn} from 'child_process';
+import {npmRunPathEnv} from 'npm-run-path';
+import minimist from 'minimist';
+import colors from 'colors';
 
-const rootDir = path.resolve(__dirname, '../..');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const argv = minimist(process.argv.slice(2), {
+export const rootDir = path.resolve(__dirname, '../..');
+
+export const argv = minimist(process.argv.slice(2), {
   string: ['package'],
   boolean: ['dev'],
   alias: {
@@ -16,12 +19,12 @@ const argv = minimist(process.argv.slice(2), {
   }
 });
 
-function execSh(command, options) {
+export function execSh(command, options) {
   const opts = {
     onSpawn: undefined,
     stdio: 'inherit',
     ...options,
-    env: npmRunPath.env(),
+    env: npmRunPathEnv(),
     windowsHide: true
   };
 
@@ -55,7 +58,7 @@ function execSh(command, options) {
   });
 }
 
-function deleteFolderRecursive(dir) {
+export function deleteFolderRecursive(dir) {
   if (fs.existsSync(dir)) {
     fs.readdirSync(dir).forEach((file) => {
       const curPath = path.join(dir, file);
@@ -69,9 +72,3 @@ function deleteFolderRecursive(dir) {
   }
 }
 
-module.exports = {
-  argv,
-  rootDir,
-  execSh,
-  deleteFolderRecursive
-};

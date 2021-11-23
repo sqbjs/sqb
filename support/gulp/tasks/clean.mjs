@@ -1,10 +1,9 @@
-/* eslint-disable no-console */
-const path = require('path');
-const colors = require('colors');
-const {packages} = require('../package');
-const {deleteFolderRecursive} = require('../common');
+import path from 'path';
+import colors from 'colors';
+import {packages} from '../package.mjs';
+import {deleteFolderRecursive} from '../common.mjs';
 
-module.exports = {
+export default {
   ...packages.createTasks('clean', async (pkg) => {
         console.log(`clean '${colors.cyan(pkg.name)}'`);
         deleteFolderRecursive(path.join(pkg.dirname, 'dist'));
@@ -29,5 +28,5 @@ module.exports = {
         deleteFolderRecursive(path.join(pkg.dirname, 'coverage'));
       }
   )
-
 };
+

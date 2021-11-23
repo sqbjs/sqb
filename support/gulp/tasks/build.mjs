@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-const colors = require('colors');
-const {packages} = require('../package');
-const {lint} = require('./lint');
-const {clean} = require('./clean');
+import colors from 'colors';
+import {packages} from '../package.mjs';
+import lint from './lint.mjs';
+import clean from './clean.mjs';
 
 const buildTasks = packages.createTasks('build', async (pkg) => {
   if (pkg.hasScript('build')) {
@@ -11,11 +11,11 @@ const buildTasks = packages.createTasks('build', async (pkg) => {
   }
 });
 
-module.exports = {
+export default {
   ...buildTasks,
   async build() {
-    await lint();
-    await clean();
+    await lint.lint();
+    await clean.clean();
     await buildTasks.build();
   }
 };
