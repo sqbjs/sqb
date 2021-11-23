@@ -1,13 +1,16 @@
-const path = require('path');
-const fs = require('fs');
-const {execSh} = require('./common');
-const {camelCase} = require('putil-varhelpers');
+import path from 'path';
+import fs from 'fs';
+import {fileURLToPath} from 'url';
+import {execSh} from './common.mjs';
+import {camelCase} from 'putil-varhelpers';
 
-const projectDir = path.resolve(__dirname, '../..');
-const packagesDir = path.join(projectDir, 'packages');
-const pkgjson = require(projectDir + '/package.json');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-class Package {
+export const projectDir = path.resolve(__dirname, '../..');
+export const packagesDir = path.join(projectDir, 'packages');
+const pkgJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+
+export class Package {
 
   constructor(name) {
     this.name = name;
@@ -40,8 +43,8 @@ class PackageList {
         arr.push(f);
       }
     }
-    if (pkgjson.gulp && pkgjson.gulp['package-order']) {
-      const order = pkgjson.gulp['package-order'];
+    if (pkgJson.gulp && pkgJson.gulp['package-order']) {
+      const order = pkgJson.gulp['package-order'];
       arr.sort((a, b) => {
         const l = order.indexOf(a);
         const r = order.indexOf(b);
@@ -92,11 +95,4 @@ class PackageList {
 
 }
 
-const packages = new PackageList();
-
-module.exports = {
-  Package,
-  packages,
-  projectDir,
-  packagesDir
-};
+export const packages = new PackageList();

@@ -1,9 +1,12 @@
 /* eslint-disable no-console */
-const colors = require('colors');
-const {packages} = require('../package');
-const path = require('path');
-const fs = require('fs');
-const semver = require('semver');
+import path from 'path';
+import fs from 'fs';
+import colors from 'colors';
+import {packages} from '../package.mjs';
+import semver from 'semver';
+import {fileURLToPath} from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function versionPackage(pkg, version) {
   console.log(`version '${colors.cyan(pkg.name)}'`);
@@ -35,7 +38,7 @@ function version(option) {
   };
 }
 
-module.exports = {
+export default {
   'version': version(),
   'version:patch': version('patch'),
   'version:minor': version('minor'),

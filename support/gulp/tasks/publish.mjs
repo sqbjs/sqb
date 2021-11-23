@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-const colors = require('colors');
-const {packages} = require('../package');
+import colors from 'colors';
+import {packages} from '../package.mjs';
 
-module.exports = {
+export default {
   ...packages.createTasks('publish', async (pkg) => {
         if (pkg.json.private)
           return;

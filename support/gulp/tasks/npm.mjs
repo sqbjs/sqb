@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-const path = require('path');
-const fs = require('fs');
-const {execSh, deleteFolderRecursive, rootDir} = require('../common');
-const {packages} = require('../package');
-const colors = require('colors');
+import path from 'path';
+import fs from 'fs';
+import colors from 'colors';
+import {packages} from '../package.mjs';
+import {execSh, deleteFolderRecursive, rootDir} from '../common.mjs';
 
-module.exports = {
+export default {
 
   async ci() {
     await packages.everyAsync((pkg) => {
@@ -19,22 +19,6 @@ module.exports = {
     if (fs.existsSync(path.join(rootDir, 'package-lock.json')))
       fs.unlinkSync(path.join(rootDir, 'package-lock.json'));
     return execSh('npm i');
-  },
-
-  async install() {
-    return execSh('npm install');
-  },
-
-  async update() {
-    return execSh('npm update');
-  },
-
-  async outdated() {
-    return execSh('npm outdated');
-  },
-
-  async audit() {
-    return execSh('npm audit');
   }
 
 };
