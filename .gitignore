@@ -1,9 +1,9 @@
 # compiled output
+/build
 /node_modules
 packages/*/dist
 packages/*/node_modules
-packages/*/coverage
-coverage
+*.cache.json
 
 # environment variables
 .env

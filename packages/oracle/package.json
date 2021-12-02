@@ -6,7 +6,7 @@
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/sqbjs/sqb.git"
@@ -28,7 +28,9 @@
   },
   "peerDependencies": {
     "oracledb": "^5.x.x",
-    "@sqb/oracle-dialect": "^4.0.6"
+    "@sqb/oracle-dialect": "^4.0.6",
+    "@sqb/builder": "^4.x.x",
+    "@sqb/connect": "^4.x.x"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -44,12 +46,14 @@
     "README",
     "dist/"
   ],
-  "nyc": {
-    "temp-dir": "./coverage/.nyc_output"
-  },
   "scripts": {
-    "build": "tsc -b tsconfig-build.json",
-    "compile": "tsc -b tsconfig.json",
-    "lint": "eslint src/** --no-error-on-unmatched-pattern"
+    "build": "tsc -b tsconfig.build.json",
+    "prebuild": "npm run lint && npm run clean:dist",
+    "postbuild": "copyfiles package.json README.md LICENSE ../../build/oracle",
+    "clean": "ts-cleanup -s src --all & ts-cleanup -s test",
+    "clean:dist": "rimraf ../../build/oracle",
+    "compile": "tsc",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern",
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
   }
 }

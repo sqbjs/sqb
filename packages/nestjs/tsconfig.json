@@ -1,10 +1,7 @@
 {
-  "extends": "../../tsconfig-base.json",
+  "extends": "../tsconfig.base.json",
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "test"],
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
     "baseUrl": "./",
     "paths": {
       "@sqb/builder": ["../builder/src"],

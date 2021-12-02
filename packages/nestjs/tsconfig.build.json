@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../build/nestjs/dist",
+    "sourceMap": false,
+    "declaration": true,
+    "noEmit": false,
+    "paths": {
+      "@sqb/builder": ["../../build/builder"],
+      "@sqb/connect": ["../../build/connect"]
+    }
+  }
+}

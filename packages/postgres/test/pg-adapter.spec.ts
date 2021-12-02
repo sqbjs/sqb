@@ -10,7 +10,7 @@ describe('PgAdapter', function () {
     if (process.env.SKIP_CREATE_DB !== 'true') {
         before(async () => {
             this.timeout(30000);
-            await createTestSchema();
+            await createTestSchema('test_sqb_postgres');
         })
     }
 
@@ -21,7 +21,7 @@ describe('PgAdapter', function () {
         database: env.PGDATABASE,
         user: env.PGUSER,
         password: env.PGPASSWORD,
-        schema: env.PGSCHEMA
+        schema: 'test_sqb_postgres'
     });
 
 });

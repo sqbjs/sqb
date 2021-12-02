@@ -2,10 +2,10 @@ import {Connection, stringifyValueForSQL} from 'postgresql-client';
 // noinspection ES6PreferShortImport
 import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
 
-const schema = process.env.PGSCHEMA || 'test';
-let schemaCreated = false;
+const schemaCreated = {};
 
-const schemaSql = `
+function getSql(schema: string) {
+    return `
 DROP SCHEMA IF EXISTS ${schema} CASCADE;
 CREATE SCHEMA ${schema} AUTHORIZATION postgres;
 
@@ -152,14 +152,16 @@ values
     '2005-07-01 01:21:11.123+03:00', 'ABCDE', '(-1.2, 3.5)', '<(-1.2, 3.5), 4.6>',
     '[(1.2, 3.5), (4.6, 5.2)]', '((-1.6, 3.0), (4.6, 0.1))');
 `
+}
 
-export async function createTestSchema() {
-    if (schemaCreated)
+export async function createTestSchema(schema: string) {
+    if (schemaCreated[schema])
         return;
     const connection = new Connection();
     await connection.connect();
     try {
-        await connection.execute(schemaSql);
+        const sql = getSql(schema);
+        await connection.execute(sql);
         const dataFiles = getInsertSQLsForTestData({
             dialect: 'postgres',
             schema,
@@ -167,7 +169,7 @@ export async function createTestSchema() {
         });
         for (const table of dataFiles)
             await connection.execute(table.scripts.join(';\n'));
-        schemaCreated = true;
+        schemaCreated[schema] = true;
     } finally {
         await connection.close(0);
     }

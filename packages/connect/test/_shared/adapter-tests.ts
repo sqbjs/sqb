@@ -7,7 +7,6 @@ import {Adapter, ClientConfiguration, QueryRequest, registerAdapter, unRegisterA
 
 export function initAdapterTests(adapter: Adapter,
                                  config?: Partial<ClientConfiguration>) {
-
     let connection: Adapter.Connection;
     let lastInsertId;
     const clientConfig: ClientConfiguration = {
