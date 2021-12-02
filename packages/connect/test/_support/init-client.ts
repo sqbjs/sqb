@@ -11,7 +11,7 @@ export function initClient(config?: ClientConfiguration): () => SqbClient {
     if (process.env.SKIP_CREATE_DB !== 'true') {
         before(async function () {
             this.timeout(30000);
-            await createTestSchema();
+            await createTestSchema('test_sqb_connect');
         })
     }
 
@@ -24,7 +24,7 @@ export function initClient(config?: ClientConfiguration): () => SqbClient {
     return () => {
         client = client || new SqbClient({
             dialect: 'postgres',
-            schema: process.env.PGSCHEMA || 'test',
+            schema: 'test_sqb_connect',
             ...config
         })
         return client;

@@ -6,7 +6,7 @@
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
   ],
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/sqbjs/sqb.git"
@@ -23,6 +23,9 @@
   ],
   "dependencies": {},
   "devDependencies": {},
+  "peerDependencies": {
+    "@sqb/builder": "^4.x.x"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
@@ -37,14 +40,14 @@
     "README",
     "dist/"
   ],
-  "nyc": {
-    "temp-dir": "./coverage/.nyc_output"
-  },
   "scripts": {
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
-    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
-    "build": "tsc -b tsconfig-build.json",
-    "compile": "tsc -b tsconfig.json",
-    "lint": "eslint src/** --no-error-on-unmatched-pattern"
+    "build": "tsc -b tsconfig.build.json",
+    "prebuild": "npm run lint && npm run clean:dist",
+    "postbuild": "copyfiles package.json README.md LICENSE ../../build/sqlite-dialect",
+    "clean": "ts-cleanup -s src --all & ts-cleanup -s test",
+    "clean:dist": "rimraf ../../build/sqlite-dialect",
+    "compile": "tsc",
+    "lint": "eslint src/** --no-error-on-unmatched-pattern",
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
   }
 }

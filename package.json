@@ -2,7 +2,7 @@
   "name": "sqb.v4",
   "private": true,
   "version": "4.0.6",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/sqbjs/sqb.git"
@@ -17,10 +17,10 @@
     "@types/node": "^16.0.1",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
+    "copyfiles": "latest",
     "colors": "^1.4.0",
     "eslint": "^8.2.0",
     "eslint-config-google": "^0.14.0",
-    "esm": "^3.2.25",
     "fast-glob": "^3.2.5",
     "gulp": "^4.0.2",
     "minimist": "^1.2.5",
@@ -28,33 +28,20 @@
     "npm-run-path": "^5.0.1",
     "nyc": "^15.1.0",
     "putil-varhelpers": "^1.3.1",
-    "semver": "^7.3.4",
-    "ts-cleanup": "^0.2.2",
-    "ts-loader": "^9.2.2",
-    "ts-node": "^10.0.0",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^4.4.2"
+    "rman": "^0.1.0",
+    "semver": "latest",
+    "ts-cleanup": "latest",
+    "ts-loader": "latest",
+    "ts-node": "latest",
+    "tsconfig-paths": "latest",
+    "typescript": "latest"
   },
   "scripts": {
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
-    "cover": "nyc --reporter=cobertura --reporter html --reporter text npm run test",
+    "_build": "rman build",
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/*.spec.ts",
+    "precoverage": "rimraf coverage",
+    "coverage": "nyc npm run test",
     "travis-cover": "nyc --reporter lcovonly npm run test"
-  },
-  "nyc": {
-    "temp-dir": "./coverage/.nyc_output"
-  },
-  "gulp": {
-    "package-order": [
-      "builder",
-      "connect",
-      "postgres-dialect",
-      "oracle-dialect",
-      "mssql-dialect",
-      "sqlite-dialect",
-      "postgres",
-      "oracle",
-      "sqljs",
-      "nestjs"
-    ]
   }
+
 }

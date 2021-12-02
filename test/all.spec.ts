@@ -1,19 +1,22 @@
 import './_support/env';
 import path from 'path';
 import glob from 'fast-glob';
+import {Workspace} from 'rman';
 
-const pkgJson = require('../package.json');
-const packagesDir = path.join(__dirname, '../packages/');
+const rootDir = path.resolve(__dirname, '../');
 
-function importTests(p: string): void {
-    const files = glob.sync(path.resolve(path.join(packagesDir, p, '/test/**/*.spec.ts')));
+async function importTests(p: string): Promise<void> {
+    const s = path.resolve(path.join(rootDir, 'packages', p, 'test/**/*.spec.ts'));
+    const files = glob.sync(s);
     for (const f of files)
-        require(f);
+        await import(f);
 }
 
-for (const p of pkgJson.gulp['package-order']) {
-    describe(p, function () {
-        if (p !== 'oracle')
-            importTests(p);
+const workspace = Workspace.create(rootDir);
+for (const p of workspace.packages) {
+    const basename = path.basename(p.dirname);
+    describe(basename, async function () {
+        if (basename !== 'oracle')
+            await importTests(basename);
     });
 }

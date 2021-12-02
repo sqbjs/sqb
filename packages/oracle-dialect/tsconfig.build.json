@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../build/oracle-dialect/dist",
+    "sourceMap": false,
+    "declaration": true,
+    "noEmit": false,
+    "paths": {
+      "@sqb/builder": ["../../build/builder"]
+    }
+  }
+}
