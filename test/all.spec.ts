@@ -1,7 +1,7 @@
 import './_support/env';
 import path from 'path';
 import glob from 'fast-glob';
-import {Workspace} from 'rman';
+import {Repository} from 'rman';
 
 const rootDir = path.resolve(__dirname, '../');
 
@@ -12,8 +12,8 @@ async function importTests(p: string): Promise<void> {
         await import(f);
 }
 
-const workspace = Workspace.create(rootDir);
-for (const p of workspace.packages) {
+const repository = Repository.create(rootDir);
+for (const p of repository.packages) {
     const basename = path.basename(p.dirname);
     describe(basename, async function () {
         if (basename !== 'oracle')
