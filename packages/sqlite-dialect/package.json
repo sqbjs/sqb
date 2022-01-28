@@ -1,7 +1,7 @@
 {
   "name": "@sqb/sqlite-dialect",
   "description": "SQB serialization extension for SQLite database",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "author": "Panates Ltd.",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
@@ -48,6 +48,7 @@
     "clean:dist": "rimraf ../../build/sqlite-dialect",
     "compile": "tsc",
     "lint": "eslint src/** --no-error-on-unmatched-pattern",
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
+    "version": "#version"
   }
 }

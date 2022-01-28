@@ -1,7 +1,7 @@
 {
   "name": "@sqb/builder",
   "description": "Extensible multi-dialect SQL query builder written with TypeScript",
-  "version": "4.0.6",
+  "version": "4.0.7",
   "author": "Panates Ltd.",
   "private": false,
   "contributors": [
@@ -56,6 +56,7 @@
     "clean:dist": "rimraf ../../build/builder",
     "compile": "tsc",
     "lint": "eslint src/** --no-error-on-unmatched-pattern",
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
+    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts",
+    "version": "#version"
   }
 }

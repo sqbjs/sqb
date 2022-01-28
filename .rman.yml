@@ -1,16 +1,3 @@
-scopes:
-  workspaces: packages/*
-  root: /
-
-scripts:
-  lint:
-    command: "eslint src/** --no-error-on-unmatched-pattern"
-    scope: workspaces
+command:
   version:
-    command: "npm version [newversion]"
-    scope: workspaces
-  build:
-    command:
-      - "lint"
-      - "$ npm run build"
-    scope: *
+    unified: true
