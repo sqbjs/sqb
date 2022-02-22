@@ -4,9 +4,6 @@
     "outDir": "../../build/mssql-dialect/dist",
     "sourceMap": false,
     "declaration": true,
-    "noEmit": false,
-    "paths": {
-      "@sqb/builder": ["../../build/builder"]
-    }
+    "noEmit": false
   }
 }

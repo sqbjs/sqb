@@ -1,4 +1,4 @@
-import {AsyncEventEmitter} from 'strict-typed-events';
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {Adapter} from './Adapter';
 import {SqbConnection} from './SqbConnection';
 import {FieldInfoMap} from './FieldInfoMap';
@@ -21,7 +21,7 @@ interface CursorEvents {
     fetch: (row: any, rowNum: number) => void;
 }
 
-export class Cursor extends AsyncEventEmitter<CursorEvents> {
+export class Cursor extends TypedEventEmitterClass<CursorEvents>(AsyncEventEmitter) {
 
     private readonly _connection: SqbConnection;
     private readonly _fields: FieldInfoMap;

@@ -1,5 +1,5 @@
 import {DeepPartial, Type} from 'ts-gems';
-import {AsyncEventEmitter} from 'strict-typed-events';
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {SqbClient} from '../client/SqbClient';
 import {SqbConnection} from '../client/SqbConnection';
 import {EntityModel} from './model/entity-model';
@@ -88,7 +88,7 @@ interface RepositoryEvents {
     acquire: (connection: SqbConnection) => Promise<void>;
 }
 
-export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
+export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(AsyncEventEmitter) {
     private readonly _executor: SqbClient | SqbConnection;
     private readonly _entity: EntityModel;
     private readonly _schema?: string;
@@ -199,7 +199,7 @@ export class Repository<T> extends AsyncEventEmitter<RepositoryEvents> {
         return (this._executor as SqbClient).acquire(async (conn) => {
             if (this._schema)
                 await conn.setSchema(this._schema);
-            await this.emitAsync({event: 'acquire', serial: true}, conn);
+            await this.emitAsyncSerial('acquire', conn);
             return fn(conn);
         });
     }
