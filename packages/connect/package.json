@@ -38,8 +38,8 @@
     "putil-taskqueue": "^2.5.3",
     "putil-varhelpers": "^1.6.1",
     "reflect-metadata": "^0.1.13",
-    "strict-typed-events": "^1.0.4",
-    "ts-gems": "^0.0.3"
+    "strict-typed-events": "^2.1.0",
+    "ts-gems": "^1.1.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.6",
