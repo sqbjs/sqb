@@ -1,6 +1,6 @@
 import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolState} from 'lightning-pool';
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
-import {AsyncEventEmitter} from 'strict-typed-events';
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import _debug from 'debug';
 import {Maybe, Type} from 'ts-gems';
 import {classes} from '@sqb/builder';
@@ -30,7 +30,7 @@ interface SqbClientEvents {
     terminate: () => void;
 }
 
-export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
+export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEventEmitter) {
     private readonly _adapter: Adapter;
     private readonly _pool: LightningPool<Adapter.Connection>;
     private readonly _defaults: ClientDefaults;
@@ -138,7 +138,7 @@ export class SqbClient extends AsyncEventEmitter<SqbClientEvents> {
         const adapterConnection = await this._pool.acquire();
         const opts = {autoCommit: this.defaults.autoCommit, ...options}
         const connection = new SqbConnection(this, adapterConnection, opts);
-        await this.emitAsync({event: 'acquire', serial: true}, connection);
+        await this.emitAsyncSerial('acquire', connection);
         connection.on('execute', (request: QueryRequest) =>
             this.emit('execute', request));
         connection.on('error', (error: Error) =>

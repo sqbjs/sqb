@@ -1,5 +1,5 @@
 import {classes} from '@sqb/builder';
-import {AsyncEventEmitter} from 'strict-typed-events';
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import assert from 'assert';
 import _debug from 'debug';
 import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
@@ -34,7 +34,7 @@ interface SqbConnectionEvents {
     rollback: () => void;
 }
 
-export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
+export class SqbConnection extends TypedEventEmitterClass<SqbConnectionEvents>(AsyncEventEmitter) {
 
     private _intlcon?: Adapter.Connection;
     private readonly _tasks = new TaskQueue();
@@ -107,7 +107,7 @@ export class SqbConnection extends AsyncEventEmitter<SqbConnectionEvents> {
     async close(): Promise<void> {
         if (!this._intlcon)
             return;
-        await this.emitAsync({event: 'close', serial: true});
+        await this.emitAsyncSerial('close');
         const intlcon = this._intlcon;
         this._intlcon = undefined;
         this.client.pool.release(intlcon)
