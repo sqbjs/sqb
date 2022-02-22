@@ -46,7 +46,7 @@
     "@types/lodash": "^4.14.171"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.0.6"
+    "@sqb/builder": "^4.x.x"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
