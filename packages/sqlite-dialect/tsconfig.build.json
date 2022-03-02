@@ -4,6 +4,9 @@
     "outDir": "../../build/sqlite-dialect/dist",
     "sourceMap": false,
     "declaration": true,
-    "noEmit": false
+    "noEmit": false,
+    "paths": {
+      "@sqb/builder": ["../../build/builder"]
+    }
   }
 }
