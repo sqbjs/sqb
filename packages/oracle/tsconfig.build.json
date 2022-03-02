@@ -4,6 +4,10 @@
     "outDir": "../../build/oracle/dist",
     "sourceMap": false,
     "declaration": true,
-    "noEmit": false
+    "noEmit": false,
+    "paths": {
+      "@sqb/builder": ["../../build/builder"],
+      "@sqb/connect": ["../../build/connect"]
+    }
   }
 }
