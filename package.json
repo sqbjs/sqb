@@ -25,6 +25,7 @@
     "npm-run-path": "^5.0.1",
     "nyc": "^15.1.0",
     "putil-varhelpers": "^1.3.1",
+    "rman": "^0.5.0",
     "ts-cleanup": "latest",
     "ts-loader": "latest",
     "ts-node": "latest",
@@ -36,7 +37,7 @@
     "precoverage": "rimraf coverage",
     "coverage": "nyc npm run test",
     "travis-cover": "nyc --reporter lcovonly npm run test",
-    "prelint": "echo a",
-    "postlint": "echo b"
+    "preclean_": "echo preclean_",
+    "postclean_": "echo postclean_"
   }
 }
