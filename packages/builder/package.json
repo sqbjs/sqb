@@ -2,7 +2,7 @@
   "name": "@sqb/builder",
   "description": "Extensible multi-dialect SQL query builder written with TypeScript",
   "version": "4.0.9",
-  "author": "Panates Ltd.",
+  "author": "Panates",
   "private": false,
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>"
