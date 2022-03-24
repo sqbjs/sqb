@@ -24,18 +24,17 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@nestjs/common": ">=7.4.0",
-    "@nestjs/core": ">=7.4.0",
-    "@nestjs/testing": ">=7.4.0",
-    "@nestjs/platform-express": ">=7.4.0",
+    "@nestjs/common": "^8.4.2",
+    "@nestjs/core": "^8.4.2",
+    "@nestjs/testing": "^8.4.2",
+    "@nestjs/platform-express": "^8.4.2",
     "postgresql-client": "^2.0.0",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0",
-    "supertest": "^6.1.3"
+    "rxjs": "^7.5.5",
+    "supertest": "^6.2.2"
   },
   "peerDependencies": {
-    "@sqb/connect": "^4.0.6",
-    "@sqb/builder": "^4.0.6",
+    "@sqb/connect": "^4.0.13",
+    "@sqb/builder": "^4.0.13",
     "@nestjs/common": ">=7.4.0",
     "@nestjs/core": ">=7.4.0",
     "rxjs": ">=6.6.0"

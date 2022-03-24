@@ -29,21 +29,21 @@
     "mysql"
   ],
   "dependencies": {
-    "debug": "^4.3.2",
+    "debug": "^4.3.4",
     "lightning-pool": "^3.1.3",
     "lodash": "^4.17.21",
     "putil-isplainobject": "^1.1.4",
-    "putil-merge": "^3.7.0",
+    "putil-merge": "^3.8.0",
     "putil-promisify": "^1.8.5",
-    "putil-taskqueue": "^2.5.3",
-    "putil-varhelpers": "^1.6.1",
+    "putil-taskqueue": "^2.5.4",
+    "putil-varhelpers": "^1.6.3",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.1.0",
-    "ts-gems": "^1.5.0"
+    "ts-gems": "^1.5.2"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.6",
-    "@types/lodash": "^4.14.171"
+    "@types/debug": "^4.1.7",
+    "@types/lodash": "^4.14.180"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.x.x"

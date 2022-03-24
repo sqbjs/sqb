@@ -22,10 +22,10 @@
     "database"
   ],
   "dependencies": {
-    "compare-versions": "^4.1.1"
+    "compare-versions": "^4.1.3"
   },
   "devDependencies": {
-    "fast-glob": "^3.2.6"
+    "fast-glob": "^3.2.11"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.x.x"

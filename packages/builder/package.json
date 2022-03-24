@@ -25,14 +25,14 @@
     "database"
   ],
   "dependencies": {
-    "debug": "^4.3.2",
+    "debug": "^4.3.4",
     "putil-flattentext": "^2.1.0",
     "putil-isplainobject": "^1.1.4",
-    "putil-merge": "^3.7.0",
-    "putil-varhelpers": "^1.6.1"
+    "putil-merge": "^3.8.0",
+    "putil-varhelpers": "^1.6.3"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.6"
+    "@types/debug": "^4.1.7"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
