@@ -3,3 +3,5 @@ command:
     contents: build
   version:
     unified: true
+  run:
+    parallel: lint

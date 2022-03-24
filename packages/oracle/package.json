@@ -23,12 +23,12 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "@types/oracledb": "^5.2.0",
-    "oracledb": "^5.2.0"
+    "@types/oracledb": "^5.2.3",
+    "oracledb": "^5.3.0"
   },
   "peerDependencies": {
     "oracledb": "^5.x.x",
-    "@sqb/oracle-dialect": "^4.0.6",
+    "@sqb/oracle-dialect": "^4.x.x",
     "@sqb/builder": "^4.x.x",
     "@sqb/connect": "^4.x.x"
   },

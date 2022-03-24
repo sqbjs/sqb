@@ -26,8 +26,8 @@
     "putil-promisify": "^1.8.5"
   },
   "devDependencies": {
-    "@types/sql.js": "^1.4.2",
-    "sql.js": "^1.5.0"
+    "@types/sql.js": "^1.4.3",
+    "sql.js": "^1.6.2"
   },
   "peerDependencies": {
     "sql.js": "^1.4.0",
