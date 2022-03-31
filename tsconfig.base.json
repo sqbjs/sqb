@@ -1,6 +1,8 @@
 {
   "extends": "@tsconfig/node14/tsconfig.json",
   "compilerOptions": {
+    "moduleResolution": "node",
+    "types": ["node"],
     "declaration": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
@@ -18,8 +20,6 @@
     "strict": true,
     "noEmitOnError": true,
     "strictNullChecks": true,
-    "moduleResolution": "node",
-    "types": ["node"],
     "noEmit": true
   },
   "exclude": [
