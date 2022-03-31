@@ -51,7 +51,7 @@ describe('DbMigrator', () => {
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe('table1');
+        assert.strictEqual(r.rows[0][0], 'table1');
 
         r = await connection.query('SELECT table_name FROM information_schema.tables WHERE  table_schema = $1 AND table_name = $2',
             {params: [schemaName, 'table2']});
@@ -77,21 +77,21 @@ describe('DbMigrator', () => {
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe(schemaName);
+        assert.strictEqual(r.rows[0][0], schemaName);
 
         r = await connection.query('SELECT table_name FROM information_schema.tables WHERE  table_schema = $1 AND table_name = $2',
             {params: [schemaName, 'table1']});
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe('table1');
+        assert.strictEqual(r.rows[0][0], 'table1');
 
         r = await connection.query('SELECT table_name FROM information_schema.tables WHERE  table_schema = $1 AND table_name = $2',
             {params: [schemaName, 'table2']});
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe('table2');
+        assert.strictEqual(r.rows[0][0], 'table2');
     });
 
     it('should insert data', async () => {
@@ -123,14 +123,14 @@ describe('DbMigrator', () => {
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe('table3');
+        assert.strictEqual(r.rows[0][0], 'table3');
 
         r = await connection.query('SELECT table_name FROM information_schema.tables WHERE  table_schema = $1 AND table_name = $2',
             {params: [schemaName, 'table4']});
         assert.ok(r.rows);
         assert.strictEqual(r.rows?.length, 1);
         // @ts-ignore
-        expect(r.rows[0][0]).toBe('table4');
+        assert.strictEqual(r.rows[0][0], 'table4');
 
         r = await connection.query(`SELECT id, name FROM ${schemaName}.table3`);
         assert.ok(r.rows);
@@ -139,7 +139,7 @@ describe('DbMigrator', () => {
 
     it('should check target version is not lower than package min version', async () => {
         const migrator = new DbMigrator();
-        await assert.throws(() => migrator.execute({
+        await assert.rejects(() => migrator.execute({
             connection,
             migrationPackage: Test1MigrationPackage,
             schema: schemaName,
