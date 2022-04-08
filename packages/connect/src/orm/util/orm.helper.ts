@@ -12,7 +12,7 @@ export function isClass(fn: any): fn is Type {
 }
 
 export function isEntityClass(fn: any): fn is Type {
-    return !!(isClass(fn) && fn[ENTITY_DEFINITION_KEY]);
+    return isClass(fn) && Reflect.hasMetadata(ENTITY_DEFINITION_KEY, fn);
 }
 
 export function isColumnElement(f: any): f is EntityColumnElement {
@@ -38,5 +38,5 @@ export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefi
 
 export async function resolveEntityMeta(ctorThunk: TypeThunk): Promise<EntityModel | undefined> {
     const ctor = await resolveEntity(ctorThunk);
-    return ctor && ctor[ENTITY_DEFINITION_KEY];
+    return ctor && Reflect.getMetadata(ENTITY_DEFINITION_KEY, ctor);
 }

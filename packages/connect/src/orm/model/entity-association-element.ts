@@ -1,9 +1,9 @@
 import type {EntityModel} from './entity-model';
 import {ElementKind} from '../orm.type';
-import {AbstractEntityelement} from './abstract-entityelement';
+import {AbstractEntityElement} from './abstract-entity-element';
 import type {AssociationNode} from './association-node';
 
-export class EntityAssociationElement extends AbstractEntityelement {
+export class EntityAssociationElement extends AbstractEntityElement {
     readonly kind: ElementKind = 'association';
 
     constructor(entity: EntityModel, name: string,

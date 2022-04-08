@@ -1,7 +1,7 @@
 import type {EntityModel} from './entity-model';
 import {ElementKind} from '../orm.type';
 
-export abstract class AbstractEntityelement {
+export abstract class AbstractEntityElement {
 
     readonly entity: EntityModel;
     readonly name: string;
