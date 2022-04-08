@@ -236,11 +236,11 @@ export class EntityModel {
     }
 
     static get(ctor: Function): Maybe<EntityModel> {
-        return ctor[ENTITY_DEFINITION_KEY];
+        return Reflect.getMetadata(ENTITY_DEFINITION_KEY, ctor);
     }
 
     static hasOwn(ctor: Function): boolean {
-        return ctor.hasOwnProperty(ENTITY_DEFINITION_KEY);
+        return Reflect.hasOwnMetadata(ENTITY_DEFINITION_KEY, ctor);
     }
 
     static attachTo(ctor: Function): EntityModel {
@@ -249,10 +249,7 @@ export class EntityModel {
             return own;
         const current = this.get(ctor);
         const entity = new EntityModel(ctor as Type);
-        Object.defineProperty(ctor, ENTITY_DEFINITION_KEY, {
-            value: entity,
-            enumerable: false
-        })
+        Reflect.defineMetadata(ENTITY_DEFINITION_KEY, entity, ctor);
         // Merge base entity columns into this one
         if (current) {
             entity.tableName = current.tableName;

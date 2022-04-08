@@ -1,8 +1,8 @@
 import {DataType} from '@sqb/builder';
-import {AbstractEntityelement} from '../model/abstract-entityelement';
+import {AbstractEntityElement} from '../model/abstract-entity-element';
 import {isColumnElement} from './orm.helper';
 
-export function serializeColumn(col: AbstractEntityelement, v: any): any {
+export function serializeColumn(col: AbstractEntityElement, v: any): any {
     if (isColumnElement(col)) {
         if (col.isArray) {
             if (Array.isArray(v))
