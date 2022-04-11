@@ -1,8 +1,8 @@
 import {
-    SerializerExtension,
-    SerializeContext,
     DefaultSerializeFunction,
-    SerializationType, OperatorType
+    OperatorType,
+    SerializationType, SerializeContext,
+    SerializerExtension
 } from '@sqb/builder';
 
 const reservedWords = ['comment'];

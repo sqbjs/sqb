@@ -1,18 +1,18 @@
 import {coerceToInt} from 'putil-varhelpers';
-import {Query} from './Query';
-import {RawStatement} from '../sql-objects/RawStatement';
-import {TableName} from '../sql-objects/TableName';
-import {FieldExpression} from '../sql-objects/FieldExpression';
 import {SerializationType} from '../enums';
+import {printArray} from '../helpers';
+import {Serializable} from '../Serializable';
+import {SerializeContext} from '../SerializeContext';
+import {FieldExpression} from '../sql-objects/FieldExpression';
+import {GroupColumn} from '../sql-objects/GroupColumn';
 import {JoinStatement} from '../sql-objects/JoinStatement';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
-import {GroupColumn} from '../sql-objects/GroupColumn';
-import {OrderColumn} from '../sql-objects/OrderColumn';
-import {Serializable} from '../Serializable';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
+import {OrderColumn} from '../sql-objects/OrderColumn';
+import {RawStatement} from '../sql-objects/RawStatement';
+import {TableName} from '../sql-objects/TableName';
 import {isJoinStatement, isSerializable} from '../typeguards';
-import {SerializeContext} from '../SerializeContext';
-import {printArray} from '../helpers';
+import {Query} from './Query';
 
 export class SelectQuery extends Query {
 

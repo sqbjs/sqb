@@ -1,6 +1,6 @@
-import {CompOperator} from './CompOperator';
 import {OperatorType} from '../../enums';
 import {Serializable} from '../../Serializable';
+import {CompOperator} from './CompOperator';
 
 export class OpLte extends CompOperator {
 

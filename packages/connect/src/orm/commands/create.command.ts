@@ -1,7 +1,9 @@
 import {Insert, Param} from '@sqb/builder';
+import {SqbConnection} from '../../client/SqbConnection';
+import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import type {EntityModel} from '../model/entity-model';
 import {isColumnElement, isObjectElement} from '../util/orm.helper';
-import {SqbConnection} from '../../client/SqbConnection';
 
 export type CreateCommandArgs = {
     entity: EntityModel;
@@ -88,7 +90,7 @@ export class CreateCommand {
                         throw new Error(`${entity.name}.${col.name} is required and can't be null`);
                     continue;
                 }
-                col.checkEnumValue(v);
+                ColumnElementMetadata.checkEnumValue(col, v);
                 const fieldName = prefix + col.fieldName + suffix;
                 const k = '$input_' + fieldName;
                 ctx.queryValues[fieldName] = Param({
@@ -99,7 +101,7 @@ export class CreateCommand {
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
             } else if (v != null && isObjectElement(col)) {
-                const type = await col.resolveType();
+                const type = await ComplexElementMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }
         }

@@ -1,5 +1,5 @@
-import {Serializable} from '../Serializable';
 import {OperatorType} from '../enums';
+import {Serializable} from '../Serializable';
 
 export abstract class Operator extends Serializable {
 

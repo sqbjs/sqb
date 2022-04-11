@@ -1,5 +1,5 @@
-import {IndexOptions} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {IndexOptions} from '../orm.type';
 
 export function Index(fields: string | string[], options?: IndexOptions): ClassDecorator
 export function Index(options?: IndexOptions): PropertyDecorator

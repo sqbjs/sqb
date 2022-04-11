@@ -1,13 +1,14 @@
-import {And, Select, In, Param} from '@sqb/builder';
-import type {Repository} from '../repository.class';
-import type {EntityModel} from '../model/entity-model';
-import type {EntityColumnElement} from '../model/entity-column-element';
-import {RowConverter} from './row-converter';
-import {AssociationNode} from '../model/association-node';
-import {isColumnElement, isObjectElement, isAssociationElement} from '../util/orm.helper';
-import {prepareFilter, JoinInfo, joinAssociationGetLast} from './command.helper';
+import {And, In, Param,Select} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
 import {getNonAssociationElementNames} from '../base-entity.class';
+import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {AssociationNode} from '../model/association-node';
+import type {EntityModel} from '../model/entity-model';
+import type {Repository} from '../repository.class';
+import {isAssociationElement,isColumnElement, isObjectElement} from '../util/orm.helper';
+import {joinAssociationGetLast,JoinInfo, prepareFilter} from './command.helper';
+import {RowConverter} from './row-converter';
 
 export type FindCommandArgs = {
     entity: EntityModel;
@@ -27,7 +28,7 @@ export class FindCommand {
     private _joins: JoinInfo[] = [];
     private _selectColumns: Record<string, {
         statement: string;
-        element: EntityColumnElement;
+        element: ColumnElementMetadata;
     }> = {};
     private _filter = And();
     private _sort?: string[];
@@ -153,7 +154,7 @@ export class FindCommand {
             }
 
             if (isObjectElement(col)) {
-                const typ = await col.resolveType();
+                const typ = await ComplexElementMetadata.resolveType(col);
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
                     type: typ.ctor
@@ -235,7 +236,7 @@ export class FindCommand {
         }
     }
 
-    private _selectColumn(tableAlias: string, el: EntityColumnElement,
+    private _selectColumn(tableAlias: string, el: ColumnElementMetadata,
                           prefix?: string, suffix?: string): string {
         const fieldName = (prefix || '').toLowerCase() +
             el.fieldName.toUpperCase() +
@@ -269,7 +270,7 @@ export class FindCommand {
                 while (a.length > 1) {
                     const col = _entityDef.getElement(a.shift() || '');
                     if (isObjectElement(col)) {
-                        _entityDef = await col.resolveType();
+                        _entityDef = await ComplexElementMetadata.resolveType(col);
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
                         if (col.fieldNameSuffix)

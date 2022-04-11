@@ -1,12 +1,12 @@
-import {Serializable} from '../Serializable';
 import {JoinType, SerializationType} from '../enums';
-import {TableName} from './TableName';
 import {SelectQuery} from '../query/SelectQuery';
-import {RawStatement} from './RawStatement';
-import {OpAnd} from './operators/OpAnd';
-import {LogicalOperator} from './operators/LogicalOperator';
-import {isRawStatement, isSelectQuery, isTableName} from '../typeguards';
+import {Serializable} from '../Serializable';
 import {SerializeContext} from '../SerializeContext';
+import {isRawStatement, isSelectQuery, isTableName} from '../typeguards';
+import {LogicalOperator} from './operators/LogicalOperator';
+import {OpAnd} from './operators/OpAnd';
+import {RawStatement} from './RawStatement';
+import {TableName} from './TableName';
 
 export class JoinStatement extends Serializable {
 

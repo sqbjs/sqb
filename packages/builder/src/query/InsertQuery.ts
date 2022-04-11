@@ -1,10 +1,10 @@
-import {ReturningQuery} from './ReturningQuery';
 import {SerializationType} from '../enums';
-import {TableName} from '../sql-objects/TableName';
-import type {RawStatement} from '../sql-objects/RawStatement';
-import {isRawStatement, isSelectQuery, isSerializable} from '../typeguards';
-import {SerializeContext} from '../SerializeContext';
 import {printArray} from '../helpers';
+import {SerializeContext} from '../SerializeContext';
+import type {RawStatement} from '../sql-objects/RawStatement';
+import {TableName} from '../sql-objects/TableName';
+import {isRawStatement, isSelectQuery, isSerializable} from '../typeguards';
+import {ReturningQuery} from './ReturningQuery';
 
 export class InsertQuery extends ReturningQuery {
 

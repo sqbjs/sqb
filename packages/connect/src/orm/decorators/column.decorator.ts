@@ -1,6 +1,6 @@
 import {DataType} from '@sqb/builder';
-import {DataPropertyOptions} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {DataPropertyOptions} from '../orm.type';
 
 export function Column(type?: DataType): PropertyDecorator
 export function Column(options?: DataPropertyOptions): PropertyDecorator

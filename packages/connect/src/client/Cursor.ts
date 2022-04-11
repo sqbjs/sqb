@@ -1,14 +1,14 @@
-import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
-import {Adapter} from './Adapter';
-import {SqbConnection} from './SqbConnection';
-import {FieldInfoMap} from './FieldInfoMap';
+import _debug from 'debug';
 import DoublyLinked from 'doublylinked';
 import TaskQueue from 'putil-taskqueue';
-import _debug from 'debug';
 import {coerceToInt} from 'putil-varhelpers';
-import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows} from './helpers';
-import {ObjectRow, QueryRequest} from './types';
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
+import {Adapter} from './Adapter';
 import {CursorStream, CursorStreamOptions} from './CursorStream';
+import {FieldInfoMap} from './FieldInfoMap';
+import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows} from './helpers';
+import {SqbConnection} from './SqbConnection';
+import {ObjectRow, QueryRequest} from './types';
 
 const debug = _debug('sqb:cursor');
 

@@ -1,30 +1,28 @@
+import {SelectQuery} from './query/SelectQuery';
+import {Serializable} from './Serializable';
+import {Operator} from './sql-objects/Operator';
+import {WrapOps} from './sql-objects/operators/LogicalOperator';
 import {OpAnd} from './sql-objects/operators/OpAnd';
-import {OpOr} from './sql-objects/operators/OpOr';
+import {OpBetween} from './sql-objects/operators/OpBetween';
 import {OpEq} from './sql-objects/operators/OpEq';
+import {OpExists} from './sql-objects/operators/OpExists';
 import {OpGt} from './sql-objects/operators/OpGt';
 import {OpGte} from './sql-objects/operators/OpGte';
-import {OpLt} from './sql-objects/operators/OpLt';
-import {OpLte} from './sql-objects/operators/OpLte';
-import {OpBetween} from './sql-objects/operators/OpBetween';
+import {OpILike} from './sql-objects/operators/OpILike';
 import {OpIn} from './sql-objects/operators/OpIn';
 import {OpIs} from './sql-objects/operators/OpIs';
 import {OpIsNot} from './sql-objects/operators/OpIsNot';
 import {OpLike} from './sql-objects/operators/OpLike';
-import {OpILike} from './sql-objects/operators/OpILike';
+import {OpLt} from './sql-objects/operators/OpLt';
+import {OpLte} from './sql-objects/operators/OpLte';
 import {OpNe} from './sql-objects/operators/OpNe';
 import {OpNotBetween} from './sql-objects/operators/OpNotBetween';
+import {OpNotExists} from './sql-objects/operators/OpNotExists';
+import {OpNotILike} from './sql-objects/operators/OpNotILike';
 import {OpNotIn} from './sql-objects/operators/OpNotIn';
 import {OpNotLike} from './sql-objects/operators/OpNotLike';
-import {OpNotILike} from './sql-objects/operators/OpNotILike';
-import {OpExists} from './sql-objects/operators/OpExists';
-import {OpNotExists} from './sql-objects/operators/OpNotExists';
-import {Operator} from './sql-objects/Operator';
+import {OpOr} from './sql-objects/operators/OpOr';
 import {RawStatement} from './sql-objects/RawStatement';
-import {Serializable} from './Serializable';
-import {SelectQuery} from './query/SelectQuery';
-
-// Avoids circular reference
-import {WrapOps} from './sql-objects/operators/LogicalOperator';
 
 function And(...args: (Operator | RawStatement)[]) {
     return new OpAnd(...args);

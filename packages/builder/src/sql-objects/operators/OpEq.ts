@@ -1,6 +1,6 @@
-import {CompOperator} from './CompOperator';
-import {Serializable} from '../../Serializable';
 import {OperatorType} from '../../enums';
+import {Serializable} from '../../Serializable';
+import {CompOperator} from './CompOperator';
 
 export class OpEq extends CompOperator {
 

@@ -1,6 +1,6 @@
-import {Logger, Type} from '@nestjs/common';
 import {Observable} from 'rxjs';
 import {delay, retryWhen, scan} from 'rxjs/operators';
+import {Logger, Type} from '@nestjs/common';
 import {SqbClient} from '@sqb/connect';
 
 const logger = new Logger('SqbModule');

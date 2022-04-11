@@ -1,5 +1,5 @@
-import {OpLike} from './OpLike';
 import {OperatorType} from '../../enums';
+import {OpLike} from './OpLike';
 
 export class OpILike extends OpLike {
 

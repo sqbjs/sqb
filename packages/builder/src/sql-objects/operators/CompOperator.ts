@@ -1,11 +1,11 @@
-import {Operator} from '../Operator';
-import {Serializable} from '../../Serializable';
 import {SerializationType} from '../../enums';
-import {isSelectQuery} from '../../typeguards';
-import {Param} from '../../sqlobject.initializers';
-import {ParamExpression} from '../ParamExpression';
-import {FieldExpression} from '../FieldExpression';
+import {Serializable} from '../../Serializable';
 import {SerializeContext} from '../../SerializeContext';
+import {Param} from '../../sqlobject.initializers';
+import {isSelectQuery} from '../../typeguards';
+import {FieldExpression} from '../FieldExpression';
+import {Operator} from '../Operator';
+import {ParamExpression} from '../ParamExpression';
 
 const EXPRESSION_PATTERN = /^([\w\\.$]+)(\[])?/;
 

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 export {Type, Maybe, DeepPartial, DeepPickWritable, DeepBuildable} from 'ts-gems';
 export * from './types';
 
@@ -9,6 +10,12 @@ export * from './client/Cursor';
 export {registerAdapter, unRegisterAdapter} from './client/extensions';
 
 export * from './orm/orm.type';
+
+export * from './orm/interfaces/element-metadata';
+export * from './orm/interfaces/column-element-metadata';
+export * from './orm/interfaces/complex-element-metadata';
+export * from './orm/interfaces/association-element-metadata';
+
 export * from './orm/base-entity.class';
 export * from './orm/decorators/entity.decorator';
 export * from './orm/decorators/primarykey.decorator';
@@ -22,9 +29,6 @@ export * from './orm/decorators/transform.decorator';
 
 export * from './orm/repository.class';
 export * from './orm/model/entity-model';
-export * from './orm/model/entity-column-element';
-export * from './orm/model/entity-object-element';
-export * from './orm/model/entity-association-element';
 export * from './orm/model/association';
 export * from './orm/model/index-meta';
 

@@ -1,5 +1,5 @@
-import {ColumnTransformFunction} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {ColumnTransformFunction} from '../orm.type';
 
 export function Parse(fn: ColumnTransformFunction): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

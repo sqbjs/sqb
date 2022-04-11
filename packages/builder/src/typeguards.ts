@@ -1,21 +1,21 @@
 import {SerializationType} from './enums';
-import {Serializable} from './Serializable';
-import type {SelectQuery} from './query/SelectQuery';
-import type {InsertQuery} from './query/InsertQuery';
-import type {UpdateQuery} from './query/UpdateQuery';
 import type {DeleteQuery} from './query/DeleteQuery';
-import type {RawStatement} from './sql-objects/RawStatement';
-import type {JoinStatement} from './sql-objects/JoinStatement';
+import type {InsertQuery} from './query/InsertQuery';
+import type {SelectQuery} from './query/SelectQuery';
+import type {UpdateQuery} from './query/UpdateQuery';
+import {Serializable} from './Serializable';
 import type {CaseStatement} from './sql-objects/CaseStatement';
-import type {ParamExpression} from './sql-objects/ParamExpression';
-import type {LogicalOperator} from './sql-objects/operators/LogicalOperator';
-import type {CompOperator} from './sql-objects/operators/CompOperator';
+import {CountStatement} from './sql-objects/CountStatement';
 import type {FieldExpression} from './sql-objects/FieldExpression';
-import type {OrderColumn} from './sql-objects/OrderColumn';
 import type {GroupColumn} from './sql-objects/GroupColumn';
+import type {JoinStatement} from './sql-objects/JoinStatement';
+import type {CompOperator} from './sql-objects/operators/CompOperator';
+import type {LogicalOperator} from './sql-objects/operators/LogicalOperator';
+import type {OrderColumn} from './sql-objects/OrderColumn';
+import type {ParamExpression} from './sql-objects/ParamExpression';
+import type {RawStatement} from './sql-objects/RawStatement';
 import type {ReturningColumn} from './sql-objects/ReturningColumn';
 import type {TableName} from './sql-objects/TableName';
-import {CountStatement} from './sql-objects/CountStatement';
 
 export function isSerializable(value: any): value is Serializable {
     return value instanceof Serializable;

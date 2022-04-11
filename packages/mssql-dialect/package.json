@@ -29,7 +29,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "engines": {
-    "node": ">= 14.0"
+    "node": ">= 16.0"
   },
   "directories": {
     "lib": "dist",
@@ -41,7 +41,7 @@
     "dist/"
   ],
   "scripts": {
-    "build": "tsc -b tsconfig.build.json",
+    "build": "tsc -b tsconfig-build.json",
     "prebuild": "npm run lint && npm run clean:dist",
     "postbuild": "copyfiles package.json README.md LICENSE ../../build/mssql-dialect",
     "clean": "ts-cleanup -s src --all & ts-cleanup -s test",

@@ -1,8 +1,8 @@
 import {And, Delete, LogicalOperator} from '@sqb/builder';
+import {SqbConnection} from '../../client/SqbConnection';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
 import {prepareFilter} from './command.helper';
-import {SqbConnection} from '../../client/SqbConnection';
 
 export type DestroyCommandArgs = {
     entity: EntityModel;

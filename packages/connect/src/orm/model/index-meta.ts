@@ -1,5 +1,5 @@
-import {EntityModel} from './entity-model';
 import {IndexOptions} from '../orm.type';
+import {EntityModel} from './entity-model';
 
 export class IndexMeta {
     entity: EntityModel;

@@ -1,20 +1,21 @@
+import {Maybe, Type} from 'ts-gems';
 import {DataType} from '@sqb/builder';
-import {Type, Maybe} from 'ts-gems';
-import {
-    IndexOptions,
-    TypeThunk, DataPropertyOptions,
-} from '../orm.type';
+import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
+import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {ENTITY_DEFINITION_KEY} from '../orm.const';
-import {IndexMeta} from './index-meta';
-import {Association} from './association';
-import {EntityColumnElement} from './entity-column-element';
-import {EntityObjectElement} from './entity-object-element';
-import {EntityAssociationElement} from './entity-association-element';
+import {
+    DataPropertyOptions,
+    IndexOptions,
+    TypeThunk,
+} from '../orm.type';
+import {isAssociationElement, isColumnElement, isObjectElement} from '../util/orm.helper';
 import {serializeColumn} from '../util/serialize-element';
+import {Association} from './association';
 import {AssociationNode} from './association-node';
-import {isColumnElement, isObjectElement, isAssociationElement} from '../util/orm.helper';
+import {IndexMeta} from './index-meta';
 
-export type EntityElement = EntityColumnElement | EntityObjectElement | EntityAssociationElement;
+export type EntityElement = ColumnElementMetadata | ComplexElementMetadata | AssociationElementMetadata;
 
 export class EntityModel {
     private _elementKeys?: string[]; // cache
@@ -33,7 +34,7 @@ export class EntityModel {
     }
 
     get elementKeys(): string[] {
-        if (!(this._elementKeys && this.hasOwnProperty('_elementKeys')))
+        if (!(this._elementKeys && Object.prototype.hasOwnProperty.call(this, '_elementKeys')))
             this._elementKeys = Array.from(this.elements.keys());
         return this._elementKeys;
     }
@@ -44,14 +45,14 @@ export class EntityModel {
         return this.elements.get(name.toLowerCase());
     }
 
-    getColumnElement(name: string): Maybe<EntityColumnElement> {
+    getColumnElement(name: string): Maybe<ColumnElementMetadata> {
         if (!name)
             return;
         const prop = this.elements.get(name.toLowerCase());
         return isColumnElement(prop) ? prop : undefined;
     }
 
-    getColumnElementByFieldName(fieldName: string): Maybe<EntityColumnElement> {
+    getColumnElementByFieldName(fieldName: string): Maybe<ColumnElementMetadata> {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
@@ -61,24 +62,24 @@ export class EntityModel {
         }
     }
 
-    getObjectElement(name: string): Maybe<EntityObjectElement> {
+    getObjectElement(name: string): Maybe<ComplexElementMetadata> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
         return isObjectElement(col) ? col : undefined;
     }
 
-    getAssociationElement(name: string): Maybe<EntityAssociationElement> {
+    getAssociationElement(name: string): Maybe<AssociationElementMetadata> {
         if (!name)
             return;
         const col = this.elements.get(name.toLowerCase());
         return isAssociationElement(col) ? col : undefined;
     }
 
-    defineColumnElement(propertyKey: string, options?: DataPropertyOptions): EntityColumnElement {
+    defineColumnElement(propertyKey: string, options?: DataPropertyOptions): ColumnElementMetadata {
         let prop = this.getElement(propertyKey);
         if (!prop || !isColumnElement(prop)) {
-            prop = new EntityColumnElement(this, propertyKey, options);
+            prop = ColumnElementMetadata.create(this, propertyKey, options);
             if (!prop.type) {
                 const typ = Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
                 if (typ === Array) {
@@ -108,12 +109,12 @@ export class EntityModel {
                 this.elementKeys.push(propertyKey);
             this.elements.set(propertyKey.toLowerCase(), prop);
         } else if (options)
-            prop.assign(options);
+            ColumnElementMetadata.assign(prop, options);
         return prop;
     }
 
-    defineAssociationElement(propertyKey: string, association: AssociationNode): EntityAssociationElement {
-        const prop = new EntityAssociationElement(this, propertyKey, association);
+    defineAssociationElement(propertyKey: string, association: AssociationNode): AssociationElementMetadata {
+        const prop = AssociationElementMetadata.create(this, propertyKey, association);
         let l: AssociationNode | undefined = association;
         let i = 1;
         while (l) {
@@ -126,18 +127,17 @@ export class EntityModel {
         return prop;
     }
 
-    defineObjectElement(propertyKey: string, type?: TypeThunk): EntityObjectElement {
+    defineObjectElement(propertyKey: string, type?: TypeThunk): ComplexElementMetadata {
         type = type || Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
         let prop = this.getElement(propertyKey);
         if (!prop || !isObjectElement(prop)) {
-            prop = new EntityObjectElement(this, propertyKey, type);
+            prop = ComplexElementMetadata.create(this, propertyKey, type);
             if (!this.elements.has(propertyKey.toLowerCase()))
                 this.elementKeys.push(propertyKey);
             this.elements.set(propertyKey.toLowerCase(), prop);
         }
-
         return prop;
     }
 
@@ -169,8 +169,8 @@ export class EntityModel {
         this.eventListeners.push({event: 'after-' + event, fn});
     }
 
-    getPrimaryIndexColumns(): EntityColumnElement[] {
-        const out: EntityColumnElement[] = [];
+    getPrimaryIndexColumns(): ColumnElementMetadata[] {
+        const out: ColumnElementMetadata[] = [];
         if (this.primaryIndex) {
             for (const k of this.primaryIndex.columns) {
                 const col = this.getColumnElement(k);

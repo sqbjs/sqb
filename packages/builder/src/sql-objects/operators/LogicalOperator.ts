@@ -1,10 +1,10 @@
-import {Operator} from '../Operator';
 import isPlainObject from 'putil-isplainobject';
 import {SerializationType} from '../../enums';
-import {Serializable} from '../../Serializable';
-import {isCompOperator, isLogicalOperator, isRawStatement} from '../../typeguards';
-import {SerializeContext} from '../../SerializeContext';
 import {printArray} from '../../helpers';
+import {Serializable} from '../../Serializable';
+import {SerializeContext} from '../../SerializeContext';
+import {isCompOperator, isLogicalOperator, isRawStatement} from '../../typeguards';
+import {Operator} from '../Operator';
 
 export const WrapOps = {};
 // noinspection RegExpUnnecessaryNonCapturingGroup

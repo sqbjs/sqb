@@ -1,5 +1,5 @@
-import {OpIn} from './OpIn';
 import {OperatorType} from '../../enums';
+import {OpIn} from './OpIn';
 
 export class OpNotIn extends OpIn {
 

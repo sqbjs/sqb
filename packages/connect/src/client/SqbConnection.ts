@@ -1,10 +1,15 @@
-import {classes} from '@sqb/builder';
-import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import assert from 'assert';
 import _debug from 'debug';
-import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
 import TaskQueue from 'putil-taskqueue';
+import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varhelpers";
+import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {Type} from 'ts-gems';
+import {classes} from '@sqb/builder';
+import {EntityModel} from '../orm/model/entity-model';
+import {Repository} from '../orm/repository.class';
+import {Adapter} from './Adapter';
+import {Cursor} from './Cursor';
+import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows, wrapAdapterFields} from './helpers';
 import {SqbClient} from './SqbClient';
 import {
     ConnectionOptions, ExecuteHookFunction, FetchFunction,
@@ -12,11 +17,6 @@ import {
     QueryExecuteOptions, QueryRequest,
     QueryResult
 } from './types';
-import {callFetchHooks, normalizeRowsToArrayRows, normalizeRowsToObjectRows, wrapAdapterFields} from './helpers';
-import {Adapter} from './Adapter';
-import {Cursor} from './Cursor';
-import {Repository} from '../orm/repository.class';
-import {EntityModel} from '../orm/model/entity-model';
 
 const debug = _debug('sqb:connection');
 

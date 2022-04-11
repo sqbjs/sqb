@@ -1,7 +1,7 @@
-import {DefaultSerializeFunction, GenerateOptions, ParamOptions} from './types';
 import {SerializationType} from './enums';
-import {Serializable} from './Serializable';
 import {serializers} from './extensions';
+import {Serializable} from './Serializable';
+import {DefaultSerializeFunction, GenerateOptions, ParamOptions} from './types';
 
 export class SerializeContext implements GenerateOptions {
     readonly reservedWords = [

@@ -1,8 +1,8 @@
-import {Adapter, ClientConfiguration} from '@sqb/connect';
 import '@sqb/oracle-dialect';
 import oracledb from 'oracledb';
-import {OraConnection} from './OraConnection';
+import {Adapter, ClientConfiguration} from '@sqb/connect';
 import {clientConfigurationToDriver} from './helpers';
+import {OraConnection} from './OraConnection';
 
 export class OraAdapter implements Adapter {
 

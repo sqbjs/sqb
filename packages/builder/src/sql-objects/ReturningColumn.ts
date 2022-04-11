@@ -1,6 +1,6 @@
 import {SerializationType} from '../enums';
-import {BaseField} from './BaseField';
 import {SerializeContext} from '../SerializeContext';
+import {BaseField} from './BaseField';
 
 const RETURNING_COLUMN_PATTERN = /^([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;
 

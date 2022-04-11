@@ -1,6 +1,6 @@
 import {Type} from 'ts-gems';
-import {EntityModel} from '../model/entity-model';
 import {Association} from '../model/association';
+import {EntityModel} from '../model/entity-model';
 import {IndexMeta} from '../model/index-meta';
 
 export function mixinEntities<A, B, C, D, E, F>(

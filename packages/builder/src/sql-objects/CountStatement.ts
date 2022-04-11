@@ -1,5 +1,5 @@
-import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
+import {Serializable} from '../Serializable';
 import {SerializeContext} from '../SerializeContext';
 
 export class CountStatement extends Serializable {

@@ -1,16 +1,18 @@
-import 'reflect-metadata';
 import _ from 'lodash';
 import {DataType} from '@sqb/builder';
-import type {EntityModel} from './entity-model';
-import {
-    ElementKind,
+import type {EntityModel} from '../model/entity-model';
+import type {
     ColumnAutoGenerationStrategy,
-    ColumnTransformFunction, DataPropertyOptions, EnumValue, FieldValue, DefaultValueGetter,
+    ColumnTransformFunction,
+    DataPropertyOptions,
+    DefaultValueGetter,
+    EnumValue,
+    FieldValue,
 } from '../orm.type';
-import {AbstractEntityElement} from './abstract-entity-element';
+import {ElementMetadata} from './element-metadata';
 
-export class EntityColumnElement extends AbstractEntityElement {
-    readonly kind: ElementKind = 'column';
+export interface ColumnElementMetadata extends ElementMetadata {
+    readonly kind: 'column';
     fieldName: string;
     dataType?: DataType;
     type?: Function;
@@ -83,23 +85,32 @@ export class EntityColumnElement extends AbstractEntityElement {
     parse?: ColumnTransformFunction;
     serialize?: ColumnTransformFunction;
 
-    constructor(entity: EntityModel, name: string, options: DataPropertyOptions = {}) {
-        super(entity, name);
-        this.fieldName = name;
+}
+
+export namespace ColumnElementMetadata {
+
+    export function create(entity: EntityModel, name: string, options: DataPropertyOptions = {}): ColumnElementMetadata {
+        const result: ColumnElementMetadata = {
+            kind: 'column',
+            entity,
+            name,
+            fieldName: name
+        }
         if (options)
-            this.assign(options);
+            ColumnElementMetadata.assign(result, options);
+        return result;
     }
 
-    assign(options: DataPropertyOptions) {
-        Object.assign(this, _.omit(options, ['entity', 'name', 'kind']));
+
+    export function assign(target: ColumnElementMetadata, options: DataPropertyOptions) {
+        Object.assign(target, _.omit(options, ['entity', 'name', 'kind']));
     }
 
-    checkEnumValue(v: FieldValue) {
-        if (v === undefined || !this.enum || (v == null && !this.notNull))
+    export function checkEnumValue(col: ColumnElementMetadata, v: FieldValue) {
+        if (v === undefined || !col.enum || (v == null && !col.notNull))
             return;
-        const enumKeys = Array.isArray(this.enum) ? this.enum : Object.keys(this.enum);
+        const enumKeys = Array.isArray(col.enum) ? col.enum : Object.keys(col.enum);
         if (!enumKeys.includes(v))
-            throw new Error(`${this.entity.name}.${this.name} value must be one of (${enumKeys})`);
+            throw new Error(`${col.entity.name}.${col.name} value must be one of (${enumKeys})`);
     }
-
 }
