@@ -1,5 +1,5 @@
-import {EmbeddedTypeOptions, TypeThunk} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {EmbeddedTypeOptions, TypeThunk} from '../orm.type';
 
 export function Embedded(type?: TypeThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

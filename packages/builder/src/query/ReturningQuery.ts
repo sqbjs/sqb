@@ -1,8 +1,8 @@
-import {Query} from './Query';
 import {SerializationType} from '../enums';
-import {ReturningColumn} from '../sql-objects/ReturningColumn';
-import {SerializeContext} from '../SerializeContext';
 import {printArray} from '../helpers';
+import {SerializeContext} from '../SerializeContext';
+import {ReturningColumn} from '../sql-objects/ReturningColumn';
+import {Query} from './Query';
 
 export abstract class ReturningQuery extends Query {
 

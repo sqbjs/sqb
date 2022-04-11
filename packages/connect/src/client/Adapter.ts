@@ -2,9 +2,9 @@ import {Maybe} from 'ts-gems';
 import {classes} from '@sqb/builder';
 import {
     ClientConfiguration,
+    DataType,
     QueryRequest,
-    RowType,
-    DataType
+    RowType
 } from './types';
 
 export interface Adapter {

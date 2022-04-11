@@ -1,8 +1,8 @@
 import {camelCase} from 'putil-varhelpers';
+import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
-import {EntityModel} from './entity-model';
 import {resolveEntityMeta} from '../util/orm.helper';
-import {EntityColumnElement} from './entity-column-element';
+import {EntityModel} from './entity-model';
 
 export class Association {
     private _resolved?: boolean;
@@ -10,8 +10,8 @@ export class Association {
     private _target?: EntityModel;  // cached value
     private _sourceKey?: string | null; // cached value
     private _targetKey?: string | null; // cached value
-    private _sourceProperty?: EntityColumnElement;
-    private _targetProperty?: EntityColumnElement;
+    private _sourceProperty?: ColumnElementMetadata;
+    private _targetProperty?: ColumnElementMetadata;
     name: string;
     readonly source: TypeThunk;
     readonly target: TypeThunk;
@@ -48,7 +48,7 @@ export class Association {
         return this._sourceKey;
     }
 
-    async resolveSourceProperty(): Promise<EntityColumnElement> {
+    async resolveSourceProperty(): Promise<ColumnElementMetadata> {
         await this._resolveKeys();
         // @ts-ignore
         return this._sourceProperty;
@@ -60,7 +60,7 @@ export class Association {
         return this._targetKey;
     }
 
-    async resolveTargetProperty(): Promise<EntityColumnElement> {
+    async resolveTargetProperty(): Promise<ColumnElementMetadata> {
         await this._resolveKeys();
         // @ts-ignore
         return this._targetProperty;

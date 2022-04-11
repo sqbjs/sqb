@@ -1,9 +1,9 @@
 import {EventEmitter} from 'events';
-import merge from 'putil-merge';
 import flattenText from 'putil-flattentext';
+import merge from 'putil-merge';
 import {Serializable} from '../Serializable';
-import {GenerateOptions, GenerateResult} from '../types';
 import {SerializeContext} from '../SerializeContext';
+import {GenerateOptions, GenerateResult} from '../types';
 
 export declare interface Query extends EventEmitter {
 }

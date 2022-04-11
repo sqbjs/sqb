@@ -1,4 +1,6 @@
 import * as crypto from 'crypto';
+import {defer} from 'rxjs';
+import * as rxjs from 'rxjs';
 import {
     DynamicModule,
     Global,
@@ -8,19 +10,17 @@ import {
     Provider
 } from '@nestjs/common';
 import {ModuleRef} from '@nestjs/core';
-import {defer} from 'rxjs';
-import * as rxjs from 'rxjs';
 import {SqbClient} from '@sqb/connect';
-import {getSQBToken, handleRetry,} from './sqb.utils';
+import {
+    SQB_MODULE_ID,
+    SQB_MODULE_OPTIONS,
+} from './sqb.constants';
 import {
     SqbModuleAsyncOptions,
     SqbModuleOptions,
     SqbOptionsFactory,
 } from './sqb.interface';
-import {
-    SQB_MODULE_ID,
-    SQB_MODULE_OPTIONS,
-} from './sqb.constants';
+import {getSQBToken, handleRetry,} from './sqb.utils';
 
 @Global()
 @Module({})

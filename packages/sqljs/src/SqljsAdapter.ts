@@ -1,10 +1,10 @@
-import fs from 'fs';
-import {Adapter, ClientConfiguration} from '@sqb/connect';
 import '@sqb/sqlite-dialect';
-import initSqlJs, {Database} from 'sql.js';
-import {SqljsConnection} from './SqljsConnection';
+import fs from 'fs';
 import path from 'path';
 import promisify from 'putil-promisify';
+import initSqlJs, {Database} from 'sql.js';
+import {Adapter, ClientConfiguration} from '@sqb/connect';
+import {SqljsConnection} from './SqljsConnection';
 
 type CachedDatabase = Database & { _refCount: number };
 

@@ -1,11 +1,10 @@
-import 'reflect-metadata';
 import {Type} from 'ts-gems';
-import type {TypeResolver, TypeThunk} from '../orm.type';
+import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
+import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import type {EntityModel} from '../model/entity-model';
-import type {EntityColumnElement} from '../model/entity-column-element';
-import type {EntityObjectElement} from '../model/entity-object-element';
-import type {EntityAssociationElement} from '../model/entity-association-element';
 import {ENTITY_DEFINITION_KEY} from '../orm.const';
+import type {TypeResolver, TypeThunk} from '../orm.type';
 
 export function isClass(fn: any): fn is Type {
     return typeof fn === 'function' && /^\s*class/.test(fn.toString());
@@ -15,15 +14,15 @@ export function isEntityClass(fn: any): fn is Type {
     return isClass(fn) && Reflect.hasMetadata(ENTITY_DEFINITION_KEY, fn);
 }
 
-export function isColumnElement(f: any): f is EntityColumnElement {
+export function isColumnElement(f: any): f is ColumnElementMetadata {
     return !!(f && f.entity && f.kind === 'column');
 }
 
-export const isObjectElement = (f: any): f is EntityObjectElement => {
+export const isObjectElement = (f: any): f is ComplexElementMetadata => {
     return !!(f && f.entity && f.kind === 'object');
 }
 
-export const isAssociationElement = (f: any): f is EntityAssociationElement => {
+export const isAssociationElement = (f: any): f is AssociationElementMetadata => {
     return !!(f && f.entity && f.kind === 'association');
 }
 

@@ -1,9 +1,11 @@
 import {And, Param, Update} from '@sqb/builder';
+import {SqbConnection} from '../../client/SqbConnection';
+import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
-import {prepareFilter} from './command.helper';
 import {isColumnElement, isObjectElement} from '../util/orm.helper';
-import {SqbConnection} from '../../client/SqbConnection';
+import {prepareFilter} from './command.helper';
 
 export type UpdateCommandArgs = {
     entity: EntityModel;
@@ -87,7 +89,7 @@ export class UpdateCommand {
                     throw new Error(`${entity.name}.${col.name} is required and can't be null`);
                 if (v === undefined)
                     continue;
-                col.checkEnumValue(v);
+                ColumnElementMetadata.checkEnumValue(col, v);
                 const fieldName = prefix + col.fieldName + suffix;
                 const k = '$input_' + fieldName;
                 ctx.queryValues[fieldName] = Param({
@@ -98,7 +100,7 @@ export class UpdateCommand {
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
             } else if (v != null && isObjectElement(col)) {
-                const type = await col.resolveType();
+                const type = await ComplexElementMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }
         }

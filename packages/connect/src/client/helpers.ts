@@ -1,13 +1,13 @@
 import {camelCase, pascalCase} from "putil-varhelpers";
 import {Maybe} from 'ts-gems';
+import {Adapter} from './Adapter';
+import {FieldInfoMap} from './FieldInfoMap';
 import {
     ArrayRow,
     ArrayRowset,
-    ValueTransformFunction,
-    FieldInfo, FieldNaming, ObjectRow, ObjectRowset, QueryRequest
+    FieldInfo, FieldNaming, ObjectRow, ObjectRowset, QueryRequest,
+    ValueTransformFunction
 } from './types';
-import {FieldInfoMap} from './FieldInfoMap';
-import {Adapter} from './Adapter';
 
 export function applyNamingStrategy(value: string, namingStrategy?: FieldNaming): Maybe<string> {
     if (typeof namingStrategy === 'string' && namingStrategy !== 'original') {

@@ -1,10 +1,10 @@
-import {IndexOptions} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {IndexOptions} from '../orm.type';
 
 export function PrimaryKey(fields: string | string[], options?: IndexOptions): ClassDecorator
 export function PrimaryKey(options?: IndexOptions): PropertyDecorator
 export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator {
-    return function (target: Object | Function, propertyKey?: string): void {
+    return function (target: Object | Function, propertyKey?: string | symbol): void {
         if (arguments.length === 1) {
             if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
                 throw new Error(`You must specify primary index column(s)`);

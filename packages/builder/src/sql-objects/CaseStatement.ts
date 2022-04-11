@@ -1,10 +1,10 @@
-import {Serializable} from '../Serializable';
 import {SerializationType} from '../enums';
+import {Serializable} from '../Serializable';
+import {SerializeContext} from '../SerializeContext';
+import {Operator} from './Operator';
 import {LogicalOperator} from './operators/LogicalOperator';
 import {OpAnd} from './operators/OpAnd';
-import {Operator} from './Operator';
 import {RawStatement} from './RawStatement';
-import {SerializeContext} from '../SerializeContext';
 
 export class CaseStatement extends Serializable {
 

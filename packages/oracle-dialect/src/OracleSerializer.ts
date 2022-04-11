@@ -1,10 +1,10 @@
-import {
-    SerializerExtension,
-    SerializeContext,
-    DefaultSerializeFunction,
-    SerializationType, OperatorType
-} from '@sqb/builder';
 import * as compareVersion from 'compare-versions';
+import {
+    DefaultSerializeFunction,
+    OperatorType,
+    SerializationType, SerializeContext,
+    SerializerExtension
+} from '@sqb/builder';
 
 const reservedWords = ['comment', 'dual'];
 

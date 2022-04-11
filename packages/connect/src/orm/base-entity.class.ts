@@ -1,9 +1,9 @@
 import {PickReadonly, PickWritable, Type} from 'ts-gems';
+import {EntityModel} from './model/entity-model';
 import {REPOSITORY_KEY} from './orm.const';
 import type {Repository} from './repository.class';
-import {EntityModel} from './model/entity-model';
 
-export abstract class BaseEntity {
+export class BaseEntity {
     private [REPOSITORY_KEY]: Repository<any>;
 
     constructor(partial?: any) {

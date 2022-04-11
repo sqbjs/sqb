@@ -1,22 +1,22 @@
+import _debug from 'debug';
 import {createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolState} from 'lightning-pool';
 import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
 import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
-import _debug from 'debug';
 import {Maybe, Type} from 'ts-gems';
 import {classes} from '@sqb/builder';
+import {EntityModel} from '../orm/model/entity-model';
+import {Repository} from '../orm/repository.class';
+import {Adapter} from './Adapter';
+import {adapters} from './extensions';
+import {SqbConnection} from './SqbConnection';
 import {
+    ArrayQueryResult,
     ClientConfiguration,
-    QueryExecuteOptions,
-    TransactionFunction,
     ClientDefaults,
     ConnectionOptions,
-    QueryRequest, ObjectQueryResult, ArrayQueryResult,
+    ObjectQueryResult, QueryExecuteOptions,
+    QueryRequest, TransactionFunction,
 } from './types';
-import {Adapter} from './Adapter';
-import {SqbConnection} from './SqbConnection';
-import {adapters} from './extensions';
-import {Repository} from '../orm/repository.class';
-import {EntityModel} from '../orm/model/entity-model';
 
 const debug = _debug('sqb:client');
 const inspect = Symbol.for('nodejs.util.inspect.custom');

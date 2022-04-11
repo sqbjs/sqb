@@ -1,5 +1,5 @@
-import {Readable} from 'stream';
 import _debug from 'debug';
+import {Readable} from 'stream';
 import {Cursor} from './Cursor';
 
 export interface CursorStreamOptions {

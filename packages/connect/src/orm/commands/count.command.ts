@@ -1,8 +1,8 @@
 import {And, Count, LogicalOperator, Select} from '@sqb/builder';
-import {prepareFilter} from './command.helper';
+import {SqbConnection} from '../../client/SqbConnection';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
-import {SqbConnection} from '../../client/SqbConnection';
+import {prepareFilter} from './command.helper';
 
 export type CountCommandArgs = {
     entity: EntityModel;

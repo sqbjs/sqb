@@ -1,7 +1,7 @@
-import {Serializable} from '../Serializable';
 import {DataType, SerializationType} from '../enums';
-import {ParamOptions} from '../types';
+import {Serializable} from '../Serializable';
 import {SerializeContext} from '../SerializeContext';
+import {ParamOptions} from '../types';
 
 export class ParamExpression extends Serializable {
     _name: string;

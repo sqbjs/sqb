@@ -1,8 +1,8 @@
-import {CompOperator} from './CompOperator';
 import {OperatorType} from '../../enums';
 import {Serializable} from '../../Serializable';
-import {isSerializable} from '../../typeguards';
 import {SerializeContext} from '../../SerializeContext';
+import {isSerializable} from '../../typeguards';
+import {CompOperator} from './CompOperator';
 
 export class OpLike extends CompOperator {
 

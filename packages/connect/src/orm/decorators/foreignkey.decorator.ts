@@ -1,5 +1,5 @@
-import {TypeThunk} from '../orm.type';
 import {EntityModel} from '../model/entity-model';
+import {TypeThunk} from '../orm.type';
 
 export function ForeignKey(type: TypeThunk, targetKey?: string): PropertyDecorator {
     return function (target: Object | Function, propertyKey?: string | symbol): void {

@@ -1,6 +1,6 @@
 import {SerializationType} from '../enums';
-import {BaseField} from './BaseField';
 import {SerializeContext} from '../SerializeContext';
+import {BaseField} from './BaseField';
 
 const GROUP_COLUMN_PATTERN = /^((?:[a-zA-Z][\w$]*\.){0,2})([\w$]*)$/;
 

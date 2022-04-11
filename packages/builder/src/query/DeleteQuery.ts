@@ -1,11 +1,11 @@
-import {Query} from './Query';
-import {RawStatement} from '../sql-objects/RawStatement';
 import {SerializationType} from '../enums';
-import {TableName} from '../sql-objects/TableName';
+import {SerializeContext} from '../SerializeContext';
 import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
+import {RawStatement} from '../sql-objects/RawStatement';
+import {TableName} from '../sql-objects/TableName';
 import {isRawStatement} from '../typeguards';
-import {SerializeContext} from '../SerializeContext';
+import {Query} from './Query';
 
 export class DeleteQuery extends Query {
 

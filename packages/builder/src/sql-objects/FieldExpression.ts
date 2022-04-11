@@ -1,6 +1,6 @@
 import {DataType, SerializationType} from '../enums';
-import {BaseField} from './BaseField';
 import {SerializeContext} from '../SerializeContext';
+import {BaseField} from './BaseField';
 
 const TABLE_COLUMN_PATTERN = /^((?:[a-zA-Z_][\w$_]*\.){0,2}) *([0-9a-zA-Z_][\w$_]*|\*) *(?:as)? *([a-zA-Z_][\w$_]*)?$/;
 

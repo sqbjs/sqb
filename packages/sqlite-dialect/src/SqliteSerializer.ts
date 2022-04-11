@@ -1,8 +1,8 @@
 import {
-    SerializerExtension,
-    SerializeContext,
     DefaultSerializeFunction,
-    SerializationType
+    SerializationType,
+    SerializeContext,
+    SerializerExtension
 } from '@sqb/builder';
 
 export class SqliteSerializer implements SerializerExtension {
