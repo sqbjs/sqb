@@ -1,9 +1,9 @@
 import '../../_support/env';
 import assert from 'assert';
-import {EntityModel} from '@sqb/connect';
 import {Eq, Param} from '@sqb/builder';
-import {Customer} from '../../_support/customer.entity';
+import {Entity} from '@sqb/connect';
 import {Country} from '../../_support/country.entity';
+import {Customer} from '../../_support/customer.entity';
 import {initClient} from '../../_support/init-client';
 
 describe('findAll()', function () {
@@ -108,7 +108,7 @@ describe('findAll()', function () {
         let rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows[0].phoneCode);
-        const col = EntityModel.get(Country).getColumnElement('phoneCode');
+        const col = Entity.getMetadata(Country).getColumnElement('phoneCode');
         col.hidden = true;
         rows = await repo.findAll({limit: 1});
         assert.ok(rows);

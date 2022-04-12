@@ -3,7 +3,7 @@ import {AssociationElementMetadata} from '../interfaces/association-element-meta
 import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import type {EntityModel} from '../model/entity-model';
-import {ENTITY_DEFINITION_KEY} from '../orm.const';
+import {ENTITY_METADATA_KEY} from '../orm.const';
 import type {TypeResolver, TypeThunk} from '../orm.type';
 
 export function isClass(fn: any): fn is Type {
@@ -11,7 +11,7 @@ export function isClass(fn: any): fn is Type {
 }
 
 export function isEntityClass(fn: any): fn is Type {
-    return isClass(fn) && Reflect.hasMetadata(ENTITY_DEFINITION_KEY, fn);
+    return isClass(fn) && Reflect.hasMetadata(ENTITY_METADATA_KEY, fn);
 }
 
 export function isColumnElement(f: any): f is ColumnElementMetadata {
@@ -37,5 +37,5 @@ export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefi
 
 export async function resolveEntityMeta(ctorThunk: TypeThunk): Promise<EntityModel | undefined> {
     const ctor = await resolveEntity(ctorThunk);
-    return ctor && Reflect.getMetadata(ENTITY_DEFINITION_KEY, ctor);
+    return ctor && Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
 }

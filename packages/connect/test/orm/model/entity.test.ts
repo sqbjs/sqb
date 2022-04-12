@@ -8,7 +8,6 @@ import {
     Entity,
     LinkToOne,
     PrimaryKey,
-    getColumnNames, getElementNames, getInsertColumnNames, getUpdateColumnNames
 } from '@sqb/connect';
 
 describe('Entity', function () {
@@ -157,7 +156,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(getElementNames(Customer), ['id', 'name', 'country', 'code']);
+        assert.deepStrictEqual(Entity.getElementNames(Customer), ['id', 'name', 'country', 'code']);
     });
 
     it(`should EntityDefinition.getDataColumnNames() return only data column names`, function () {
@@ -187,7 +186,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(getColumnNames(Customer), ['id', 'name', 'code']);
+        assert.deepStrictEqual(Entity.getColumnNames(Customer), ['id', 'name', 'code']);
     });
 
     it(`should getInsertColumnNames() return only data column names to insert`, function () {
@@ -217,7 +216,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(getInsertColumnNames(Customer), ['name', 'code']);
+        assert.deepStrictEqual(Entity.getInsertColumnNames(Customer), ['name', 'code']);
     });
 
     it(`should EntityDefinition.getInsertColumnNames() return only data column names to insert`, function () {
@@ -247,7 +246,7 @@ describe('Entity', function () {
             code: string
         }
 
-        assert.deepStrictEqual(getUpdateColumnNames(Customer), ['id', 'code']);
+        assert.deepStrictEqual(Entity.getUpdateColumnNames(Customer), ['id', 'code']);
     });
 
 });
