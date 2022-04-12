@@ -74,7 +74,7 @@ export class CreateCommand {
         let v;
         prefix = prefix || '';
         suffix = suffix || '';
-        for (const col of entity.elements.values()) {
+        for (const col of Object.values(entity.elements)) {
             v = values[col.name];
             if (isColumnElement(col)) {
                 if (col.noInsert)

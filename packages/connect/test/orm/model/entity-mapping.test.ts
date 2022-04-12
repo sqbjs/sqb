@@ -6,7 +6,6 @@ import {
     Entity,
     ForeignKey, Index
 } from '@sqb/connect';
-import {OmitEntity, PickEntity, UnionEntity} from '../../../src/orm/util/entity-mapping';
 
 describe('Entity mapping', function () {
 
@@ -25,7 +24,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends UnionEntity(EntityA, EntityB) {
+            class NewEntityClass extends Entity.Union(EntityA, EntityB) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -57,7 +56,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends UnionEntity(EntityA, EntityB) {
+            class NewEntityClass extends Entity.Union(EntityA, EntityB) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -83,7 +82,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends UnionEntity(EntityA, EntityB) {
+            class NewEntityClass extends Entity.Union(EntityA, EntityB) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -94,7 +93,7 @@ describe('Entity mapping', function () {
         });
     })
 
-    describe('PickEntity()', function () {
+    describe('Entity.Pick()', function () {
 
         it(`should pick given properties`, () => {
             @Entity()
@@ -106,7 +105,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends PickEntity(EntityA, ['id']) {
+            class NewEntityClass extends Entity.Pick(EntityA, ['id']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -137,7 +136,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends PickEntity(EntityB, ['name', 'aId1']) {
+            class NewEntityClass extends Entity.Pick(EntityB, ['name', 'aId1']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -162,7 +161,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends PickEntity(EntityA, ['name']) {
+            class NewEntityClass extends Entity.Pick(EntityA, ['name']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -174,7 +173,7 @@ describe('Entity mapping', function () {
 
     })
 
-    describe('OmitEntity()', function () {
+    describe('Entity.Omit()', function () {
 
         it(`should omit given properties`, () => {
             @Entity()
@@ -186,7 +185,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends OmitEntity(EntityA, ['id']) {
+            class NewEntityClass extends Entity.Omit(EntityA, ['id']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -217,7 +216,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends OmitEntity(EntityB, ['name', 'aId1']) {
+            class NewEntityClass extends Entity.Omit(EntityB, ['name', 'aId1']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);
@@ -242,7 +241,7 @@ describe('Entity mapping', function () {
             }
 
             @Entity()
-            class NewEntityClass extends OmitEntity(EntityA, ['name']) {
+            class NewEntityClass extends Entity.Omit(EntityA, ['name']) {
             }
 
             const meta = Entity.getMetadata(NewEntityClass);

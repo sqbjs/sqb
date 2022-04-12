@@ -1,5 +1,5 @@
 import {DataType} from '@sqb/builder';
-import {EntityModel} from '../model/entity-model';
+import {EntityMetadata} from '../model/entity-model';
 import {DataPropertyOptions} from '../orm.type';
 
 export function Column(type?: DataType): PropertyDecorator
@@ -9,7 +9,7 @@ export function Column(arg0?: DataType | DataPropertyOptions): PropertyDecorator
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
         const options = typeof arg0 === 'string' ? {dataType: arg0} : arg0;
-        EntityModel.attachTo(target.constructor)
+        EntityMetadata.attachTo(target.constructor)
             .defineColumnElement(propertyKey, options);
     }
 }

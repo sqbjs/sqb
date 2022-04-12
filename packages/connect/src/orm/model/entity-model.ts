@@ -3,29 +3,31 @@ import {DataType} from '@sqb/builder';
 import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
 import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
-import {ENTITY_DEFINITION_KEY} from '../orm.const';
+import {IndexMetadata} from '../interfaces/index-metadata';
+import {ENTITY_METADATA_KEY} from '../orm.const';
 import {
     DataPropertyOptions,
     IndexOptions,
     TypeThunk,
 } from '../orm.type';
+import {applyMixins} from '../util/apply-mixins';
 import {isAssociationElement, isColumnElement, isObjectElement} from '../util/orm.helper';
 import {serializeColumn} from '../util/serialize-element';
 import {Association} from './association';
 import {AssociationNode} from './association-node';
-import {IndexMeta} from './index-meta';
 
-export type EntityElement = ColumnElementMetadata | ComplexElementMetadata | AssociationElementMetadata;
+export type AnyElementMetadata = ColumnElementMetadata | ComplexElementMetadata | AssociationElementMetadata;
 
 export class EntityModel {
     private _elementKeys?: string[]; // cache
+    private _elements: Record<string, AnyElementMetadata> = {};
+    private _elementsByName: Record<string, AnyElementMetadata> = {};
     readonly name: string;
     tableName?: string;
     schema?: string;
     comment?: string;
-    primaryIndex?: IndexMeta;
-    elements = new Map<string, EntityElement>();
-    indexes: IndexMeta[] = [];
+    primaryIndex?: IndexMetadata;
+    indexes: IndexMetadata[] = [];
     foreignKeys: Association[] = [];
     eventListeners: { event: string, fn: Function }[] = [];
 
@@ -33,22 +35,27 @@ export class EntityModel {
         this.name = ctor.name;
     }
 
-    get elementKeys(): string[] {
-        if (!(this._elementKeys && Object.prototype.hasOwnProperty.call(this, '_elementKeys')))
-            this._elementKeys = Array.from(this.elements.keys());
-        return this._elementKeys;
+    get elements(): Record<string, AnyElementMetadata> {
+        return this._elements;
     }
 
-    getElement(name: string): Maybe<EntityElement> {
+    get elementKeys(): string[] {
+        // return Object.keys(this._elementsByName);
+        if (!Object.prototype.hasOwnProperty.call(this, '_elementKeys'))
+            this._elementKeys = Object.values(this.elements).map(m => m.name);
+        return this._elementKeys as string[];
+    }
+
+    getElement(name: string): Maybe<AnyElementMetadata> {
         if (!name)
             return;
-        return this.elements.get(name.toLowerCase());
+        return this.elements[name.toLowerCase()];
     }
 
     getColumnElement(name: string): Maybe<ColumnElementMetadata> {
         if (!name)
             return;
-        const prop = this.elements.get(name.toLowerCase());
+        const prop = this.elements[name.toLowerCase()];
         return isColumnElement(prop) ? prop : undefined;
     }
 
@@ -56,7 +63,7 @@ export class EntityModel {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
-        for (const prop of this.elements.values()) {
+        for (const prop of Object.values(this.elements)) {
             if (isColumnElement(prop) && prop.fieldName.toLowerCase() === fieldName)
                 return prop;
         }
@@ -65,18 +72,19 @@ export class EntityModel {
     getObjectElement(name: string): Maybe<ComplexElementMetadata> {
         if (!name)
             return;
-        const col = this.elements.get(name.toLowerCase());
+        const col = this.elements[name.toLowerCase()];
         return isObjectElement(col) ? col : undefined;
     }
 
     getAssociationElement(name: string): Maybe<AssociationElementMetadata> {
         if (!name)
             return;
-        const col = this.elements.get(name.toLowerCase());
+        const col = this.elements[name.toLowerCase()];
         return isAssociationElement(col) ? col : undefined;
     }
 
     defineColumnElement(propertyKey: string, options?: DataPropertyOptions): ColumnElementMetadata {
+
         let prop = this.getElement(propertyKey);
         if (!prop || !isColumnElement(prop)) {
             prop = ColumnElementMetadata.create(this, propertyKey, options);
@@ -105,11 +113,14 @@ export class EntityModel {
             if (options?.isArray)
                 prop.isArray = true;
 
-            if (!this.elements.has(propertyKey.toLowerCase()))
-                this.elementKeys.push(propertyKey);
-            this.elements.set(propertyKey.toLowerCase(), prop);
+            // if (!this.elements[elementKey])
+//                 this.elementKeys.push(propertyKey);
+            this._defineElement(propertyKey, prop);
         } else if (options)
             ColumnElementMetadata.assign(prop, options);
+
+        // EntityMetadata.defineElement(this.ctor, propertyKey, prop);
+
         return prop;
     }
 
@@ -121,9 +132,10 @@ export class EntityModel {
             l.name = this.name + '.' + propertyKey + '#' + (i++);
             l = l.next;
         }
-        if (!this.elements.has(propertyKey.toLowerCase()))
-            this.elementKeys.push(propertyKey);
-        this.elements.set(propertyKey.toLowerCase(), prop);
+        // if (!this.elements[propertyKey.toLowerCase()])
+        // this.elementKeys.push(propertyKey);
+        this._defineElement(propertyKey, prop);
+        // EntityMetadata.defineElement(this.ctor, propertyKey, prop);
         return prop;
     }
 
@@ -134,20 +146,21 @@ export class EntityModel {
         let prop = this.getElement(propertyKey);
         if (!prop || !isObjectElement(prop)) {
             prop = ComplexElementMetadata.create(this, propertyKey, type);
-            if (!this.elements.has(propertyKey.toLowerCase()))
-                this.elementKeys.push(propertyKey);
-            this.elements.set(propertyKey.toLowerCase(), prop);
+            // if (!this.elements[propertyKey.toLowerCase()])
+            // this.elementKeys.push(propertyKey);
         }
+        this._defineElement(propertyKey, prop);
+        // EntityMetadata.defineElement(this.ctor, propertyKey, prop);
         return prop;
     }
 
     setPrimaryIndex(column: string | string[], options?: IndexOptions): void {
-        this.primaryIndex = new IndexMeta(this, column, options);
+        this.primaryIndex = IndexMetadata.create(this, column, options);
         this.primaryIndex.unique = true;
     }
 
     addIndex(column: string | string[], options?: IndexOptions): void {
-        this.indexes.push(new IndexMeta(this, column, options));
+        this.indexes.push(IndexMetadata.create(this, column, options));
     }
 
     addForeignKey(propertyKey: string, target: TypeThunk, targetKey?: string): void {
@@ -182,13 +195,13 @@ export class EntityModel {
         return out;
     }
 
-    getElementNames(fn: (el: EntityElement) => boolean): string[] {
+    getElementNames(filter?: (el: AnyElementMetadata) => boolean): string[] {
         const out: string[] = [];
-        for (const k of this.elementKeys) {
-            const el = this.getElement(k);
-            if (el && (!fn || fn(el)))
-                out.push(k);
+        for (const el of Object.values(this.elements)) {
+            if (el && (!filter || filter(el)))
+                out.push(el.name);
         }
+
         return out;
     }
 
@@ -210,22 +223,25 @@ export class EntityModel {
 
     getInsertColumnNames(): string[] {
         const out: string[] = [];
-        for (const k of this.elementKeys) {
-            const col = this.getElement(k);
-            if (isColumnElement(col) && !col.noInsert)
-                out.push(k);
+        for (const el of Object.values(this.elements)) {
+            if (isColumnElement(el) && !el.noInsert)
+                out.push(el.name);
         }
         return out;
     }
 
     getUpdateColumnNames(): string[] {
         const out: string[] = [];
-        for (const k of this.elementKeys) {
-            const col = this.getElement(k);
-            if (isColumnElement(col) && !col.noUpdate)
-                out.push(k);
+        for (const el of Object.values(this.elements)) {
+            if (isColumnElement(el) && !el.noUpdate)
+                out.push(el.name);
         }
         return out;
+    }
+
+    protected _defineElement(propertyKey: string, meta: AnyElementMetadata) {
+        this._elements[propertyKey.toLowerCase()] = meta;
+        this._elementsByName[propertyKey] = meta;
     }
 
     async getForeignKeyFor(t: EntityModel): Promise<Maybe<Association>> {
@@ -236,36 +252,36 @@ export class EntityModel {
     }
 
     static get(ctor: Function): Maybe<EntityModel> {
-        return Reflect.getMetadata(ENTITY_DEFINITION_KEY, ctor);
+        return Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
     static hasOwn(ctor: Function): boolean {
-        return Reflect.hasOwnMetadata(ENTITY_DEFINITION_KEY, ctor);
+        return Reflect.hasOwnMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    static attachTo(ctor: Function): EntityModel {
-        const own: EntityModel | undefined = this.hasOwn(ctor) ? this.get(ctor) : undefined;
+}
+
+export namespace EntityMetadata {
+
+    export function attachTo(ctor: Type | Function): EntityModel {
+        const own = getOwn(ctor);
         if (own)
             return own;
-        const current = this.get(ctor);
+        const current = get(ctor);
         const entity = new EntityModel(ctor as Type);
-        Reflect.defineMetadata(ENTITY_DEFINITION_KEY, entity, ctor);
+        Reflect.defineMetadata(ENTITY_METADATA_KEY, entity, ctor);
         // Merge base entity columns into this one
         if (current) {
             entity.tableName = current.tableName;
-            for (const k of current.elementKeys) {
-                const col = current.elements.get(k.toLowerCase());
-                if (col) {
-                    entity.elementKeys.push(k);
-                    entity.elements.set(k.toLowerCase(), col);
-                }
+            for (const [k, el] of Object.entries(current.elements)) {
+                entity.elements[k] = el;
             }
             for (const fk of current.foreignKeys) {
                 const newFk = new Association(fk.name, {...fk, source: ctor as Type});
                 entity.foreignKeys.push(newFk);
             }
             for (const idx of current.indexes) {
-                const newIdx = new IndexMeta(entity, idx.columns, idx);
+                const newIdx = IndexMetadata.create(entity, idx.columns, idx);
                 entity.indexes.push(newIdx);
             }
             entity.eventListeners.push(...current.eventListeners);
@@ -286,52 +302,121 @@ export class EntityModel {
                     continue;
                 const col = entity.getElement(key);
                 if (col)
-                    obj[key] = serializeColumn(col, v);
+                    obj[col.name] = serializeColumn(col, v);
             }
             return obj;
         }
         return entity;
     }
 
-    static getElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function get(ctor: Type | Function): Maybe<EntityModel> {
+        return Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
+    }
+
+    export function getOwn(ctor: Type | Function): Maybe<EntityModel> {
+        return Reflect.getOwnMetadata(ENTITY_METADATA_KEY, ctor);
+    }
+
+    export function getElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         return meta && [...meta.elementKeys] as K[];
     }
 
-    static getColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getColumnNames() as (K[]);
     }
 
-    static getAssociationElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getAssociationElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getAssociationElementNames() as (K[]);
     }
 
-    static getNonAssociationElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getNonAssociationElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getNonAssociationElementNames() as (K[]);
     }
 
-    static getObjectElementNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getObjectElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getObjectElementNames() as (K[]);
     }
 
-    static getInsertColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getInsertColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getInsertColumnNames() as (K[]);
     }
 
-    static getUpdateColumnNames<T extends Function, K extends keyof T>(ctor: T): K[] | undefined {
-        const meta = this.get(ctor);
+    export function getUpdateColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
+        const meta = get(ctor);
         if (meta)
             return meta.getUpdateColumnNames() as (K[]);
     }
 
+    export function mixin<T, A>(derived: Type<T>, baseCtor: Type<A>, elements?: string[]): Type<T & A> {
+        const elementKeys = elements && elements.map(x => x.toLowerCase());
+        const hasElement = (k: string) => !(elementKeys && !elementKeys.includes(k.toLowerCase()));
+        applyMixins(derived, baseCtor, hasElement);
+        const trg = attachTo(derived);
+        const src = get(baseCtor);
+        if (!src)
+            return derived as Type<T & A>;
+
+        if (!trg.tableName) {
+            trg.tableName = src.tableName;
+            trg.schema = src.schema;
+            trg.comment = src.comment;
+        }
+
+        // If target has no primary index and source has
+        if (!trg.primaryIndex && src.primaryIndex) {
+            // Ignore if index columns is not in elements array
+            if (!src.primaryIndex.columns.find(x => !hasElement(x))) {
+                trg.primaryIndex = {...src.primaryIndex, entity: trg};
+            }
+        }
+
+        // Copy indexes
+        if (src.indexes && src.indexes.length) {
+            trg.indexes = trg.indexes || [];
+            for (const idx of src.indexes) {
+                if (!idx.columns.find(x => !hasElement(x))) {
+                    trg.indexes.push({...idx, entity: trg});
+                }
+            }
+        }
+
+        // Copy foreign indexes
+        if (src.foreignKeys && src.foreignKeys.length) {
+            trg.foreignKeys = trg.foreignKeys || [];
+            for (const fk of src.foreignKeys) {
+                if (!fk.sourceKey || hasElement(fk.sourceKey)) {
+                    const newFk = new Association(fk.name, {...fk, source: derived});
+                    trg.foreignKeys.push(newFk);
+                }
+            }
+        }
+
+        // Copy event listeners
+        if (src.eventListeners && src.eventListeners.length) {
+            trg.eventListeners = trg.eventListeners || [];
+            trg.eventListeners.push(...src.eventListeners);
+        }
+
+        // Copy elements
+        for (const [n, p] of Object.entries(src.elements)) {
+            if (!hasElement(n))
+                continue;
+            const o: any = Object.assign({}, p);
+            o.entity = trg;
+            Object.setPrototypeOf(o, Object.getPrototypeOf(p));
+            trg.elements[n] = o;
+        }
+        return derived as Type<T & A>;
+    }
 }

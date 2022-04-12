@@ -1,2 +1,2 @@
-export const ENTITY_DEFINITION_KEY = Symbol.for('sqb.entity-definition');
-export const REPOSITORY_KEY = Symbol.for('sqb.entity.repository');
+export const ENTITY_METADATA_KEY = Symbol.for('SQB_ENTITY_METADATA');
+export const REPOSITORY_KEY = Symbol.for('SQB_REPOSITORY');

@@ -1,6 +1,6 @@
 import {And, In, Param,Select} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
-import {getNonAssociationElementNames} from '../base-entity.class';
+import {Entity} from '../decorators/entity.decorator';
 import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {AssociationNode} from '../model/association-node';
@@ -114,7 +114,7 @@ export class FindCommand {
             opts.exclude.map(x => x.toLowerCase()) : undefined;
 
         const requestElements = _elements ? [..._elements] :
-            (getNonAssociationElementNames(entity.ctor) as string[])
+            (Entity.getNonAssociationElementNames(entity.ctor) as string[])
                 .map(x => x.toLowerCase());
         if (_include)
             requestElements.push(..._include);
