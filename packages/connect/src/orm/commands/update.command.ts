@@ -1,10 +1,10 @@
 import {And, Param, Update} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
 import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {EntityModel} from '../model/entity-model';
 import {Repository} from '../repository.class';
-import {isColumnElement, isComplexElement} from '../util/orm.helper';
+import {isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 import {prepareFilter} from './command.helper';
 
 export type UpdateCommandArgs = {
@@ -99,8 +99,8 @@ export class UpdateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isComplexElement(col)) {
-                const type = await ComplexElementMetadata.resolveType(col);
+            } else if (v != null && isEmbeddedElement(col)) {
+                const type = await EmbeddedElementMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }
         }

@@ -1,7 +1,7 @@
 import {Type} from 'ts-gems';
 import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
 import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import type {EntityModel} from '../model/entity-model';
 import {ENTITY_METADATA_KEY} from '../orm.const';
 import type {TypeResolver, TypeThunk} from '../orm.type';
@@ -15,15 +15,15 @@ export function isEntityClass(fn: any): fn is Type {
 }
 
 export function isColumnElement(f: any): f is ColumnElementMetadata {
-    return !!(f && f.entity && f.kind === 'column');
+    return !!(f && f.name && f.kind === 'column');
 }
 
-export const isComplexElement = (f: any): f is ComplexElementMetadata => {
-    return !!(f && f.entity && f.kind === 'object');
+export const isEmbeddedElement = (f: any): f is EmbeddedElementMetadata => {
+    return !!(f && f.name && f.kind === 'object');
 }
 
 export const isAssociationElement = (f: any): f is AssociationElementMetadata => {
-    return !!(f && f.entity && f.kind === 'association');
+    return !!(f && f.name && f.kind === 'association');
 }
 
 export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefined> {

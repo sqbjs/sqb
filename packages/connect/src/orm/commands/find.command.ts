@@ -2,12 +2,12 @@ import {And, In, Param,Select} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
 import {Entity} from '../decorators/entity.decorator';
 import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {AssociationNode} from '../model/association-node';
 import type {EntityModel} from '../model/entity-model';
 import {EntityMetadata} from '../model/entity-model';
 import type {Repository} from '../repository.class';
-import {isAssociationElement,isColumnElement, isComplexElement} from '../util/orm.helper';
+import {isAssociationElement,isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 import {joinAssociationGetLast,JoinInfo, prepareFilter} from './command.helper';
 import {RowConverter} from './row-converter';
 
@@ -154,8 +154,8 @@ export class FindCommand {
                 continue;
             }
 
-            if (isComplexElement(col)) {
-                const typ = await ComplexElementMetadata.resolveType(col);
+            if (isEmbeddedElement(col)) {
+                const typ = await EmbeddedElementMetadata.resolveType(col);
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
                     type: typ.ctor
@@ -270,8 +270,8 @@ export class FindCommand {
                 const a: string[] = elName.split('.');
                 while (a.length > 1) {
                     const col = EntityMetadata.getElement(_entityDef, a.shift() || '');
-                    if (isComplexElement(col)) {
-                        _entityDef = await ComplexElementMetadata.resolveType(col);
+                    if (isEmbeddedElement(col)) {
+                        _entityDef = await EmbeddedElementMetadata.resolveType(col);
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
                         if (col.fieldNameSuffix)

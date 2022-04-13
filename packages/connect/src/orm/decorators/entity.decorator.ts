@@ -1,7 +1,7 @@
 import {Maybe, Type} from 'ts-gems';
 import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
 import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {IndexMetadata} from '../interfaces/index-metadata';
 import {AnyElementMetadata, EntityMetadata} from '../model/entity-model';
 import {Ctor, EntityConfig} from '../orm.type';
@@ -35,9 +35,9 @@ export namespace Entity {
         return model && EntityMetadata.getColumnElement(model, elementName);
     }
 
-    export function getObjectElement(ctor: Ctor, elementName: string): Maybe<ComplexElementMetadata> {
+    export function getEmbeddedElement(ctor: Ctor, elementName: string): Maybe<EmbeddedElementMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getObjectElement(model, elementName);
+        return model && EntityMetadata.getEmbeddedElement(model, elementName);
     }
 
     export function getAssociationElement(ctor: Ctor, elementName: string): Maybe<AssociationElementMetadata> {
@@ -60,9 +60,9 @@ export namespace Entity {
         return (model && EntityMetadata.getColumnNames(model)) || [];
     }
 
-    export function getObjectElementNames(ctor: Ctor): string[] {
+    export function getEmbeddedElementNames(ctor: Ctor): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getObjectElementNames(model)) || [];
+        return (model && EntityMetadata.getEmbeddedElementNames(model)) || [];
     }
 
     export function getAssociationElementNames(ctor: Ctor): string[] {

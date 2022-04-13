@@ -1,5 +1,6 @@
 import {IndexMetadata} from '../interfaces/index-metadata';
 import {EntityMetadata} from '../model/entity-model';
+import {Column} from './column.decorator';
 
 export function PrimaryKey(fields: string | string[], options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>): ClassDecorator
 export function PrimaryKey(options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>): PropertyDecorator
@@ -17,7 +18,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
         const meta = EntityMetadata.attachTo(target.constructor);
-        meta.defineColumnElement(propertyKey, {notNull: true});
+        Column({notNull: true})(target, propertyKey);
         EntityMetadata.setPrimaryKeys(meta, propertyKey, arg0);
     };
 }

@@ -101,7 +101,6 @@ export namespace ColumnElementMetadata {
         return result;
     }
 
-
     export function assign(target: ColumnElementMetadata, options: DataPropertyOptions) {
         Object.assign(target, _.omit(options, ['entity', 'name', 'kind']));
     }
