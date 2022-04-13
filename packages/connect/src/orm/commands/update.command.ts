@@ -1,20 +1,20 @@
 import {And, Param, Update} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
-import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
-import {EntityModel} from '../model/entity-model';
+import {ColumnElementMetadata} from '../model/column-element-metadata';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import {EntityMetadata} from '../model/entity-metadata';
 import {Repository} from '../repository.class';
 import {isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 import {prepareFilter} from './command.helper';
 
 export type UpdateCommandArgs = {
-    entity: EntityModel;
+    entity: EntityMetadata;
     connection: SqbConnection;
     values: any;
 } & Repository.UpdateAllOptions;
 
 type UpdateCommandContext = {
-    entity: EntityModel;
+    entity: EntityMetadata;
     queryParams: any;
     queryValues: any;
     queryFilter: any[];
@@ -69,7 +69,7 @@ export class UpdateCommand {
     }
 
     protected static async _prepareParams(ctx: UpdateCommandContext,
-                                          entity: EntityModel,
+                                          entity: EntityMetadata,
                                           values: any,
                                           prefix?: string,
                                           suffix?: string) {

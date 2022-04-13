@@ -1,17 +1,17 @@
 import {Maybe, Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
-import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
-import {IndexMetadata} from '../interfaces/index-metadata';
-import {AnyElementMetadata, EntityMetadata} from '../model/entity-model';
-import {Ctor, EntityConfig} from '../orm.type';
+import {AssociationElementMetadata} from '../model/association-element-metadata';
+import {ColumnElementMetadata} from '../model/column-element-metadata';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import {AnyElementMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata';
+import {IndexMetadata} from '../model/index-metadata';
+import {Ctor} from '../orm.type';
 import {applyMixins} from '../util/apply-mixins';
 
-export function Entity(options?: EntityConfig | string): ClassDecorator {
+export function Entity(options?: EntityOptions | string): ClassDecorator {
     return function (target) {
-        const opts: EntityConfig = typeof options === 'object' ? options : {};
+        const opts: EntityOptions = typeof options === 'object' ? options : {};
         const tableName = typeof options === 'string' ? options : opts.tableName;
-        const entity = EntityMetadata.attachTo(target);
+        const entity = EntityMetadata.inject(target);
         entity.tableName = tableName || target.name;
         if (opts.schema)
             entity.schema = opts.schema;
@@ -86,12 +86,12 @@ export namespace Entity {
     }
 
     export function getPrimaryIndex(ctor: Ctor): Maybe<IndexMetadata> {
-        const model = EntityMetadata.attachTo(ctor);
+        const model = EntityMetadata.inject(ctor);
         return EntityMetadata.getPrimaryIndex(model);
     }
 
     export function getPrimaryIndexColumns(ctor: Ctor): ColumnElementMetadata[] {
-        const model = EntityMetadata.attachTo(ctor);
+        const model = EntityMetadata.inject(ctor);
         return EntityMetadata.getPrimaryIndexColumns(model);
     }
 
@@ -109,7 +109,7 @@ export namespace Entity {
             (k: string) => pickKeys.includes(k.toLowerCase()));
         const srcMeta = EntityMetadata.get(classRef);
         if (srcMeta) {
-            const trgMeta = EntityMetadata.attachTo(PickEntityClass);
+            const trgMeta = EntityMetadata.inject(PickEntityClass);
             EntityMetadata.mixin(trgMeta, srcMeta, pickKeys);
         }
         return PickEntityClass as Type<Pick<T, typeof keys[number]>>;
@@ -124,13 +124,14 @@ export namespace Entity {
                 applyConstructorProperties(this, classRef, args);
             }
         }
-        const omitKeys = keys as unknown as string[];
+        const omitKeys = (keys as unknown as string[]).map(x => x.toLowerCase());
         applyMixins(OmitEntityClass, classRef,
             (k: string) => !(omitKeys && !omitKeys.includes(k.toLowerCase())));
         const srcMeta = EntityMetadata.get(classRef);
         if (srcMeta) {
-            const elementKeys = srcMeta.elementKeys.filter(x => !keys.includes(x as any));
-            const trgMeta = EntityMetadata.attachTo(OmitEntityClass);
+            const elementKeys = Object.keys(srcMeta.elements)
+                .filter(x => !omitKeys.includes(x));
+            const trgMeta = EntityMetadata.inject(OmitEntityClass);
             EntityMetadata.mixin(trgMeta, srcMeta, elementKeys);
         }
         return OmitEntityClass as Type<Omit<T, typeof keys[number]>>;
@@ -160,7 +161,7 @@ export namespace Entity {
             applyMixins(UnionClass, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
-                const trgMeta = EntityMetadata.attachTo(UnionClass);
+                const trgMeta = EntityMetadata.inject(UnionClass);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }

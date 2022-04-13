@@ -1,21 +1,34 @@
 import _ from 'lodash';
 import {DataType} from '@sqb/builder';
-import type {EntityModel} from '../model/entity-model';
 import type {
     ColumnAutoGenerationStrategy,
     ColumnTransformFunction,
-    DataPropertyOptions,
     DefaultValueGetter,
     EnumValue,
     FieldValue,
 } from '../orm.type';
 import {ElementMetadata} from './element-metadata';
+import type {EntityMetadata} from './entity-metadata';
+
+export type ColumnElementOptions = Partial<Omit<ColumnElementMetadata, 'entity' | 'name' | 'kind'>>;
 
 export interface ColumnElementMetadata extends ElementMetadata {
     readonly kind: 'column';
+
+    /**
+     Name of table field
+     */
     fieldName: string;
-    dataType?: DataType;
+
+    /**
+     JS type. String, Boolean, Person etc
+    */
     type?: Function;
+
+    /**
+     * Column data type
+     */
+    dataType?: DataType;
 
     /**
      * Field comment
@@ -89,7 +102,7 @@ export interface ColumnElementMetadata extends ElementMetadata {
 
 export namespace ColumnElementMetadata {
 
-    export function create(entity: EntityModel, name: string, options: DataPropertyOptions = {}): ColumnElementMetadata {
+    export function create(entity: EntityMetadata, name: string, options: ColumnElementOptions = {}): ColumnElementMetadata {
         const result: ColumnElementMetadata = {
             kind: 'column',
             entity,
@@ -101,7 +114,7 @@ export namespace ColumnElementMetadata {
         return result;
     }
 
-    export function assign(target: ColumnElementMetadata, options: DataPropertyOptions) {
+    export function assign(target: ColumnElementMetadata, options: ColumnElementOptions) {
         Object.assign(target, _.omit(options, ['entity', 'name', 'kind']));
     }
 

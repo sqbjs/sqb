@@ -1,6 +1,6 @@
-import {AssociationNode} from '../model/association-node';
-import type {EntityModel} from '../model/entity-model';
+import {AssociationNode} from './association-node';
 import {ElementMetadata} from './element-metadata';
+import type {EntityMetadata} from './entity-metadata';
 
 export interface AssociationElementMetadata extends ElementMetadata {
     readonly kind: 'association';
@@ -9,7 +9,7 @@ export interface AssociationElementMetadata extends ElementMetadata {
 
 export namespace AssociationElementMetadata {
 
-    export function create(entity: EntityModel, name: string, association: AssociationNode): AssociationElementMetadata {
+    export function create(entity: EntityMetadata, name: string, association: AssociationNode): AssociationElementMetadata {
         return {
             kind: 'association',
             entity,

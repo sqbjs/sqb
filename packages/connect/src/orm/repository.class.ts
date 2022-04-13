@@ -10,7 +10,7 @@ import {CreateCommand} from './commands/create.command';
 import {DestroyCommand} from './commands/destroy.command';
 import {FindCommand} from './commands/find.command';
 import {UpdateCommand} from './commands/update.command';
-import {EntityModel} from './model/entity-model';
+import {EntityMetadata} from './model/entity-metadata';
 import {extractKeyValues} from './util/extract-keyvalues';
 
 export namespace Repository {
@@ -90,17 +90,17 @@ interface RepositoryEvents {
 
 export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(AsyncEventEmitter) {
     private readonly _executor: SqbClient | SqbConnection;
-    private readonly _entity: EntityModel;
+    private readonly _entity: EntityMetadata;
     private readonly _schema?: string;
 
-    constructor(entityDef: EntityModel, executor: SqbClient | SqbConnection, schema?: string) {
+    constructor(entityDef: EntityMetadata, executor: SqbClient | SqbConnection, schema?: string) {
         super();
         this._executor = executor;
         this._entity = entityDef;
         this._schema = schema;
     }
 
-    get entity(): EntityModel {
+    get entity(): EntityMetadata {
         return this._entity;
     }
 
@@ -279,7 +279,6 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
 
     protected async _destroy(keyValue: any | Record<string, any>,
                              options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<boolean> {
-        // todo call event listeners
         const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))

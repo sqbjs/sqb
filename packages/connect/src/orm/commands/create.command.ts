@@ -1,20 +1,19 @@
 import {Insert, Param} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
-import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
-import type {EntityModel} from '../model/entity-model';
-import {EntityMetadata} from '../model/entity-model';
+import {ColumnElementMetadata} from '../model/column-element-metadata';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import {EntityMetadata} from '../model/entity-metadata';
 import {isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 
 export type CreateCommandArgs = {
-    entity: EntityModel;
+    entity: EntityMetadata;
     connection: SqbConnection;
     values: any;
     returning?: boolean;
 }
 
 type CreateCommandContext = {
-    entity: EntityModel;
+    entity: EntityMetadata;
     queryParams: any;
     queryValues: any;
     colCount: number;
@@ -72,7 +71,7 @@ export class CreateCommand {
     }
 
     protected static async _prepareParams(ctx: CreateCommandContext,
-                                          entity: EntityModel,
+                                          entity: EntityMetadata,
                                           values: any,
                                           prefix?: string,
                                           suffix?: string) {

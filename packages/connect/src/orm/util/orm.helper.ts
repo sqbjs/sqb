@@ -1,8 +1,8 @@
 import {Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
-import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
-import type {EntityModel} from '../model/entity-model';
+import {AssociationElementMetadata} from '../model/association-element-metadata';
+import type {ColumnElementMetadata} from '../model/column-element-metadata';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import type {EntityMetadata} from '../model/entity-metadata';
 import {ENTITY_METADATA_KEY} from '../orm.const';
 import type {TypeResolver, TypeThunk} from '../orm.type';
 
@@ -35,7 +35,7 @@ export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefi
         return ctorThunk as Type;
 }
 
-export async function resolveEntityMeta(ctorThunk: TypeThunk): Promise<EntityModel | undefined> {
+export async function resolveEntityMeta(ctorThunk: TypeThunk): Promise<EntityMetadata | undefined> {
     const ctor = await resolveEntity(ctorThunk);
     return ctor && Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
 }

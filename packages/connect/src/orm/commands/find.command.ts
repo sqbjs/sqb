@@ -1,18 +1,17 @@
 import {And, In, Param,Select} from '@sqb/builder';
 import {SqbConnection} from '../../client/SqbConnection';
 import {Entity} from '../decorators/entity.decorator';
-import type {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {AssociationNode} from '../model/association-node';
-import type {EntityModel} from '../model/entity-model';
-import {EntityMetadata} from '../model/entity-model';
+import type {ColumnElementMetadata} from '../model/column-element-metadata';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import {EntityMetadata} from '../model/entity-metadata';
 import type {Repository} from '../repository.class';
 import {isAssociationElement,isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 import {joinAssociationGetLast,JoinInfo, prepareFilter} from './command.helper';
 import {RowConverter} from './row-converter';
 
 export type FindCommandArgs = {
-    entity: EntityModel;
+    entity: EntityMetadata;
     connection: SqbConnection
 } & Repository.FindAllOptions;
 
@@ -21,8 +20,8 @@ const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 export class FindCommand {
     maxEagerFetch: number = 100000;
     maxSubQueries: number = 5;
-    readonly mainEntity: EntityModel;
-    readonly resultEntity: EntityModel;
+    readonly mainEntity: EntityMetadata;
+    readonly resultEntity: EntityMetadata;
     readonly converter: RowConverter;
     readonly mainAlias: string = 'T';
     resultAlias: string = 'T';
@@ -34,18 +33,18 @@ export class FindCommand {
     private _filter = And();
     private _sort?: string[];
 
-    protected constructor(selectEntity: EntityModel, outputEntity: EntityModel) {
+    protected constructor(selectEntity: EntityMetadata, outputEntity: EntityMetadata) {
         this.mainEntity = selectEntity;
         this.resultEntity = outputEntity;
         this.converter = new RowConverter(outputEntity.ctor);
     }
 
-    static async create(source: EntityModel | AssociationNode, opts: {
+    static async create(source: EntityMetadata | AssociationNode, opts: {
         maxSubQueries?: number;
         maxEagerFetch?: number;
     } = {}): Promise<FindCommand> {
         let command: FindCommand;
-        let listingEntity: EntityModel;
+        let listingEntity: EntityMetadata;
         if (source instanceof AssociationNode) {
             const node = source;
             listingEntity = await node.resolveTarget();
@@ -94,7 +93,7 @@ export class FindCommand {
     async addElements(opts: {
                           tableAlias?: string;
                           converter?: RowConverter;
-                          entity?: EntityModel;
+                          entity?: EntityMetadata;
                           elements?: string[];
                           include?: string[];
                           exclude?: string[];
@@ -125,7 +124,7 @@ export class FindCommand {
         const prefix = opts.prefix || '';
         const suffix = opts.suffix || '';
 
-        for (const key of entity.elementKeys) {
+        for (const key of Object.keys(entity.elements)) {
             const col = EntityMetadata.getElement(entity, key);
             if (!col)
                 continue;
@@ -346,7 +345,7 @@ export class FindCommand {
         return [];
     }
 
-    private _getEntityFromAlias(tableAlias: string): EntityModel {
+    private _getEntityFromAlias(tableAlias: string): EntityMetadata {
         if (tableAlias === this.mainAlias)
             return this.mainEntity;
         if (tableAlias === this.resultAlias)

@@ -1,7 +1,8 @@
-import {EntityMetadata} from '../model/entity-model';
-import {EmbeddedTypeOptions, TypeThunk} from '../orm.type';
+import {EmbeddedElementOptions} from '../model/embedded-element-metadata';
+import {EntityMetadata} from '../model/entity-metadata';
+import {TypeThunk} from '../orm.type';
 
-export function Embedded(type?: TypeThunk, options?: EmbeddedTypeOptions): PropertyDecorator {
+export function Embedded(type?: TypeThunk, options?: EmbeddedElementOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
@@ -10,11 +11,7 @@ export function Embedded(type?: TypeThunk, options?: EmbeddedTypeOptions): Prope
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
 
-        const entity = EntityMetadata.attachTo(target.constructor);
-        const el = EntityMetadata.defineEmbeddedElement(entity, propertyKey, type);
-        if (options?.fieldNamePrefix)
-            el.fieldNamePrefix = options.fieldNamePrefix;
-        if (options?.fieldNameSuffix)
-            el.fieldNameSuffix = options.fieldNameSuffix;
+        const entity = EntityMetadata.inject(target.constructor);
+        EntityMetadata.defineEmbeddedElement(entity, propertyKey, type, options);
     }
 }

@@ -40,7 +40,6 @@ describe('Entity', function () {
             tableName: 'CustomEntity',
             schema: 'my_schema',
             comment: 'comment'
-
         })
         class MyEntity {
 

@@ -11,10 +11,10 @@ export {registerAdapter, unRegisterAdapter} from './client/extensions';
 
 export * from './orm/orm.type';
 
-export * from './orm/interfaces/element-metadata';
-export * from './orm/interfaces/column-element-metadata';
-export * from './orm/interfaces/embedded-element-metadata';
-export * from './orm/interfaces/association-element-metadata';
+export * from './orm/model/element-metadata';
+export * from './orm/model/column-element-metadata';
+export * from './orm/model/embedded-element-metadata';
+export * from './orm/model/association-element-metadata';
 
 export * from './orm/base-entity.class';
 export * from './orm/decorators/entity.decorator';
@@ -28,8 +28,8 @@ export * from './orm/decorators/events.decorator';
 export * from './orm/decorators/transform.decorator';
 
 export * from './orm/repository.class';
-export * from './orm/model/entity-model';
+export * from './orm/model/entity-metadata';
 export * from './orm/model/association';
-export * from './orm/interfaces/index-metadata';
+export * from './orm/model/index-metadata';
 
 export {isColumnElement, isEmbeddedElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';

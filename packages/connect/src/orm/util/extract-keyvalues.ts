@@ -1,8 +1,8 @@
-import {EntityMetadata, EntityModel} from '../model/entity-model';
+import {EntityMetadata} from '../model/entity-metadata';
 import {isColumnElement} from './orm.helper';
 
 export function extractKeyValues<T>(
-    entityDef: EntityModel,
+    entityDef: EntityMetadata,
     valueOrInstance: any | Record<string, any> | T,
     keepOther?: boolean
 ): Record<string, any> {
