@@ -3,7 +3,7 @@ import '../../_support/env';
 import * as assert from 'assert';
 import {
     Column,
-    Entity,
+    Entity, EntityMetadata,
     ForeignKey, Index
 } from '@sqb/connect';
 
@@ -30,8 +30,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(meta.getElement('id'));
-            assert.ok(meta.getElement('name'));
+            assert.ok(EntityMetadata.getElement(meta, 'id'));
+            assert.ok(EntityMetadata.getElement(meta, 'name'));
         });
 
         it(`should combine foreign keys`, () => {
@@ -111,8 +111,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(meta.getElement('id'));
-            assert.ok(!meta.getElement('name'));
+            assert.ok(EntityMetadata.getElement(meta, 'id'));
+            assert.ok(!EntityMetadata.getElement(meta, 'name'));
         });
 
         it(`should pick foreign keys for only given keys`, () => {
@@ -191,8 +191,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             assert.ok(meta);
             assert.strictEqual(meta.name, 'NewEntityClass');
-            assert.ok(!meta.getElement('id'));
-            assert.ok(meta.getElement('name'));
+            assert.ok(!EntityMetadata.getElement(meta, 'id'));
+            assert.ok(EntityMetadata.getElement(meta, 'name'));
         });
 
         it(`should omit foreign keys for only given keys`, () => {

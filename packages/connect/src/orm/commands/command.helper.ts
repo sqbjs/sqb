@@ -4,8 +4,8 @@ import {
 } from '@sqb/builder';
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {AssociationNode} from '../model/association-node';
-import {EntityModel} from '../model/entity-model';
-import {isAssociationElement,isColumnElement, isObjectElement} from '../util/orm.helper';
+import {EntityMetadata, EntityModel} from '../model/entity-model';
+import {isAssociationElement, isColumnElement, isComplexElement} from '../util/orm.helper';
 
 export interface JoinInfo {
     association: AssociationNode;
@@ -15,26 +15,32 @@ export interface JoinInfo {
     join: JoinStatement;
 }
 
-export async function joinAssociationGetFirst(joinInfos: JoinInfo[],
-                                              association: AssociationNode,
-                                              parentAlias: string,
-                                              innerJoin?: boolean): Promise<JoinInfo> {
+export async function joinAssociationGetFirst(
+    joinInfos: JoinInfo[],
+    association: AssociationNode,
+    parentAlias: string,
+    innerJoin?: boolean
+): Promise<JoinInfo> {
     const joins = await joinAssociation(joinInfos, association, parentAlias, innerJoin);
     return joins[0];
 }
 
-export async function joinAssociationGetLast(joinInfos: JoinInfo[],
-                                             association: AssociationNode,
-                                             parentAlias: string,
-                                             innerJoin?: boolean): Promise<JoinInfo> {
+export async function joinAssociationGetLast(
+    joinInfos: JoinInfo[],
+    association: AssociationNode,
+    parentAlias: string,
+    innerJoin?: boolean
+): Promise<JoinInfo> {
     const joins = await joinAssociation(joinInfos, association, parentAlias, innerJoin);
     return joins[joins.length - 1];
 }
 
-export async function joinAssociation(joinInfos: JoinInfo[],
-                                      association: AssociationNode,
-                                      parentAlias: string,
-                                      innerJoin?: boolean): Promise<JoinInfo[]> {
+export async function joinAssociation(
+    joinInfos: JoinInfo[],
+    association: AssociationNode,
+    parentAlias: string,
+    innerJoin?: boolean
+): Promise<JoinInfo[]> {
     let joinInfo: JoinInfo | undefined;
     let node = association;
     const result: JoinInfo[] = [];
@@ -107,7 +113,7 @@ export async function prepareFilter(
                 let subSelect: SelectQuery | undefined;
                 for (let i = 0; i < l; i++) {
                     pt = itemPath[i];
-                    const col = _curEntity.getElement(pt);
+                    const col = EntityMetadata.getElement(_curEntity, pt);
                     if (!col)
                         throw new Error(`Unknown property (${item._left}) defined in filter`);
                     // if last item on path
@@ -119,7 +125,7 @@ export async function prepareFilter(
                     } else {
                         if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
-                        if (isObjectElement(col)) {
+                        if (isComplexElement(col)) {
                             _curEntity = await ComplexElementMetadata.resolveType(col);
                             _curPrefix = _curPrefix + (col.fieldNamePrefix || '');
                             _curSuffix = (col.fieldNameSuffix || '') + _curSuffix;
@@ -138,7 +144,7 @@ export async function prepareFilter(
 
                             subSelect.where(
                                 Eq(
-                                    Field('K.' +  targetCol.fieldName, targetCol.dataType, targetCol.isArray),
+                                    Field('K.' + targetCol.fieldName, targetCol.dataType, targetCol.isArray),
                                     Field(tableAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray))
                             )
                             trgOp.add(Exists(subSelect));

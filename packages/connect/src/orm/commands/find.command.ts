@@ -5,8 +5,9 @@ import type {ColumnElementMetadata} from '../interfaces/column-element-metadata'
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {AssociationNode} from '../model/association-node';
 import type {EntityModel} from '../model/entity-model';
+import {EntityMetadata} from '../model/entity-model';
 import type {Repository} from '../repository.class';
-import {isAssociationElement,isColumnElement, isObjectElement} from '../util/orm.helper';
+import {isAssociationElement,isColumnElement, isComplexElement} from '../util/orm.helper';
 import {joinAssociationGetLast,JoinInfo, prepareFilter} from './command.helper';
 import {RowConverter} from './row-converter';
 
@@ -125,7 +126,7 @@ export class FindCommand {
         const suffix = opts.suffix || '';
 
         for (const key of entity.elementKeys) {
-            const col = entity.getElement(key);
+            const col = EntityMetadata.getElement(entity, key);
             if (!col)
                 continue;
             const colNameLower = col.name.toLowerCase();
@@ -153,7 +154,7 @@ export class FindCommand {
                 continue;
             }
 
-            if (isObjectElement(col)) {
+            if (isComplexElement(col)) {
                 const typ = await ComplexElementMetadata.resolveType(col);
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
@@ -268,8 +269,8 @@ export class FindCommand {
             if (elName.includes('.')) {
                 const a: string[] = elName.split('.');
                 while (a.length > 1) {
-                    const col = _entityDef.getElement(a.shift() || '');
-                    if (isObjectElement(col)) {
+                    const col = EntityMetadata.getElement(_entityDef, a.shift() || '');
+                    if (isComplexElement(col)) {
                         _entityDef = await ComplexElementMetadata.resolveType(col);
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
@@ -289,7 +290,7 @@ export class FindCommand {
                     continue;
                 elName = a.shift() || '';
             }
-            const col = _entityDef.getElement(elName);
+            const col = EntityMetadata.getElement(_entityDef, elName);
             if (!col)
                 throw new Error(`Unknown element (${elName}) declared in sort property`);
             if (!isColumnElement(col))

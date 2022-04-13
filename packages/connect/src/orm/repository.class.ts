@@ -279,6 +279,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
 
     protected async _destroy(keyValue: any | Record<string, any>,
                              options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<boolean> {
+        // todo call event listeners
         const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))

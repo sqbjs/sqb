@@ -2,7 +2,7 @@ import {camelCase} from 'putil-varhelpers';
 import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
 import {resolveEntityMeta} from '../util/orm.helper';
-import {EntityModel} from './entity-model';
+import {EntityMetadata, EntityModel} from './entity-model';
 
 export class Association {
     private _resolved?: boolean;
@@ -84,7 +84,7 @@ export class Association {
 
         if (!(sourceKey && targetKey)) {
             // Try to determine key fields from foreign key from source to target
-            let foreign = await source.getForeignKeyFor(target);
+            let foreign = await EntityMetadata.getForeignKeyFor(source, target);
             if (foreign && foreign !== this) {
                 await foreign._resolveKeys();
                 this._sourceKey = foreign._sourceKey;
@@ -94,7 +94,7 @@ export class Association {
                 return;
             } else {
                 // Try to determine key fields from foreign key from target to source
-                foreign = await target.getForeignKeyFor(source);
+                foreign = await EntityMetadata.getForeignKeyFor(target, source);
                 if (foreign && foreign !== this) {
                     await foreign._resolveKeys();
                     this._sourceKey = foreign._targetKey;
@@ -121,17 +121,16 @@ export class Association {
                 masterKey = sourceKey || '';
             }
 
-
             if (!detailKey) {
-                const primaryIndex = detail.primaryIndex;
-                detailKey = primaryIndex && primaryIndex.columns.length === 1 ?
-                    primaryIndex.columns[0] : 'id';
+                const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(detail);
+                detailKey = primaryIndexColumns && primaryIndexColumns.length === 1 ?
+                    primaryIndexColumns[0].name : 'id';
             }
 
             if (!masterKey) {
                 // snake-case
                 masterKey = detail.name[0].toLowerCase() + detail.name.substring(1) + '_' + detailKey;
-                if (!master.getColumnElement(masterKey))
+                if (!EntityMetadata.getColumnElement(master, masterKey))
                     masterKey = camelCase(masterKey);
             }
             if (this.sourceBelongsToTarget) {
@@ -142,10 +141,10 @@ export class Association {
                 sourceKey = masterKey;
             }
         }
-        this._targetProperty = target.getColumnElement(targetKey);
+        this._targetProperty = EntityMetadata.getColumnElement(target, targetKey);
         if (!this._targetProperty)
             throw new Error(`Can't determine target key of ${this.name}`);
-        this._sourceProperty = source.getColumnElement(sourceKey);
+        this._sourceProperty = EntityMetadata.getColumnElement(source, sourceKey);
         if (!this._sourceProperty)
             throw new Error(`Can't determine source key of ${this.name}`);
         this._targetKey = targetKey;

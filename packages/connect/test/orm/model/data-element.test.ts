@@ -2,10 +2,10 @@
 import '../../_support/env';
 import * as assert from 'assert';
 import {
+    AfterDestroy, AfterInsert, AfterUpdate, BeforeDestroy, BeforeInsert, BeforeUpdate,
     Column,
     DataType,
-    Entity,
-    AfterInsert, AfterDestroy, AfterUpdate, BeforeInsert, BeforeDestroy, BeforeUpdate
+    Entity, EntityMetadata,
 } from '@sqb/connect';
 
 describe('Data Column', function () {
@@ -19,7 +19,7 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = EntityMetadata.getColumnElement(meta, 'id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.name, 'id');
     });
@@ -32,7 +32,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = EntityMetadata.getColumnElement(meta, 'id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.dataType, DataType.GUID);
     });
@@ -61,7 +61,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = EntityMetadata.getColumnElement(meta, 'id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.type, Number);
         assert.strictEqual(idColumn.dataType, DataType.NUMBER);
@@ -102,22 +102,22 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
-        let col = meta.getColumnElement('col1');
+        let col = EntityMetadata.getColumnElement(meta, 'col1');
         assert.strictEqual(col.type, String);
         assert.strictEqual(col.dataType, DataType.VARCHAR);
-        col = meta.getColumnElement('col2');
+        col = EntityMetadata.getColumnElement(meta, 'col2');
         assert.strictEqual(col.type, Number);
         assert.strictEqual(col.dataType, DataType.NUMBER);
-        col = meta.getColumnElement('col3');
+        col = EntityMetadata.getColumnElement(meta, 'col3');
         assert.strictEqual(col.type, Boolean);
         assert.strictEqual(col.dataType, DataType.BOOL);
-        col = meta.getColumnElement('col4');
+        col = EntityMetadata.getColumnElement(meta, 'col4');
         assert.strictEqual(col.type, Date);
         assert.strictEqual(col.dataType, DataType.TIMESTAMP);
-        col = meta.getColumnElement('col5');
+        col = EntityMetadata.getColumnElement(meta, 'col5');
         assert.strictEqual(col.type, Buffer);
         assert.strictEqual(col.dataType, DataType.BINARY);
-        col = meta.getColumnElement('col6');
+        col = EntityMetadata.getColumnElement(meta, 'col6');
         assert.strictEqual(col.type, String);
         assert.strictEqual(col.dataType, DataType.VARCHAR);
         assert.strictEqual(col.isArray, true);
@@ -134,9 +134,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'after-insert');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doAfterInsert);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['after-insert']);
+        assert.strictEqual(meta.eventListeners['after-insert'][0], MyEntity.prototype.doAfterInsert);
     });
 
     it(`should validate @AfterInsert() decorator is used for function property`, () => {
@@ -161,9 +161,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'after-destroy');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doAfterDestroy);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['after-destroy']);
+        assert.strictEqual(meta.eventListeners['after-destroy'][0], MyEntity.prototype.doAfterDestroy);
     });
 
     it(`should validate @AfterDestroy() decorator is used for function property`, () => {
@@ -188,9 +188,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'after-update');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doAfterUpdate);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['after-update']);
+        assert.strictEqual(meta.eventListeners['after-update'][0], MyEntity.prototype.doAfterUpdate);
     });
 
     it(`should validate @AfterUpdate() decorator is used for function property`, () => {
@@ -215,9 +215,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'before-insert');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doBeforeInsert);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['before-insert']);
+        assert.strictEqual(meta.eventListeners['before-insert'][0], MyEntity.prototype.doBeforeInsert);
     });
 
     it(`should validate @BeforeInsert() decorator is used for function property`, () => {
@@ -242,9 +242,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'before-destroy');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doBeforeDestroy);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['before-destroy']);
+        assert.strictEqual(meta.eventListeners['before-destroy'][0], MyEntity.prototype.doBeforeDestroy);
     });
 
     it(`should validate @BeforeDestroy() decorator is used for function property`, () => {
@@ -269,9 +269,9 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        assert.strictEqual(meta.eventListeners.length, 1);
-        assert.strictEqual(meta.eventListeners[0].event, 'before-update');
-        assert.strictEqual(meta.eventListeners[0].fn, MyEntity.prototype.doBeforeUpdate);
+        assert.ok(meta.eventListeners);
+        assert.ok(meta.eventListeners['before-update']);
+        assert.strictEqual(meta.eventListeners['before-update'][0], MyEntity.prototype.doBeforeUpdate);
     });
 
     it(`should validate @BeforeUpdate() decorator is used for function property`, () => {

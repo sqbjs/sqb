@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
 import '../../_support/env';
 import * as assert from 'assert';
-import {Column, Embedded, Entity} from '@sqb/connect';
+import {Column, Embedded, Entity, EntityMetadata} from '@sqb/connect';
 
 describe('Embedded object element', function () {
 
@@ -21,7 +21,7 @@ describe('Embedded object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getObjectElement('name');
+        const name = EntityMetadata.getObjectElement(meta, 'name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
     });
@@ -38,7 +38,7 @@ describe('Embedded object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const name = meta.getObjectElement('name');
+        const name = EntityMetadata.getObjectElement(meta, 'name');
         assert.ok(name);
         assert.strictEqual(name.type, PersonName);
         assert.strictEqual(name.fieldNamePrefix, 'prefix');

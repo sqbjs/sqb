@@ -5,8 +5,8 @@ export function ForeignKey(type: TypeThunk, targetKey?: string): PropertyDecorat
     return function (target: Object | Function, propertyKey?: string | symbol): void {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
-        EntityMetadata.attachTo(target.constructor)
-            .addForeignKey(propertyKey, type, targetKey);
+        const entity = EntityMetadata.attachTo(target.constructor);
+        EntityMetadata.addForeignKey(entity, propertyKey, type, targetKey);
     };
 
 }

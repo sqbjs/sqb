@@ -6,17 +6,17 @@ import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import {IndexMetadata} from '../interfaces/index-metadata';
 import {ENTITY_METADATA_KEY} from '../orm.const';
 import {
+    Ctor,
     DataPropertyOptions,
-    IndexOptions,
     TypeThunk,
 } from '../orm.type';
-import {applyMixins} from '../util/apply-mixins';
-import {isAssociationElement, isColumnElement, isObjectElement} from '../util/orm.helper';
+import {isAssociationElement, isColumnElement, isComplexElement} from '../util/orm.helper';
 import {serializeColumn} from '../util/serialize-element';
 import {Association} from './association';
 import {AssociationNode} from './association-node';
 
 export type AnyElementMetadata = ColumnElementMetadata | ComplexElementMetadata | AssociationElementMetadata;
+
 
 export class EntityModel {
     private _elementKeys?: string[]; // cache
@@ -26,10 +26,9 @@ export class EntityModel {
     tableName?: string;
     schema?: string;
     comment?: string;
-    primaryIndex?: IndexMetadata;
     indexes: IndexMetadata[] = [];
     foreignKeys: Association[] = [];
-    eventListeners: { event: string, fn: Function }[] = [];
+    eventListeners: Record<string, Function[]> = {};
 
     constructor(readonly ctor: Type) {
         this.name = ctor.name;
@@ -46,46 +45,8 @@ export class EntityModel {
         return this._elementKeys as string[];
     }
 
-    getElement(name: string): Maybe<AnyElementMetadata> {
-        if (!name)
-            return;
-        return this.elements[name.toLowerCase()];
-    }
-
-    getColumnElement(name: string): Maybe<ColumnElementMetadata> {
-        if (!name)
-            return;
-        const prop = this.elements[name.toLowerCase()];
-        return isColumnElement(prop) ? prop : undefined;
-    }
-
-    getColumnElementByFieldName(fieldName: string): Maybe<ColumnElementMetadata> {
-        if (!fieldName)
-            return;
-        fieldName = fieldName.toLowerCase();
-        for (const prop of Object.values(this.elements)) {
-            if (isColumnElement(prop) && prop.fieldName.toLowerCase() === fieldName)
-                return prop;
-        }
-    }
-
-    getObjectElement(name: string): Maybe<ComplexElementMetadata> {
-        if (!name)
-            return;
-        const col = this.elements[name.toLowerCase()];
-        return isObjectElement(col) ? col : undefined;
-    }
-
-    getAssociationElement(name: string): Maybe<AssociationElementMetadata> {
-        if (!name)
-            return;
-        const col = this.elements[name.toLowerCase()];
-        return isAssociationElement(col) ? col : undefined;
-    }
-
     defineColumnElement(propertyKey: string, options?: DataPropertyOptions): ColumnElementMetadata {
-
-        let prop = this.getElement(propertyKey);
+        let prop = EntityMetadata.getElement(this, propertyKey);
         if (!prop || !isColumnElement(prop)) {
             prop = ColumnElementMetadata.create(this, propertyKey, options);
             if (!prop.type) {
@@ -143,100 +104,13 @@ export class EntityModel {
         type = type || Reflect.getMetadata("design:type", this.ctor.prototype, propertyKey);
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
-        let prop = this.getElement(propertyKey);
-        if (!prop || !isObjectElement(prop)) {
+        let prop = EntityMetadata.getElement(this, propertyKey);
+        if (!prop || !isComplexElement(prop)) {
             prop = ComplexElementMetadata.create(this, propertyKey, type);
-            // if (!this.elements[propertyKey.toLowerCase()])
-            // this.elementKeys.push(propertyKey);
         }
         this._defineElement(propertyKey, prop);
         // EntityMetadata.defineElement(this.ctor, propertyKey, prop);
         return prop;
-    }
-
-    setPrimaryIndex(column: string | string[], options?: IndexOptions): void {
-        this.primaryIndex = IndexMetadata.create(this, column, options);
-        this.primaryIndex.unique = true;
-    }
-
-    addIndex(column: string | string[], options?: IndexOptions): void {
-        this.indexes.push(IndexMetadata.create(this, column, options));
-    }
-
-    addForeignKey(propertyKey: string, target: TypeThunk, targetKey?: string): void {
-        const fk = new Association(this.name + '.' + propertyKey, {
-                source: this.ctor,
-                sourceKey: propertyKey,
-                target,
-                targetKey
-            }
-        );
-        this.foreignKeys.push(fk);
-    }
-
-    before(event: 'insert' | 'update' | 'destroy', fn: Type): void {
-        this.eventListeners.push({event: 'before-' + event, fn});
-    }
-
-    after(event: 'insert' | 'update' | 'destroy', fn: Type): void {
-        this.eventListeners.push({event: 'after-' + event, fn});
-    }
-
-    getPrimaryIndexColumns(): ColumnElementMetadata[] {
-        const out: ColumnElementMetadata[] = [];
-        if (this.primaryIndex) {
-            for (const k of this.primaryIndex.columns) {
-                const col = this.getColumnElement(k);
-                if (!col)
-                    throw new Error(`Data column "${k}" in primary index of ${this.name} does not exists`)
-                out.push(col);
-            }
-        }
-        return out;
-    }
-
-    getElementNames(filter?: (el: AnyElementMetadata) => boolean): string[] {
-        const out: string[] = [];
-        for (const el of Object.values(this.elements)) {
-            if (el && (!filter || filter(el)))
-                out.push(el.name);
-        }
-
-        return out;
-    }
-
-    getColumnNames(): string[] {
-        return this.getElementNames(isColumnElement);
-    }
-
-    getObjectElementNames(): string[] {
-        return this.getElementNames(isObjectElement);
-    }
-
-    getAssociationElementNames(): string[] {
-        return this.getElementNames(isAssociationElement);
-    }
-
-    getNonAssociationElementNames(): string[] {
-        return this.getElementNames(x => !isAssociationElement(x));
-    }
-
-    getInsertColumnNames(): string[] {
-        const out: string[] = [];
-        for (const el of Object.values(this.elements)) {
-            if (isColumnElement(el) && !el.noInsert)
-                out.push(el.name);
-        }
-        return out;
-    }
-
-    getUpdateColumnNames(): string[] {
-        const out: string[] = [];
-        for (const el of Object.values(this.elements)) {
-            if (isColumnElement(el) && !el.noUpdate)
-                out.push(el.name);
-        }
-        return out;
     }
 
     protected _defineElement(propertyKey: string, meta: AnyElementMetadata) {
@@ -244,54 +118,25 @@ export class EntityModel {
         this._elementsByName[propertyKey] = meta;
     }
 
-    async getForeignKeyFor(t: EntityModel): Promise<Maybe<Association>> {
-        for (const f of this.foreignKeys) {
-            if (await f.resolveTarget() === t)
-                return f;
-        }
-    }
-
-    static get(ctor: Function): Maybe<EntityModel> {
-        return Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
-    }
-
-    static hasOwn(ctor: Function): boolean {
-        return Reflect.hasOwnMetadata(ENTITY_METADATA_KEY, ctor);
-    }
-
 }
 
 export namespace EntityMetadata {
 
-    export function attachTo(ctor: Type | Function): EntityModel {
+    export function attachTo(ctor: Ctor): EntityModel {
         const own = getOwn(ctor);
         if (own)
             return own;
-        const current = get(ctor);
-        const entity = new EntityModel(ctor as Type);
-        Reflect.defineMetadata(ENTITY_METADATA_KEY, entity, ctor);
+        const baseMeta = get(ctor);
+        const meta = new EntityModel(ctor as Type);
+        Reflect.defineMetadata(ENTITY_METADATA_KEY, meta, ctor);
         // Merge base entity columns into this one
-        if (current) {
-            entity.tableName = current.tableName;
-            for (const [k, el] of Object.entries(current.elements)) {
-                entity.elements[k] = el;
-            }
-            for (const fk of current.foreignKeys) {
-                const newFk = new Association(fk.name, {...fk, source: ctor as Type});
-                entity.foreignKeys.push(newFk);
-            }
-            for (const idx of current.indexes) {
-                const newIdx = IndexMetadata.create(entity, idx.columns, idx);
-                entity.indexes.push(newIdx);
-            }
-            entity.eventListeners.push(...current.eventListeners);
-            if (current.primaryIndex)
-                entity.setPrimaryIndex([...current.primaryIndex.columns]);
+        if (baseMeta) {
+            EntityMetadata.mixin(meta, baseMeta);
         }
 
         ctor.prototype.toJSON = function (): Object {
             const obj = {};
-            const elementKeys = entity.elementKeys;
+            const elementKeys = meta.elementKeys;
             const l = elementKeys.length;
             let key;
             let v;
@@ -300,123 +145,206 @@ export namespace EntityMetadata {
                 v = this[key];
                 if (v === undefined)
                     continue;
-                const col = entity.getElement(key);
+                const col = EntityMetadata.getElement(meta, key);
                 if (col)
                     obj[col.name] = serializeColumn(col, v);
             }
             return obj;
         }
-        return entity;
+        return meta;
     }
 
-    export function get(ctor: Type | Function): Maybe<EntityModel> {
+    export function get(ctor: Ctor): Maybe<EntityModel> {
         return Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    export function getOwn(ctor: Type | Function): Maybe<EntityModel> {
+    export function getOwn(ctor: Ctor): Maybe<EntityModel> {
         return Reflect.getOwnMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    export function getElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        return meta && [...meta.elementKeys] as K[];
+    export function addIndex(model: EntityModel, index: IndexMetadata): void {
+        model.indexes = model.indexes || [];
+        index = {
+            ...index,
+            columns: Array.isArray(index.columns) ? index.columns : [index.columns]
+        };
+        if (index.primary)
+            model.indexes.forEach(idx => delete idx.primary);
+        model.indexes.push(index);
     }
 
-    export function getColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getColumnNames() as (K[]);
+    export function addForeignKey(model: EntityModel, propertyKey: string, target: TypeThunk, targetKey?: string): void {
+        model.foreignKeys = model.foreignKeys || [];
+        const fk = new Association(model.name + '.' + propertyKey, {
+                source: model.ctor,
+                sourceKey: propertyKey,
+                target,
+                targetKey
+            }
+        );
+        model.foreignKeys.push(fk);
     }
 
-    export function getAssociationElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getAssociationElementNames() as (K[]);
+    export function addEventListener(model: EntityModel, event: string, fn: Function): void {
+        if (typeof fn !== 'function')
+            throw new Error('Property must be a function');
+        model.eventListeners = model.eventListeners || {};
+        model.eventListeners[event] = model.eventListeners[event] || [];
+        model.eventListeners[event].push(fn);
     }
 
-    export function getNonAssociationElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getNonAssociationElementNames() as (K[]);
+    export function getElement(model: EntityModel, elementName: string): Maybe<AnyElementMetadata> {
+        if (!elementName)
+            return;
+        return model.elements[elementName.toLowerCase()];
     }
 
-    export function getObjectElementNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getObjectElementNames() as (K[]);
+    export function getColumnElement(model: EntityModel, elementName: string): Maybe<ColumnElementMetadata> {
+        const el = getElement(model, elementName);
+        return isColumnElement(el) ? el : undefined;
     }
 
-    export function getInsertColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getInsertColumnNames() as (K[]);
+    export function getObjectElement(model: EntityModel, elementName: string): Maybe<ComplexElementMetadata> {
+        const el = getElement(model, elementName);
+        return isComplexElement(el) ? el : undefined;
     }
 
-    export function getUpdateColumnNames<T extends Type | Function, K extends keyof T>(ctor: T): Maybe<K[]> {
-        const meta = get(ctor);
-        if (meta)
-            return meta.getUpdateColumnNames() as (K[]);
+    export function getAssociationElement(model: EntityModel, elementName: string): Maybe<AssociationElementMetadata> {
+        const el = getElement(model, elementName);
+        return isAssociationElement(el) ? el : undefined;
     }
 
-    export function mixin<T, A>(derived: Type<T>, baseCtor: Type<A>, elements?: string[]): Type<T & A> {
-        const elementKeys = elements && elements.map(x => x.toLowerCase());
-        const hasElement = (k: string) => !(elementKeys && !elementKeys.includes(k.toLowerCase()));
-        applyMixins(derived, baseCtor, hasElement);
-        const trg = attachTo(derived);
-        const src = get(baseCtor);
-        if (!src)
-            return derived as Type<T & A>;
-
-        if (!trg.tableName) {
-            trg.tableName = src.tableName;
-            trg.schema = src.schema;
-            trg.comment = src.comment;
+    export function getColumnElementByFieldName(model: EntityModel, fieldName: string): Maybe<ColumnElementMetadata> {
+        if (!fieldName)
+            return;
+        fieldName = fieldName.toLowerCase();
+        for (const prop of Object.values(model.elements)) {
+            if (isColumnElement(prop) && prop.fieldName.toLowerCase() === fieldName)
+                return prop;
         }
+    }
 
-        // If target has no primary index and source has
-        if (!trg.primaryIndex && src.primaryIndex) {
-            // Ignore if index columns is not in elements array
-            if (!src.primaryIndex.columns.find(x => !hasElement(x))) {
-                trg.primaryIndex = {...src.primaryIndex, entity: trg};
+    export function getElementNames(model: EntityModel, filter?: (el: AnyElementMetadata) => boolean): string[] {
+        const out: string[] = [];
+        for (const el of Object.values(model.elements)) {
+            if (el && (!filter || filter(el)))
+                out.push(el.name);
+        }
+        return out;
+    }
+
+    export function getColumnNames(model: EntityModel): string[] {
+        return getElementNames(model, isColumnElement);
+    }
+
+    export function getObjectElementNames(model: EntityModel): string[] {
+        return getElementNames(model, isComplexElement);
+    }
+
+    export function getAssociationElementNames(model: EntityModel): string[] {
+        return getElementNames(model, isAssociationElement);
+    }
+
+    export function getNonAssociationElementNames(model: EntityModel): string[] {
+        return getElementNames(model, x => !isAssociationElement(x));
+    }
+
+    export function getInsertColumnNames(model: EntityModel): string[] {
+        return getElementNames(model, x => isColumnElement(x) && !x.noInsert);
+    }
+
+    export function getUpdateColumnNames(model: EntityModel): string[] {
+        return getElementNames(model, x => isColumnElement(x) && !x.noUpdate);
+    }
+
+    export function getPrimaryIndex(model: EntityModel): Maybe<IndexMetadata> {
+        return model.indexes.find(idx => idx.primary);
+    }
+
+    export function getPrimaryIndexColumns(model: EntityModel): ColumnElementMetadata[] {
+        const idx = getPrimaryIndex(model);
+        const out: ColumnElementMetadata[] = [];
+        if (idx) {
+            for (const k of idx.columns) {
+                const col = getColumnElement(model, k);
+                if (!col)
+                    throw new Error(`Data column "${k}" in primary index of ${model.name} does not exists`)
+                out.push(col);
             }
         }
+        return out;
+    }
 
+    export async function getForeignKeyFor(src: EntityModel, trg: EntityModel): Promise<Maybe<Association>> {
+        for (const f of src.foreignKeys) {
+            if (await f.resolveTarget() === trg)
+                return f;
+        }
+    }
+
+    export function setPrimaryKeys(
+        model: EntityModel,
+        column: string | string[],
+        options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>
+    ): void {
+        addIndex(model, {
+            ...options,
+            columns: Array.isArray(column) ? column : [column],
+            unique: true,
+            primary: true
+        });
+    }
+
+    export function mixin(derived: EntityModel, base: EntityModel, elements?: string[]) {
+        const elementKeys = elements && elements.map(x => x.toLowerCase());
+        const hasElement = (k: string) => !(elementKeys && !elementKeys.includes(k.toLowerCase()));
+        // applyMixins(derived, baseCtor, hasElement);
+
+        if (!derived.tableName) {
+            derived.tableName = base.tableName;
+            derived.schema = base.schema;
+            derived.comment = base.comment;
+        }
         // Copy indexes
-        if (src.indexes && src.indexes.length) {
-            trg.indexes = trg.indexes || [];
-            for (const idx of src.indexes) {
+        if (base.indexes && base.indexes.length) {
+            const hasPrimaryIndex = !!getPrimaryIndex(derived);
+            for (const idx of base.indexes) {
                 if (!idx.columns.find(x => !hasElement(x))) {
-                    trg.indexes.push({...idx, entity: trg});
+                    if (hasPrimaryIndex)
+                        addIndex(derived, {...idx, primary: undefined});
+                    else
+                        addIndex(derived, idx);
                 }
             }
         }
 
         // Copy foreign indexes
-        if (src.foreignKeys && src.foreignKeys.length) {
-            trg.foreignKeys = trg.foreignKeys || [];
-            for (const fk of src.foreignKeys) {
+        if (base.foreignKeys && base.foreignKeys.length) {
+            derived.foreignKeys = derived.foreignKeys || [];
+            for (const fk of base.foreignKeys) {
                 if (!fk.sourceKey || hasElement(fk.sourceKey)) {
-                    const newFk = new Association(fk.name, {...fk, source: derived});
-                    trg.foreignKeys.push(newFk);
+                    const newFk = new Association(fk.name, {...fk, source: derived.ctor});
+                    derived.foreignKeys.push(newFk);
                 }
             }
         }
 
         // Copy event listeners
-        if (src.eventListeners && src.eventListeners.length) {
-            trg.eventListeners = trg.eventListeners || [];
-            trg.eventListeners.push(...src.eventListeners);
+        if (base.eventListeners) {
+            for (const [event, arr] of Object.entries(base.eventListeners)) {
+                arr.forEach(fn =>
+                    EntityMetadata.addEventListener(derived, event, fn))
+            }
         }
 
         // Copy elements
-        for (const [n, p] of Object.entries(src.elements)) {
+        for (const [n, p] of Object.entries(base.elements)) {
             if (!hasElement(n))
                 continue;
             const o: any = Object.assign({}, p);
-            o.entity = trg;
+            o.entity = derived;
             Object.setPrototypeOf(o, Object.getPrototypeOf(p));
-            trg.elements[n] = o;
+            derived.elements[n] = o;
         }
-        return derived as Type<T & A>;
     }
 }

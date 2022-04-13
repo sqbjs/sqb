@@ -108,7 +108,7 @@ describe('findAll()', function () {
         let rows = await repo.findAll({limit: 1});
         assert.ok(rows);
         assert.ok(rows[0].phoneCode);
-        const col = Entity.getMetadata(Country).getColumnElement('phoneCode');
+        const col = Entity.getColumnElement(Country, 'phoneCode');
         col.hidden = true;
         rows = await repo.findAll({limit: 1});
         assert.ok(rows);
