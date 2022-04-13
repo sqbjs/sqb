@@ -11,11 +11,10 @@ describe('PrimaryKey', function () {
 
         }
 
-        const meta = Entity.getMetadata(MyEntity);
-        assert.ok(meta);
-        assert.ok(meta.primaryIndex);
-        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
-        assert.strictEqual(meta.primaryIndex.unique, true);
+        const primaryIndex = Entity.getPrimaryIndex(MyEntity);
+        assert.ok(primaryIndex);
+        assert.deepStrictEqual(primaryIndex.columns, ['id']);
+        assert.strictEqual(primaryIndex.unique, true);
     });
 
     it(`should define primary index field with object definition`, () => {
@@ -25,12 +24,11 @@ describe('PrimaryKey', function () {
 
         }
 
-        const meta = Entity.getMetadata(MyEntity);
-        assert.ok(meta);
-        assert.ok(meta.primaryIndex);
-        assert.strictEqual(meta.primaryIndex.name, 'px_myentity_id');
-        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
-        assert.strictEqual(meta.primaryIndex.unique, true);
+        const primaryIndex = Entity.getPrimaryIndex(MyEntity);
+        assert.ok(primaryIndex);
+        assert.strictEqual(primaryIndex.name, 'px_myentity_id');
+        assert.deepStrictEqual(primaryIndex.columns, ['id']);
+        assert.strictEqual(primaryIndex.unique, true);
     });
 
     it(`should be used as PropertyDecorator`, () => {
@@ -41,12 +39,11 @@ describe('PrimaryKey', function () {
 
         }
 
-        const meta = Entity.getMetadata(MyEntity);
-        assert.ok(meta);
-        assert.ok(meta.primaryIndex);
-        assert.deepStrictEqual(meta.primaryIndex.columns, ['id']);
-        assert.strictEqual(meta.primaryIndex.name, 'px_myentity_id');
-        assert.strictEqual(meta.primaryIndex.unique, true);
+        const primaryIndex = Entity.getPrimaryIndex(MyEntity);
+        assert.ok(primaryIndex);
+        assert.deepStrictEqual(primaryIndex.columns, ['id']);
+        assert.strictEqual(primaryIndex.name, 'px_myentity_id');
+        assert.strictEqual(primaryIndex.unique, true);
     });
 
     it(`should throw error on invalid argument`, () => {

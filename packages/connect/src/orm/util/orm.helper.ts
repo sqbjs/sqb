@@ -18,7 +18,7 @@ export function isColumnElement(f: any): f is ColumnElementMetadata {
     return !!(f && f.entity && f.kind === 'column');
 }
 
-export const isObjectElement = (f: any): f is ComplexElementMetadata => {
+export const isComplexElement = (f: any): f is ComplexElementMetadata => {
     return !!(f && f.entity && f.kind === 'object');
 }
 

@@ -6,7 +6,7 @@ import {
     Entity,
     Link,
     LinkToOne,
-    PrimaryKey, linkToOne, LinkToMany
+    PrimaryKey, linkToOne, LinkToMany, EntityMetadata
 } from '@sqb/connect';
 import {isAssociationElement} from '../../../src/orm/util/orm.helper';
 
@@ -39,7 +39,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = EntityMetadata.getAssociationElement(meta, 'country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -56,7 +56,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = EntityMetadata.getAssociationElement(meta, 'country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -73,7 +73,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('country');
+        const col = EntityMetadata.getAssociationElement(meta, 'country');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'country');
         assert.strictEqual(col.association.source, Customer);
@@ -89,7 +89,7 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         assert.ok(meta);
-        const col = meta.getAssociationElement('countries');
+        const col = EntityMetadata.getAssociationElement(meta, 'countries');
         assert.ok(isAssociationElement(col));
         assert.strictEqual(col.name, 'countries');
         assert.strictEqual(col.association.source, Customer);

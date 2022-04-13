@@ -32,4 +32,4 @@ export * from './orm/model/entity-model';
 export * from './orm/model/association';
 export * from './orm/interfaces/index-metadata';
 
-export {isColumnElement, isObjectElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';
+export {isColumnElement, isComplexElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';

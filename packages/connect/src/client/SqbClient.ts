@@ -4,7 +4,7 @@ import {coerceToBoolean, coerceToInt} from 'putil-varhelpers';
 import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {Maybe, Type} from 'ts-gems';
 import {classes} from '@sqb/builder';
-import {EntityModel} from '../orm/model/entity-model';
+import {EntityMetadata} from '../orm/model/entity-model';
 import {Repository} from '../orm/repository.class';
 import {Adapter} from './Adapter';
 import {adapters} from './extensions';
@@ -194,7 +194,7 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
             if (!ctor)
                 throw new Error(`Repository "${entity}" is not registered`);
         } else ctor = entity;
-        const entityDef = EntityModel.get(ctor);
+        const entityDef = EntityMetadata.get(ctor);
         if (!entityDef)
             throw new Error(`You must provide an @Entity annotated constructor`);
         return new Repository<T>(entityDef, this, opts?.schema);

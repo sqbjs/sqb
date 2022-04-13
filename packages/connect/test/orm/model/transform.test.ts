@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method,@typescript-eslint/no-unused-vars */
 import '../../_support/env';
 import * as assert from 'assert';
-import {Entity, Parse, Serialize} from '@sqb/connect';
+import {Entity, EntityMetadata, Parse, Serialize} from '@sqb/connect';
 
 describe('Parse', function () {
 
@@ -16,7 +16,7 @@ describe('Parse', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = EntityMetadata.getColumnElement(meta, 'id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.parse, fn);
     });
@@ -36,7 +36,7 @@ describe('Serialize', function () {
         const meta = Entity.getMetadata(MyEntity);
         assert.ok(meta);
         assert.strictEqual(meta.name, 'MyEntity');
-        const idColumn = meta.getColumnElement('id');
+        const idColumn = EntityMetadata.getColumnElement(meta, 'id');
         assert.ok(idColumn);
         assert.strictEqual(idColumn.serialize, fn);
     });

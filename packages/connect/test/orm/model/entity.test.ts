@@ -67,12 +67,11 @@ describe('Entity', function () {
             code: string
         }
 
-        const baseMeta = Entity.getMetadata(Base);
-        const meta = Entity.getMetadata(MyEntity);
-        assert.ok(meta);
-        assert.ok(meta.getElement('id'));
-        assert.ok(meta.primaryIndex);
-        assert.deepStrictEqual(meta.primaryIndex.columns, baseMeta.primaryIndex.columns);
+        const primaryIndex1 = Entity.getPrimaryIndex(Base);
+        assert.ok(primaryIndex1);
+        const primaryIndex2 = Entity.getPrimaryIndex(MyEntity);
+        assert.ok(primaryIndex2);
+        assert.deepStrictEqual(primaryIndex1.columns, primaryIndex2.columns);
     });
 
     it(`should entity instance serialize to JSON`, () => {
@@ -129,7 +128,7 @@ describe('Entity', function () {
             '"int":3,"smallint":2,"bigint":"12345","arr1":[1,2,3]}');
     });
 
-    it(`should EntityDefinition.getElementNames() return all element names`, function () {
+    it(`should Entity.getElementNames() return all element names`, function () {
         @Entity()
         class Country {
             @Column()

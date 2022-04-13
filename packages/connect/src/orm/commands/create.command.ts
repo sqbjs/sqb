@@ -3,7 +3,8 @@ import {SqbConnection} from '../../client/SqbConnection';
 import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
 import type {EntityModel} from '../model/entity-model';
-import {isColumnElement, isObjectElement} from '../util/orm.helper';
+import {EntityMetadata} from '../model/entity-model';
+import {isColumnElement, isComplexElement} from '../util/orm.helper';
 
 export type CreateCommandArgs = {
     entity: EntityModel;
@@ -46,8 +47,12 @@ export class CreateCommand {
             throw new Error('No element given to create new entity instance');
 
         const query = Insert(tableName, ctx.queryValues);
-        if (args.returning && entity.primaryIndex)
-            query.returning(...entity.getPrimaryIndexColumns().map(col => col.fieldName));
+        if (args.returning) {
+            const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(entity);
+            if (primaryIndexColumns.length)
+                query.returning(...primaryIndexColumns.map(col => col.fieldName));
+        }
+
 
         const qr = await args.connection.execute(query, {
             params: ctx.queryParams,
@@ -58,7 +63,7 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const el = entity.getColumnElementByFieldName(f.fieldName);
+                const el = EntityMetadata.getColumnElementByFieldName(entity, f.fieldName);
                 if (el)
                     keyValues[el.name] = qr.rows[0][f.index];
             }
@@ -100,7 +105,7 @@ export class CreateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isObjectElement(col)) {
+            } else if (v != null && isComplexElement(col)) {
                 const type = await ComplexElementMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }

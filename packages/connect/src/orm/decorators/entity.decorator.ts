@@ -1,6 +1,11 @@
-import {Type} from 'ts-gems';
-import {EntityMetadata} from '../model/entity-model';
-import {EntityConfig} from '../orm.type';
+import {Maybe, Type} from 'ts-gems';
+import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
+import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
+import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {IndexMetadata} from '../interfaces/index-metadata';
+import {AnyElementMetadata, EntityMetadata} from '../model/entity-model';
+import {Ctor, EntityConfig} from '../orm.type';
+import {applyMixins} from '../util/apply-mixins';
 
 export function Entity(options?: EntityConfig | string): ClassDecorator {
     return function (target) {
@@ -19,14 +24,76 @@ export namespace Entity {
 
     export const getMetadata = EntityMetadata.get;
     export const getOwnMetadata = EntityMetadata.getOwn;
-    export const getElementNames = EntityMetadata.getElementNames;
-    export const getColumnNames = EntityMetadata.getColumnNames;
-    export const getAssociationElementNames = EntityMetadata.getAssociationElementNames;
-    export const getNonAssociationElementNames = EntityMetadata.getNonAssociationElementNames;
-    export const getInsertColumnNames = EntityMetadata.getInsertColumnNames;
-    export const getUpdateColumnNames = EntityMetadata.getUpdateColumnNames;
-    export const getObjectElementNames = EntityMetadata.getObjectElementNames;
 
+    export function getElement(ctor: Ctor, elementName: string): Maybe<AnyElementMetadata> {
+        const model = EntityMetadata.get(ctor);
+        return model && EntityMetadata.getElement(model, elementName);
+    }
+
+    export function getColumnElement(ctor: Ctor, elementName: string): Maybe<ColumnElementMetadata> {
+        const model = EntityMetadata.get(ctor);
+        return model && EntityMetadata.getColumnElement(model, elementName);
+    }
+
+    export function getObjectElement(ctor: Ctor, elementName: string): Maybe<ComplexElementMetadata> {
+        const model = EntityMetadata.get(ctor);
+        return model && EntityMetadata.getObjectElement(model, elementName);
+    }
+
+    export function getAssociationElement(ctor: Ctor, elementName: string): Maybe<AssociationElementMetadata> {
+        const model = EntityMetadata.get(ctor);
+        return model && EntityMetadata.getAssociationElement(model, elementName);
+    }
+
+    export function getColumnElementByFieldName(ctor: Ctor, fieldName: string): Maybe<ColumnElementMetadata> {
+        const model = EntityMetadata.get(ctor);
+        return model && EntityMetadata.getColumnElementByFieldName(model, fieldName);
+    }
+
+    export function getElementNames(ctor: Ctor, filter?: (el: AnyElementMetadata) => boolean): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getElementNames(model, filter)) || [];
+    }
+
+    export function getColumnNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getColumnNames(model)) || [];
+    }
+
+    export function getObjectElementNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getObjectElementNames(model)) || [];
+    }
+
+    export function getAssociationElementNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getAssociationElementNames(model)) || [];
+    }
+
+    export function getNonAssociationElementNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getNonAssociationElementNames(model)) || [];
+    }
+
+    export function getInsertColumnNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getInsertColumnNames(model)) || [];
+    }
+
+    export function getUpdateColumnNames(ctor: Ctor): string[] {
+        const model = EntityMetadata.get(ctor);
+        return (model && EntityMetadata.getUpdateColumnNames(model)) || [];
+    }
+
+    export function getPrimaryIndex(ctor: Ctor): Maybe<IndexMetadata> {
+        const model = EntityMetadata.attachTo(ctor);
+        return EntityMetadata.getPrimaryIndex(model);
+    }
+
+    export function getPrimaryIndexColumns(ctor: Ctor): ColumnElementMetadata[] {
+        const model = EntityMetadata.attachTo(ctor);
+        return EntityMetadata.getPrimaryIndexColumns(model);
+    }
 
     export function Pick<T, K extends keyof T>(
         classRef: Type<T>,
@@ -37,7 +104,14 @@ export namespace Entity {
                 applyConstructorProperties(this, classRef, args);
             }
         }
-        EntityMetadata.mixin(PickEntityClass, classRef, keys as unknown as string[]);
+        const pickKeys = keys as unknown as string[];
+        applyMixins(PickEntityClass, classRef,
+            (k: string) => pickKeys.includes(k.toLowerCase()));
+        const srcMeta = EntityMetadata.get(classRef);
+        if (srcMeta) {
+            const trgMeta = EntityMetadata.attachTo(PickEntityClass);
+            EntityMetadata.mixin(trgMeta, srcMeta, pickKeys);
+        }
         return PickEntityClass as Type<Pick<T, typeof keys[number]>>;
     }
 
@@ -50,9 +124,15 @@ export namespace Entity {
                 applyConstructorProperties(this, classRef, args);
             }
         }
-        const meta = EntityMetadata.get(classRef);
-        const omitKeys = meta && meta.elementKeys.filter(x => !keys.includes(x as any));
-        EntityMetadata.mixin(OmitEntityClass, classRef, omitKeys as unknown as string[]);
+        const omitKeys = keys as unknown as string[];
+        applyMixins(OmitEntityClass, classRef,
+            (k: string) => !(omitKeys && !omitKeys.includes(k.toLowerCase())));
+        const srcMeta = EntityMetadata.get(classRef);
+        if (srcMeta) {
+            const elementKeys = srcMeta.elementKeys.filter(x => !keys.includes(x as any));
+            const trgMeta = EntityMetadata.attachTo(OmitEntityClass);
+            EntityMetadata.mixin(trgMeta, srcMeta, elementKeys);
+        }
         return OmitEntityClass as Type<Omit<T, typeof keys[number]>>;
     }
 
@@ -77,7 +157,12 @@ export namespace Entity {
             }
         }
         for (const base of bases) {
-            EntityMetadata.mixin(UnionClass, base);
+            applyMixins(UnionClass, base);
+            const srcMeta = EntityMetadata.get(base);
+            if (srcMeta) {
+                const trgMeta = EntityMetadata.attachTo(UnionClass);
+                EntityMetadata.mixin(trgMeta, srcMeta);
+            }
         }
         return UnionClass;
     }

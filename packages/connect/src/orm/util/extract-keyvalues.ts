@@ -1,4 +1,4 @@
-import {EntityModel} from '../model/entity-model';
+import {EntityMetadata, EntityModel} from '../model/entity-model';
 import {isColumnElement} from './orm.helper';
 
 export function extractKeyValues<T>(
@@ -6,12 +6,12 @@ export function extractKeyValues<T>(
     valueOrInstance: any | Record<string, any> | T,
     keepOther?: boolean
 ): Record<string, any> {
-    const primaryIndex = entityDef.primaryIndex;
+    const primaryIndex = EntityMetadata.getPrimaryIndex(entityDef);
     if (!primaryIndex)
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
     const validateCol = (k) => {
-        const col = entityDef.getElement(k);
+        const col = EntityMetadata.getElement(entityDef, k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
         if (!isColumnElement(col))

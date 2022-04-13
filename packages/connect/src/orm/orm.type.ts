@@ -1,6 +1,8 @@
 import {Type} from 'ts-gems';
 import {DataType} from '..';
 
+export type Ctor = Type | Function;
+
 /* Model related */
 export type ElementKind = 'column' | 'object' | 'association';
 
@@ -37,18 +39,6 @@ export interface EntityConfig {
      * Table comment
      */
     comment?: string;
-}
-
-export interface IndexOptions {
-    /**
-     *  Name of the index
-     */
-    name?: string;
-
-    /**
-     * Specifies if index is unique
-     */
-    unique?: boolean;
 }
 
 export interface AssociationSettings {
