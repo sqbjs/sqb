@@ -2,10 +2,10 @@ import {
     And, Eq, Exists, Field, InnerJoin, isCompOperator, isLogicalOperator, JoinStatement, LeftOuterJoin,
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
-import {ComplexElementMetadata} from '../interfaces/complex-element-metadata';
+import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {AssociationNode} from '../model/association-node';
 import {EntityMetadata, EntityModel} from '../model/entity-model';
-import {isAssociationElement, isColumnElement, isComplexElement} from '../util/orm.helper';
+import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 
 export interface JoinInfo {
     association: AssociationNode;
@@ -125,8 +125,8 @@ export async function prepareFilter(
                     } else {
                         if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
-                        if (isComplexElement(col)) {
-                            _curEntity = await ComplexElementMetadata.resolveType(col);
+                        if (isEmbeddedElement(col)) {
+                            _curEntity = await EmbeddedElementMetadata.resolveType(col);
                             _curPrefix = _curPrefix + (col.fieldNamePrefix || '');
                             _curSuffix = (col.fieldNameSuffix || '') + _curSuffix;
                             continue;

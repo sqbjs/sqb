@@ -3,16 +3,16 @@ import {TypeThunk} from '../orm.type';
 import {resolveEntityMeta} from '../util/orm.helper';
 import {ElementMetadata} from './element-metadata';
 
-export interface ComplexElementMetadata extends ElementMetadata {
+export interface EmbeddedElementMetadata extends ElementMetadata {
     readonly kind: 'object';
     type: TypeThunk;
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;
 }
 
-export namespace ComplexElementMetadata {
+export namespace EmbeddedElementMetadata {
 
-    export function create(entity: EntityModel, name: string, type: TypeThunk): ComplexElementMetadata {
+    export function create(entity: EntityModel, name: string, type: TypeThunk): EmbeddedElementMetadata {
         return {
             kind: 'object',
             entity,
@@ -21,7 +21,7 @@ export namespace ComplexElementMetadata {
         }
     }
 
-    export async function resolveType(meta: ComplexElementMetadata): Promise<EntityModel> {
+    export async function resolveType(meta: EmbeddedElementMetadata): Promise<EntityModel> {
         const typ = await resolveEntityMeta(meta.type);
         if (typ)
             return typ;

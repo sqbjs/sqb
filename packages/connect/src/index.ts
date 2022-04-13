@@ -13,7 +13,7 @@ export * from './orm/orm.type';
 
 export * from './orm/interfaces/element-metadata';
 export * from './orm/interfaces/column-element-metadata';
-export * from './orm/interfaces/complex-element-metadata';
+export * from './orm/interfaces/embedded-element-metadata';
 export * from './orm/interfaces/association-element-metadata';
 
 export * from './orm/base-entity.class';
@@ -32,4 +32,4 @@ export * from './orm/model/entity-model';
 export * from './orm/model/association';
 export * from './orm/interfaces/index-metadata';
 
-export {isColumnElement, isComplexElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';
+export {isColumnElement, isEmbeddedElement, isAssociationElement, isEntityClass} from './orm/util/orm.helper';
