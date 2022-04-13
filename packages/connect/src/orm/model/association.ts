@@ -1,13 +1,13 @@
 import {camelCase} from 'putil-varhelpers';
-import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
 import {resolveEntityMeta} from '../util/orm.helper';
-import {EntityMetadata, EntityModel} from './entity-model';
+import {ColumnElementMetadata} from './column-element-metadata';
+import {EntityMetadata} from './entity-metadata';
 
 export class Association {
     private _resolved?: boolean;
-    private _source?: EntityModel;  // cached value
-    private _target?: EntityModel;  // cached value
+    private _source?: EntityMetadata;  // cached value
+    private _target?: EntityMetadata;  // cached value
     private _sourceKey?: string | null; // cached value
     private _targetKey?: string | null; // cached value
     private _sourceProperty?: ColumnElementMetadata;
@@ -28,14 +28,14 @@ export class Association {
         this.kind = args.kind;
     }
 
-    async resolveSource(): Promise<EntityModel> {
+    async resolveSource(): Promise<EntityMetadata> {
         this._source = await resolveEntityMeta(this.source);
         if (!this._source)
             throw new Error(`Can't resolve source entity of association "${this.name}"`);
         return this._source;
     }
 
-    async resolveTarget(): Promise<EntityModel> {
+    async resolveTarget(): Promise<EntityMetadata> {
         this._target = await resolveEntityMeta(this.target);
         if (!this._target)
             throw new Error(`Can't resolve target entity of association "${this.name}"`);
@@ -105,8 +105,8 @@ export class Association {
                 }
             }
 
-            let master: EntityModel;
-            let detail: EntityModel;
+            let master: EntityMetadata;
+            let detail: EntityMetadata;
             let masterKey: string;
             let detailKey: string;
             if (this.sourceBelongsToTarget) {

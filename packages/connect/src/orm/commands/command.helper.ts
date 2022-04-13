@@ -2,15 +2,15 @@ import {
     And, Eq, Exists, Field, InnerJoin, isCompOperator, isLogicalOperator, JoinStatement, LeftOuterJoin,
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
 import {AssociationNode} from '../model/association-node';
-import {EntityMetadata, EntityModel} from '../model/entity-model';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
+import {EntityMetadata} from '../model/entity-metadata';
 import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 
 export interface JoinInfo {
     association: AssociationNode;
-    sourceEntity: EntityModel;
-    targetEntity: EntityModel;
+    sourceEntity: EntityMetadata;
+    targetEntity: EntityMetadata;
     joinAlias: string;
     join: JoinStatement;
 }
@@ -79,7 +79,7 @@ export async function joinAssociation(
 }
 
 export async function prepareFilter(
-    entityDef: EntityModel,
+    entityDef: EntityMetadata,
     filter: any,
     trgOp: LogicalOperator,
     tableAlias = 'T'): Promise<void> {

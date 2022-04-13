@@ -1,8 +1,8 @@
-import type {EntityModel} from '../model/entity-model';
 import type {ElementKind} from '../orm.type';
+import type {EntityMetadata} from './entity-metadata';
 
 export interface ElementMetadata {
-    readonly entity: EntityModel;
+    readonly entity: EntityMetadata;
     readonly name: string;
     readonly kind: ElementKind;
 }

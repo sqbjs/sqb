@@ -1,5 +1,5 @@
-import {IndexMetadata} from '../interfaces/index-metadata';
-import {EntityMetadata} from '../model/entity-model';
+import {EntityMetadata} from '../model/entity-metadata';
+import {IndexMetadata} from '../model/index-metadata';
 import {Column} from './column.decorator';
 
 export function PrimaryKey(fields: string | string[], options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>): ClassDecorator
@@ -9,7 +9,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
         if (arguments.length === 1) {
             if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
                 throw new Error(`You must specify primary index column(s)`);
-            const meta = EntityMetadata.attachTo(target);
+            const meta = EntityMetadata.inject(target);
             EntityMetadata.setPrimaryKeys(meta, arg0, arg1);
             return;
         }
@@ -17,7 +17,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
             throw new Error('Property decorators can be used for class properties only');
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
-        const meta = EntityMetadata.attachTo(target.constructor);
+        const meta = EntityMetadata.inject(target.constructor);
         Column({notNull: true})(target, propertyKey);
         EntityMetadata.setPrimaryKeys(meta, propertyKey, arg0);
     };

@@ -5,7 +5,7 @@ import {coalesce, coerceToBoolean, coerceToInt, coerceToString} from "putil-varh
 import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {Type} from 'ts-gems';
 import {classes} from '@sqb/builder';
-import {EntityMetadata} from '../orm/model/entity-model';
+import {EntityMetadata} from '../orm/model/entity-metadata';
 import {Repository} from '../orm/repository.class';
 import {Adapter} from './Adapter';
 import {Cursor} from './Cursor';

@@ -1,54 +1,46 @@
 import {Maybe, Type} from 'ts-gems';
 import {DataType} from '@sqb/builder';
-import {AssociationElementMetadata} from '../interfaces/association-element-metadata';
-import {ColumnElementMetadata} from '../interfaces/column-element-metadata';
-import {EmbeddedElementMetadata} from '../interfaces/embedded-element-metadata';
-import {IndexMetadata} from '../interfaces/index-metadata';
 import {ENTITY_METADATA_KEY} from '../orm.const';
-import {
-    Ctor,
-    DataPropertyOptions,
-    TypeThunk,
-} from '../orm.type';
+import {Ctor, TypeThunk} from '../orm.type';
 import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper';
 import {serializeColumn} from '../util/serialize-element';
 import {Association} from './association';
+import {AssociationElementMetadata} from './association-element-metadata';
 import {AssociationNode} from './association-node';
+import {ColumnElementMetadata, ColumnElementOptions} from './column-element-metadata';
+import {EmbeddedElementMetadata, EmbeddedElementOptions} from './embedded-element-metadata';
+import {IndexMetadata} from './index-metadata';
 
 export type AnyElementMetadata = ColumnElementMetadata | EmbeddedElementMetadata | AssociationElementMetadata;
+export type EntityOptions = Partial<Pick<EntityMetadata, 'name' | 'schema' | 'comment' | 'tableName'>>;
 
-export class EntityModel {
-    private _elementKeys?: string[]; // cache
-    elements: Record<string, AnyElementMetadata> = {};
+export interface EntityMetadata {
+    readonly ctor: Type;
     readonly name: string;
     tableName?: string;
     schema?: string;
     comment?: string;
-    indexes: IndexMetadata[] = [];
-    foreignKeys: Association[] = [];
-    eventListeners: Record<string, Function[]> = {};
-
-    constructor(readonly ctor: Type) {
-        this.name = ctor.name;
-    }
-
-    get elementKeys(): string[] {
-        // return Object.keys(this._elementsByName);
-        if (!Object.prototype.hasOwnProperty.call(this, '_elementKeys'))
-            this._elementKeys = Object.values(this.elements).map(m => m.name);
-        return this._elementKeys as string[];
-    }
-
+    elements: Record<string, AnyElementMetadata>;
+    indexes: IndexMetadata[];
+    foreignKeys: Association[];
+    eventListeners: Record<string, Function[]>;
 }
 
 export namespace EntityMetadata {
 
-    export function attachTo(ctor: Ctor): EntityModel {
+    export function inject(ctor: Ctor): EntityMetadata {
         const own = getOwn(ctor);
         if (own)
             return own;
         const baseMeta = get(ctor);
-        const meta = new EntityModel(ctor as Type);
+        const meta: EntityMetadata = {
+            ctor: ctor as Type,
+            name: ctor.name,
+            elements: {},
+            indexes: [],
+            foreignKeys: [],
+            eventListeners: {}
+        };
         Reflect.defineMetadata(ENTITY_METADATA_KEY, meta, ctor);
         // Merge base entity columns into this one
         if (baseMeta) {
@@ -57,54 +49,52 @@ export namespace EntityMetadata {
 
         ctor.prototype.toJSON = function (): Object {
             const obj = {};
-            const elementKeys = meta.elementKeys;
+            const elementKeys = Object.keys(meta.elements);
             const l = elementKeys.length;
             let key;
             let v;
             for (let i = 0; i < l; i++) {
-                key = elementKeys[i]
-                v = this[key];
-                if (v === undefined)
-                    continue;
+                key = elementKeys[i];
                 const col = EntityMetadata.getElement(meta, key);
-                if (col)
-                    obj[col.name] = serializeColumn(col, v);
+                if (col) {
+                    v = this[col.name];
+                    if (v !== undefined)
+                        obj[col.name] = serializeColumn(col, v);
+                }
             }
             return obj;
         }
         return meta;
     }
 
-    export function get(ctor: Ctor): Maybe<EntityModel> {
+    export function get(ctor: Ctor): Maybe<EntityMetadata> {
         return Reflect.getMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    export function getOwn(ctor: Ctor): Maybe<EntityModel> {
+    export function getOwn(ctor: Ctor): Maybe<EntityMetadata> {
         return Reflect.getOwnMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    export function getElement(entity: EntityModel, elementName: string): Maybe<AnyElementMetadata> {
-        if (!elementName)
-            return;
-        return entity.elements[elementName.toLowerCase()];
+    export function getElement(entity: EntityMetadata, elementName: string): Maybe<AnyElementMetadata> {
+        return elementName ? entity.elements[elementName.toLowerCase()] : undefined;
     }
 
-    export function getColumnElement(entity: EntityModel, elementName: string): Maybe<ColumnElementMetadata> {
+    export function getColumnElement(entity: EntityMetadata, elementName: string): Maybe<ColumnElementMetadata> {
         const el = getElement(entity, elementName);
         return isColumnElement(el) ? el : undefined;
     }
 
-    export function getEmbeddedElement(entity: EntityModel, elementName: string): Maybe<EmbeddedElementMetadata> {
+    export function getEmbeddedElement(entity: EntityMetadata, elementName: string): Maybe<EmbeddedElementMetadata> {
         const el = getElement(entity, elementName);
         return isEmbeddedElement(el) ? el : undefined;
     }
 
-    export function getAssociationElement(entity: EntityModel, elementName: string): Maybe<AssociationElementMetadata> {
+    export function getAssociationElement(entity: EntityMetadata, elementName: string): Maybe<AssociationElementMetadata> {
         const el = getElement(entity, elementName);
         return isAssociationElement(el) ? el : undefined;
     }
 
-    export function getColumnElementByFieldName(entity: EntityModel, fieldName: string): Maybe<ColumnElementMetadata> {
+    export function getColumnElementByFieldName(entity: EntityMetadata, fieldName: string): Maybe<ColumnElementMetadata> {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
@@ -114,44 +104,55 @@ export namespace EntityMetadata {
         }
     }
 
-    export function getElementNames(entity: EntityModel, filter?: (el: AnyElementMetadata) => boolean): string[] {
-        const out: string[] = [];
-        for (const el of Object.values(entity.elements)) {
-            if (el && (!filter || filter(el)))
-                out.push(el.name);
+    export function getElementNames(entity: EntityMetadata, filter?: (el: AnyElementMetadata) => boolean): string[] {
+        if (filter) {
+            const out: string[] = [];
+            for (const el of Object.values(entity.elements)) {
+                if (el && (!filter || filter(el)))
+                    out.push(el.name);
+            }
+            return out;
         }
-        return out;
+        // Create a cached name array
+        if (!Object.prototype.hasOwnProperty.call(entity, '_elementNames'))
+            Object.defineProperty(entity, '_elementNames', {
+                enumerable: false,
+                configurable: true,
+                writable: true,
+                value: Object.values(entity.elements).map(m => m.name)
+            });
+        return (entity as any)._elementNames as string[];
     }
 
-    export function getColumnNames(entity: EntityModel): string[] {
+    export function getColumnNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, isColumnElement);
     }
 
-    export function getEmbeddedElementNames(entity: EntityModel): string[] {
+    export function getEmbeddedElementNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, isEmbeddedElement);
     }
 
-    export function getAssociationElementNames(entity: EntityModel): string[] {
+    export function getAssociationElementNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, isAssociationElement);
     }
 
-    export function getNonAssociationElementNames(entity: EntityModel): string[] {
+    export function getNonAssociationElementNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, x => !isAssociationElement(x));
     }
 
-    export function getInsertColumnNames(entity: EntityModel): string[] {
+    export function getInsertColumnNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, x => isColumnElement(x) && !x.noInsert);
     }
 
-    export function getUpdateColumnNames(entity: EntityModel): string[] {
+    export function getUpdateColumnNames(entity: EntityMetadata): string[] {
         return getElementNames(entity, x => isColumnElement(x) && !x.noUpdate);
     }
 
-    export function getPrimaryIndex(entity: EntityModel): Maybe<IndexMetadata> {
+    export function getPrimaryIndex(entity: EntityMetadata): Maybe<IndexMetadata> {
         return entity.indexes.find(idx => idx.primary);
     }
 
-    export function getPrimaryIndexColumns(entity: EntityModel): ColumnElementMetadata[] {
+    export function getPrimaryIndexColumns(entity: EntityMetadata): ColumnElementMetadata[] {
         const idx = getPrimaryIndex(entity);
         const out: ColumnElementMetadata[] = [];
         if (idx) {
@@ -165,14 +166,14 @@ export namespace EntityMetadata {
         return out;
     }
 
-    export async function getForeignKeyFor(src: EntityModel, trg: EntityModel): Promise<Maybe<Association>> {
+    export async function getForeignKeyFor(src: EntityMetadata, trg: EntityMetadata): Promise<Maybe<Association>> {
         for (const f of src.foreignKeys) {
             if (await f.resolveTarget() === trg)
                 return f;
         }
     }
 
-    export function addIndex(entity: EntityModel, index: IndexMetadata): void {
+    export function addIndex(entity: EntityMetadata, index: IndexMetadata): void {
         entity.indexes = entity.indexes || [];
         index = {
             ...index,
@@ -183,7 +184,7 @@ export namespace EntityMetadata {
         entity.indexes.push(index);
     }
 
-    export function addForeignKey(entity: EntityModel, propertyKey: string, target: TypeThunk, targetKey?: string): void {
+    export function addForeignKey(entity: EntityMetadata, propertyKey: string, target: TypeThunk, targetKey?: string): void {
         entity.foreignKeys = entity.foreignKeys || [];
         const fk = new Association(entity.name + '.' + propertyKey, {
                 source: entity.ctor,
@@ -195,7 +196,7 @@ export namespace EntityMetadata {
         entity.foreignKeys.push(fk);
     }
 
-    export function addEventListener(entity: EntityModel, event: string, fn: Function): void {
+    export function addEventListener(entity: EntityMetadata, event: string, fn: Function): void {
         if (typeof fn !== 'function')
             throw new Error('Property must be a function');
         entity.eventListeners = entity.eventListeners || {};
@@ -204,63 +205,92 @@ export namespace EntityMetadata {
     }
 
     export function defineColumnElement(
-        entity: EntityModel,
-        propertyKey: string,
-        options?: DataPropertyOptions
+        entity: EntityMetadata,
+        name: string,
+        options: ColumnElementOptions = {}
     ): ColumnElementMetadata {
-        let prop = EntityMetadata.getElement(entity, propertyKey);
+        delete (entity as any)._elementNames;
+        let prop = EntityMetadata.getElement(entity, name);
+        if (isColumnElement(prop))
+            options = {...prop, ...options};
 
-        if (!prop || !isColumnElement(prop)) {
-            prop = ColumnElementMetadata.create(entity, propertyKey, options);
-            if (!prop.type) {
-                const typ = Reflect.getMetadata("design:type", entity.ctor.prototype, propertyKey); // todo
-                if (typ === Array) {
-                    prop.type = String;
-                    prop.isArray = true;
-                } else prop.type = typ;
+        if (!options.type) {
+            switch (options.dataType) {
+                case DataType.BOOL:
+                    options.type = Boolean;
+                    break;
+                case DataType.VARCHAR:
+                case DataType.CHAR:
+                case DataType.TEXT:
+                    options.type = String;
+                    break;
+                case DataType.NUMBER:
+                case DataType.DOUBLE:
+                case DataType.FLOAT:
+                case DataType.INTEGER:
+                case DataType.SMALLINT:
+                    options.type = Number;
+                    break;
+                case DataType.TIMESTAMP:
+                case DataType.TIMESTAMPTZ:
+                    options.type = Date;
+                    break;
+                case DataType.BINARY:
+                    options.type = Buffer;
+                    break;
+                default:
+                    options.type = String;
             }
-            if (!prop.dataType) {
-                if (prop.type === Boolean)
-                    prop.dataType = DataType.BOOL;
-                else if (prop.type === String)
-                    prop.dataType = DataType.VARCHAR;
-                else if (prop.type === Number)
-                    prop.dataType = DataType.NUMBER;
-                else if (prop.type === Date)
-                    prop.dataType = DataType.TIMESTAMP;
-                else if (prop.type === Array) {
-                    prop.dataType = DataType.VARCHAR;
-                    prop.isArray = true;
-                } else if (prop.type === Buffer)
-                    prop.dataType = DataType.BINARY;
+        }
+        if (!options.dataType) {
+            switch (options.type) {
+                case Boolean:
+                    options.dataType = DataType.BOOL;
+                    break;
+                case Number:
+                    options.dataType = DataType.NUMBER;
+                    break;
+                case Date:
+                    options.dataType = DataType.TIMESTAMP;
+                    break;
+                case Array:
+                    options.dataType = DataType.VARCHAR;
+                    options.isArray = true;
+                    break;
+                case Buffer:
+                    options.dataType = DataType.BINARY;
+                    break;
+                default:
+                    options.dataType = DataType.VARCHAR;
             }
-            if (options?.isArray)
-                prop.isArray = true;
+        }
 
-            // if (!this.elements[elementKey])
-//                 this.elementKeys.push(propertyKey);
-            entity.elements[propertyKey.toLowerCase()] = prop;
-        } else if (options)
-            ColumnElementMetadata.assign(prop, options);
-
+        prop = ColumnElementMetadata.create(entity, name, options);
+        entity.elements[name.toLowerCase()] = prop;
         return prop;
     }
 
     export function defineEmbeddedElement(
-        entity: EntityModel,
-        propertyKey: string,
-        type: TypeThunk
+        entity: EntityMetadata,
+        name: string,
+        type: TypeThunk,
+        options?: EmbeddedElementOptions
     ): EmbeddedElementMetadata {
-        const prop = EmbeddedElementMetadata.create(entity, propertyKey, type);
-        entity.elements[propertyKey.toLowerCase()] = prop;
+        delete (entity as any)._elementNames;
+        let prop = EntityMetadata.getElement(entity, name);
+        if (isEmbeddedElement(prop))
+            options = {...prop, ...options};
+        prop = EmbeddedElementMetadata.create(entity, name, type, options);
+        entity.elements[name.toLowerCase()] = prop;
         return prop;
     }
 
     export function defineAssociationElement(
-        entity: EntityModel,
+        entity: EntityMetadata,
         propertyKey: string,
         association: AssociationNode
     ): AssociationElementMetadata {
+        delete (entity as any)._elementNames;
         const prop = AssociationElementMetadata.create(entity, propertyKey, association);
         let l: AssociationNode | undefined = association;
         let i = 1;
@@ -273,7 +303,7 @@ export namespace EntityMetadata {
     }
 
     export function setPrimaryKeys(
-        entity: EntityModel,
+        entity: EntityMetadata,
         column: string | string[],
         options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>
     ): void {
@@ -285,11 +315,12 @@ export namespace EntityMetadata {
         });
     }
 
-    export function mixin(derived: EntityModel, base: EntityModel, elements?: string[]) {
+    export function mixin(derived: EntityMetadata, base: EntityMetadata, elements?: string[]) {
         const elementKeys = elements && elements.map(x => x.toLowerCase());
         const hasElement = (k: string) => !(elementKeys && !elementKeys.includes(k.toLowerCase()));
         // applyMixins(derived, baseCtor, hasElement);
 
+        delete (derived as any)._elementNames;
         if (!derived.tableName) {
             derived.tableName = base.tableName;
             derived.schema = base.schema;
