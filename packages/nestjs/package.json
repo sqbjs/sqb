@@ -33,8 +33,8 @@
     "supertest": "^6.2.2"
   },
   "peerDependencies": {
-    "@sqb/connect": "^4.0.13",
-    "@sqb/builder": "^4.0.13",
+    "@sqb/connect": "^4.x.x",
+    "@sqb/builder": "^4.x.x",
     "@nestjs/common": ">=7.4.0",
     "@nestjs/core": ">=7.4.0",
     "rxjs": ">=6.6.0"
