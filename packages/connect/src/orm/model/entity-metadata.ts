@@ -81,17 +81,27 @@ export namespace EntityMetadata {
 
     export function getColumnElement(entity: EntityMetadata, elementName: string): Maybe<ColumnElementMetadata> {
         const el = getElement(entity, elementName);
-        return isColumnElement(el) ? el : undefined;
+        if (el && !isColumnElement(el))
+            throw new Error(`"${el.name}" requested as "column" but it is "${el.kind}"`);
+        return el as ColumnElementMetadata;
     }
 
     export function getEmbeddedElement(entity: EntityMetadata, elementName: string): Maybe<EmbeddedElementMetadata> {
         const el = getElement(entity, elementName);
-        return isEmbeddedElement(el) ? el : undefined;
+        if (el && !isEmbeddedElement(el))
+            throw new Error(`"${el.name}" requested as "embedded" but it is "${el.kind}"`);
+        return el as EmbeddedElementMetadata;
     }
 
     export function getAssociationElement(entity: EntityMetadata, elementName: string): Maybe<AssociationElementMetadata> {
         const el = getElement(entity, elementName);
-        return isAssociationElement(el) ? el : undefined;
+        if (el && !isAssociationElement(el))
+            throw new Error(`"${el.name}" requested as "association" but it is "${el.kind}"`);
+        return el as AssociationElementMetadata;
+    }
+
+    export function findElement(entity: EntityMetadata, predicate: (el: AnyElementMetadata) => boolean): Maybe<AnyElementMetadata> {
+        return Object.values(entity.elements).find(predicate);
     }
 
     export function getColumnElementByFieldName(entity: EntityMetadata, fieldName: string): Maybe<ColumnElementMetadata> {
@@ -149,7 +159,7 @@ export namespace EntityMetadata {
     }
 
     export function getPrimaryIndex(entity: EntityMetadata): Maybe<IndexMetadata> {
-        return entity.indexes.find(idx => idx.primary);
+        return entity.indexes && entity.indexes.find(idx => idx.primary);
     }
 
     export function getPrimaryIndexColumns(entity: EntityMetadata): ColumnElementMetadata[] {
@@ -167,6 +177,8 @@ export namespace EntityMetadata {
     }
 
     export async function getForeignKeyFor(src: EntityMetadata, trg: EntityMetadata): Promise<Maybe<Association>> {
+        if (!src.foreignKeys)
+            return;
         for (const f of src.foreignKeys) {
             if (await f.resolveTarget() === trg)
                 return f;
@@ -315,10 +327,9 @@ export namespace EntityMetadata {
         });
     }
 
-    export function mixin(derived: EntityMetadata, base: EntityMetadata, elements?: string[]) {
-        const elementKeys = elements && elements.map(x => x.toLowerCase());
-        const hasElement = (k: string) => !(elementKeys && !elementKeys.includes(k.toLowerCase()));
-        // applyMixins(derived, baseCtor, hasElement);
+    export function mixin(derived: EntityMetadata, base: EntityMetadata, filter?: (n: string) => boolean) {
+        // const elementKeys = elements && elements.map(x => x.toLowerCase());
+        const hasElement = (k: string) => !filter || filter(k);
 
         delete (derived as any)._elementNames;
         if (!derived.tableName) {
@@ -359,6 +370,7 @@ export namespace EntityMetadata {
         }
 
         // Copy elements
+        derived.elements = derived.elements || {};
         for (const [n, p] of Object.entries(base.elements)) {
             if (!hasElement(n))
                 continue;

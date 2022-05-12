@@ -44,3 +44,5 @@ export {
     isAssociationElement,
     isEntityClass
 } from './orm/util/orm.helper';
+
+export * from './orm/backward';
