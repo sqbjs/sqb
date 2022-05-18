@@ -21,16 +21,15 @@
     "oracle",
     "database"
   ],
-  "dependencies": {},
   "devDependencies": {
     "@types/oracledb": "^5.2.3",
     "oracledb": "^5.3.0"
   },
   "peerDependencies": {
-    "oracledb": "^5.x.x",
-    "@sqb/oracle-dialect": "^4.x.x",
-    "@sqb/builder": "^4.x.x",
-    "@sqb/connect": "^4.x.x"
+    "@sqb/builder": "^4.1.0",
+    "@sqb/connect": "^4.1.2",
+    "@sqb/oracle-dialect": "^4.1.0",
+    "oracledb": "^5.x.x"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

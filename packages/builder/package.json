@@ -29,7 +29,7 @@
     "putil-flattentext": "^2.1.0",
     "putil-isplainobject": "^1.1.4",
     "putil-merge": "^3.8.0",
-    "putil-varhelpers": "^1.6.3"
+    "putil-varhelpers": "^1.6.4"
   },
   "devDependencies": {
     "@types/debug": "^4.1.7"
