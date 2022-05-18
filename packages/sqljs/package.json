@@ -30,10 +30,10 @@
     "sql.js": "^1.6.2"
   },
   "peerDependencies": {
-    "sql.js": "^1.4.0",
-    "@sqb/sqlite-dialect": "^4.x.x",
-    "@sqb/builder": "^4.x.x",
-    "@sqb/connect": "^4.x.x"
+    "@sqb/builder": "^4.1.0",
+    "@sqb/connect": "^4.1.2",
+    "@sqb/sqlite-dialect": "^4.1.0",
+    "sql.js": "^1.4.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

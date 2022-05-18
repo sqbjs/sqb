@@ -28,7 +28,7 @@
     "fast-glob": "^3.2.11"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.x.x"
+    "@sqb/builder": "^4.1.0"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
