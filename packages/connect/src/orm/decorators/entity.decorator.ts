@@ -113,11 +113,11 @@ export namespace Entity {
         baseD: Type<D>, baseE: Type<E>, baseF: Type<F>
     ): Type<A & B & C & D & E & F>
     export function mixin(derivedCtor: any, ...bases: Type[]) {
-        const trgMeta = EntityMetadata.inject(derivedCtor);
         for (const base of bases) {
             applyMixins(derivedCtor, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
+                const trgMeta = EntityMetadata.inject(derivedCtor);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }
@@ -184,11 +184,11 @@ export namespace Entity {
                     applyConstructorProperties(this, c, args);
             }
         }
-        const trgMeta = EntityMetadata.inject(UnionClass);
         for (const base of bases) {
             applyMixins(UnionClass, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
+                const trgMeta = EntityMetadata.inject(UnionClass);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }
