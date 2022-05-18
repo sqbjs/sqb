@@ -99,6 +99,31 @@ export namespace Entity {
         return EntityMetadata.getPrimaryIndexColumns(model);
     }
 
+    export function mixin<A, B>(derivedCtor: Type<A>, baseB: Type<B>): Type<A & B>
+    export function mixin<A, B, C>(derivedCtor: Type<A>, baseB: Type<B>, baseC: Type<C>): Type<A & B & C>
+    export function mixin<A, B, C, D>(
+        derivedCtor: Type<A>, baseB: Type<B>, baseC: Type<C>, baseD: Type<D>
+    ): Type<A & B & C & D>
+    export function mixin<A, B, C, D, E>(
+        derivedCtor: Type<A>, baseB: Type<B>, baseC: Type<C>,
+        baseD: Type<D>, baseE: Type<E>
+    ): Type<A & B & C & D & E>
+    export function mixin<A, B, C, D, E, F>(
+        derivedCtor: Type<A>, baseB: Type<B>, baseC: Type<C>,
+        baseD: Type<D>, baseE: Type<E>, baseF: Type<F>
+    ): Type<A & B & C & D & E & F>
+    export function mixin(derivedCtor: any, ...bases: Type[]) {
+        const trgMeta = EntityMetadata.inject(derivedCtor);
+        for (const base of bases) {
+            applyMixins(derivedCtor, base);
+            const srcMeta = EntityMetadata.get(base);
+            if (srcMeta) {
+                EntityMetadata.mixin(trgMeta, srcMeta);
+            }
+        }
+        return derivedCtor;
+    }
+
     export function Pick<T, K extends keyof T>(
         classRef: Type<T>,
         keys: readonly K[]
@@ -159,11 +184,11 @@ export namespace Entity {
                     applyConstructorProperties(this, c, args);
             }
         }
+        const trgMeta = EntityMetadata.inject(UnionClass);
         for (const base of bases) {
             applyMixins(UnionClass, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
-                const trgMeta = EntityMetadata.inject(UnionClass);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }
