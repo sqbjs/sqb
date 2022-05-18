@@ -114,6 +114,8 @@ export namespace Entity {
     ): Type<A & B & C & D & E & F>
     export function mixin(derivedCtor: any, ...bases: Type[]) {
         for (const base of bases) {
+            if (!base)
+                continue;
             applyMixins(derivedCtor, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
