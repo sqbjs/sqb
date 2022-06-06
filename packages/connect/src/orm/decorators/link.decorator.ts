@@ -10,7 +10,7 @@ export function Link(chain: LinkChain<any>): PropertyDecorator {
         if (chain.first.returnsMany() &&
             Reflect.getMetadata("design:type", target, propertyKey) !== Array)
             throw new Error(`Returning type of property (${propertyKey}) must be an array`);
-        const entity = EntityMetadata.inject(target.constructor as Type);
+        const entity = EntityMetadata.define(target.constructor as Type);
         // @ts-ignore
         // noinspection JSConstantReassignment
         chain.first.source = entity.ctor;

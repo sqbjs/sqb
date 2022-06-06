@@ -9,7 +9,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
         if (arguments.length === 1) {
             if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
                 throw new Error(`You must specify primary index column(s)`);
-            const meta = EntityMetadata.inject(target);
+            const meta = EntityMetadata.define(target);
             EntityMetadata.setPrimaryKeys(meta, arg0, arg1);
             return;
         }
@@ -17,7 +17,7 @@ export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDeco
             throw new Error('Property decorators can be used for class properties only');
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
-        const meta = EntityMetadata.inject(target.constructor);
+        const meta = EntityMetadata.define(target.constructor);
         Column({notNull: true})(target, propertyKey);
         EntityMetadata.setPrimaryKeys(meta, propertyKey, arg0);
     };

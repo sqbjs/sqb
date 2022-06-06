@@ -10,7 +10,7 @@ export function Entity(options?: EntityOptions | string): ClassDecorator {
     return function (target) {
         const opts: EntityOptions = typeof options === 'object' ? options : {};
         const tableName = typeof options === 'string' ? options : opts.tableName;
-        const entity = EntityMetadata.inject(target);
+        const entity = EntityMetadata.define(target);
         entity.tableName = tableName || target.name;
         if (opts.schema)
             entity.schema = opts.schema;
@@ -90,12 +90,12 @@ export namespace Entity {
     }
 
     export function getPrimaryIndex(ctor: Type): Maybe<IndexMetadata> {
-        const model = EntityMetadata.inject(ctor);
+        const model = EntityMetadata.define(ctor);
         return EntityMetadata.getPrimaryIndex(model);
     }
 
     export function getPrimaryIndexColumns(ctor: Type): ColumnElementMetadata[] {
-        const model = EntityMetadata.inject(ctor);
+        const model = EntityMetadata.define(ctor);
         return EntityMetadata.getPrimaryIndexColumns(model);
     }
 
@@ -119,7 +119,7 @@ export namespace Entity {
             applyMixins(derivedCtor, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
-                const trgMeta = EntityMetadata.inject(derivedCtor);
+                const trgMeta = EntityMetadata.define(derivedCtor);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }
@@ -140,7 +140,7 @@ export namespace Entity {
         applyMixins(PickEntityClass, classRef, filter);
         const srcMeta = EntityMetadata.get(classRef);
         if (srcMeta) {
-            const trgMeta = EntityMetadata.inject(PickEntityClass);
+            const trgMeta = EntityMetadata.define(PickEntityClass);
             EntityMetadata.mixin(trgMeta, srcMeta, filter);
         }
         return PickEntityClass as Type<Pick<T, typeof keys[number]>>;
@@ -160,7 +160,7 @@ export namespace Entity {
         applyMixins(OmitEntityClass, classRef, filter);
         const srcMeta = EntityMetadata.get(classRef);
         if (srcMeta) {
-            const trgMeta = EntityMetadata.inject(OmitEntityClass);
+            const trgMeta = EntityMetadata.define(OmitEntityClass);
             EntityMetadata.mixin(trgMeta, srcMeta, filter);
         }
         return OmitEntityClass as Type<Omit<T, typeof keys[number]>>;
@@ -190,7 +190,7 @@ export namespace Entity {
             applyMixins(UnionClass, base);
             const srcMeta = EntityMetadata.get(base);
             if (srcMeta) {
-                const trgMeta = EntityMetadata.inject(UnionClass);
+                const trgMeta = EntityMetadata.define(UnionClass);
                 EntityMetadata.mixin(trgMeta, srcMeta);
             }
         }

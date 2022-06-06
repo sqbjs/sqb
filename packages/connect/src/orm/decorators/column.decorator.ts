@@ -9,7 +9,7 @@ export function Column(arg0): PropertyDecorator {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');
         const options = (typeof arg0 === 'string' ? {dataType: arg0} : arg0) || {};
-        const entity = EntityMetadata.inject(target.constructor);
+        const entity = EntityMetadata.define(target.constructor);
 
         if (!options.type) {
             const typ = Reflect.getMetadata("design:type", entity.ctor.prototype, propertyKey);

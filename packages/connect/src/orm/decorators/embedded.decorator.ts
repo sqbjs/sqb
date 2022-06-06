@@ -11,7 +11,7 @@ export function Embedded(type?: TypeThunk, options?: EmbeddedElementOptions): Pr
         if (typeof type !== 'function')
             throw new Error('"type" must be defined');
 
-        const entity = EntityMetadata.inject(target.constructor);
+        const entity = EntityMetadata.define(target.constructor);
         EntityMetadata.defineEmbeddedElement(entity, propertyKey, type, options);
     }
 }
