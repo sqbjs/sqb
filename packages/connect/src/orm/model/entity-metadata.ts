@@ -28,7 +28,7 @@ export interface EntityMetadata {
 
 export namespace EntityMetadata {
 
-    export function inject(ctor: Ctor): EntityMetadata {
+    export function define(ctor: Ctor): EntityMetadata {
         const own = getOwn(ctor);
         if (own)
             return own;

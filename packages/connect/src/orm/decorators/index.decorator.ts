@@ -8,14 +8,14 @@ export function Index(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator
         if (typeof target === 'function') {
             if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
                 throw new Error(`You must specify index column(s)`);
-            const model = EntityMetadata.inject(target);
+            const model = EntityMetadata.define(target);
             return EntityMetadata.addIndex(model, {...arg1, columns: arg0});
         }
         if (!target.constructor)
             throw new Error('Property decorators can be used for class properties only');
         if (typeof propertyKey !== 'string')
             throw new Error('Index() decorator can be used for string property keys only');
-        const model = EntityMetadata.inject(target.constructor);
+        const model = EntityMetadata.define(target.constructor);
         EntityMetadata.addIndex(model, {...arg0, columns: [propertyKey]});
     };
 
