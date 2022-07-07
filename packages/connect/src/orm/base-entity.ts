@@ -3,7 +3,7 @@ import {REPOSITORY_KEY} from './orm.const';
 import type {Repository} from './repository.class';
 
 export class BaseEntity {
-    private [REPOSITORY_KEY]: Repository<any>;
+    private [REPOSITORY_KEY]?: Repository<any>;
 
     constructor(partial?: any) {
         const elements = Entity.getColumnNames(Object.getPrototypeOf(this).constructor);
@@ -16,12 +16,12 @@ export class BaseEntity {
 
     async destroy(): Promise<boolean> {
         const repo = this[REPOSITORY_KEY];
-        return repo.destroy(this);
+        return !!(repo && repo.destroy(this));
     }
 
     async exists(): Promise<boolean> {
         const repo = this[REPOSITORY_KEY];
-        return repo.exists(this);
+        return !!(repo && repo.exists(this));
     }
 
     toJSON(): any {
