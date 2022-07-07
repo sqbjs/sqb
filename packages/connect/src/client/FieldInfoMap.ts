@@ -8,13 +8,13 @@ export class FieldInfoMap {
         Object.defineProperty(this, '_obj', {
             enumerable: false,
             configurable: false,
-            writable: false,
+            writable: true,
             value: {}
         });
         Object.defineProperty(this, '_arr', {
             enumerable: false,
             configurable: false,
-            writable: false,
+            writable: true,
             value: []
         });
     }
@@ -23,10 +23,16 @@ export class FieldInfoMap {
         const idx = field.index != null ? field.index : this._arr.length;
         this._arr[idx] = field;
         field.index = idx;
-        this._obj = this._arr.reduce((a, f) => {
+        const _obj = this._arr.reduce((a, f) => {
             a[f.name.toUpperCase()] = f;
             return a;
         }, {});
+        Object.defineProperty(this, '_obj', {
+            enumerable: false,
+            configurable: false,
+            writable: true,
+            value: _obj
+        });
     }
 
     get(k: string | number): FieldInfo {
