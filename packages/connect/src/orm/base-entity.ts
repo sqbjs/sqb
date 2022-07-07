@@ -25,7 +25,7 @@ export class BaseEntity {
     }
 
     toJSON(): any {
-        // this method is an placeholder an will be overwritten by declareEntity() method
+        // this method is a placeholder and will be overwritten by declareEntity() method
         return this;
     }
 }
