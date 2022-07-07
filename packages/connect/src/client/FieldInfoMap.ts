@@ -1,11 +1,26 @@
 import {FieldInfo} from './types';
 
 export class FieldInfoMap {
-    private _obj: Record<string, FieldInfo> = {};
-    private _arr: FieldInfo[] = [];
+    private _obj!: Record<string, FieldInfo>;
+    private _arr!: FieldInfo[];
+
+    constructor() {
+        Object.defineProperty(this, '_obj', {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: {}
+        });
+        Object.defineProperty(this, '_arr', {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: []
+        });
+    }
 
     add(field: FieldInfo) {
-        const idx = field.index != null ? field.index: this._arr.length;
+        const idx = field.index != null ? field.index : this._arr.length;
         this._arr[idx] = field;
         field.index = idx;
         this._obj = this._arr.reduce((a, f) => {
