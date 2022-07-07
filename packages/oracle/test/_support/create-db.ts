@@ -1,7 +1,7 @@
 import oracledb from 'oracledb';
+import {ClientConfiguration} from '@sqb/connect/src';
 import {getInsertSQLsForTestData} from '@sqb/connect/test/_shared/adapter-tests';
 import {clientConfigurationToDriver} from '@sqb/oracle/src/helpers';
-import {ClientConfiguration} from '@sqb/connect/src';
 
 const schema = process.env.ORASCHEMA || 'test';
 let schemaCreated = false;
@@ -185,7 +185,7 @@ export async function createTestSchema() {
         for (const s of sqls) {
             try {
                 await connection.execute(s);
-            } catch (e) {
+            } catch (e: any) {
                 e.message += '\n' + s;
                 throw e;
             }
@@ -199,7 +199,7 @@ export async function createTestSchema() {
             sql += 'execute immediate \'commit\';\n end;'
             try {
                 await connection.execute(sql);
-            } catch (e) {
+            } catch (e: any) {
                 e.message += '\n' + sql;
                 throw e;
             }
