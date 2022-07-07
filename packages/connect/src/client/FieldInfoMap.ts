@@ -47,4 +47,8 @@ export class FieldInfoMap {
         return [...this._arr];
     }
 
+    toJSON(): Record<string, FieldInfo> {
+        return {...this._obj};
+    }
+
 }
