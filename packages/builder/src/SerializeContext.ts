@@ -1,7 +1,7 @@
 import {SerializationType} from './enums';
 import {serializers} from './extensions';
 import {Serializable} from './Serializable';
-import {isQuery, isSerializable} from './typeguards';
+import {isLogicalOperator, isQuery, isSerializable} from './typeguards';
 import {DefaultSerializeFunction, GenerateOptions, ParamOptions} from './types';
 
 export class SerializeContext implements GenerateOptions {
@@ -68,9 +68,9 @@ export class SerializeContext implements GenerateOptions {
         if (typeof v === 'object') {
             if (isSerializable(v)) {
                 const s = v._serialize(this);
-                return s ? (isQuery(v) ? '(' + s + ')' : s) :
+                return s ? (isQuery(v) || isLogicalOperator(v) ? '(' + s + ')' : s) :
                     /* istanbul ignore next */
-                    'null';
+                    '';
             }
             if (v instanceof Date) {
                 return this.serialize(SerializationType.DATE_VALUE, v,
