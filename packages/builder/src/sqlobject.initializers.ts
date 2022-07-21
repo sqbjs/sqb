@@ -5,6 +5,7 @@ import {SelectQuery} from './query/SelectQuery';
 import {UpdateQuery} from './query/UpdateQuery';
 import {Serializable} from './Serializable';
 import {CaseStatement} from './sql-objects/CaseStatement';
+import {CoalesceStatement} from './sql-objects/CoalesceStatement';
 import {CountStatement} from './sql-objects/CountStatement';
 import {FieldExpression} from './sql-objects/FieldExpression';
 import {JoinStatement} from './sql-objects/JoinStatement';
@@ -65,6 +66,10 @@ export function FullOuterJoin(table: string | SelectQuery | RawStatement): JoinS
 
 export function Case(): CaseStatement {
     return new CaseStatement();
+}
+
+export function Coalesce(...expressions: any[]): CoalesceStatement {
+    return new CoalesceStatement(...expressions);
 }
 
 export function Count(): CountStatement {

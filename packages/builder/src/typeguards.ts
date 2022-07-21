@@ -1,6 +1,7 @@
 import {SerializationType} from './enums';
 import type {DeleteQuery} from './query/DeleteQuery';
 import type {InsertQuery} from './query/InsertQuery';
+import {Query} from './query/Query';
 import type {SelectQuery} from './query/SelectQuery';
 import type {UpdateQuery} from './query/UpdateQuery';
 import {Serializable} from './Serializable';
@@ -19,6 +20,10 @@ import type {TableName} from './sql-objects/TableName';
 
 export function isSerializable(value: any): value is Serializable {
     return value instanceof Serializable;
+}
+
+export function isQuery(value: any): value is Serializable {
+    return value instanceof Query;
 }
 
 export function isRawStatement(value: any): value is RawStatement {
