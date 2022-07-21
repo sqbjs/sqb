@@ -20,8 +20,8 @@ export class SelectQuery extends Query {
     _columns?: Serializable[];
     _joins?: JoinStatement[];
     _where?: LogicalOperator;
-    _groupBy?: (GroupColumn | RawStatement)[];
-    _orderBy?: (OrderColumn | RawStatement)[];
+    _groupBy?: (GroupColumn | Serializable)[];
+    _orderBy?: (OrderColumn | Serializable)[];
     _limit?: number;
     _offset?: number;
     _alias?: string;
@@ -91,7 +91,7 @@ export class SelectQuery extends Query {
     /**
      * Defines "where" part of query
      */
-    groupBy(...field: (string | RawStatement)[]): this {
+    groupBy(...field: (string | Serializable)[]): this {
         this._groupBy = this._groupBy || [];
         for (const arg of field) {
             if (!arg) continue;
@@ -103,7 +103,7 @@ export class SelectQuery extends Query {
     /**
      * Defines "order by" part of query.
      */
-    orderBy(...field: (string | RawStatement)[]): this {
+    orderBy(...field: (string | Serializable)[]): this {
         this._orderBy = this._orderBy || [];
         for (const arg of field) {
             if (!arg) continue;
@@ -214,12 +214,13 @@ export class SelectQuery extends Query {
         const arr: string[] = [];
         if (this._columns)
             for (const t of this._columns) {
-                const s = t._serialize(ctx);
+                const s = ctx.anyToSQL(t);
+                    // t._serialize(ctx);
                 if (s) {
                     if (t instanceof SelectQuery) {
                         if (!t._alias)
                             throw new TypeError('Alias required for sub-select in columns');
-                        arr.push('(' + s + ') ' + t._alias);
+                        arr.push(s + ' ' + t._alias);
                     } else
                         arr.push(s);
                 }

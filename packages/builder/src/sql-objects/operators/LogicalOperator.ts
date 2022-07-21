@@ -44,10 +44,10 @@ export abstract class LogicalOperator extends Operator {
     _serialize(ctx: SerializeContext): string {
         const arr: string[] = [];
         for (const t of this._items) {
-            const s: string = t._serialize(ctx);
+            const s: string = ctx.anyToSQL(t);
             /* istanbul ignore else */
             if (s)
-                arr.push(isLogicalOperator(t) ? '(' + s + ')' : s);
+                arr.push(s);
         }
         return ctx.serialize(SerializationType.LOGICAL_EXPRESSION, arr, () => {
             const s = printArray(arr, ' ' + String(this._operatorType));
@@ -55,6 +55,7 @@ export abstract class LogicalOperator extends Operator {
         });
     }
 
+    // noinspection JSMethodCanBeStatic
     private _wrapObject(obj): Serializable[] {
         const result: Serializable[] = [];
         for (const n of Object.getOwnPropertyNames(obj)) {

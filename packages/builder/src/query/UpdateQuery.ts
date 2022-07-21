@@ -5,7 +5,7 @@ import {LogicalOperator} from '../sql-objects/operators/LogicalOperator';
 import {OpAnd} from '../sql-objects/operators/OpAnd';
 import {RawStatement} from '../sql-objects/RawStatement';
 import {TableName} from '../sql-objects/TableName';
-import {isRawStatement, isSelectQuery} from '../typeguards';
+import {isRawStatement} from '../typeguards';
 import {ReturningQuery} from './ReturningQuery';
 
 export class UpdateQuery extends ReturningQuery {
@@ -66,7 +66,7 @@ export class UpdateQuery extends ReturningQuery {
             const value = ctx.anyToSQL(allValues[n]);
             arr.push({
                 field: n,
-                value: isSelectQuery(allValues[n]) ? '(' + value + ')' : value
+                value
             });
         }
         return ctx.serialize(SerializationType.UPDATE_QUERY_VALUES, arr, () => {

@@ -2,7 +2,6 @@ import {SerializationType} from '../../enums';
 import {Serializable} from '../../Serializable';
 import {SerializeContext} from '../../SerializeContext';
 import {Param} from '../../sqlobject.initializers';
-import {isSelectQuery} from '../../typeguards';
 import {FieldExpression} from '../FieldExpression';
 import {Operator} from '../Operator';
 import {ParamExpression} from '../ParamExpression';
@@ -58,9 +57,9 @@ export abstract class CompOperator extends Operator {
         }
 
         if (x instanceof Serializable) {
-            const expression = x._serialize(ctx);
+            const expression = ctx.anyToSQL(x);
             const result: any = {
-                expression: isSelectQuery(x) ? '(' + expression + ')' : expression
+                expression
             }
             if (x instanceof FieldExpression) {
                 result.dataType = result._dataType;
