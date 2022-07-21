@@ -1,6 +1,7 @@
 import {SerializationType} from './enums';
 import {serializers} from './extensions';
 import {Serializable} from './Serializable';
+import {isQuery, isSerializable} from './typeguards';
 import {DefaultSerializeFunction, GenerateOptions, ParamOptions} from './types';
 
 export class SerializeContext implements GenerateOptions {
@@ -65,9 +66,9 @@ export class SerializeContext implements GenerateOptions {
                 () => '(' + v.join(',')) + ')';
         }
         if (typeof v === 'object') {
-            if (v.isSerializable) {
+            if (isSerializable(v)) {
                 const s = v._serialize(this);
-                return s ? (v.isQuery ? '(' + s + ')' : s) :
+                return s ? (isQuery(v) ? '(' + s + ')' : s) :
                     /* istanbul ignore next */
                     'null';
             }

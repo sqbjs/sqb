@@ -30,6 +30,7 @@ export enum SerializationType {
     JOIN_CONDITIONS = 'join_conditions',
     RAW = 'raw',
     CASE_STATEMENT = 'case_expression',
+    COALESCE_STATEMENT = 'coalesce_expression',
     COUNT_STATEMENT = 'count_expression',
     CONDITIONS_BLOCK = 'conditions_block',
     COMPARISON_EXPRESSION = 'comparison_expression',
