@@ -34,6 +34,8 @@ export class OracleSerializer implements SerializerExtension {
                 return this._serializeBooleanValue(ctx, o);
             case SerializationType.RETURNING_BLOCK:
                 return this._serializeReturning();
+            case SerializationType.STRINGAGG_STATEMENT:
+                return this._serializeStringAGG(ctx, o, defFn);
         }
     }
 
@@ -103,6 +105,13 @@ export class OracleSerializer implements SerializerExtension {
 
     private _serializeBooleanValue(_ctx: SerializeContext, o: any): string {
         return o == null ? 'null' : (o ? '1' : '0');
+    }
+
+    private _serializeStringAGG(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
+        return 'listagg(' + o.field +
+            ',\'' + o.delimiter + '\') within group (' +
+            (o.orderBy ? o.orderBy : 'order by null') + ')' +
+            (o.alias ? ' ' + o.alias : '');
     }
 
     private _serializeReturning(): string {

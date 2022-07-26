@@ -13,6 +13,7 @@ import {LowerStatement} from './sql-objects/LowerStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
 import {RawStatement} from './sql-objects/RawStatement';
 import {UpperStatement} from './sql-objects/UpperStatement';
+import {StringAGGStatement} from './sql-objects/StringAggStatement';
 
 export function Raw(text: string): RawStatement {
     return new RawStatement(text);
@@ -80,6 +81,10 @@ export function Lower(expression: any): LowerStatement {
 
 export function Upper(expression: any): UpperStatement {
     return new UpperStatement(expression);
+}
+
+export function StringAGG(field: any): StringAGGStatement {
+    return new StringAGGStatement(field);
 }
 
 export function Count(): CountStatement {
