@@ -1,6 +1,6 @@
 import './_support/env';
-import path from 'path';
 import glob from 'fast-glob';
+import path from 'path';
 import {Repository} from 'rman';
 
 const rootDir = path.resolve(__dirname, '../');

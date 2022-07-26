@@ -2,7 +2,7 @@ import './_support/env';
 import assert from 'assert';
 import {
     registerSerializer, unRegisterSerializer,
-    Select, Eq, Param
+    Select, Eq, Param, StringAGG
 } from '@sqb/builder';
 import {OracleSerializer} from '../src/OracleSerializer';
 
@@ -53,6 +53,15 @@ describe('OracleSerializer', function () {
                 .where(Eq('dt', new Date(Date.UTC(2017, 0, 1, 0, 0, 0))));
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql, 'select * from table1 where dt = to_date(\'2017-01-01\', \'yyyy-mm-dd\')')
+        });
+
+        it('should serialize string-agg function to listagg', function () {
+            const query = Select(
+                StringAGG('abc')
+            )
+                .from('table1')
+            const result = query.generate({dialect: 'oracle'});
+            assert.strictEqual(result.sql, `select listagg(abc,',') within group (order by null) from table1`)
         });
 
         it('Should serialize params', function () {

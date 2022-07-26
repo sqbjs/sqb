@@ -1,6 +1,6 @@
 import '../_support/env';
 import assert from 'assert';
-import {SerializationType, Case, Select, Eq, Gt, Lt} from '@sqb/builder';
+import {Case, Eq, Gt, Lt, Select, SerializationType} from '@sqb/builder';
 
 describe('serialize "Case"', function () {
 
