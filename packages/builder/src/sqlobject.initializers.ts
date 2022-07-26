@@ -9,8 +9,10 @@ import {CoalesceStatement} from './sql-objects/CoalesceStatement';
 import {CountStatement} from './sql-objects/CountStatement';
 import {FieldExpression} from './sql-objects/FieldExpression';
 import {JoinStatement} from './sql-objects/JoinStatement';
+import {LowerStatement} from './sql-objects/LowerStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
 import {RawStatement} from './sql-objects/RawStatement';
+import {UpperStatement} from './sql-objects/UpperStatement';
 
 export function Raw(text: string): RawStatement {
     return new RawStatement(text);
@@ -70,6 +72,14 @@ export function Case(): CaseStatement {
 
 export function Coalesce(...expressions: any[]): CoalesceStatement {
     return new CoalesceStatement(...expressions);
+}
+
+export function Lower(expression: any): LowerStatement {
+    return new LowerStatement(expression);
+}
+
+export function Upper(expression: any): UpperStatement {
+    return new UpperStatement(expression);
 }
 
 export function Count(): CountStatement {
