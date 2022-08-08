@@ -1,6 +1,6 @@
 import './_support/env';
-import {OraAdapter} from '../src/OraAdapter';
 import {initAdapterTests} from '@sqb/connect/test/_shared/adapter-tests';
+import {OraAdapter} from '../src/OraAdapter';
 import {createTestSchema, dbConfig} from './_support/create-db';
 
 describe('OraAdapter', function () {

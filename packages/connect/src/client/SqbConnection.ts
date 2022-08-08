@@ -175,6 +175,7 @@ export class SqbConnection extends TypedEventEmitterClass<SqbConnectionEvents>(A
             const result: QueryResult = {
                 executeTime: Date.now() - startTime
             };
+
             if (request.showSql)
                 result.query = request;
 

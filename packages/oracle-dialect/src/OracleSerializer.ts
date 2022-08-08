@@ -1,4 +1,3 @@
-import * as compareVersion from 'compare-versions';
 import {
     DefaultSerializeFunction,
     OperatorType,
@@ -45,7 +44,7 @@ export class OracleSerializer implements SerializerExtension {
         const offset = Math.max((o.offset || 0), 0);
 
         if (limit || offset) {
-            if (ctx.dialectVersion && compareVersion.compare(ctx.dialectVersion, '12', '>=')) {
+            if (ctx.dialectVersion && ctx.dialectVersion >= '12') {
                 if (offset)
                     out += '\nOFFSET ' + offset + ' ROWS' +
                         (limit ? ' FETCH NEXT ' + limit + ' ROWS ONLY' : '');
@@ -107,7 +106,10 @@ export class OracleSerializer implements SerializerExtension {
         return o == null ? 'null' : (o ? '1' : '0');
     }
 
-    private _serializeStringAGG(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
+    // noinspection JSUnusedLocalSymbols
+    private _serializeStringAGG(ctx: SerializeContext, o: any,
+                                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                defFn: DefaultSerializeFunction): string {
         return 'listagg(' + o.field +
             ',\'' + o.delimiter + '\') within group (' +
             (o.orderBy ? o.orderBy : 'order by null') + ')' +
