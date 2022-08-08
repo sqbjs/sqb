@@ -75,7 +75,12 @@ export class OracleSerializer implements SerializerExtension {
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
         if (o.right) {
-            if (o.right.expression.toLowerCase() === 'null') {
+            if (o.value == null) {
+                if (o.right.expression.startsWith(':')) {
+                    if (ctx.params)
+                        delete ctx.params[o.right.expression.substring(1)]
+                    o.right.expression = 'null';
+                }
                 if (o.operatorType === 'eq')
                     return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
                 if (o.operatorType === 'ne')
