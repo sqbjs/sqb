@@ -122,7 +122,7 @@ CREATE TABLE ${schema}.customer_details
   alerts  VARCHAR2(256)
 )
 `, `
-ALTER TABLE ${schema}.customer_details ADD CONSTRAINT fk_customer_details_customer_id 
+ALTER TABLE ${schema}.customer_details ADD CONSTRAINT fk_cust_det_customer_id 
   FOREIGN KEY (customer_id) REFERENCES ${schema}.CUSTOMERS (id)
 `);
 
@@ -134,7 +134,7 @@ CREATE TABLE ${schema}.customer_vip_details
   rank  integer
 )
 `, `
-ALTER TABLE ${schema}.customer_vip_details ADD CONSTRAINT fk_customer_vip_details_customer_id 
+ALTER TABLE ${schema}.customer_vip_details ADD CONSTRAINT fk_cust_vip_det_customer_id 
   FOREIGN KEY (customer_id) REFERENCES ${schema}.CUSTOMERS (id)
 `);
 
@@ -170,10 +170,10 @@ CREATE TABLE ${schema}.customer_tags (
 ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT customer_tags_PK 
   PRIMARY KEY (customer_id, tag_id)
 `, `
-ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT FK_customer_tags_customer_id 
+ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT FK_cust_tags_customer_id 
   FOREIGN KEY (customer_id) REFERENCES ${schema}.customers (id)
 `, `
-ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT FK_customer_tags_tag_id
+ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT FK_cust_tags_tag_id
  FOREIGN KEY (tag_id) REFERENCES ${schema}.tags (id)`
 );
 

@@ -5,7 +5,8 @@
     "baseUrl": "./",
     "paths": {
       "@sqb/builder": ["../builder/src"],
-      "@sqb/connect": ["../connect/src"]
+      "@sqb/connect": ["../connect/src"],
+      "@sqb/oracle-dialect": ["../oracle-dialect/src"]
     }
   }
 }

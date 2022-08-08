@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
+import assert from "assert";
 import fs from "fs";
 import path from "path";
-import assert from "assert";
 import {DataType, Insert, Param, Query, Select, Update} from '@sqb/builder';
 import {Adapter, ClientConfiguration, QueryRequest, registerAdapter, unRegisterAdapter} from '@sqb/connect';
 
@@ -69,7 +69,7 @@ export function initAdapterTests(adapter: Adapter,
 
     it('should execute a select query and return fields and rows (objectRows=false)', async function () {
         connection = await adapter.connect(clientConfig);
-        const query = Select('id').from('customers').orderBy('id');
+        const query = Select('id').from('customers').orderBy('id').limit(10);
         const result = await adapterExecute(query, {objectRows: false});
         assert.ok(result);
         assert.ok(result.rows && result.rows.length);

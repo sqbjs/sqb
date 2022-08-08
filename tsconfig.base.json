@@ -18,7 +18,7 @@
     "noLib": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "allowJs": false,
     "strict": true,
     "noEmitOnError": true,

@@ -27,9 +27,9 @@
     "oracledb": "^5.4.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.1.5",
-    "@sqb/connect": "^4.1.5",
-    "@sqb/oracle-dialect": "^4.1.5",
+    "@sqb/builder": "^4.2.0",
+    "@sqb/connect": "^4.2.0",
+    "@sqb/oracle-dialect": "^4.2.0",
     "oracledb": "^5.x.x"
   },
   "main": "dist/index.js",
