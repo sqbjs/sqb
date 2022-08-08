@@ -35,8 +35,6 @@ export class OracleSerializer implements SerializerExtension {
                 return this._serializeReturning();
             case SerializationType.STRINGAGG_STATEMENT:
                 return this._serializeStringAGG(ctx, o, defFn);
-            case SerializationType.SEQUENCE_GETTER_STATEMENT:
-                return this._serializeSequenceGetter(ctx, o, defFn);
         }
     }
 
@@ -76,21 +74,18 @@ export class OracleSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-        if (o.right.value == null) {
-            if (o.right.expression?.startsWith(':')) {
-                if (ctx.params)
-                    delete ctx.params[o.right.expression.substring(1)]
-                if (ctx.preparedParams)
-                    delete ctx.preparedParams[o.right.expression.substring(1)]
-                if (ctx.paramOptions)
-                    delete ctx.paramOptions[o.right.expression.substring(1)]
-                o.right.expression = 'null';
-                o.right.isParam = false;
+        if (o.right) {
+            if (o.value == null) {
+                if (o.right.expression.startsWith(':')) {
+                    if (ctx.params)
+                        delete ctx.params[o.right.expression.substring(1)]
+                    o.right.expression = 'null';
+                }
+                if (o.operatorType === 'eq')
+                    return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
+                if (o.operatorType === 'ne')
+                    return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'is not'});
             }
-            if (o.operatorType === 'eq')
-                return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
-            if (o.operatorType === 'ne')
-                return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'is not'});
         }
         return defFn(ctx, o);
     }
@@ -123,15 +118,6 @@ export class OracleSerializer implements SerializerExtension {
         return 'listagg(' + o.field +
             ',\'' + o.delimiter + '\') within group (' +
             (o.orderBy ? o.orderBy : 'order by null') + ')' +
-            (o.alias ? ' ' + o.alias : '');
-    }
-
-    // noinspection JSUnusedLocalSymbols
-    private _serializeSequenceGetter(ctx: SerializeContext, o: any,
-                                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                     defFn: DefaultSerializeFunction): string {
-        return o.genName + '.' +
-            (o.next ? 'nextval' : 'currval') +
             (o.alias ? ' ' + o.alias : '');
     }
 
