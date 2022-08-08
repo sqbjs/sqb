@@ -12,8 +12,8 @@ import {JoinStatement} from './sql-objects/JoinStatement';
 import {LowerStatement} from './sql-objects/LowerStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
 import {RawStatement} from './sql-objects/RawStatement';
-import {UpperStatement} from './sql-objects/UpperStatement';
 import {StringAGGStatement} from './sql-objects/StringAggStatement';
+import {UpperStatement} from './sql-objects/UpperStatement';
 
 export function Raw(text: string): RawStatement {
     return new RawStatement(text);
