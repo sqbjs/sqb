@@ -12,6 +12,7 @@ import {JoinStatement} from './sql-objects/JoinStatement';
 import {LowerStatement} from './sql-objects/LowerStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
 import {RawStatement} from './sql-objects/RawStatement';
+import {SequenceGetterStatement} from './sql-objects/SequenceGetterStatement';
 import {StringAGGStatement} from './sql-objects/StringAggStatement';
 import {UpperStatement} from './sql-objects/UpperStatement';
 
@@ -89,6 +90,14 @@ export function StringAGG(field: any): StringAGGStatement {
 
 export function Count(): CountStatement {
     return new CountStatement();
+}
+
+export function SequenceNext(expression: string): SequenceGetterStatement {
+    return new SequenceGetterStatement(expression, true);
+}
+
+export function SequenceCurr(expression: string): SequenceGetterStatement {
+    return new SequenceGetterStatement(expression, false);
 }
 
 export function Param(name: string, dataType?: DataType, isArray?: boolean): ParamExpression

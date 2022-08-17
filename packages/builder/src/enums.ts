@@ -33,6 +33,7 @@ export enum SerializationType {
     COALESCE_STATEMENT = 'coalesce_expression',
     LOWER_STATEMENT = 'lower_expression',
     UPPER_STATEMENT = 'upper_expression',
+    SEQUENCE_GETTER_STATEMENT = 'sequence_getter_statement',
     STRINGAGG_STATEMENT = 'StringAGG_expression',
     COUNT_STATEMENT = 'count_expression',
     CONDITIONS_BLOCK = 'conditions_block',
