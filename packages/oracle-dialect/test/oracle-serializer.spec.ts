@@ -1,9 +1,8 @@
 import './_support/env';
 import assert from 'assert';
 import {
-    registerSerializer, unRegisterSerializer,
-    Select, Eq, Param, StringAGG
-} from '@sqb/builder';
+Eq, Param,     registerSerializer,     Select, SequenceNext,
+StringAGG, unRegisterSerializer} from '@sqb/builder';
 import {OracleSerializer} from '../src/OracleSerializer';
 
 describe('OracleSerializer', function () {
@@ -19,12 +18,24 @@ describe('OracleSerializer', function () {
             assert.strictEqual(result.sql, 'select * from dual');
         });
 
-        it('should replace "= null" to "is null"', function () {
+        it.only('should replace "= null" to "is null"', function () {
             const query = Select().from().where({'ID': null});
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql, 'select * from dual where ID is null');
         });
 
+        it.only('should replace "= null" to "is null"', function () {
+            const query = Select().from().where({'ID': Param('cid')});
+            const result = query.generate({dialect: 'oracle'});
+            assert.strictEqual(result.sql, 'select * from dual where ID is null');
+        });
+
+
+        it('should replace "= null" to "is null"', function () {
+            const query = Select().from().where(Eq('ID', null));
+            const result = query.generate({dialect: 'oracle'});
+            assert.strictEqual(result.sql, 'select * from dual where ID is null');
+        });
 
         it('should replace "!= null" to "is not null"', function () {
             const query = Select().from().where({'ID !=': null});
@@ -32,11 +43,16 @@ describe('OracleSerializer', function () {
             assert.strictEqual(result.sql, 'select * from dual where ID is not null');
         });
 
-
         it('should replace "!= null" to "is not null"', function () {
             const query = Select().from().where({'ID !=': null});
             const result = query.generate({dialect: 'oracle'});
             assert.strictEqual(result.sql, 'select * from dual where ID is not null')
+        });
+
+        it('should serialize GenId"', function () {
+            const query = Select(SequenceNext('test'))
+            const result = query.generate({dialect: 'oracle'});
+            assert.strictEqual(result.sql, 'select test.nextval from dual')
         });
 
         it('should serialize date-time with "to_date()" function', function () {
