@@ -10,6 +10,8 @@ import {CountStatement} from './sql-objects/CountStatement';
 import {FieldExpression} from './sql-objects/FieldExpression';
 import {JoinStatement} from './sql-objects/JoinStatement';
 import {LowerStatement} from './sql-objects/LowerStatement';
+import {MaxStatement} from './sql-objects/MaxStatement';
+import {MinStatement} from './sql-objects/MinStatement';
 import {ParamExpression} from './sql-objects/ParamExpression';
 import {RawStatement} from './sql-objects/RawStatement';
 import {SequenceGetterStatement} from './sql-objects/SequenceGetterStatement';
@@ -82,6 +84,14 @@ export function Lower(expression: any): LowerStatement {
 
 export function Upper(expression: any): UpperStatement {
     return new UpperStatement(expression);
+}
+
+export function Min(expression: any): MinStatement {
+    return new MinStatement(expression);
+}
+
+export function Max(expression: any): MaxStatement {
+    return new MaxStatement(expression);
 }
 
 export function StringAGG(field: any): StringAGGStatement {
