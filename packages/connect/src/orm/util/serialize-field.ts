@@ -1,9 +1,9 @@
 import {DataType} from '@sqb/builder';
 import {FieldMetadata} from '../model/field-metadata.js';
-import {isColumnElement} from './orm.helper.js';
+import {isColumnField} from './orm.helper.js';
 
 export function serializeColumn(col: FieldMetadata, v: any): any {
-    if (isColumnElement(col)) {
+    if (isColumnField(col)) {
         if (col.isArray) {
             if (Array.isArray(v))
                 return v.map(x => serializeDataValue(col.dataType || DataType.VARCHAR, x));

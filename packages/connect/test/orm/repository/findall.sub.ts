@@ -115,7 +115,7 @@ describe('findAll()', function () {
         let rows = await repo.findAll({limit: 1});
         expect(rows).toBeDefined();
         expect(rows[0].phoneCode).toBeDefined();
-        const col = Entity.getColumnElement(Country, 'phoneCode');
+        const col = Entity.getColumnField(Country, 'phoneCode');
         col!.hidden = true;
         rows = await repo.findAll({limit: 1});
         expect(rows).toBeDefined();

@@ -1,10 +1,10 @@
-import type {ElementKind} from '../orm.type.js';
+import type {FieldKind} from '../orm.type.js';
 import type {EntityMetadata} from './entity-metadata.js';
 
 export interface FieldMetadata {
     readonly entity: EntityMetadata;
     readonly name: string;
-    readonly kind: ElementKind;
+    readonly kind: FieldKind;
 
     /**
      * Indicates whether or not to hide this field by default when making queries.

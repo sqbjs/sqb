@@ -4,7 +4,7 @@ import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
 import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 import {Repository} from '../repository.class.js';
-import {isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {isColumnField, isEmbeddedField} from '../util/orm.helper.js';
 import {prepareFilter} from './command.helper.js';
 
 export type UpdateCommandArgs = {
@@ -80,7 +80,7 @@ export class UpdateCommand {
             v = values[col.name];
             if (v === undefined)
                 continue;
-            if (isColumnElement(col)) {
+            if (isColumnField(col)) {
                 if (col.noUpdate)
                     continue;
                 if (typeof col.serialize === 'function')
@@ -99,7 +99,7 @@ export class UpdateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isEmbeddedElement(col)) {
+            } else if (v != null && isEmbeddedField(col)) {
                 const type = await EmbeddedFieldMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }

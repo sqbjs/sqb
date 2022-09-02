@@ -5,7 +5,7 @@ import {
 import {AssociationNode} from '../model/association-node.js';
 import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
-import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {isAssociationField, isColumnField, isEmbeddedField} from '../util/orm.helper.js';
 
 export interface JoinInfo {
     association: AssociationNode;
@@ -113,25 +113,25 @@ export async function prepareFilter(
                 let subSelect: SelectQuery | undefined;
                 for (let i = 0; i < l; i++) {
                     pt = itemPath[i];
-                    const col = EntityMetadata.getElement(_curEntity, pt);
+                    const col = EntityMetadata.getField(_curEntity, pt);
                     if (!col)
                         throw new Error(`Unknown property (${item._left}) defined in filter`);
                     // if last item on path
                     if (i === l - 1) {
-                        if (!isColumnElement(col))
+                        if (!isColumnField(col))
                             throw new Error(`Invalid column expression (${item._left}) defined in filter`);
                         const ctor = Object.getPrototypeOf(item).constructor;
                         trgOp.add(new ctor(Field(_curAlias + '.' + _curPrefix + col.fieldName + _curSuffix, col.dataType, col.isArray), item._right));
                     } else {
-                        if (isColumnElement(col))
+                        if (isColumnField(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
-                        if (isEmbeddedElement(col)) {
+                        if (isEmbeddedField(col)) {
                             _curEntity = await EmbeddedFieldMetadata.resolveType(col);
                             _curPrefix = _curPrefix + (col.fieldNamePrefix || '');
                             _curSuffix = (col.fieldNameSuffix || '') + _curSuffix;
                             continue;
                         }
-                        if (!isAssociationElement(col))
+                        if (!isAssociationField(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
 
                         let node: AssociationNode | undefined;

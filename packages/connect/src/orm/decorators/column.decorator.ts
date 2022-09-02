@@ -19,6 +19,6 @@ export function Column(arg0): PropertyDecorator {
             } else options.type = typ;
         }
 
-        EntityMetadata.defineColumnElement(entity, propertyKey, options);
+        EntityMetadata.defineColumnField(entity, propertyKey, options);
     }
 }

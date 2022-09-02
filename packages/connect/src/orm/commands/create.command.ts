@@ -3,7 +3,7 @@ import {SqbConnection} from '../../client/sqb-connection.js';
 import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
 import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
-import {isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {isColumnField, isEmbeddedField} from '../util/orm.helper.js';
 
 export type CreateCommandArgs = {
     entity: EntityMetadata;
@@ -43,7 +43,7 @@ export class CreateCommand {
         // Prepare
         await this._prepareParams(ctx, entity, args.values);
         if (!ctx.colCount)
-            throw new Error('No element given to create new entity instance');
+            throw new Error('No field given to create new entity instance');
 
         const query = Insert(tableName, ctx.queryValues);
         if (args.returning) {
@@ -62,7 +62,7 @@ export class CreateCommand {
         if (args.returning && qr.fields && qr.rows?.length) {
             const keyValues = {};
             for (const f of qr.fields.values()) {
-                const el = EntityMetadata.getColumnElementByFieldName(entity, f.fieldName);
+                const el = EntityMetadata.getColumnFieldByFieldName(entity, f.fieldName);
                 if (el)
                     keyValues[el.name] = qr.rows[0][f.index];
             }
@@ -80,7 +80,7 @@ export class CreateCommand {
         suffix = suffix || '';
         for (const col of Object.values(entity.fields)) {
             v = values[col.name];
-            if (isColumnElement(col)) {
+            if (isColumnField(col)) {
                 if (col.noInsert)
                     continue;
                 if (v == null && col.default !== undefined) {
@@ -104,7 +104,7 @@ export class CreateCommand {
                 });
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
-            } else if (v != null && isEmbeddedElement(col)) {
+            } else if (v != null && isEmbeddedField(col)) {
                 const type = await EmbeddedFieldMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }

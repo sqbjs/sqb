@@ -126,11 +126,11 @@ export class RowConverter {
 
     private _rowToObject(executor: SqbConnection, fields: FieldInfoMap, row: any[]): any {
         // Cache keys for better performance
-        const elementKeys = this.keys;
-        const elementLen = elementKeys.length;
+        const fieldKeys = this.keys;
+        const fieldsLen = fieldKeys.length;
         let result: any;
-        for (let elIdx = 0; elIdx < elementLen; elIdx++) {
-            const elKey = elementKeys[elIdx];
+        for (let elIdx = 0; elIdx < fieldsLen; elIdx++) {
+            const elKey = fieldKeys[elIdx];
             const prop = this._properties[elKey];
             if (isValueProperty(prop)) {
                 const field = fields.get(prop.fieldAlias);
@@ -146,7 +146,7 @@ export class RowConverter {
                     }
                 }
             } else if (isNestedProperty(prop)) {
-                // One2Many Eager element
+                // One2Many Eager field
                 // Keep a list of key field/value pairs to fetch rows for eager relation
                 const _params = prop.paramValues;
                 const f = fields.get(prop.parentField);

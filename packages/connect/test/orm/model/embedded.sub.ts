@@ -19,7 +19,7 @@ describe('Embedded object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
         expect(meta!.name).toStrictEqual('MyEntity');
-        const name = EntityMetadata.getEmbeddedElement(meta!, 'name');
+        const name = EntityMetadata.getEmbeddedField(meta!, 'name');
         expect(name).toBeDefined();
         expect(name!.type).toStrictEqual(PersonName);
     });
@@ -36,7 +36,7 @@ describe('Embedded object element', function () {
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
         expect(meta!.name).toStrictEqual('MyEntity');
-        const name = EntityMetadata.getEmbeddedElement(meta!, 'name');
+        const name = EntityMetadata.getEmbeddedField(meta!, 'name');
         expect(name).toBeDefined();
         expect(name!.type).toStrictEqual(PersonName);
         expect(name!.fieldNamePrefix).toStrictEqual('prefix');

@@ -19,7 +19,7 @@ describe('Data Column', function () {
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
         expect(meta!.name).toStrictEqual('MyEntity');
-        const idColumn = EntityMetadata.getColumnElement(meta!, 'id');
+        const idColumn = EntityMetadata.getColumnField(meta!, 'id');
         expect(idColumn).toBeDefined();
         expect(idColumn!.name).toStrictEqual('id');
     });
@@ -32,7 +32,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
-        const idColumn = EntityMetadata.getColumnElement(meta!, 'id');
+        const idColumn = EntityMetadata.getColumnField(meta!, 'id');
         expect(idColumn).toBeDefined();
         expect(idColumn!.dataType).toStrictEqual(DataType.GUID);
     });
@@ -61,7 +61,7 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
-        const idColumn = EntityMetadata.getColumnElement(meta!, 'id');
+        const idColumn = EntityMetadata.getColumnField(meta!, 'id');
         expect(idColumn).toBeDefined();
         expect(idColumn!.type).toStrictEqual(Number);
         expect(idColumn!.dataType).toStrictEqual(DataType.NUMBER);
@@ -102,22 +102,22 @@ describe('Data Column', function () {
 
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
-        let col = EntityMetadata.getColumnElement(meta!, 'col1');
+        let col = EntityMetadata.getColumnField(meta!, 'col1');
         expect(col!.type).toStrictEqual(String);
         expect(col!.dataType).toStrictEqual(DataType.VARCHAR);
-        col = EntityMetadata.getColumnElement(meta!, 'col2');
+        col = EntityMetadata.getColumnField(meta!, 'col2');
         expect(col!.type).toStrictEqual(Number);
         expect(col!.dataType).toStrictEqual(DataType.NUMBER);
-        col = EntityMetadata.getColumnElement(meta!, 'col3');
+        col = EntityMetadata.getColumnField(meta!, 'col3');
         expect(col!.type).toStrictEqual(Boolean);
         expect(col!.dataType).toStrictEqual(DataType.BOOL);
-        col = EntityMetadata.getColumnElement(meta!, 'col4');
+        col = EntityMetadata.getColumnField(meta!, 'col4');
         expect(col!.type).toStrictEqual(Date);
         expect(col!.dataType).toStrictEqual(DataType.TIMESTAMP);
-        col = EntityMetadata.getColumnElement(meta!, 'col5');
+        col = EntityMetadata.getColumnField(meta!, 'col5');
         expect(col!.type).toStrictEqual(Buffer);
         expect(col!.dataType).toStrictEqual(DataType.BINARY);
-        col = EntityMetadata.getColumnElement(meta!, 'col6');
+        col = EntityMetadata.getColumnField(meta!, 'col6');
         expect(col!.type).toStrictEqual(String);
         expect(col!.dataType).toStrictEqual(DataType.VARCHAR);
         expect(col!.isArray).toStrictEqual(true);

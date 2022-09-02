@@ -28,8 +28,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             expect(meta).toBeDefined();
             expect(meta!.name).toStrictEqual('NewEntityClass');
-            expect(EntityMetadata.getElement(meta!, 'id')).toBeDefined();
-            expect(EntityMetadata.getElement(meta!, 'name')).toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'id')).toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'name')).toBeDefined();
         });
 
         it(`should combine foreign keys`, () => {
@@ -109,8 +109,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             expect(meta).toBeDefined();
             expect(meta!.name).toStrictEqual('NewEntityClass');
-            expect(EntityMetadata.getElement(meta!, 'id')).toBeDefined();
-            expect(EntityMetadata.getElement(meta!, 'name')).not.toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'id')).toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'name')).not.toBeDefined();
         });
 
         it(`should pick foreign keys for only given keys`, () => {
@@ -189,8 +189,8 @@ describe('Entity mapping', function () {
             const meta = Entity.getMetadata(NewEntityClass);
             expect(meta).toBeDefined();
             expect(meta!.name).toStrictEqual('NewEntityClass');
-            expect(EntityMetadata.getElement(meta!, 'id')).not.toBeDefined();
-            expect(EntityMetadata.getElement(meta!, 'name')).toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'id')).not.toBeDefined();
+            expect(EntityMetadata.getField(meta!, 'name')).toBeDefined();
         });
 
         it(`should omit foreign keys for only given keys`, () => {
