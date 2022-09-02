@@ -1,9 +1,9 @@
 import {DataType} from '@sqb/builder';
-import {DataFieldOptions} from '../model/column-field-metadata.js';
+import {ColumnFieldOptions} from '../model/column-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 
 export function Column(type?: DataType): PropertyDecorator
-export function Column(options?: DataFieldOptions): PropertyDecorator
+export function Column(options?: ColumnFieldOptions): PropertyDecorator
 export function Column(arg0): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')

@@ -8,7 +8,7 @@ function toJSON(obj: any): any {
     return obj ? JSON.parse(JSON.stringify(obj)) : undefined;
 }
 
-describe('find() one to one relations', function () {
+describe('Repository / find() one to one relations', function () {
 
     let client: SqbClient;
 

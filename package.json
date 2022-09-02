@@ -11,6 +11,16 @@
   "workspaces": [
     "packages/**"
   ],
+  "scripts": {
+    "preclean": "rimraf build coverage",
+    "clean": "rman run clean",
+    "build": "rman build",
+    "test": "jest --passWithNoTests --detectOpenHandles",
+    "precover": "rimraf coverage",
+    "cover": "jest --passWithNoTests --detectOpenHandles --coverage",
+    "precitest": "rimraf coverage",
+    "citest": "jest --passWithNoTests --detectOpenHandles --coverage --coverageReporters=lcov"
+  },
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.9",
     "@tsconfig/recommended": "^1.0.1",
@@ -37,13 +47,6 @@
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.0",
     "typescript": "^4.8.2"
-  },
-  "scripts": {
-    "test": "jest --runInBand",
-    "precoverage": "rimraf coverage",
-    "coverage": "nyc npm run test",
-    "travis-cover": "nyc --reporter lcovonly npm run test",
-    "preclean": "rimraf coverage"
   },
   "engines": {
     "node": ">= 16.0",

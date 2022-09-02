@@ -1,8 +1,8 @@
 import {
     Column,
     Entity,
-    Link, LinkFromMany, linkFromMany,
-    LinkToOne, PrimaryKey
+    Link,
+    PrimaryKey
 } from '@sqb/connect';
 import {Continent} from './continent.entity.js';
 import type {Customer} from './customer.entity.js';
@@ -25,14 +25,18 @@ export class Country {
     @Column({fieldName: 'has_market', default: true})
     hasMarket: boolean;
 
-    @LinkToOne(Continent)
+    @Link({exclusive: true})
     readonly continent: Continent;
 
-    @LinkFromMany(async () => (await import('./customer.entity.js')).Customer)
+    @Link({exclusive: true})
+        .toMany(async () => (await import('./customer.entity.js')).Customer,
+            {sourceKey: 'code', targetKey: 'countryCode'})
     readonly customers: Customer[];
 
-    @Link(linkFromMany(async () => (await import('./customer.entity.js')).Customer)
-        .where({vip: true}))
+    @Link({exclusive: true}).toMany(
+        async () => (await import('./customer.entity.js')).Customer,
+        {sourceKey: 'code', targetKey: 'countryCode', where: {vip: true}}
+    )
     readonly vipCustomers: Customer[];
 
 }

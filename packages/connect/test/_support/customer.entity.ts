@@ -4,8 +4,8 @@ import {
     DataType,
     Embedded,
     Entity,
-    Link, linkFromMany, LinkFromOne, linkFromOne,
-    LinkToOne, linkToOne, Parse,
+    Link,
+    Parse,
     PrimaryKey,
     Serialize,
 } from '@sqb/connect';
@@ -41,6 +41,7 @@ export class Customer extends BaseEntity {
     @Column({
         fieldName: 'birth_date',
         dataType: DataType.DATE,
+        exclusive: true
     })
     birthDate?: Date;
 
@@ -83,23 +84,28 @@ export class Customer extends BaseEntity {
     @Column({fieldName: 'custom_data', dataType: DataType.JSON})
     customData: object;
 
-    @LinkToOne()
+    @Link({exclusive: true})
     readonly country?: Country;
 
-    @Link(linkFromOne(CustomerVip))
+    @Link({exclusive: true})
+        .toOne(CustomerVip, {sourceKey: 'id', targetKey: 'customerId'})
     readonly vipDetails: CustomerVip;
 
-    @Link(linkFromOne(CustomerVip)
-        .where({'rank>=': 5}))
+    @Link({exclusive: true})
+        .toOne(CustomerVip, {sourceKey: 'id', targetKey: 'customerId', where: {'rank>=': 5}})
     readonly vvipDetails: CustomerVip;
 
-    @Link(linkToOne(Country).linkToOne(Continent))
+    @Link({exclusive: true})
+        .toOne(Country)
+        .toOne(Continent)
     readonly continent: Continent;
 
-    @LinkFromOne(CustomerDetail)
+    @Link({exclusive: true}).toOne(CustomerDetail, {sourceKey: 'id', targetKey: 'customerId'})
     readonly details: CustomerDetail;
 
-    @Link(linkFromMany(CustomerTag).linkToOne(Tag))
+    @Link({exclusive: true})
+        .toMany(CustomerTag)
+        .toOne(Tag)
     readonly tags?: Tag[];
 
 }

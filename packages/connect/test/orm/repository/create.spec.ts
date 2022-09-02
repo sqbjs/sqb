@@ -4,7 +4,7 @@ import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 import {Tag} from '../../_support/tags.entity.js';
 
-describe('create()', function () {
+describe('Repository / create()', function () {
 
     let client: SqbClient;
 

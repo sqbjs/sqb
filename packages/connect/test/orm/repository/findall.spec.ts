@@ -5,7 +5,7 @@ import {Country} from '../../_support/country.entity.js';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('findAll()', function () {
+describe('Repository / findAll()', function () {
 
     let client: SqbClient;
 
@@ -26,6 +26,7 @@ describe('findAll()', function () {
         expect(rows[0].givenName).toBeDefined();
         expect(rows[0].familyName).toBeDefined();
         expect(rows[0].country).toBeUndefined();
+        expect(rows[0].birthDate).toBeUndefined();
     });
 
     it('should return embedded fields', async function () {
@@ -79,15 +80,15 @@ describe('findAll()', function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,
-            include: ['country']
+            include: ['birthDate']
         });
         expect(rows).toBeDefined();
         expect(rows[0].givenName).toBeDefined();
         expect(rows[0].familyName).toBeDefined();
-        expect(rows[0].country).toBeDefined();
+        expect(rows[0].birthDate).toBeDefined();
     });
 
-    it('should exclude associated elements if not included', async function () {
+    it('should exclude exclusive fields if not included', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({limit: 1});
         expect(rows).toBeDefined();
@@ -95,7 +96,7 @@ describe('findAll()', function () {
         expect(rows[0].country).toBeUndefined();
     });
 
-    it('should exclude returning elements specified in "exclude" option', async function () {
+    it('should exclude result fields', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,

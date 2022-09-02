@@ -1,5 +1,5 @@
 import {camelCase} from 'putil-varhelpers';
-import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type.js';
+import {AssociationSettings, TypeThunk} from '../orm.type.js';
 import {resolveEntityMeta} from '../util/orm.helper.js';
 import {ColumnFieldMetadata} from './column-field-metadata.js';
 import {EntityMetadata} from './entity-metadata.js';
@@ -17,7 +17,7 @@ export class Association {
     readonly target: TypeThunk;
     readonly sourceKey?: string;
     readonly targetKey?: string;
-    readonly kind?: AssociationKind;
+    readonly many: boolean;
 
     constructor(name: string, args: AssociationSettings) {
         this.name = name;
@@ -25,7 +25,7 @@ export class Association {
         this.target = args.target;
         this.sourceKey = args.sourceKey;
         this.targetKey = args.targetKey;
-        this.kind = args.kind;
+        this.many = !!args.many;
     }
 
     async resolveSource(): Promise<EntityMetadata> {
@@ -66,13 +66,10 @@ export class Association {
         return this._targetProperty;
     }
 
-    get sourceBelongsToTarget(): boolean {
-        return this.kind === 'from' || this.kind === 'from-many';
+    returnsMany(): boolean {
+        return this.many;
     }
 
-    returnsMany(): boolean {
-        return this.kind === 'to-many' || this.kind === 'from-many';
-    }
 
     protected async _resolveKeys(): Promise<void> {
         if (this._resolved)
@@ -105,21 +102,10 @@ export class Association {
                 }
             }
 
-            let master: EntityMetadata;
-            let detail: EntityMetadata;
-            let masterKey: string;
-            let detailKey: string;
-            if (this.sourceBelongsToTarget) {
-                master = target;
-                detail = source;
-                masterKey = targetKey || '';
-                detailKey = sourceKey || '';
-            } else {
-                master = source;
-                detail = target;
-                detailKey = targetKey || '';
-                masterKey = sourceKey || '';
-            }
+            const master = source;
+            const detail = target;
+            let masterKey = sourceKey || '';
+            let detailKey = targetKey || '';
 
             if (!detailKey) {
                 const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(detail);
@@ -133,13 +119,8 @@ export class Association {
                 if (!EntityMetadata.getColumnField(master, masterKey))
                     masterKey = camelCase(masterKey);
             }
-            if (this.sourceBelongsToTarget) {
-                targetKey = masterKey;
-                sourceKey = detailKey;
-            } else {
-                targetKey = detailKey;
-                sourceKey = masterKey;
-            }
+            targetKey = detailKey;
+            sourceKey = masterKey;
         }
         this._targetProperty = EntityMetadata.getColumnField(target, targetKey);
         if (!this._targetProperty)

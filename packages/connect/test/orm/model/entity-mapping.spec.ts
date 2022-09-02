@@ -5,7 +5,7 @@ import {
     ForeignKey, Index
 } from '@sqb/connect';
 
-describe('Entity mapping', function () {
+describe('Model / Entity mapping', function () {
 
     describe('UnionEntity()', function () {
 

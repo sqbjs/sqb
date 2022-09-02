@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {Entity, EntityMetadata, Parse, Serialize} from '@sqb/connect';
 
-describe('Parse', function () {
+describe('Model / Parse', function () {
 
     it(`should @Parse() decorator set "parse" property of metadata`, () => {
         const fn = (v) => '>' + v;
@@ -21,7 +21,7 @@ describe('Parse', function () {
 
 });
 
-describe('Serialize', function () {
+describe('Model / Serialize', function () {
 
     it(`should @Serialize() decorator set "parse" property of metadata`, () => {
         const fn = (v) => '>' + v;

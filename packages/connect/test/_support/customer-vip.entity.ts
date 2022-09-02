@@ -1,4 +1,4 @@
-import {BaseEntity, Column, DataType, Entity, LinkToOne, PrimaryKey,} from '@sqb/connect';
+import {BaseEntity, Column, DataType, Entity, Link, PrimaryKey,} from '@sqb/connect';
 import type {Customer} from './customer.entity';
 
 @Entity('customer_vip_details')
@@ -13,7 +13,7 @@ export class CustomerVip extends BaseEntity {
     @Column({dataType: DataType.SMALLINT})
     rank?: number;
 
-    @LinkToOne(async () => (await import('./customer.entity.js')).Customer)
+    @Link({exclusive: true}).toOne(async () => (await import('./customer.entity.js')).Customer)
     readonly customer?: Customer;
 
 }

@@ -5,8 +5,6 @@ export type Ctor = Type | Function;
 /* Model related */
 export type FieldKind = 'column' | 'object' | 'association';
 
-export type AssociationKind = 'to' | 'to-many' | 'from' | 'from-many';
-
 /**
  * Indicates auto generation strategy
  */
@@ -28,5 +26,5 @@ export interface AssociationSettings {
     target: TypeThunk;
     sourceKey?: string;
     targetKey?: string;
-    kind?: AssociationKind;
+    many?: boolean;
 }

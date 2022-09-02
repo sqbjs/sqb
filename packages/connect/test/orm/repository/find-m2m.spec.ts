@@ -3,7 +3,7 @@ import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('find() many to many relations', function () {
+describe('Repository / find() many to many relations', function () {
 
     let client: SqbClient;
 

@@ -113,9 +113,18 @@ export class FindCommand {
         const _include = opts.include ?
             opts.include.map(x => x.toLowerCase()) : undefined;
 
-        const requestedFields = _pick ? [..._pick] :
-            (Entity.getNonAssociationFieldNames(entity.ctor) as string[])
-                .map(x => x.toLowerCase());
+        let requestedFields: string[];
+        if (_pick)
+            requestedFields = [..._pick];
+        else {
+            requestedFields = Entity.getFieldNames(entity.ctor).reduce((a, x) => {
+                const f = Entity.getField(entity.ctor, x);
+                if (f && !f.exclusive)
+                    a.push(x.toLowerCase())
+                return a;
+            }, [] as string[])
+        }
+
         if (_include)
             requestedFields.push(..._include);
 
