@@ -19,7 +19,7 @@ class Customer {
     countryCode: string;
 }
 
-describe('Association', function () {
+describe('Model / Association', function () {
 
     it(`should resolve source entity (entity class)`, async () => {
         const association = new Association('', {source: Customer, target: Country});

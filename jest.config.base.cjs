@@ -4,21 +4,23 @@ module.exports = {
   'verbose': true,
   'forceExit': true,
   coveragePathIgnorePatterns: [
-    '<rootDir>/build/',
-    '<rootDir>/dist/',
+    '/build/',
+    '/dist/',
+    '/packages/oracle/',
     '/node_modules/',
-    '_support'
+    '_support',
+    '_shared'
   ],
   coverageReporters: ['lcov', 'text'],
   globals: {
     'ts-jest': {
       'isolatedModules': false,
-      // 'preferTsExts': true,
+      'preferTsExts': true,
       'tsconfig': '<rootDir>/test/tsconfig.json'
     }
   },
   moduleNameMapper: {
     '^@sqb/(.*)$': ['<rootDir>/../$1/src'],
-    "(\\..+)\\.js": "$1"
-  },
+    '(\\..+)\\.js': '$1'
+  }
 };

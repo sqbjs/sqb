@@ -3,7 +3,7 @@ import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('findOne()', function () {
+describe('Repository / findOne()', function () {
 
     let client: SqbClient;
 

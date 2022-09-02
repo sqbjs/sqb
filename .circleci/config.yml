@@ -7,11 +7,11 @@ workflows:
   main:
     jobs:
       - test:
-          version: '15'
-      - test:
           version: '16'
       - test:
           version: '17'
+      - test:
+          version: '18'
 
 jobs:
   test:

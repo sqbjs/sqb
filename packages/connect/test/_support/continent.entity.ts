@@ -1,4 +1,4 @@
-import {Column, Entity, Link, LinkFromMany, linkFromOne, PrimaryKey} from '@sqb/connect';
+import {Column, Entity, Link, PrimaryKey} from '@sqb/connect';
 import type {Country} from './country.entity.js';
 import type {Customer} from './customer.entity.js';
 
@@ -11,15 +11,24 @@ export class Continent {
     @Column()
     name: string;
 
-    @LinkFromMany(() => require('./country.entity.js').Country)
+    @Link({exclusive: true})
+        .toMany(async () => (await import('./country.entity.js')).Country,
+            {sourceKey: 'code', targetKey: 'continentCode'})
     countries: Country[];
 
-    @Link(linkFromOne(() => require('./country.entity.js').Country)
-        .where({hasMarket: true}))
+    @Link({exclusive: true})
+        .toMany(async () => (await import('./country.entity.js')).Country,
+            {sourceKey: 'code', targetKey: 'continentCode', where: {hasMarket: true}})
     marketCountries: Country[];
 
-    @Link(linkFromOne(() => require('./country.entity.js').Country)
-        .linkFromMany(() => require('./customer.entity.js').Customer))
+    @Link({exclusive: true})
+        .toMany(
+            async () => (await import('./country.entity.js')).Country,
+            {sourceKey: 'code', targetKey: 'continentCode'})
+        .toOne(
+            async () => (await import('./customer.entity.js')).Customer,
+            {sourceKey: 'code', targetKey: 'countryCode'}
+        )
     customers: Customer[]
 
 }

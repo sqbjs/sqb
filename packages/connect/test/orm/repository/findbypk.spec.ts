@@ -4,7 +4,7 @@ import {Country} from '../../_support/country.entity.js';
 import {CustomerTag} from '../../_support/customer-tag.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('findByPk()', function () {
+describe('Repository / findByPk()', function () {
 
     let client: SqbClient;
 

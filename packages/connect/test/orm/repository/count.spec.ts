@@ -2,7 +2,7 @@ import {SqbClient} from '@sqb/connect';
 import {Country} from '../../_support/country.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('count()', function () {
+describe('Repository / count()', function () {
 
     let client: SqbClient;
 

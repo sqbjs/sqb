@@ -29,7 +29,7 @@ const createCustomer = async function (values?: any): Promise<DeepPartial<Custom
     return await repo.create(v);
 }
 
-describe('update()', function () {
+describe('Repository / update()', function () {
 
     beforeAll(async () => {
         client = await initClient();

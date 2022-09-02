@@ -1,5 +1,5 @@
 import {Type} from 'ts-gems';
-import {AssociationKind, TypeResolver, TypeThunk} from '../orm.type.js';
+import {TypeResolver, TypeThunk} from '../orm.type.js';
 import {AssociationNode} from './association-node.js';
 
 export class LinkChain<T> {
@@ -7,11 +7,11 @@ export class LinkChain<T> {
     current: AssociationNode;
 
     constructor(public target: TypeThunk<T>,
-                kind: AssociationKind,
                 targetKey?: keyof T,
-                sourceKey?: string) {
+                sourceKey?: string,
+                many?: boolean) {
         this.first = this.current = new AssociationNode('', {
-            kind,
+            many,
             target,
             source: null as unknown as Type,
             sourceKey,
@@ -30,35 +30,24 @@ export class LinkChain<T> {
     linkToOne<K>(target: Type<K> | TypeResolver<K>,
                  targetColumn?: keyof K,
                  parentColumn?: keyof T): LinkChain<K> {
-        return this._newNode(target, 'to', targetColumn, parentColumn);
+        return this._newNode(target, targetColumn, parentColumn);
     }
 
     linkToMany<K>(target: Type<K> | TypeResolver<K>,
                   targetColumn?: keyof K,
                   parentColumn?: keyof T): LinkChain<K> {
-        return this._newNode(target, 'to-many', targetColumn, parentColumn);
-    }
-
-    linkFromOne<K>(target: Type<K> | TypeResolver<K>,
-                   targetColumn?: keyof K,
-                   parentColumn?: keyof T): LinkChain<K> {
-        return this._newNode(target, 'from', targetColumn, parentColumn);
-    }
-
-    linkFromMany<K>(target: Type<K> | TypeResolver<K>,
-                    targetColumn?: keyof K,
-                    parentColumn?: keyof T): LinkChain<K> {
-        return this._newNode(target, 'from-many', targetColumn, parentColumn);
+        return this._newNode(target, targetColumn, parentColumn, true);
     }
 
     private _newNode<K>(target: Type<K> | TypeResolver<K>,
-                        kind: AssociationKind,
                         targetKey?: keyof K,
-                        parentKey?: keyof T): LinkChain<K> {
+                        parentKey?: keyof T,
+                        many = false
+    ): LinkChain<K> {
         const child = new AssociationNode(
             this.current.name,
             {
-                kind,
+                many,
                 source: this.current.target,
                 target,
                 sourceKey: parentKey as string,

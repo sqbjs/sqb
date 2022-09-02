@@ -2,7 +2,7 @@ import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('destroy()', function () {
+describe('Repository / destroy()', function () {
 
     let client: SqbClient;
 

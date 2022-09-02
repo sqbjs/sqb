@@ -10,7 +10,7 @@ import type {
 import type {EntityMetadata} from './entity-metadata.js';
 import {FieldMetadata} from './field-metadata.js';
 
-export type DataFieldOptions = Partial<Omit<ColumnFieldMetadata, 'entity' | 'name' | 'kind'>>;
+export type ColumnFieldOptions = Partial<Omit<ColumnFieldMetadata, 'entity' | 'name' | 'kind'>>;
 
 export interface ColumnFieldMetadata extends FieldMetadata {
     readonly kind: 'column';
@@ -97,7 +97,7 @@ export interface ColumnFieldMetadata extends FieldMetadata {
 
 export namespace ColumnFieldMetadata {
 
-    export function create(entity: EntityMetadata, name: string, options: DataFieldOptions = {}): ColumnFieldMetadata {
+    export function create(entity: EntityMetadata, name: string, options: ColumnFieldOptions = {}): ColumnFieldMetadata {
         const result: ColumnFieldMetadata = {
             kind: 'column',
             entity,
@@ -109,7 +109,7 @@ export namespace ColumnFieldMetadata {
         return result;
     }
 
-    export function assign(target: ColumnFieldMetadata, options: DataFieldOptions) {
+    export function assign(target: ColumnFieldMetadata, options: ColumnFieldOptions) {
         Object.assign(target, _.omit(options, ['entity', 'name', 'kind']));
     }
 

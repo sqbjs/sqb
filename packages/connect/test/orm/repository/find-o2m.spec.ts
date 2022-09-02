@@ -6,7 +6,7 @@ import {Country} from '../../_support/country.entity.js';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('find() one to many relations', function () {
+describe('Repository / find() one to many relations', function () {
 
     let client: SqbClient;
 

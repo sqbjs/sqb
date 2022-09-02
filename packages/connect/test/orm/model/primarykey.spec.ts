@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,@typescript-eslint/no-unused-vars */
 import {Entity, PrimaryKey} from '@sqb/connect';
 
-describe('PrimaryKey', function () {
+describe('Model / PrimaryKey', function () {
 
     it(`should define primary index field with string argument`, () => {
         @PrimaryKey('id')

@@ -4,11 +4,11 @@ import {
     Column,
     DataType,
     Entity,
-    LinkToOne,
+    Link,
     PrimaryKey,
 } from '@sqb/connect';
 
-describe('Entity', function () {
+describe('Model / Entity', function () {
 
     it(`should @Entity() decorator attach metadata to class`, () => {
         @Entity()
@@ -141,7 +141,7 @@ describe('Entity', function () {
             @Column()
             name: number;
 
-            @LinkToOne()
+            @Link()
             country: Country;
 
         }
@@ -171,7 +171,7 @@ describe('Entity', function () {
             @Column()
             name: number;
 
-            @LinkToOne()
+            @Link()
             country: Country;
 
         }
@@ -201,7 +201,7 @@ describe('Entity', function () {
             @Column({noUpdate: true})
             name: number;
 
-            @LinkToOne()
+            @Link()
             country: Country;
 
         }
@@ -231,7 +231,7 @@ describe('Entity', function () {
             @Column({noUpdate: true})
             name: number;
 
-            @LinkToOne()
+            @Link()
             country: Country;
 
         }

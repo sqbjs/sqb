@@ -5,9 +5,9 @@ import {Ctor, TypeThunk} from '../orm.type.js';
 import {isAssociationField, isColumnField, isEmbeddedField} from '../util/orm.helper.js';
 import {serializeColumn} from '../util/serialize-field.js';
 import {Association} from './association.js';
-import {AssociationFieldMetadata} from './association-field-metadata.js';
+import {AssociationFieldMetadata, AssociationFieldOptions} from './association-field-metadata.js';
 import {AssociationNode} from './association-node.js';
-import {ColumnFieldMetadata, DataFieldOptions} from './column-field-metadata.js';
+import {ColumnFieldMetadata, ColumnFieldOptions} from './column-field-metadata.js';
 import {EmbeddedFieldMetadata, EmbeddedFieldOptions} from './embedded-field-metadata.js';
 import {IndexMetadata} from './index-metadata.js';
 
@@ -219,7 +219,7 @@ export namespace EntityMetadata {
     export function defineColumnField(
         entity: EntityMetadata,
         name: string,
-        options: DataFieldOptions = {}
+        options: ColumnFieldOptions = {}
     ): ColumnFieldMetadata {
         delete (entity as any)._fieldNames;
         let prop = EntityMetadata.getField(entity, name);
@@ -300,10 +300,11 @@ export namespace EntityMetadata {
     export function defineAssociationField(
         entity: EntityMetadata,
         propertyKey: string,
-        association: AssociationNode
+        association: AssociationNode,
+        options?: AssociationFieldOptions
     ): AssociationFieldMetadata {
         delete (entity as any)._fieldNames;
-        const prop = AssociationFieldMetadata.create(entity, propertyKey, association);
+        const prop = AssociationFieldMetadata.create(entity, propertyKey, association, options);
         let l: AssociationNode | undefined = association;
         let i = 1;
         while (l) {
