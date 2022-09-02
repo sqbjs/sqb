@@ -1,10 +1,8 @@
-import '../_support/env';
-import assert from 'assert';
 import {Readable} from 'stream';
 import {Select} from '@sqb/builder';
-import {Cursor} from '@sqb/connect';
-import {SqbConnection} from '../../src/client/SqbConnection';
-import {initClient} from '../_support/init-client';
+import {Cursor, SqbClient} from '@sqb/connect';
+import {SqbConnection} from '../../src/client/sqb-connection.js';
+import {initClient} from '../_support/init-client.js';
 
 function readStream(stream: Readable): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -24,7 +22,7 @@ function readStream(stream: Readable): Promise<string> {
 
 function readObjectStream(stream: Readable): Promise<any> {
     return new Promise((resolve, reject) => {
-        const arr = [];
+        const arr: any[] = [];
         stream.on('data', (chunk): void => {
             arr.push(chunk);
         });
@@ -40,36 +38,43 @@ function readObjectStream(stream: Readable): Promise<any> {
 
 describe('CursorStream', function () {
 
-    const client = initClient({defaults: {cursor: true, objectRows: true}});
+    let client: SqbClient;
     let cursor: Cursor;
 
+    beforeAll(async () => {
+        client = await initClient({defaults: {cursor: true, objectRows: true}});
+    })
+
+    afterAll(async () => {
+        await client.close(0);
+    });
+
     it('should stream string buffer', async function () {
-        this.slow(1000);
-        await client().acquire(async (session: SqbConnection) => {
+        await client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
             const buf = await readStream(stream);
-            assert.strictEqual(typeof buf, 'string');
+            expect(typeof buf).toStrictEqual('string');
             const obj = JSON.parse(buf);
-            assert(Array.isArray(obj));
-            assert(stream.isClosed);
+            expect(Array.isArray(obj)).toBeTruthy();
+            expect(stream.isClosed).toStrictEqual(true);
         });
     });
 
     it('should stream row object if objectMode enabled', async function () {
-        await client().acquire(async (session: SqbConnection) => {
+        await client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream({objectMode: true});
             const arr = await readObjectStream(stream);
-            assert(Array.isArray(arr));
-            assert(stream.isClosed);
+            expect(Array.isArray(arr)).toStrictEqual(true);
+            expect(stream.isClosed).toStrictEqual(true);
         });
     });
 
     it('should cursor.close() also close the stream', function (done) {
-        client().acquire(async (session: SqbConnection) => {
+        client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             const stream = cursor.toStream();
@@ -79,7 +84,7 @@ describe('CursorStream', function () {
     });
 
     it('should handle cursor errors', function (done) {
-        client().acquire(async (session: SqbConnection) => {
+        client.acquire(async (session: SqbConnection) => {
             const result = await session.execute(Select().from('customers'));
             cursor = result && result.cursor;
             (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));

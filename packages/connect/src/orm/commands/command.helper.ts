@@ -2,10 +2,10 @@ import {
     And, Eq, Exists, Field, InnerJoin, isCompOperator, isLogicalOperator, JoinStatement, LeftOuterJoin,
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
-import {AssociationNode} from '../model/association-node';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
-import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper';
+import {AssociationNode} from '../model/association-node.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
 
 export interface JoinInfo {
     association: AssociationNode;

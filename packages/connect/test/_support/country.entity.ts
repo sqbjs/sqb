@@ -1,11 +1,11 @@
 import {
     Column,
     Entity,
-    PrimaryKey,
-    LinkToOne, LinkFromMany, Link, linkFromMany
+    Link, LinkFromMany, linkFromMany,
+    LinkToOne, PrimaryKey
 } from '@sqb/connect';
-import {Continent} from './continent.entity';
-import type {Customer} from './customer.entity';
+import {Continent} from './continent.entity.js';
+import type {Customer} from './customer.entity.js';
 
 @Entity('countries')
 export class Country {
@@ -28,10 +28,10 @@ export class Country {
     @LinkToOne(Continent)
     readonly continent: Continent;
 
-    @LinkFromMany(() => require('./customer.entity').Customer)
+    @LinkFromMany(async () => (await import('./customer.entity.js')).Customer)
     readonly customers: Customer[];
 
-    @Link(linkFromMany(() => require('./customer.entity').Customer)
+    @Link(linkFromMany(async () => (await import('./customer.entity.js')).Customer)
         .where({vip: true}))
     readonly vipCustomers: Customer[];
 

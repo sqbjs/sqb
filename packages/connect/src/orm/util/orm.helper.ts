@@ -1,10 +1,10 @@
 import {Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../model/association-element-metadata';
-import type {ColumnElementMetadata} from '../model/column-element-metadata';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import type {EntityMetadata} from '../model/entity-metadata';
-import {ENTITY_METADATA_KEY} from '../orm.const';
-import type {TypeResolver, TypeThunk} from '../orm.type';
+import {AssociationElementMetadata} from '../model/association-element-metadata.js';
+import type {ColumnElementMetadata} from '../model/column-element-metadata.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import type {EntityMetadata} from '../model/entity-metadata.js';
+import {ENTITY_METADATA_KEY} from '../orm.const.js';
+import type {TypeResolver, TypeThunk} from '../orm.type.js';
 
 export function isClass(fn: any): fn is Type {
     return typeof fn === 'function' && /^\s*class/.test(fn.toString());

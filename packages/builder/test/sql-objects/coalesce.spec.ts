@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Coalesce, Field, Select, SerializationType} from '@sqb/builder';
+import {Coalesce, Field, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Coalesce"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Coalesce"', function () {
     };
 
     it('should initialize Coalesce', function () {
-        assert.strictEqual(Coalesce()._type, SerializationType.COALESCE_STATEMENT);
+        expect(Coalesce()._type).toStrictEqual(SerializationType.COALESCE_STATEMENT);
     });
 
     it('should serialize values', function () {
@@ -18,7 +16,7 @@ describe('serialize "Coalesce"', function () {
             Coalesce(null, 'a', 1)
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select coalesce(null, 'a', 1) from table1`);
+        expect(result.sql).toStrictEqual(`select coalesce(null, 'a', 1) from table1`);
     });
 
     it('should serialize Field names', function () {
@@ -26,7 +24,7 @@ describe('serialize "Coalesce"', function () {
             Coalesce(Field('a'), Field('b'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select coalesce(a, b) from table1`);
+        expect(result.sql).toStrictEqual(`select coalesce(a, b) from table1`);
     });
 
     it('should serialize sub query', function () {
@@ -34,7 +32,7 @@ describe('serialize "Coalesce"', function () {
             Coalesce(Select().from('table2'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select coalesce((select * from table2)) from table1`);
+        expect(result.sql).toStrictEqual(`select coalesce((select * from table2)) from table1`);
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "Coalesce"', function () {
             Coalesce(1, 2).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select coalesce(1, 2) col1 from table1');
+        expect(result.sql).toStrictEqual('select coalesce(1, 2) col1 from table1');
     });
 
 });

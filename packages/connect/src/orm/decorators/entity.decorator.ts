@@ -1,10 +1,10 @@
 import {Maybe, Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../model/association-element-metadata';
-import {ColumnElementMetadata} from '../model/column-element-metadata';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import {AnyElementMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata';
-import {IndexMetadata} from '../model/index-metadata';
-import {applyMixins} from '../util/apply-mixins';
+import {AssociationElementMetadata} from '../model/association-element-metadata.js';
+import {ColumnElementMetadata} from '../model/column-element-metadata.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {AnyElementMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata.js';
+import {IndexMetadata} from '../model/index-metadata.js';
+import {applyMixins} from '../util/apply-mixins.js';
 
 export function Entity(options?: EntityOptions | string): ClassDecorator {
     return function (target) {

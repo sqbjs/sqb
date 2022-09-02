@@ -1,11 +1,11 @@
 import {Connection, stringifyValueForSQL} from 'postgresql-client';
-// noinspection ES6PreferShortImport
-import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests';
+import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests.js';
 
 const schemaCreated = {};
 
 function getSql(schema: string) {
     return `
+LOCK TABLE pg_catalog.pg_namespace;
 DROP SCHEMA IF EXISTS ${schema} CASCADE;
 CREATE SCHEMA ${schema} AUTHORIZATION postgres;
 
@@ -157,9 +157,14 @@ values
 export async function createTestSchema(schema: string) {
     if (schemaCreated[schema])
         return;
+    schemaCreated[schema] = true;
     const connection = new Connection();
     await connection.connect();
     try {
+        const r = await connection.query('SELECT schema_name FROM information_schema.schemata ' +
+            'where schema_name = \'' + schema + '\'');
+        if (r.rows && r.rows.length)
+            return;
         const sql = getSql(schema);
         await connection.execute(sql);
         const dataFiles = getInsertSQLsForTestData({
@@ -169,7 +174,6 @@ export async function createTestSchema(schema: string) {
         });
         for (const table of dataFiles)
             await connection.execute(table.scripts.join(';\n'));
-        schemaCreated[schema] = true;
     } finally {
         await connection.close(0);
     }

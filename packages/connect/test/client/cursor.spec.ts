@@ -1,273 +1,281 @@
-import '../_support/env';
-import assert from 'assert';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {Select} from '@sqb/builder';
-import { Cursor} from '@sqb/connect';
-import {SqbConnection} from '../../src/client/SqbConnection';
-import {initClient} from '../_support/init-client';
+import {Cursor, SqbClient} from '@sqb/connect';
+import {SqbConnection} from '../../src/client/sqb-connection.js';
+import {initClient} from '../_support/init-client.js';
 
 describe('Cursor', function () {
 
-    const client = initClient({defaults: {cursor: true, objectRows: true}});
-    let cursor: Cursor;
+    let client: SqbClient;
+    let cursor: Cursor | undefined;
+
+    beforeAll(async () => {
+        client = await initClient({defaults: {cursor: true, objectRows: true}});
+    })
+
+    afterAll(async () => {
+        await client.close(0);
+    });
 
     it('should return Cursor for select queries', async function () {
-        const result = await client().execute(Select().from('customers'));
+        const result = await client.execute(Select().from('customers'));
         cursor = result && result.cursor;
-        assert(cursor);
-        assert.strictEqual(cursor.isBof, true);
-        assert.strictEqual(cursor.inspect(), '[object Cursor]');
-        assert(cursor.connection);
-        return cursor.close();
+        expect(cursor).toBeDefined();
+        expect(cursor!.isBof).toStrictEqual(true);
+        expect(cursor!.inspect()).toStrictEqual('[object Cursor]');
+        expect(cursor!.connection).toBeDefined();
+        return cursor!.close();
     });
 
     it('should iterate rows', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
+            expect(cursor).toBeDefined();
             let row;
             let i = 0;
             let id = '';
-            assert.strictEqual(cursor.isBof, true);
-            assert.strictEqual(cursor.isEof, false);
-            while ((row = await cursor.next())) {
-                assert.strictEqual(cursor.isBof, false);
-                assert.notStrictEqual(row.id, id);
+            expect(cursor!.isBof).toStrictEqual(true);
+            expect(cursor!.isEof).toStrictEqual(false);
+            while ((row = await cursor!.next())) {
+                expect(cursor!.isBof).toStrictEqual(false);
+                expect(row.id).not.toStrictEqual(id);
                 id = row.id;
-                assert.strictEqual(cursor.rowNum, ++i);
+                expect(cursor!.rowNum).toStrictEqual(++i);
             }
-            assert.strictEqual(cursor.isBof, false);
-            await cursor.next();
-            assert.strictEqual(cursor.isEof, true);
+            expect(cursor!.isBof).toStrictEqual(false);
+            await cursor!.next();
+            expect(cursor!.isEof).toStrictEqual(true);
         });
     });
 
     it('should automatically close cursor when connection closed (manuel)', function (done) {
         Promise.resolve().then(async () => {
-            const connection = await client().acquire();
+            const connection = await client.acquire();
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            cursor.on('close', done);
+            expect(cursor).toBeDefined();
+            cursor!.on('close', done);
             connection.release();
         }).catch(done);
     });
 
     it('should automatically close cursor when after acquire block', function (done) {
         Promise.resolve().then(async () =>
-            client().acquire(async connection => {
+            client.acquire(async connection => {
                 const result = await connection.execute(Select().from('customers'));
                 cursor = result && result.cursor;
-                cursor.on('close', done);
+                expect(cursor).toBeDefined();
+                cursor!.on('close', done);
             })
         ).catch(done);
     });
 
     it('should automatically close connection when cursor closed', function (done) {
         Promise.resolve().then(async () => {
-            const result = await client().execute(Select().from('customers'));
+            const result = await client.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            cursor.connection.once('close', done);
-            await cursor.close();
+            expect(cursor).toBeDefined();
+            cursor!.connection.once('close', done);
+            await cursor!.close();
         }).catch(done);
     });
 
     it('should seek() move cursor', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
+            expect(cursor).toBeDefined();
             let curRow = NaN;
-            cursor.on('move', (row, rowNum) => {
+            cursor!.on('move', (row, rowNum) => {
                 curRow = rowNum;
             });
-            await cursor.seek(10);
-            assert.strictEqual(cursor.isBof, false);
-            assert.strictEqual(cursor.rowNum, 10);
-            assert.ok(cursor.row);
-            assert.strictEqual(cursor.rowNum, curRow);
+            await cursor!.seek(10);
+            expect(cursor!.isBof).toStrictEqual(false);
+            expect(cursor!.rowNum).toStrictEqual(10);
+            expect(cursor!.row).toBeDefined();
+            expect(cursor!.rowNum).toStrictEqual(curRow);
         });
     });
+
     it('should seek(big number) move cursor to eof', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            await cursor.seek(10000);
-            assert.strictEqual(cursor.isBof, false);
-            assert.strictEqual(cursor.isEof, true);
-            assert(!cursor.row);
-            assert.ok(cursor.rowNum > 100);
+            expect(cursor).toBeDefined();
+            await cursor!.seek(10000);
+            expect(cursor!.isBof).toStrictEqual(false);
+            expect(cursor!.isEof).toStrictEqual(true);
+            expect(!cursor!.row).toBeDefined();
+            expect(cursor!.rowNum).toBeGreaterThan(100);
         });
     });
 
     it('should cache rows', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'),
                 {fetchRows: 100});
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
-            await cursor.seek(50);
-            assert.strictEqual((cursor as any)._cache.length, 100);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
+            await cursor!.seek(50);
+            expect((cursor as any)._cache.length).toStrictEqual(100);
         });
     });
 
     it('should seek(big number) move cursor to eof (cached)', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
-            await cursor.seek(10000);
-            assert.strictEqual(cursor.isBof, false);
-            assert.strictEqual(cursor.isEof, true);
-            assert(!cursor.row);
-            assert.ok(cursor.rowNum > 100);
-            assert.strictEqual((cursor as any)._cache.length, cursor.rowNum - 1);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
+            await cursor!.seek(10000);
+            expect(cursor!.isBof).toStrictEqual(false);
+            expect(cursor!.isEof).toStrictEqual(true);
+            expect(cursor!.row).toBeUndefined();
+            expect(cursor!.rowNum).toBeGreaterThan(100);
+            expect((cursor as any)._cache.length).toStrictEqual(cursor!.rowNum - 1);
         });
     });
 
     it('should move cursor back if cached', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'), {objectRows: true});
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
-            await cursor.seek(10);
-            assert.strictEqual(cursor.rowNum, 10);
-            const id = cursor.row.id;
-            await cursor.seek(40);
-            assert.strictEqual(cursor.rowNum, 50);
-            await cursor.moveTo(10);
-            assert.strictEqual(cursor.rowNum, 10);
-            assert.strictEqual(cursor.row.id, id);
-            await cursor.prev();
-            assert.strictEqual(cursor.rowNum, 9);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
+            await cursor!.seek(10);
+            expect(cursor!.rowNum).toStrictEqual(10);
+            const id = cursor!.row.id;
+            await cursor!.seek(40);
+            expect(cursor!.rowNum).toStrictEqual(50);
+            await cursor!.moveTo(10);
+            expect(cursor!.rowNum).toStrictEqual(10);
+            expect(cursor!.row.id).toStrictEqual(id);
+            await cursor!.prev();
+            expect(cursor!.rowNum).toStrictEqual(9);
         });
     });
 
     it('should seek(0) do nothing', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
-            await cursor.seek(50);
-            assert.strictEqual(cursor.rowNum, 50);
-            await cursor.seek(0);
-            assert.strictEqual(cursor.rowNum, 50);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
+            await cursor!.seek(50);
+            expect(cursor!.rowNum).toStrictEqual(50);
+            await cursor!.seek(0);
+            expect(cursor!.rowNum).toStrictEqual(50);
         });
     });
 
     it('should reset cursor in cached mode', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
-            await cursor.seek(50);
-            assert.strictEqual(cursor.rowNum, 50);
-            cursor.reset();
-            assert.strictEqual(cursor.rowNum, 0);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
+            await cursor!.seek(50);
+            expect(cursor!.rowNum).toStrictEqual(50);
+            cursor!.reset();
+            expect(cursor!.rowNum).toStrictEqual(0);
         });
     });
 
     it('should not reset cursor in non cached mode', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            assert.throws(() => cursor.reset(),
-                /method needs cache to be enabled/);
+            expect(cursor).toBeDefined();
+            expect(() => cursor!.reset()).toThrow('method needs cache to be enabled');
         });
     });
 
     it('should fetchAll() emit eof', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            cursor.cached();
+            expect(cursor).toBeDefined();
+            cursor!.cached();
             let eofCalled = false;
-            cursor.on('eof', () => eofCalled = true);
-            await cursor.fetchAll();
-            assert.strictEqual(eofCalled, true);
+            cursor!.on('eof', () => eofCalled = true);
+            await cursor!.fetchAll();
+            expect(eofCalled).toStrictEqual(true);
         });
     });
 
-
     it('should fetchAll() does not emit "move" event', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            cursor.cached();
-            assert(cursor);
+            expect(cursor).toBeDefined();
+            cursor!.cached();
             let moveCalled = false;
-            cursor.on('move', () => {
+            cursor!.on('move', () => {
                 moveCalled = true;
             });
-            await cursor.fetchAll();
-            assert.strictEqual(moveCalled, false);
+            await cursor!.fetchAll();
+            expect(moveCalled).toStrictEqual(false);
         });
     });
 
     it('should close cursor after fetched all rows', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
+            expect(cursor).toBeDefined();
             let closeCalled = false;
-            cursor.on('close', () => {
+            cursor!.on('close', () => {
                 closeCalled = true;
             });
-            while (await cursor.next()) {
+            while (await cursor!.next()) {
                 //
             }
-            assert.strictEqual(closeCalled, true);
+            expect(closeCalled).toStrictEqual(true);
         });
     });
 
     it('should not fetch rows if closed', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            await cursor.close();
-            assert.strictEqual(await cursor.next(), undefined);
+            expect(cursor).toBeDefined();
+            await cursor!.close();
+            expect(await cursor!.next()).toBeUndefined();
         });
     });
 
     it('should cache can not be enabled after fetch', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
-            await cursor.next();
-            await assert.throws(() => cursor.cached(),
-                /Cache can be enabled before fetching rows/);
+            expect(cursor).toBeDefined();
+            await cursor!.next();
+            expect(() => cursor!.cached())
+                .toThrow('Cache can be enabled before fetching rows');
         });
 
     });
 
     it('should handle close error', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
+            expect(cursor).toBeDefined();
             (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
-            await assert.rejects(() => cursor.close(),
-                /Any error/);
+            await expect(() => cursor!.close()).rejects
+                .toThrow('Any error');
         });
     });
 
     it('should handle adapter errors', async function () {
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(Select().from('customers'));
             cursor = result && result.cursor;
-            assert(cursor);
+            expect(cursor).toBeDefined();
             (cursor as any)._intlcur.fetch = () => Promise.reject(new Error('Any error'));
-            await assert.rejects(() => cursor.next(),
-                /Any error/);
+            await expect(() => cursor!.next()).rejects.toThrow('Any error');
         });
     });
 
@@ -275,14 +283,14 @@ describe('Cursor', function () {
         let l = 0;
         const query = Select().from('customers')
             .onFetch((row) => row.customField = ++l);
-        await client().acquire(async (connection: SqbConnection) => {
+        await client.acquire(async (connection: SqbConnection) => {
             const result = await connection.execute(query, {fetchRows: 100});
             cursor = result && result.cursor;
-            assert(cursor);
-            await cursor.seek(10);
-            assert.strictEqual(cursor.rowNum, 10);
-            assert.strictEqual(l, 100);
-            assert.strictEqual(cursor.row.customField, 10);
+            expect(cursor).toBeDefined();
+            await cursor!.seek(10);
+            expect(cursor!.rowNum).toStrictEqual(10);
+            expect(l).toStrictEqual(100);
+            expect(cursor!.row.customField).toStrictEqual(10);
         });
     });
 

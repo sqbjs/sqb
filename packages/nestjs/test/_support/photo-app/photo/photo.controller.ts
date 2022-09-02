@@ -1,17 +1,13 @@
-import { Controller, Get, Post } from '@nestjs/common';
-import { PhotoService } from './photo.service';
+import {Controller, Post} from '@nestjs/common';
+import {PhotoService} from './photo.service.js';
 
 @Controller('photo')
 export class PhotoController {
-  constructor(private readonly photoService: PhotoService) {}
+    constructor(private readonly photoService: PhotoService) {
+    }
 
-  @Get()
-  findAll(): Promise<any[]> {
-    return this.photoService.findAll();
-  }
-
-  @Post()
-  create(): Promise<any> {
-    return this.photoService.create();
-  }
+    @Post()
+    create(): Promise<any> {
+        return this.photoService.create();
+    }
 }

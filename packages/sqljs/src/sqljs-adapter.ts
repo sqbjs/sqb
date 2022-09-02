@@ -1,0 +1,97 @@
+import '@sqb/sqlite-dialect';
+import fs from 'fs';
+import path from 'path';
+import promisify from 'putil-promisify';
+import initSqlJs, {Database} from 'sql.js';
+import {Adapter, ClientConfiguration} from '@sqb/connect';
+import {SqljsConnection} from './sqljs-connection.js';
+
+type CachedDatabase = Database & { _refCount: number };
+
+const dbCache = new Map<string, CachedDatabase>();
+
+export class SqljsAdapter implements Adapter {
+
+    driver = 'sqljs';
+    dialect = 'sqlite';
+    features = {
+        cursor: true,
+        // fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
+    }
+
+    async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
+        if (!config.database)
+            throw new Error('You must provide sqlite database file for sql.js driver');
+
+        let dbName = '';
+        let isMemory = false;
+
+        const m = config.database.match(/^(:memory:)(\w+)?$/);
+        if (m) {
+            isMemory = true;
+            dbName = config.database;
+        } else {
+            dbName = path.resolve(config.database);
+        }
+
+        let intlDb = dbCache.get(dbName);
+        if (intlDb) {
+            intlDb._refCount++;
+        } else {
+            const SQL = await initSqlJs({
+                // Fix: This fixes bug in sql.js: https://github.com/sql-js/sql.js/issues/528
+                locateFile: file => {
+                    const dir = path.dirname(_getCallerFile());
+                    const f = 'file:/' + path.resolve(dir, file);
+                    const oldNormalize = path.normalize;
+                    path.normalize = (x) => {
+                        if (x === f) {
+                            path.normalize = oldNormalize;
+                            return f.substring(6);
+                        }
+                        return oldNormalize(x);
+                    }
+                    return f;
+                }
+            });
+            if (isMemory) {
+                intlDb = new SQL.Database() as CachedDatabase;
+                intlDb._refCount = 0;
+            } else {
+                const buf = await promisify.fromCallback(cb => fs.readFile(dbName, cb));
+                intlDb = new SQL.Database(buf) as CachedDatabase;
+                intlDb._refCount = 1;
+            }
+            dbCache.set(dbName, intlDb);
+        }
+
+        const _intlDb = intlDb;
+        return new SqljsConnection(_intlDb, () => {
+            if (isMemory)
+                return;
+            if (--_intlDb._refCount <= 0) {
+                _intlDb.close();
+                dbCache.delete(dbName);
+            }
+        });
+
+    }
+
+}
+
+export async function closeMemoryDatabase(name?: string): Promise<void> {
+    const memoryDbName = name || ':memory:';
+    const memDb = dbCache.get(memoryDbName);
+    if (memDb) {
+        dbCache.delete(memoryDbName);
+        memDb.close();
+    }
+}
+
+function _getCallerFile() {
+    const err = new Error();
+    Error.prepareStackTrace = (_, stack) => stack;
+    const stack = err.stack;
+    Error.prepareStackTrace = undefined;
+    return (stack as any)[2].getFileName();
+}

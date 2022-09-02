@@ -1,13 +1,11 @@
 /* eslint-disable camelcase */
-import '../_support/env';
-import assert from 'assert';
+import {Adapter, ArrayRowset, ObjectRowset} from '@sqb/connect';
 import {
     applyNamingStrategy,
     normalizeRowsToArrayRows,
     normalizeRowsToObjectRows,
     wrapAdapterFields
-} from '../../src/client/helpers';
-import {Adapter, ArrayRowset, ObjectRowset} from '@sqb/connect';
+} from '../../src/client/helpers.js';
 
 describe('Helpers', function () {
 
@@ -24,37 +22,37 @@ describe('Helpers', function () {
     describe('applyNamingStrategy', function () {
 
         it('should return given value as lowercase', function () {
-            assert.strictEqual(applyNamingStrategy('hello_world', 'lowercase'), 'hello_world');
+            expect(applyNamingStrategy('hello_world', 'lowercase')).toStrictEqual('hello_world');
             // @ts-ignore
-            assert.strictEqual(applyNamingStrategy('Hello_World', 'LowerCase'), 'hello_world');
+            expect(applyNamingStrategy('Hello_World', 'LowerCase')).toStrictEqual('hello_world');
         });
 
         it('should return given value as uppercase', function () {
-            assert.strictEqual(applyNamingStrategy('hello_world', 'uppercase'), 'HELLO_WORLD');
+            expect(applyNamingStrategy('hello_world', 'uppercase')).toStrictEqual('HELLO_WORLD');
             // @ts-ignore
-            assert.strictEqual(applyNamingStrategy('Hello_World', 'UpperCase'), 'HELLO_WORLD');
+            expect(applyNamingStrategy('Hello_World', 'UpperCase')).toStrictEqual('HELLO_WORLD');
         });
 
         it('should return given value as camelcase', function () {
-            assert.strictEqual(applyNamingStrategy('helloWorld', 'camelcase'), 'helloWorld');
-            assert.strictEqual(applyNamingStrategy('HELLO_WORLD', 'camelcase'), 'helloWorld');
-            assert.strictEqual(applyNamingStrategy('hello_world', 'camelcase'), 'helloWorld');
-            assert.strictEqual(applyNamingStrategy('Hello_World', 'camelcase'), 'helloWorld');
+            expect(applyNamingStrategy('helloWorld', 'camelcase')).toStrictEqual('helloWorld');
+            expect(applyNamingStrategy('HELLO_WORLD', 'camelcase')).toStrictEqual('helloWorld');
+            expect(applyNamingStrategy('hello_world', 'camelcase')).toStrictEqual('helloWorld');
+            expect(applyNamingStrategy('Hello_World', 'camelcase')).toStrictEqual('helloWorld');
         });
 
         it('should return given value as pascalcase', function () {
-            assert.strictEqual(applyNamingStrategy('helloWorld', 'pascalcase'), 'HelloWorld');
-            assert.strictEqual(applyNamingStrategy('HELLO_WORLD', 'pascalcase'), 'HelloWorld');
-            assert.strictEqual(applyNamingStrategy('hello_world', 'pascalcase'), 'HelloWorld');
-            assert.strictEqual(applyNamingStrategy('Hello_World', 'pascalcase'), 'HelloWorld');
+            expect(applyNamingStrategy('helloWorld', 'pascalcase')).toStrictEqual('HelloWorld');
+            expect(applyNamingStrategy('HELLO_WORLD', 'pascalcase')).toStrictEqual('HelloWorld');
+            expect(applyNamingStrategy('hello_world', 'pascalcase')).toStrictEqual('HelloWorld');
+            expect(applyNamingStrategy('Hello_World', 'pascalcase')).toStrictEqual('HelloWorld');
         });
 
         it('should use custom function', function () {
-            assert.strictEqual(applyNamingStrategy('hello_world', (x) => x.toUpperCase()), 'HELLO_WORLD');
+            expect(applyNamingStrategy('hello_world', (x) => x.toUpperCase())).toStrictEqual('HELLO_WORLD');
         });
 
         it('should do nothing if no strategy given', function () {
-            assert.strictEqual(applyNamingStrategy('hello_world', undefined), 'hello_world');
+            expect(applyNamingStrategy('hello_world', undefined)).toStrictEqual('hello_world');
         });
 
     });
@@ -63,19 +61,19 @@ describe('Helpers', function () {
 
         it('should convert Adapter.Field[] to FieldInfoMap', function () {
             const fields = wrapAdapterFields(adapterFields);
-            assert(!Array.isArray(fields));
-            assert(fields.get('field_name1'));
-            assert.strictEqual(fields.get('field_name1').name, 'field_name1');
-            assert.strictEqual(fields.get('field_name1').index, 0);
-            assert.strictEqual(fields.get(0).name, 'field_name1');
-            assert.strictEqual(fields.get(0).index, 0);
+            expect(!Array.isArray(fields)).toBeTruthy();
+            expect(fields.get('field_name1')).toBeDefined();
+            expect(fields.get('field_name1').name).toStrictEqual('field_name1');
+            expect(fields.get('field_name1').index).toStrictEqual(0);
+            expect(fields.get(0).name).toStrictEqual('field_name1');
+            expect(fields.get(0).index).toStrictEqual(0);
         });
 
         it('should apply naming strategy', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
-            assert(!Array.isArray(fields));
-            assert(fields.get('fieldName1'));
-            assert.strictEqual(fields.get('fieldName1').fieldName, 'field_name1');
+            expect(!Array.isArray(fields)).toBeTruthy();
+            expect(fields.get('fieldName1')).toBeDefined();
+            expect(fields.get('fieldName1').fieldName).toStrictEqual('field_name1');
         });
 
     });
@@ -85,57 +83,57 @@ describe('Helpers', function () {
         it('should convert array rows to object rows', function () {
             const fields = wrapAdapterFields(adapterFields);
             const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, arrayRows.length);
-            assert(!Array.isArray(rows[0]));
-            assert(rows[0].field_name1);
-            assert.strictEqual(rows[0].field_name1, 'a');
-            assert.strictEqual(rows[0].field_name2, 'b');
-            assert.strictEqual(rows[0].field_name3, null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(arrayRows.length);
+            expect(!Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0].field_name1).toBeDefined();
+            expect(rows[0].field_name1).toStrictEqual('a');
+            expect(rows[0].field_name2).toStrictEqual('b');
+            expect(rows[0].field_name3).toStrictEqual(null);
         });
 
         it('should keep object rows', function () {
             const fields = wrapAdapterFields(adapterFields);
             const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, objectRows.length);
-            assert(!Array.isArray(rows[0]));
-            assert(rows[0].field_name1);
-            assert.strictEqual(rows[0].field_name1, 'a');
-            assert.strictEqual(rows[0].field_name2, 'b');
-            assert.strictEqual(rows[0].field_name3, null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(objectRows.length);
+            expect(!Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0].field_name1).toBeDefined();
+            expect(rows[0].field_name1).toStrictEqual('a');
+            expect(rows[0].field_name2).toStrictEqual('b');
+            expect(rows[0].field_name3).toStrictEqual(null);
         });
 
         it('should apply naming strategy to fields in rows (object rows source)', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
             const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, arrayRows.length);
-            assert(!Array.isArray(rows[0]));
-            assert(rows[0].fieldName1);
-            assert.strictEqual(rows[0].fieldName1, 'a');
-            assert.strictEqual(rows[0].fieldName2, 'b');
-            assert.strictEqual(rows[0].fieldName3, null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(arrayRows.length);
+            expect(!Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0].fieldName1).toBeDefined();
+            expect(rows[0].fieldName1).toStrictEqual('a');
+            expect(rows[0].fieldName2).toStrictEqual('b');
+            expect(rows[0].fieldName3).toStrictEqual(null);
         });
 
         it('should apply naming strategy to fields in rows (array rows source)', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
             const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, arrayRows.length);
-            assert(!Array.isArray(rows[0]));
-            assert(rows[0].fieldName1);
-            assert.strictEqual(rows[0].fieldName1, 'a');
-            assert.strictEqual(rows[0].fieldName2, 'b');
-            assert.strictEqual(rows[0].fieldName3, null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(arrayRows.length);
+            expect(!Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0].fieldName1).toBeDefined();
+            expect(rows[0].fieldName1).toStrictEqual('a');
+            expect(rows[0].fieldName2).toStrictEqual('b');
+            expect(rows[0].fieldName3).toStrictEqual(null);
         });
 
         it('should remove null field values ignoreNulls == true', function () {
             const fields = wrapAdapterFields(adapterFields, 'camelcase');
             const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, {ignoreNulls: true});
-            assert.strictEqual(rows[0].fieldName1, 'a');
-            assert.strictEqual(rows[0].fieldName2, 'b');
-            assert.strictEqual(rows[0].fieldName3, undefined);
+            expect(rows[0].fieldName1).toStrictEqual('a');
+            expect(rows[0].fieldName2).toStrictEqual('b');
+            expect(rows[0].fieldName3).toStrictEqual(undefined);
         });
 
         it('should apply value transform ', function () {
@@ -143,8 +141,8 @@ describe('Helpers', function () {
             const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, {
                 transform: x => '$' + x
             });
-            assert.strictEqual(rows[0].fieldName1, '$a');
-            assert.strictEqual(rows[0].fieldName2, '$b');
+            expect(rows[0].fieldName1).toStrictEqual('$a');
+            expect(rows[0].fieldName2).toStrictEqual('$b');
         });
 
     })
@@ -154,23 +152,23 @@ describe('Helpers', function () {
         it('should convert object rows to array rows if objectRows = false', function () {
             const fields = wrapAdapterFields(adapterFields);
             const rows = normalizeRowsToArrayRows(fields, 'object', objectRows);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, objectRows.length);
-            assert(Array.isArray(rows[0]));
-            assert.strictEqual(rows[0][0], 'a');
-            assert.strictEqual(rows[0][1], 'b');
-            assert.strictEqual(rows[0][2], null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(objectRows.length);
+            expect(Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0][0]).toStrictEqual('a');
+            expect(rows[0][1]).toStrictEqual('b');
+            expect(rows[0][2]).toStrictEqual(null);
         });
 
         it('should keep to array rows if objectRows = false', function () {
             const fields = wrapAdapterFields(adapterFields);
             const rows = normalizeRowsToArrayRows(fields, 'array', arrayRows as any);
-            assert(Array.isArray(rows));
-            assert.strictEqual(rows.length, arrayRows.length);
-            assert(Array.isArray(rows[0]));
-            assert.strictEqual(rows[0][0], 'a');
-            assert.strictEqual(rows[0][1], 'b');
-            assert.strictEqual(rows[0][2], null);
+            expect(Array.isArray(rows)).toBeTruthy();
+            expect(rows.length).toStrictEqual(arrayRows.length);
+            expect(Array.isArray(rows[0])).toBeTruthy();
+            expect(rows[0][0]).toStrictEqual('a');
+            expect(rows[0][1]).toStrictEqual('b');
+            expect(rows[0][2]).toStrictEqual(null);
         });
 
     });

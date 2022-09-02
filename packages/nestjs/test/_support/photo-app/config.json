@@ -1,7 +1,0 @@
-{
-  "name": "db1",
-  "dialect": "postgres",
-  "schema": "test_sqb_nest",
-  "retryAttempts": 2,
-  "retryDelay": 1000
-}

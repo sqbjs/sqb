@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Field, Lower, Select, SerializationType} from '@sqb/builder';
+import {Field, Lower, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Lower"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Lower"', function () {
     };
 
     it('should initialize Lower', function () {
-        assert.strictEqual(Lower('A')._type, SerializationType.LOWER_STATEMENT);
+        expect(Lower('A')._type).toStrictEqual(SerializationType.LOWER_STATEMENT);
     });
 
     it('should serialize values', function () {
@@ -18,7 +16,7 @@ describe('serialize "Lower"', function () {
             Lower('ABC')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select lower('ABC') from table1`);
+        expect(result.sql).toStrictEqual(`select lower('ABC') from table1`);
     });
 
     it('should serialize Field names', function () {
@@ -26,7 +24,7 @@ describe('serialize "Lower"', function () {
             Lower(Field('a'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select lower(a) from table1`);
+        expect(result.sql).toStrictEqual(`select lower(a) from table1`);
     });
 
     it('should serialize sub query', function () {
@@ -34,7 +32,7 @@ describe('serialize "Lower"', function () {
             Lower(Select().from('table2'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select lower((select * from table2)) from table1`);
+        expect(result.sql).toStrictEqual(`select lower((select * from table2)) from table1`);
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "Lower"', function () {
             Lower(1).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select lower(1) col1 from table1');
+        expect(result.sql).toStrictEqual('select lower(1) col1 from table1');
     });
 
 });

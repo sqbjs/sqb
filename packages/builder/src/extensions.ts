@@ -1,4 +1,4 @@
-import {SerializerExtension} from './types';
+import {SerializerExtension} from './types.js';
 
 export let serializers: SerializerExtension[] = [];
 

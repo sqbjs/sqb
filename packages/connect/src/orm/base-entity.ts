@@ -1,6 +1,6 @@
-import {Entity} from './decorators/entity.decorator';
-import {REPOSITORY_KEY} from './orm.const';
-import type {Repository} from './repository.class';
+import {Entity} from './decorators/entity.decorator.js';
+import {REPOSITORY_KEY} from './orm.const.js';
+import type {Repository} from './repository.class.js';
 
 export class BaseEntity {
     private [REPOSITORY_KEY]?: Repository<any>;

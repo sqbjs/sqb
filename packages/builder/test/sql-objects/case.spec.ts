@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Case, Eq, Gt, Lt, Select, SerializationType} from '@sqb/builder';
+import {Case, Eq, Gt, Lt, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Case"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Case"', function () {
     };
 
     it('should initialize Case', function () {
-        assert.strictEqual(Case()._type, SerializationType.CASE_STATEMENT);
+        expect(Case()._type).toStrictEqual(SerializationType.CASE_STATEMENT);
     });
 
     it('should serialize single condition in "when"', function () {
@@ -18,7 +16,7 @@ describe('serialize "Case"', function () {
             Case().when(Gt('age', 16)).then(1).else(0)
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select case when age > 16 then 1 else 0 end from table1');
+        expect(result.sql).toStrictEqual('select case when age > 16 then 1 else 0 end from table1');
     });
 
     it('should serialize without condition in "when"', function () {
@@ -26,7 +24,7 @@ describe('serialize "Case"', function () {
             Case().when().then(1).else(100)
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select * from table1');
+        expect(result.sql).toStrictEqual('select * from table1');
     });
 
     it('should serialize group of conditions in "when"', function () {
@@ -34,7 +32,7 @@ describe('serialize "Case"', function () {
             Case().when(Gt('col1', 4), Lt('col1', 8)).then(1).else(100)
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select case when col1 > 4 and col1 < 8 then 1 else 100 end from table1');
+        expect(result.sql).toStrictEqual('select case when col1 > 4 and col1 < 8 then 1 else 100 end from table1');
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "Case"', function () {
             Case().when(Eq('col1', 5)).then(1).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select case when col1 = 5 then 1 end col1 from table1');
+        expect(result.sql).toStrictEqual('select case when col1 = 5 then 1 end col1 from table1');
     });
 
 });

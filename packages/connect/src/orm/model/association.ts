@@ -1,8 +1,8 @@
 import {camelCase} from 'putil-varhelpers';
-import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type';
-import {resolveEntityMeta} from '../util/orm.helper';
-import {ColumnElementMetadata} from './column-element-metadata';
-import {EntityMetadata} from './entity-metadata';
+import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type.js';
+import {resolveEntityMeta} from '../util/orm.helper.js';
+import {ColumnElementMetadata} from './column-element-metadata.js';
+import {EntityMetadata} from './entity-metadata.js';
 
 export class Association {
     private _resolved?: boolean;

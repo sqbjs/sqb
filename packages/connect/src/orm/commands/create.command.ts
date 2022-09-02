@@ -1,9 +1,9 @@
 import {Insert, Param} from '@sqb/builder';
-import {SqbConnection} from '../../client/SqbConnection';
-import {ColumnElementMetadata} from '../model/column-element-metadata';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
-import {isColumnElement, isEmbeddedElement} from '../util/orm.helper';
+import {SqbConnection} from '../../client/sqb-connection.js';
+import {ColumnElementMetadata} from '../model/column-element-metadata.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
 
 export type CreateCommandArgs = {
     entity: EntityMetadata;

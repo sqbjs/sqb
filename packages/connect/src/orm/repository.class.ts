@@ -1,17 +1,17 @@
 import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
 import {DeepPartial, Type} from 'ts-gems';
-import {FieldInfoMap} from '../client/FieldInfoMap';
-import {SqbClient} from '../client/SqbClient';
-import {SqbConnection} from '../client/SqbConnection';
-import {QueryRequest, TransactionFunction} from '../client/types';
-import {InstanceValues} from '../types';
-import {CountCommand} from './commands/count.command';
-import {CreateCommand} from './commands/create.command';
-import {DestroyCommand} from './commands/destroy.command';
-import {FindCommand} from './commands/find.command';
-import {UpdateCommand} from './commands/update.command';
-import {EntityMetadata} from './model/entity-metadata';
-import {extractKeyValues} from './util/extract-keyvalues';
+import {FieldInfoMap} from '../client/field-info-map.js';
+import {SqbClient} from '../client/sqb-client.js';
+import {SqbConnection} from '../client/sqb-connection.js';
+import {QueryRequest, TransactionFunction} from '../client/types.js';
+import {EntityData} from '../types.js';
+import {CountCommand} from './commands/count.command.js';
+import {CreateCommand} from './commands/create.command.js';
+import {DestroyCommand} from './commands/destroy.command.js';
+import {FindCommand} from './commands/find.command.js';
+import {UpdateCommand} from './commands/update.command.js';
+import {EntityMetadata} from './model/entity-metadata.js';
+import {extractKeyValues} from './util/extract-keyvalues.js';
 
 export namespace Repository {
 
@@ -108,13 +108,13 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return this._entity.ctor;
     }
 
-    create(values: InstanceValues<T>, options?: Repository.CreateOptions): Promise<DeepPartial<T>> {
+    create(values: EntityData<T>, options?: Repository.CreateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return this._create(values, {...options, connection});
         }, options);
     }
 
-    createOnly(values: InstanceValues<T>, options?: Repository.CreateOptions): Promise<void> {
+    createOnly(values: EntityData<T>, options?: Repository.CreateOptions): Promise<void> {
         return this._execute(async (connection) => {
             return this._createOnly(values, {...options, connection});
         }, options);
@@ -162,7 +162,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         }, options);
     }
 
-    update(keyValue: any | Record<string, any>, values: InstanceValues<T>,
+    update(keyValue: any | Record<string, any>, values: EntityData<T>,
            options?: Repository.UpdateOptions): Promise<DeepPartial<T> | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
@@ -172,14 +172,14 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         }, options);
     }
 
-    updateOnly(keyValue: any | Record<string, any>, values: InstanceValues<T>,
+    updateOnly(keyValue: any | Record<string, any>, values: EntityData<T>,
                options?: Repository.UpdateOptions): Promise<DeepPartial<T>> {
         return this._execute(async (connection) => {
             return !!(await this._update(keyValue, values, {...options, connection}));
         }, options);
     }
 
-    updateAll(values: InstanceValues<T>,
+    updateAll(values: EntityData<T>,
               options?: Repository.UpdateAllOptions): Promise<number> {
         return this._execute(async (connection) => {
             return this._updateAll(values, {...options, connection});
@@ -204,7 +204,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         });
     }
 
-    protected async _create(values: InstanceValues<T>,
+    protected async _create(values: EntityData<T>,
                             options: Repository.CreateOptions & { connection: SqbConnection }): Promise<DeepPartial<T>> {
         await this._emit('before-create', values, options);
         const keyValues = await CreateCommand.execute({
@@ -220,7 +220,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return result;
     }
 
-    protected async _createOnly(values: InstanceValues<T>,
+    protected async _createOnly(values: EntityData<T>,
                                 options: Repository.CreateOptions & { connection: SqbConnection }): Promise<void> {
         await this._emit('before-create', values, options);
         await CreateCommand.execute({
@@ -311,7 +311,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     }
 
     protected async _update(keyValue: any | Record<string, any>,
-                            values: InstanceValues<T>,
+                            values: EntityData<T>,
                             options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<Record<string, any> | undefined> {
         await this._emit('before-update', keyValue, values, options);
         const keyValues = extractKeyValues(this._entity, keyValue, true);
@@ -333,7 +333,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return rowsAffected ? keyValues : undefined;
     }
 
-    protected async _updateAll(values: InstanceValues<T>,
+    protected async _updateAll(values: EntityData<T>,
                                options: Repository.UpdateAllOptions & { connection: SqbConnection }): Promise<number> {
         await this._emit('before-update-all', values, options);
         const rowsAffected = await UpdateCommand.execute({

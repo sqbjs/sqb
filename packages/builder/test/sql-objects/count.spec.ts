@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {SerializationType, Select, Count} from '@sqb/builder';
+import {Count, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Count"', function () {
 
@@ -10,13 +8,13 @@ describe('serialize "Count"', function () {
     };
 
     it('should initialize Count', function () {
-        assert.strictEqual(Count()._type, SerializationType.COUNT_STATEMENT);
+        expect(Count()._type).toStrictEqual(SerializationType.COUNT_STATEMENT);
     });
 
     it('should serialize', function () {
         const query = Select(Count()).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select count(*) from table1');
+        expect(result.sql).toStrictEqual('select count(*) from table1');
     });
 
 });

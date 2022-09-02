@@ -1,6 +1,6 @@
 // Backward compatibility
 import {PickWritable, Type} from 'ts-gems';
-import {Entity} from './decorators/entity.decorator';
+import {Entity} from './decorators/entity.decorator.js';
 
 export function getInsertColumnNames<T, K extends keyof PickWritable<T>>(ctor: Type<T>): K[] {
     return Entity.getInsertColumnNames(ctor) as K[];

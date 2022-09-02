@@ -1,16 +1,14 @@
 {
-  "extends": "../../../tsconfig.base.json",
-  "include": ["./**/*.ts"],
-  "exclude": [],
+  "extends": "../../../tsconfig-base.json",
+  "include": ["**/*.ts"],
   "compilerOptions": {
-    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noEmit": true,
+    "sourceMap": true,
     "baseUrl": "./",
-    "types": ["mocha", "node"],
     "paths": {
-      "@sqb/builder": ["../../builder/src"],
-      "@sqb/connect": ["../src"],
-      "@sqb/postgres": ["../../postgres/src"],
-      "@sqb/postgres-dialect": ["../../postgres-dialect/src"]
+      "@sqb/*": ["../../*/src"],
     }
   }
 }

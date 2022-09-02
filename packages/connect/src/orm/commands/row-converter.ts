@@ -1,10 +1,10 @@
 import {Type} from 'ts-gems';
 import {DataType} from '@sqb/builder';
-import type {FieldInfoMap} from '../../client/FieldInfoMap';
-import {SqbConnection} from '../../client/SqbConnection';
-import {ColumnTransformFunction} from '../orm.type';
-import type {Repository} from '../repository.class';
-import type {FindCommand} from './find.command';
+import type {FieldInfoMap} from '../../client/field-info-map';
+import {SqbConnection} from '../../client/sqb-connection.js';
+import {ColumnTransformFunction} from '../orm.type.js';
+import type {Repository} from '../repository.class.js';
+import type {FindCommand} from './find.command.js';
 
 export interface ValueProperty {
     fieldAlias: string;

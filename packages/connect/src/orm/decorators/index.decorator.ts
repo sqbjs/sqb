@@ -1,5 +1,5 @@
-import {EntityMetadata} from '../model/entity-metadata';
-import {IndexMetadata} from '../model/index-metadata';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {IndexMetadata} from '../model/index-metadata.js';
 
 export function Index(fields: string | string[], options?: Omit<IndexMetadata, 'columns'>): ClassDecorator
 export function Index(options?: Omit<IndexMetadata, 'columns'>): PropertyDecorator

@@ -13,7 +13,7 @@ export class CustomerVip extends BaseEntity {
     @Column({dataType: DataType.SMALLINT})
     rank?: number;
 
-    @LinkToOne(() => require('./customer.entity').Customer)
+    @LinkToOne(async () => (await import('./customer.entity.js')).Customer)
     readonly customer?: Customer;
 
 }

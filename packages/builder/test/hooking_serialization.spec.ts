@@ -1,6 +1,4 @@
-import './_support/env';
-import assert from 'assert';
-import {SerializationType, Select, Eq} from '@sqb/builder';
+import {Eq, Select, SerializationType} from '../src/index.js';
 
 describe('Hooking serialization', function () {
 
@@ -17,7 +15,7 @@ describe('Hooking serialization', function () {
                     return 'table2';
             });
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select * from table2');
+        expect(result.sql).toStrictEqual('select * from table2');
     });
 
     it('should continue serialization with modified options', function () {
@@ -29,7 +27,7 @@ describe('Hooking serialization', function () {
                     o.left.expression = 'new_id';
             });
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select * from table1 where new_id = 1');
+        expect(result.sql).toStrictEqual('select * from table1 where new_id = 1');
     });
 
 });

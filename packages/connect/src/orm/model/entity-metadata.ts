@@ -1,15 +1,15 @@
 import {Maybe, Type} from 'ts-gems';
 import {DataType} from '@sqb/builder';
-import {ENTITY_METADATA_KEY} from '../orm.const';
-import {Ctor, TypeThunk} from '../orm.type';
-import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper';
-import {serializeColumn} from '../util/serialize-element';
-import {Association} from './association';
-import {AssociationElementMetadata} from './association-element-metadata';
-import {AssociationNode} from './association-node';
-import {ColumnElementMetadata, ColumnElementOptions} from './column-element-metadata';
-import {EmbeddedElementMetadata, EmbeddedElementOptions} from './embedded-element-metadata';
-import {IndexMetadata} from './index-metadata';
+import {ENTITY_METADATA_KEY} from '../orm.const.js';
+import {Ctor, TypeThunk} from '../orm.type.js';
+import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {serializeColumn} from '../util/serialize-element.js';
+import {Association} from './association.js';
+import {AssociationElementMetadata} from './association-element-metadata.js';
+import {AssociationNode} from './association-node.js';
+import {ColumnElementMetadata, ColumnElementOptions} from './column-element-metadata.js';
+import {EmbeddedElementMetadata, EmbeddedElementOptions} from './embedded-element-metadata.js';
+import {IndexMetadata} from './index-metadata.js';
 
 export type AnyElementMetadata = ColumnElementMetadata | EmbeddedElementMetadata | AssociationElementMetadata;
 export type EntityOptions = Partial<Pick<EntityMetadata, 'name' | 'schema' | 'comment' | 'tableName'>>;

@@ -1,5 +1,5 @@
-import {EntityMetadata} from '../model/entity-metadata';
-import {isColumnElement} from './orm.helper';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {isColumnElement} from './orm.helper.js';
 
 export function extractKeyValues<T>(
     entityDef: EntityMetadata,

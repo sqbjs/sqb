@@ -1,16 +1,14 @@
+import '@sqb/postgres';
+import {Server} from 'http';
+import request from 'supertest';
 import {INestApplication} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
-import request from 'supertest';
-import {AsyncOptionsClassModule} from './_support/photo-app/async-class-options.module';
-import {Server} from 'http';
-import {createSchema} from './_support/create-schema';
+import {AsyncOptionsClassModule} from './_support/photo-app/async-class-options.module.js';
 
 describe('Sqb-Nestjs (async-class)', () => {
 
     let server: Server;
     let app: INestApplication;
-
-    before(() => createSchema());
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({

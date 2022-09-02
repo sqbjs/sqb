@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Field, Select, SerializationType, Upper} from '@sqb/builder';
+import {Field, Select, SerializationType, Upper} from '../../src/index.js';
 
 describe('serialize "Upper"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Upper"', function () {
     };
 
     it('should initialize Upper', function () {
-        assert.strictEqual(Upper('A')._type, SerializationType.UPPER_STATEMENT);
+        expect(Upper('A')._type,).toStrictEqual(SerializationType.UPPER_STATEMENT);
     });
 
     it('should serialize values', function () {
@@ -18,7 +16,7 @@ describe('serialize "Upper"', function () {
             Upper('ABC')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select upper('ABC') from table1`);
+        expect(result.sql).toStrictEqual(`select upper('ABC') from table1`);
     });
 
     it('should serialize Field names', function () {
@@ -26,7 +24,7 @@ describe('serialize "Upper"', function () {
             Upper(Field('a'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select upper(a) from table1`);
+        expect(result.sql).toStrictEqual(`select upper(a) from table1`);
     });
 
     it('should serialize sub query', function () {
@@ -34,7 +32,7 @@ describe('serialize "Upper"', function () {
             Upper(Select().from('table2'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select upper((select * from table2)) from table1`);
+        expect(result.sql).toStrictEqual(`select upper((select * from table2)) from table1`);
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "Upper"', function () {
             Upper(1).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select upper(1) col1 from table1');
+        expect(result.sql).toStrictEqual('select upper(1) col1 from table1');
     });
 
 });

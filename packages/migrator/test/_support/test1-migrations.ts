@@ -1,5 +1,5 @@
 import path from 'path';
-import {MigrationPackage} from '../../src';
+import {MigrationPackage} from '../../src/index.js';
 
 export const Test1MigrationPackage: MigrationPackage = {
   description: 'Test Migration',

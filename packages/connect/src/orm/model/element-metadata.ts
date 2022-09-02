@@ -1,5 +1,5 @@
-import type {ElementKind} from '../orm.type';
-import type {EntityMetadata} from './entity-metadata';
+import type {ElementKind} from '../orm.type.js';
+import type {EntityMetadata} from './entity-metadata.js';
 
 export interface ElementMetadata {
     readonly entity: EntityMetadata;

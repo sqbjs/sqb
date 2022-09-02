@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Eq, Param, Raw, Select, SerializationType, Update} from '@sqb/builder';
+import {Eq, Param, Raw, Select, SerializationType, Update} from '../../src/index.js';
 
 describe('Serialize update query', function () {
 
@@ -11,43 +9,44 @@ describe('Serialize update query', function () {
 
     it('should initialize UpdateQuery', function () {
         const q = Update('table1', {id: 1});
-        assert.strictEqual(q && q._type, SerializationType.UPDATE_QUERY);
+        expect(q && q._type).toStrictEqual(SerializationType.UPDATE_QUERY);
     });
 
     it('should serialize update', function () {
         const query = Update('table1', {id: 2, name: 'aaa'})
             .where(Eq('id', 1));
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
+        expect(result.sql).toStrictEqual('update table1 set id = 2, name = \'aaa\' where id = 1');
     });
 
     it('should pass raw as table name', function () {
         const query = Update(Raw('table1'), {id: 2, name: 'aaa'})
             .where(Eq('id', 1));
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'update table1 set id = 2, name = \'aaa\' where id = 1');
+        expect(result.sql).toStrictEqual('update table1 set id = 2, name = \'aaa\' where id = 1');
     });
 
     it('should use select query as value', function () {
         const query = Update('table1', {id: 2, name: Select('name').from('table2')})
             .where(Eq('id', 1));
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'update table1 set id = 2, name = (select name from table2) where id = 1');
+        expect(result.sql).toStrictEqual('update table1 set id = 2, name = (select name from table2) where id = 1');
     });
 
     it('should validate first (tableName) argument', function () {
-        assert.throws(() =>
-                Update(null, {id: 1, name: 'aaa'}),
-            /required as first argument/);
+        expect(() =>
+            // @ts-ignore
+            Update(null, {id: 1, name: 'aaa'})
+        ).toThrow('required as first argument');
     });
 
     it('should validate second (values) argument', function () {
-        assert.throws(() =>
-                Update('table1', [1, 'aaa']),
-            /instance required as second argument/);
-        assert.throws(() =>
-                Update('table1', 'sdfds'),
-            /instance required as second argument/);
+        expect(() =>
+            Update('table1', [1, 'aaa'])
+        ).toThrow('instance required as second argument');
+        expect(() =>
+            Update('table1', 'sdfds')
+        ).toThrow('instance required as second argument');
     });
 
     it('should serialize params with "values" argument: COLON', function () {
@@ -58,8 +57,8 @@ describe('Serialize update query', function () {
                 name: 'Abc'
             }, ...options
         }, options));
-        assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.params, {
+        expect(result.sql).toStrictEqual('update table1 set id = :id, name = :name');
+        expect(result.params).toStrictEqual({
             id: 1,
             name: 'Abc'
         });
@@ -72,25 +71,25 @@ describe('Serialize update query', function () {
                 name: 'Abc'
             });
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'update table1 set id = :id, name = :name');
-        assert.deepStrictEqual(result.params, {
+        expect(result.sql).toStrictEqual('update table1 set id = :id, name = :name');
+        expect(result.params).toStrictEqual({
             id: 1,
             name: 'Abc'
         });
     });
 
     it('should validate query.params', function () {
-        assert.throws(() =>
+        expect(() =>
                 Update('table1', {id: Param('id'), name: /name/})
-                    .values([1, 'Abc']),
-            /Invalid argument/);
+                    .values([1, 'Abc'])
+        ).toThrow('Invalid argument');
     });
 
     it('should serialize update with returning', function () {
         const query = Update('table1', {id: 1, name: 'aaa'})
             .returning('id', 'name as n');
         const result = query.generate(options);
-        assert.strictEqual(result.sql,
+        expect(result.sql).toStrictEqual(
             'update table1 set id = 1, name = \'aaa\' returning id, name as n');
     });
 

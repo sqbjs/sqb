@@ -1,63 +1,78 @@
 {
-  "name": "@sqb/sqljs",
-  "description": "SQB serialization extension for sql.js driver",
-  "version": "4.2.1",
-  "author": "Panates",
-  "contributors": [
-    "Eray Hanoglu <e.hanoglu@panates.com>"
+  "name" : "@sqb/sqljs",
+  "description" : "SQB serialization extension for sql.js driver",
+  "version" : "4.3.0",
+  "author" : "Panates",
+  "contributors" : [
+    "Eray Hanoglu <e.hanoglu@panates.com>",
+    "Ilker Gurelli <i.gurelli@panates.com>"
   ],
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sqbjs/sqb.git",
-    "directory": "packages/sqljs"
+  "license" : "Apache-2.0",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/sqbjs/sqb.git",
+    "directory" : "packages/sqljs"
   },
-  "keywords": [
-    "javascript",
-    "typescript",
+  "scripts" : {
+    "compile" : "tsc",
+    "prebuild" : "npm run lint && npm run clean",
+    "build" : "npm run build:cjs && npm run build:esm",
+    "build:cjs" : "tsc -b tsconfig-build-cjs.json",
+    "build:esm" : "tsc -b tsconfig-build-esm.json",
+    "postbuild" : "cp README.md package.json ../../LICENSE ../../build/sqljs && cp ../../package.cjs.json ../../build/sqljs/cjs/package.json",
+    "lint" : "eslint .",
+    "test" : "jest",
+    "cover" : "jest --collect-coverage",
+    "clean" : "npm run clean:src | npm run clean:dist | npm run clean:cover",
+    "clean:src" : "ts-cleanup -s src --all",
+    "clean:dist" : "rimraf ../../build/sqljs",
+    "clean:cover" : "rimraf ../../coverage/sqljs"
+  },
+  "dependencies" : {
+    "putil-promisify" : "^1.8.5"
+  },
+  "devDependencies" : {
+    "@types/sql.js" : "^1.4.3",
+    "sql.js" : "^1.7.0"
+  },
+  "peerDependencies" : {
+    "@sqb/builder" : "^4.3.0",
+    "@sqb/connect" : "^4.3.0",
+    "@sqb/sqlite-dialect" : "^4.3.0",
+    "sql.js" : "^1.7.0"
+  },
+  "type" : "module",
+  "main" : "cjs/index.js",
+  "module" : "esm/index.js",
+  "types" : "esm/index.d.ts",
+  "exports" : {
+    "." : {
+      "require" : "./cjs/index.js",
+      "default" : "./esm/index.js"
+    },
+    "./cjs" : "./cjs/index.js",
+    "./esm" : "./esm/index.js"
+  },
+  "engines" : {
+    "node" : ">=16.0",
+    "npm" : ">=7.0.0"
+  },
+  "files" : [
+    "bin/",
+    "cjs/",
+    "esm/",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords" : [
+    "sqb",
+    "sqlite",
+    "sql.js",
     "sql",
     "query",
     "builder",
     "dialect",
-    "sqlite",
-    "sql.js",
+    "serializer",
     "database"
-  ],
-  "dependencies": {
-    "putil-promisify": "^1.8.5"
-  },
-  "devDependencies": {
-    "@types/sql.js": "^1.4.3",
-    "sql.js": "^1.7.0"
-  },
-  "peerDependencies": {
-    "@sqb/builder": "^4.2.0",
-    "@sqb/connect": "^4.2.0",
-    "@sqb/sqlite-dialect": "^4.2.0",
-    "sql.js": "^1.4.0"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "engines": {
-    "node": ">= 16.0"
-  },
-  "directories": {
-    "lib": "dist",
-    "test": "test"
-  },
-  "files": [
-    "LICENSE",
-    "README",
-    "dist/"
-  ],
-  "scripts": {
-    "build": "tsc -b tsconfig-build.json",
-    "prebuild": "npm run lint && npm run clean:dist",
-    "postbuild": "copyfiles package.json README.md LICENSE ../../build/sqljs",
-    "clean": "ts-cleanup -s src --all & ts-cleanup -s test",
-    "clean:dist": "rimraf ../../build/sqljs",
-    "compile": "tsc",
-    "lint": "eslint src/** --no-error-on-unmatched-pattern",
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
-  }
+  ]
 }

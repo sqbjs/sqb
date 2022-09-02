@@ -1,7 +1,7 @@
 import glob from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
-import {MigrationTask} from './types';
+import {MigrationTask} from './types.js';
 
 export function loadTaskFiles(pattern: string): MigrationTask[] {
     const out: MigrationTask[] = [];

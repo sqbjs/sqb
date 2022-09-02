@@ -1,4 +1,4 @@
-import {Adapter} from './Adapter';
+import {Adapter} from './adapter.js';
 
 export let adapters: Adapter[] = [];
 

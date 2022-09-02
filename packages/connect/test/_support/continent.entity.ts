@@ -1,6 +1,6 @@
-import {Column, Entity, PrimaryKey, LinkFromMany, Link, linkFromOne} from '@sqb/connect';
-import type {Country} from './country.entity';
-import type {Customer} from './customer.entity';
+import {Column, Entity, Link, LinkFromMany, linkFromOne, PrimaryKey} from '@sqb/connect';
+import type {Country} from './country.entity.js';
+import type {Customer} from './customer.entity.js';
 
 @Entity('continents')
 export class Continent {
@@ -11,15 +11,15 @@ export class Continent {
     @Column()
     name: string;
 
-    @LinkFromMany(() => require('./country.entity').Country)
+    @LinkFromMany(() => require('./country.entity.js').Country)
     countries: Country[];
 
-    @Link(linkFromOne(() => require('./country.entity').Country)
+    @Link(linkFromOne(() => require('./country.entity.js').Country)
         .where({hasMarket: true}))
     marketCountries: Country[];
 
-    @Link(linkFromOne(() => require('./country.entity').Country)
-        .linkFromMany(() => require('./customer.entity').Customer))
+    @Link(linkFromOne(() => require('./country.entity.js').Country)
+        .linkFromMany(() => require('./customer.entity.js').Customer))
     customers: Customer[]
 
 }

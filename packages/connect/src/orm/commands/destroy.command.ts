@@ -1,8 +1,8 @@
 import {And, Delete, LogicalOperator} from '@sqb/builder';
-import {SqbConnection} from '../../client/SqbConnection';
-import {EntityMetadata} from '../model/entity-metadata';
-import {Repository} from '../repository.class';
-import {prepareFilter} from './command.helper';
+import {SqbConnection} from '../../client/sqb-connection.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {Repository} from '../repository.class.js';
+import {prepareFilter} from './command.helper.js';
 
 export type DestroyCommandArgs = {
     entity: EntityMetadata;

@@ -1,13 +1,14 @@
 {
-  "extends": "../../../tsconfig.base.json",
-  "include": ["./**/*.ts"],
-  "exclude": [],
+  "extends": "../../../tsconfig-base.json",
+  "include": ["**/*.ts"],
   "compilerOptions": {
-    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noEmit": true,
+    "sourceMap": true,
     "baseUrl": "./",
-    "types": ["mocha", "node"],
     "paths": {
-      "@sqb/builder": ["../src"]
+      "@opra/*": ["../../*/src"],
     }
   }
 }

@@ -1,2 +1,2 @@
-export * from './db-migrator';
-export * from './types';
+export * from './db-migrator.js';
+export * from './types.js';

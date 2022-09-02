@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Select, SequenceCurr,SequenceNext, SerializationType} from '@sqb/builder';
+import {Select, SequenceCurr, SequenceNext, SerializationType} from '../../src/index.js';
 
 describe('serialize "Sequence Getter"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Sequence Getter"', function () {
     };
 
     it('should initialize genID', function () {
-        assert.strictEqual(SequenceNext('A')._type, SerializationType.SEQUENCE_GETTER_STATEMENT);
+        expect(SequenceNext('A')._type).toStrictEqual(SerializationType.SEQUENCE_GETTER_STATEMENT);
     });
 
     it('should serialize nextval', function () {
@@ -18,7 +16,7 @@ describe('serialize "Sequence Getter"', function () {
             SequenceNext('ABC')
         );
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select nextval('ABC')`);
+        expect(result.sql).toStrictEqual(`select nextval('ABC')`);
     });
 
     it('should serialize currval', function () {
@@ -26,7 +24,7 @@ describe('serialize "Sequence Getter"', function () {
             SequenceCurr('ABC')
         );
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select currval('ABC')`);
+        expect(result.sql).toStrictEqual(`select currval('ABC')`);
     });
 
     it('should serialize alias', function () {
@@ -34,7 +32,7 @@ describe('serialize "Sequence Getter"', function () {
             SequenceNext('test').as('col1')
         )
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select nextval('test') col1`);
+        expect(result.sql).toStrictEqual(`select nextval('test') col1`);
     });
 
 });
