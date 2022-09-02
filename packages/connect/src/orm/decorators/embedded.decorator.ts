@@ -1,8 +1,8 @@
-import {EmbeddedElementOptions} from '../model/embedded-element-metadata.js';
+import {EmbeddedFieldOptions} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 import {TypeThunk} from '../orm.type.js';
 
-export function Embedded(type?: TypeThunk, options?: EmbeddedElementOptions): PropertyDecorator {
+export function Embedded(type?: TypeThunk, options?: EmbeddedFieldOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {
         if (typeof propertyKey !== 'string')
             throw new Error('Symbol properties are not accepted');

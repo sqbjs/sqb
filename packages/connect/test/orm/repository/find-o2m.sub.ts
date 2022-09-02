@@ -23,7 +23,7 @@ describe('find() one to many relations', function () {
         it('return associated rows as array property', async () => {
             const repo = client.getRepository(Continent);
             const rows = await repo.findAll({
-                elements: ['code', 'countries']
+                pick: ['code', 'countries']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toBeGreaterThan(0);
@@ -40,7 +40,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
-                elements: ['code', 'customers.givenName', 'customers.countryCode']
+                pick: ['code', 'customers.givenName', 'customers.countryCode']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toStrictEqual(2);
@@ -58,7 +58,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Country);
             client.defaults.showSql = true;
             const rows = await repo.findAll({
-                elements: ['code', 'customers'],
+                pick: ['code', 'customers'],
                 sort: ['code', 'customers.givenName']
             });
             expect(rows).toBeDefined();
@@ -87,7 +87,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Continent);
             const rows = await repo.findAll({
                 filter: {code: 'AM'},
-                elements: ['code', 'countries.continentCode', 'countries.customers', 'countries.code']
+                pick: ['code', 'countries.continentCode', 'countries.customers', 'countries.code']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toBeGreaterThan(0);
@@ -128,7 +128,7 @@ describe('find() one to many relations', function () {
         it('limit maximum sub queries', async () => {
             const repo = client.getRepository(Country);
             let r = await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxSubQueries: 1
             });
             expect(r).toBeDefined();
@@ -137,7 +137,7 @@ describe('find() one to many relations', function () {
             expect(r[0].customers).toBeDefined();
 
             r = r = await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxSubQueries: 0
             });
             expect(r).toBeDefined();
@@ -149,7 +149,7 @@ describe('find() one to many relations', function () {
         it('limit maximum number of eager items', async () => {
             const repo = client.getRepository(Country);
             await expect(async () => await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxEagerFetch: 5
             })).rejects.toThrow('maxEagerFetch');
         });
@@ -157,12 +157,12 @@ describe('find() one to many relations', function () {
         it('detect circular queries', async () => {
             const repo1 = client.getRepository(Country);
             await expect(() => repo1.findAll({
-                elements: ['customers.country']
+                pick: ['customers.country']
             })).rejects.toThrow('Circular');
 
             const repo2 = client.getRepository(Customer);
             await expect(() => repo2.findAll({
-                elements: ['country.customers.country']
+                pick: ['country.customers.country']
             })).rejects.toThrow('Circular');
         });
 
@@ -174,7 +174,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
-                elements: ['code', 'customers']
+                pick: ['code', 'customers']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toBeGreaterThan(0);
@@ -191,7 +191,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Continent);
             const rows = await repo.findAll({
                 filter: {code: 'AM'},
-                elements: ['code', 'countries.continentCode', 'countries.customers', 'countries.code']
+                pick: ['code', 'countries.continentCode', 'countries.customers', 'countries.code']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toBeGreaterThan(0);
@@ -212,7 +212,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Country);
             const rows = await repo.findAll({
                 filter: [In('code', ['DE', 'TR'])],
-                elements: ['code', 'customers.givenName', 'customers.countryCode']
+                pick: ['code', 'customers.givenName', 'customers.countryCode']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toStrictEqual(2);
@@ -229,7 +229,7 @@ describe('find() one to many relations', function () {
         it('limit maximum sub queries', async () => {
             const repo = client.getRepository(Country);
             let r = await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxSubQueries: 1
             });
             expect(r).toBeDefined();
@@ -238,7 +238,7 @@ describe('find() one to many relations', function () {
             expect(r[0].customers).toBeDefined();
 
             r = r = await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxSubQueries: 0
             });
             expect(r).toBeDefined();
@@ -250,7 +250,7 @@ describe('find() one to many relations', function () {
         it('throw if eager rows exceeds limit', async () => {
             const repo = client.getRepository(Country);
             await expect(async () => await repo.findAll({
-                elements: ['code', 'customers.id'],
+                pick: ['code', 'customers.id'],
                 maxEagerFetch: 5
             })).rejects.toThrow('maxEagerFetch');
         });
@@ -259,13 +259,13 @@ describe('find() one to many relations', function () {
             const repo1 = client.getRepository(Country);
             await expect(() => repo1.findAll({
                 filter: {code: 'US'},
-                elements: ['code', 'customers.country']
+                pick: ['code', 'customers.country']
             })).rejects.toThrow('Circular');
 
             const repo2 = client.getRepository(Customer);
             await expect(() => repo2.findAll({
                 filter: {code: 'US'},
-                elements: ['id', 'country.code', 'country.customers.country']
+                pick: ['id', 'country.code', 'country.customers.country']
             })).rejects.toThrow('Circular');
         });
     })
@@ -276,7 +276,7 @@ describe('find() one to many relations', function () {
             const repo = client.getRepository(Country);
             const rows = await repo.findAll({
                 filter: [Eq('code', 'US')],
-                elements: ['code', 'vipCustomers']
+                pick: ['code', 'vipCustomers']
             });
             expect(rows).toBeDefined();
             expect(rows.length).toBeGreaterThan(0);

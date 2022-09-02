@@ -1,7 +1,7 @@
 import {Maybe, Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../model/association-element-metadata.js';
-import {ColumnElementMetadata} from '../model/column-element-metadata.js';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {AssociationFieldMetadata} from '../model/association-field-metadata.js';
+import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
+import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {AnyElementMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata.js';
 import {IndexMetadata} from '../model/index-metadata.js';
 import {applyMixins} from '../util/apply-mixins.js';
@@ -29,22 +29,22 @@ export namespace Entity {
         return model && EntityMetadata.getElement(model, key as string);
     }
 
-    export function getColumnElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<ColumnElementMetadata> {
+    export function getColumnElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<ColumnFieldMetadata> {
         const model = EntityMetadata.get(ctor);
         return model && EntityMetadata.getColumnElement(model, key as string);
     }
 
-    export function getEmbeddedElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<EmbeddedElementMetadata> {
+    export function getEmbeddedElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<EmbeddedFieldMetadata> {
         const model = EntityMetadata.get(ctor);
         return model && EntityMetadata.getEmbeddedElement(model, key as string);
     }
 
-    export function getAssociationElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<AssociationElementMetadata> {
+    export function getAssociationElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<AssociationFieldMetadata> {
         const model = EntityMetadata.get(ctor);
         return model && EntityMetadata.getAssociationElement(model, key as string);
     }
 
-    export function getColumnElementByFieldName(ctor: Type, fieldName: string): Maybe<ColumnElementMetadata> {
+    export function getColumnElementByFieldName(ctor: Type, fieldName: string): Maybe<ColumnFieldMetadata> {
         const model = EntityMetadata.get(ctor);
         return model && EntityMetadata.getColumnElementByFieldName(model, fieldName);
     }
@@ -94,7 +94,7 @@ export namespace Entity {
         return EntityMetadata.getPrimaryIndex(model);
     }
 
-    export function getPrimaryIndexColumns(ctor: Type): ColumnElementMetadata[] {
+    export function getPrimaryIndexColumns(ctor: Type): ColumnFieldMetadata[] {
         const model = EntityMetadata.define(ctor);
         return EntityMetadata.getPrimaryIndexColumns(model);
     }

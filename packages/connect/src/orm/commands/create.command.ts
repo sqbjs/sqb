@@ -1,7 +1,7 @@
 import {Insert, Param} from '@sqb/builder';
 import {SqbConnection} from '../../client/sqb-connection.js';
-import {ColumnElementMetadata} from '../model/column-element-metadata.js';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
+import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 import {isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
 
@@ -78,7 +78,7 @@ export class CreateCommand {
         let v;
         prefix = prefix || '';
         suffix = suffix || '';
-        for (const col of Object.values(entity.elements)) {
+        for (const col of Object.values(entity.fields)) {
             v = values[col.name];
             if (isColumnElement(col)) {
                 if (col.noInsert)
@@ -94,7 +94,7 @@ export class CreateCommand {
                         throw new Error(`${entity.name}.${col.name} is required and can't be null`);
                     continue;
                 }
-                ColumnElementMetadata.checkEnumValue(col, v);
+                ColumnFieldMetadata.checkEnumValue(col, v);
                 const fieldName = prefix + col.fieldName + suffix;
                 const k = '$input_' + fieldName;
                 ctx.queryValues[fieldName] = Param({
@@ -105,7 +105,7 @@ export class CreateCommand {
                 ctx.queryParams[k] = v;
                 ctx.colCount++;
             } else if (v != null && isEmbeddedElement(col)) {
-                const type = await EmbeddedElementMetadata.resolveType(col);
+                const type = await EmbeddedFieldMetadata.resolveType(col);
                 await this._prepareParams(ctx, type, v, col.fieldNamePrefix, col.fieldNameSuffix);
             }
         }

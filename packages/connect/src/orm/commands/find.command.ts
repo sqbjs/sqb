@@ -2,10 +2,10 @@ import {And, In, Param, Select} from '@sqb/builder';
 import {SqbConnection} from '../../client/sqb-connection.js';
 import {Entity} from '../decorators/entity.decorator.js';
 import {AssociationNode} from '../model/association-node.js';
-import type {ColumnElementMetadata} from '../model/column-element-metadata.js';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
+import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
-import type {Repository} from '../repository.class.js';
+import {Repository} from '../repository.class.js';
 import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
 import {joinAssociationGetLast, JoinInfo, prepareFilter} from './command.helper.js';
 import {RowConverter} from './row-converter.js';
@@ -28,7 +28,7 @@ export class FindCommand {
     private _joins: JoinInfo[] = [];
     private _selectColumns: Record<string, {
         statement: string;
-        element: ColumnElementMetadata;
+        element: ColumnFieldMetadata;
     }> = {};
     private _filter = And();
     private _sort?: string[];
@@ -75,10 +75,10 @@ export class FindCommand {
             maxEagerFetch: args.maxEagerFetch,
         });
 
-        await command.addElements({
-            elements: args.elements,
+        await command.addFields({
+            pick: args.pick,
             include: args.include,
-            exclude: args.exclude,
+            omit: args.omit,
             sort: args.sort
         });
 
@@ -90,86 +90,88 @@ export class FindCommand {
         return await command.execute(args);
     }
 
-    async addElements(opts: {
-                          tableAlias?: string;
-                          converter?: RowConverter;
-                          entity?: EntityMetadata;
-                          elements?: string[];
-                          include?: string[];
-                          exclude?: string[];
-                          sort?: string[];
-                          prefix?: string;
-                          suffix?: string;
-                      } = {}
+    async addFields(opts: {
+                        tableAlias?: string;
+                        converter?: RowConverter;
+                        entity?: EntityMetadata;
+                        pick?: string[];
+                        omit?: string[];
+                        include?: string[];
+                        sort?: string[];
+                        prefix?: string;
+                        suffix?: string;
+                    } = {}
     ): Promise<void> {
         const tableAlias = opts.tableAlias || this.resultAlias;
         const entity = opts.entity || this._getEntityFromAlias(tableAlias);
         const converter = opts.converter || this.converter;
 
-        const _elements = opts.elements ?
-            opts.elements.map(x => x.toLowerCase()) : undefined;
+        const _pick = opts.pick ?
+            opts.pick.map(x => x.toLowerCase()) : undefined;
+        const _omit = opts.omit ?
+            opts.omit.map(x => x.toLowerCase()) : undefined;
         const _include = opts.include ?
             opts.include.map(x => x.toLowerCase()) : undefined;
-        const _exclude = opts.exclude ?
-            opts.exclude.map(x => x.toLowerCase()) : undefined;
 
-        const requestElements = _elements ? [..._elements] :
+        const requestedFields = _pick ? [..._pick] :
             (Entity.getNonAssociationElementNames(entity.ctor) as string[])
                 .map(x => x.toLowerCase());
         if (_include)
-            requestElements.push(..._include);
+            requestedFields.push(..._include);
 
-        const sortElements = opts.sort && opts.sort.length ?
+        const sortFields = opts.sort && opts.sort.length ?
             opts.sort.map(x => x.toLowerCase()) : undefined;
         const prefix = opts.prefix || '';
         const suffix = opts.suffix || '';
 
-        for (const key of Object.keys(entity.elements)) {
+        for (const key of Object.keys(entity.fields)) {
             const col = EntityMetadata.getElement(entity, key);
             if (!col)
                 continue;
             const colNameLower = col.name.toLowerCase();
 
             // Ignore element if in excluded list
-            if (_exclude && _exclude.includes(colNameLower))
+            if (_omit && _omit.includes(colNameLower))
                 continue;
 
             // Check if element request list
-            if (!requestElements.find(
+            if (!requestedFields.find(
                 (x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))
             ) continue;
+
+            if (col.hidden)
+                continue;
 
             // Add field to select list if element is a column
             if (isColumnElement(col)) {
                 const fieldAlias = this._selectColumn(tableAlias, col, prefix, suffix);
                 // Add column to converter
-                if (!col.hidden)
-                    converter.addValueProperty({
-                        name: col.name,
-                        fieldAlias,
-                        dataType: col.dataType,
-                        parse: col.parse
-                    });
+                converter.addValueProperty({
+                    name: col.name,
+                    fieldAlias,
+                    dataType: col.dataType,
+                    parse: col.parse
+                });
                 continue;
             }
 
             if (isEmbeddedElement(col)) {
-                const typ = await EmbeddedElementMetadata.resolveType(col);
+                const typ = await EmbeddedFieldMetadata.resolveType(col);
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
                     type: typ.ctor
                 }).converter;
-                await this.addElements({
+                await this.addFields({
                     tableAlias,
                     converter: subConverter,
                     entity: typ,
                     prefix: col.fieldNamePrefix,
                     suffix: col.fieldNameSuffix,
-                    elements: _elements?.includes(colNameLower) ? undefined :
-                        extractSubElements(colNameLower, _elements),
-                    include: extractSubElements(colNameLower, _include),
-                    exclude: extractSubElements(colNameLower, _exclude),
-                    sort: extractSubElements(colNameLower, sortElements),
+                    pick: _pick?.includes(colNameLower) ? undefined :
+                        extractSubFields(colNameLower, _pick),
+                    include: extractSubFields(colNameLower, _include),
+                    omit: extractSubFields(colNameLower, _omit),
+                    sort: extractSubFields(colNameLower, sortFields),
                 });
                 continue;
             }
@@ -184,15 +186,15 @@ export class FindCommand {
                         type: joinInfo.targetEntity.ctor
                     }).converter;
                     // Add join fields to select columns list
-                    await this.addElements({
+                    await this.addFields({
                         tableAlias: joinInfo.joinAlias,
                         converter: subConverter,
                         entity: joinInfo.targetEntity,
-                        elements: _elements?.includes(colNameLower) ? undefined :
-                            extractSubElements(colNameLower, _elements),
-                        include: extractSubElements(colNameLower, _include),
-                        exclude: extractSubElements(colNameLower, _exclude),
-                        sort: extractSubElements(colNameLower, sortElements),
+                        pick: _pick?.includes(colNameLower) ? undefined :
+                            extractSubFields(colNameLower, _pick),
+                        include: extractSubFields(colNameLower, _include),
+                        omit: extractSubFields(colNameLower, _omit),
+                        sort: extractSubFields(colNameLower, sortFields),
                     });
                     continue;
                 }
@@ -211,12 +213,12 @@ export class FindCommand {
                     });
                     findCommand.converter.parent = this.converter;
                     await findCommand.filter(In(targetCol.name, Param(parentField)));
-                    const sort = sortElements && extractSubElements(colNameLower, sortElements);
-                    await findCommand.addElements({
-                        elements: _elements?.includes(colNameLower) ? undefined :
-                            extractSubElements(colNameLower, _elements),
-                        include: extractSubElements(colNameLower, _include),
-                        exclude: extractSubElements(colNameLower, _exclude),
+                    const sort = sortFields && extractSubFields(colNameLower, sortFields);
+                    await findCommand.addFields({
+                        pick: _pick?.includes(colNameLower) ? undefined :
+                            extractSubFields(colNameLower, _pick),
+                        include: extractSubFields(colNameLower, _include),
+                        omit: extractSubFields(colNameLower, _omit),
                         sort,
                     });
                     if (sort)
@@ -230,14 +232,14 @@ export class FindCommand {
                         findCommand,
                         parentField,
                         keyField,
-                        sort: extractSubElements(colNameLower, sortElements)
+                        sort: extractSubFields(colNameLower, sortFields)
                     });
                 }
             }
         }
     }
 
-    private _selectColumn(tableAlias: string, el: ColumnElementMetadata,
+    private _selectColumn(tableAlias: string, el: ColumnFieldMetadata,
                           prefix?: string, suffix?: string): string {
         const fieldName = (prefix || '').toLowerCase() +
             el.fieldName.toUpperCase() +
@@ -254,9 +256,9 @@ export class FindCommand {
         await prepareFilter(this.mainEntity, filter, this._filter);
     }
 
-    async sort(sortElements: string[]): Promise<void> {
-        const orderColumns: string[] = [];
-        for (const item of sortElements) {
+    async sort(sortFields: string[]): Promise<void> {
+        const out: string[] = [];
+        for (const item of sortFields) {
             const m = item.match(SORT_ORDER_PATTERN);
             if (!m)
                 throw new Error(`"${item}" is not a valid order expression`);
@@ -271,7 +273,7 @@ export class FindCommand {
                 while (a.length > 1) {
                     const col = EntityMetadata.getElement(_entityDef, a.shift() || '');
                     if (isEmbeddedElement(col)) {
-                        _entityDef = await EmbeddedElementMetadata.resolveType(col);
+                        _entityDef = await EmbeddedFieldMetadata.resolveType(col);
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
                         if (col.fieldNameSuffix)
@@ -297,9 +299,9 @@ export class FindCommand {
                 throw new Error(`Can not sort by "${elName}", because it is not a data column`);
 
             const dir = m[1] || '+';
-            orderColumns.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
+            out.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
         }
-        this._sort = orderColumns;
+        this._sort = out;
     }
 
     async execute(args: Pick<FindCommandArgs, 'connection' | 'distinct' |
@@ -361,11 +363,11 @@ export class FindCommand {
 
 }
 
-function extractSubElements(colNameLower: string, elements?: string[]): string[] | undefined {
-    if (!(elements && elements.length))
+function extractSubFields(colNameLower: string, fields?: string[]): string[] | undefined {
+    if (!(fields && fields.length))
         return;
-    if (elements) {
-        return elements.reduce((trg: string[], v: string) => {
+    if (fields) {
+        return fields.reduce((trg: string[], v: string) => {
             if (v.startsWith(colNameLower + '.'))
                 trg.push(v.substring(colNameLower.length + 1).toLowerCase())
             return trg;

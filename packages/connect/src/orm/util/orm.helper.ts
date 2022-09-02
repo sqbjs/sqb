@@ -1,7 +1,7 @@
 import {Type} from 'ts-gems';
-import {AssociationElementMetadata} from '../model/association-element-metadata.js';
-import type {ColumnElementMetadata} from '../model/column-element-metadata.js';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {AssociationFieldMetadata} from '../model/association-field-metadata.js';
+import type {ColumnFieldMetadata} from '../model/column-field-metadata.js';
+import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import type {EntityMetadata} from '../model/entity-metadata.js';
 import {ENTITY_METADATA_KEY} from '../orm.const.js';
 import type {TypeResolver, TypeThunk} from '../orm.type.js';
@@ -14,15 +14,15 @@ export function isEntityClass(fn: any): fn is Type {
     return isClass(fn) && Reflect.hasMetadata(ENTITY_METADATA_KEY, fn);
 }
 
-export function isColumnElement(f: any): f is ColumnElementMetadata {
+export function isColumnElement(f: any): f is ColumnFieldMetadata {
     return !!(f && f.name && f.kind === 'column');
 }
 
-export const isEmbeddedElement = (f: any): f is EmbeddedElementMetadata => {
+export const isEmbeddedElement = (f: any): f is EmbeddedFieldMetadata => {
     return !!(f && f.name && f.kind === 'object');
 }
 
-export const isAssociationElement = (f: any): f is AssociationElementMetadata => {
+export const isAssociationElement = (f: any): f is AssociationFieldMetadata => {
     return !!(f && f.name && f.kind === 'association');
 }
 

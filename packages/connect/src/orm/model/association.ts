@@ -1,7 +1,7 @@
 import {camelCase} from 'putil-varhelpers';
 import {AssociationKind, AssociationSettings, TypeThunk} from '../orm.type.js';
 import {resolveEntityMeta} from '../util/orm.helper.js';
-import {ColumnElementMetadata} from './column-element-metadata.js';
+import {ColumnFieldMetadata} from './column-field-metadata.js';
 import {EntityMetadata} from './entity-metadata.js';
 
 export class Association {
@@ -10,8 +10,8 @@ export class Association {
     private _target?: EntityMetadata;  // cached value
     private _sourceKey?: string | null; // cached value
     private _targetKey?: string | null; // cached value
-    private _sourceProperty?: ColumnElementMetadata;
-    private _targetProperty?: ColumnElementMetadata;
+    private _sourceProperty?: ColumnFieldMetadata;
+    private _targetProperty?: ColumnFieldMetadata;
     name: string;
     readonly source: TypeThunk;
     readonly target: TypeThunk;
@@ -48,7 +48,7 @@ export class Association {
         return this._sourceKey;
     }
 
-    async resolveSourceProperty(): Promise<ColumnElementMetadata> {
+    async resolveSourceProperty(): Promise<ColumnFieldMetadata> {
         await this._resolveKeys();
         // @ts-ignore
         return this._sourceProperty;
@@ -60,7 +60,7 @@ export class Association {
         return this._targetKey;
     }
 
-    async resolveTargetProperty(): Promise<ColumnElementMetadata> {
+    async resolveTargetProperty(): Promise<ColumnFieldMetadata> {
         await this._resolveKeys();
         // @ts-ignore
         return this._targetProperty;

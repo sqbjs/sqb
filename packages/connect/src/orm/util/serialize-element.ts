@@ -1,8 +1,8 @@
 import {DataType} from '@sqb/builder';
-import {ElementMetadata} from '../model/element-metadata.js';
+import {FieldMetadata} from '../model/field-metadata.js';
 import {isColumnElement} from './orm.helper.js';
 
-export function serializeColumn(col: ElementMetadata, v: any): any {
+export function serializeColumn(col: FieldMetadata, v: any): any {
     if (isColumnElement(col)) {
         if (col.isArray) {
             if (Array.isArray(v))

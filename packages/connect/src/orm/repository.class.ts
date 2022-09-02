@@ -22,9 +22,9 @@ export namespace Repository {
     }
 
     export interface CreateOptions extends CommandOptions {
-        elements?: string[];
+        pick?: string[];
+        omit?: string[];
         include?: string[];
-        exclude?: string[];
     }
 
     export interface CountOptions extends CommandOptions {
@@ -43,9 +43,9 @@ export namespace Repository {
     }
 
     export interface FindOneOptions extends CommandOptions {
-        elements?: string[];
+        pick?: string[];
+        omit?: string[];
         include?: string[];
-        exclude?: string[];
         filter?: any;
         params?: any;
         sort?: string[];
@@ -61,17 +61,17 @@ export namespace Repository {
     }
 
     export interface GetOptions extends CommandOptions {
-        elements?: string[];
+        pick?: string[];
+        omit?: string[];
         include?: string[];
-        exclude?: string[];
         filter?: any;
         params?: any;
     }
 
     export interface UpdateOptions extends CommandOptions {
-        elements?: string[];
+        pick?: string[];
+        omit?: string[];
         include?: string[];
-        exclude?: string[];
         filter?: any;
         params?: any;
     }
