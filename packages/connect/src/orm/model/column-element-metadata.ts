@@ -6,9 +6,9 @@ import type {
     DefaultValueGetter,
     EnumValue,
     FieldValue,
-} from '../orm.type';
-import {ElementMetadata} from './element-metadata';
-import type {EntityMetadata} from './entity-metadata';
+} from '../orm.type.js';
+import {ElementMetadata} from './element-metadata.js';
+import type {EntityMetadata} from './entity-metadata.js';
 
 export type ColumnElementOptions = Partial<Omit<ColumnElementMetadata, 'entity' | 'name' | 'kind'>>;
 
@@ -22,7 +22,7 @@ export interface ColumnElementMetadata extends ElementMetadata {
 
     /**
      JS type. String, Boolean, Person etc
-    */
+     */
     type?: Function;
 
     /**

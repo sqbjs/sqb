@@ -2,10 +2,10 @@ import {
     BaseEntity,
     Column,
     Entity,
-    PrimaryKey,
     LinkToOne,
+    PrimaryKey,
 } from '@sqb/connect';
-import type {Customer} from './customer.entity';
+import type {Customer} from './customer.entity.js';
 
 @Entity('customer_details')
 export class CustomerDetail extends BaseEntity {
@@ -19,7 +19,7 @@ export class CustomerDetail extends BaseEntity {
     @Column()
     alerts?: string;
 
-    @LinkToOne(() => require('./customer.entity').Customer)
+    @LinkToOne(async () => (await import('./customer.entity.js')).Customer)
     readonly customer?: Customer;
 
 }

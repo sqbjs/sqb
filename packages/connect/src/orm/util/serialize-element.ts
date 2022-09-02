@@ -1,6 +1,6 @@
 import {DataType} from '@sqb/builder';
-import {ElementMetadata} from '../model/element-metadata';
-import {isColumnElement} from './orm.helper';
+import {ElementMetadata} from '../model/element-metadata.js';
+import {isColumnElement} from './orm.helper.js';
 
 export function serializeColumn(col: ElementMetadata, v: any): any {
     if (isColumnElement(col)) {

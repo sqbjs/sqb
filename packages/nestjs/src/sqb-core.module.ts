@@ -14,13 +14,13 @@ import {SqbClient} from '@sqb/connect';
 import {
     SQB_MODULE_ID,
     SQB_MODULE_OPTIONS,
-} from './sqb.constants';
+} from './sqb.constants.js';
 import {
     SqbModuleAsyncOptions,
     SqbModuleOptions,
     SqbOptionsFactory,
-} from './sqb.interface';
-import {getSQBToken, handleRetry,} from './sqb.utils';
+} from './sqb.interface.js';
+import {getSQBToken, handleRetry,} from './sqb.utils.js';
 
 @Global()
 @Module({})

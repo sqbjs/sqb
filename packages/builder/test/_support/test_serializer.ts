@@ -1,4 +1,4 @@
-import {SerializationType, SerializeContext} from '@sqb/builder';
+import {SerializationType, SerializeContext} from '../../src/index.js';
 
 export class TestSerializer {
 

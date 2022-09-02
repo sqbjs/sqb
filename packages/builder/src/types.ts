@@ -1,5 +1,5 @@
-import {DataType, SerializationType} from './enums';
-import type {SerializeContext} from './SerializeContext';
+import {DataType, SerializationType} from './enums.js';
+import type {SerializeContext} from './serialize-context.js';
 
 export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
                                  defFn: DefaultSerializeFunction) => string | undefined;

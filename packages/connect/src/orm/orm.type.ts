@@ -21,7 +21,7 @@ export type TypeThunk<T = any> = Type<T> | TypeResolver<T>;
 export type EnumValue = (FieldValue)[] | Object;
 
 export type FieldValue = string | number | boolean | Date | null;
-export type DefaultValueGetter = (obj?: any) => FieldValue;
+export type DefaultValueGetter = (obj?: any) => FieldValue | undefined;
 
 export interface AssociationSettings {
     source: TypeThunk;

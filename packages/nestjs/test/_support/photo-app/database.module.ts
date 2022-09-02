@@ -1,7 +1,6 @@
 import {DynamicModule, Module} from '@nestjs/common';
 import {SqbModule} from '@sqb/nestjs';
-
-const dbConfig  = require('./config.json');
+import {dbConfig} from './config.js';
 
 @Module({})
 export class DatabaseModule {

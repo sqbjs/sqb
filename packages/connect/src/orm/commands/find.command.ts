@@ -1,14 +1,14 @@
-import {And, In, Param,Select} from '@sqb/builder';
-import {SqbConnection} from '../../client/SqbConnection';
-import {Entity} from '../decorators/entity.decorator';
-import {AssociationNode} from '../model/association-node';
-import type {ColumnElementMetadata} from '../model/column-element-metadata';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
-import type {Repository} from '../repository.class';
-import {isAssociationElement,isColumnElement, isEmbeddedElement} from '../util/orm.helper';
-import {joinAssociationGetLast,JoinInfo, prepareFilter} from './command.helper';
-import {RowConverter} from './row-converter';
+import {And, In, Param, Select} from '@sqb/builder';
+import {SqbConnection} from '../../client/sqb-connection.js';
+import {Entity} from '../decorators/entity.decorator.js';
+import {AssociationNode} from '../model/association-node.js';
+import type {ColumnElementMetadata} from '../model/column-element-metadata.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import type {Repository} from '../repository.class.js';
+import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {joinAssociationGetLast, JoinInfo, prepareFilter} from './command.helper.js';
+import {RowConverter} from './row-converter.js';
 
 export type FindCommandArgs = {
     entity: EntityMetadata;
@@ -209,6 +209,7 @@ export class FindCommand {
                         maxSubQueries: this.maxSubQueries - 1,
                         maxEagerFetch: this.maxEagerFetch
                     });
+                    findCommand.converter.parent = this.converter;
                     await findCommand.filter(In(targetCol.name, Param(parentField)));
                     const sort = sortElements && extractSubElements(colNameLower, sortElements);
                     await findCommand.addElements({

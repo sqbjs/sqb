@@ -1,4 +1,4 @@
-import {EntityMetadata} from '../model/entity-metadata';
+import {EntityMetadata} from '../model/entity-metadata.js';
 
 export function BeforeInsert(): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

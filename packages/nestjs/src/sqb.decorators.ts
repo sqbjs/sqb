@@ -1,5 +1,5 @@
 import {Inject} from '@nestjs/common';
-import {getSQBToken} from './sqb.utils';
+import {getSQBToken} from './sqb.utils.js';
 
 export const InjectSQB: (name?: string) =>
     ParameterDecorator = (name?: string) =>

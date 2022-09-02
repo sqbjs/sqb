@@ -4,9 +4,8 @@ import {
     SqbModuleOptions,
     SqbOptionsFactory,
 } from '@sqb/nestjs';
-import {PhotoModule} from './photo/photo.module';
-
-const dbConfig = require('./config.json');
+import {dbConfig} from './config.js';
+import {PhotoModule} from './photo/photo.module.js';
 
 class ConfigService implements SqbOptionsFactory {
     createSqbOptions(): SqbModuleOptions {

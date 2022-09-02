@@ -1,15 +1,15 @@
 import assert from 'assert';
 import {Connection} from 'postgresql-client';
-import {DbMigrator} from '../src';
-import {Test1MigrationPackage} from './_support/test1-migrations';
-import {Test2MigrationPackage} from './_support/test2-migrations';
+import {DbMigrator} from '../src/index.js';
+import {Test1MigrationPackage} from './_support/test1-migrations.js';
+import {Test2MigrationPackage} from './_support/test2-migrations.js';
 
 describe('DbMigrator', () => {
     let connection: Connection;
     const databaseName = 'emr_test';
     const schemaName = 'migration_test';
 
-    before(async () => {
+    beforeAll(async () => {
         connection = new Connection({database: 'postgres'});
         await connection.connect();
         const r = await connection.query('SELECT oid FROM pg_database WHERE datname = $1', {params: [databaseName]});
@@ -22,7 +22,7 @@ describe('DbMigrator', () => {
         await connection.execute(`drop schema if exists ${schemaName} cascade;`);
     });
 
-    after(async () => {
+    afterAll(async () => {
         await connection.close(0);
     });
 

@@ -1,7 +1,7 @@
-import {TypeThunk} from '../orm.type';
-import {resolveEntityMeta} from '../util/orm.helper';
-import {ElementMetadata} from './element-metadata';
-import type {EntityMetadata} from './entity-metadata';
+import {TypeThunk} from '../orm.type.js';
+import {resolveEntityMeta} from '../util/orm.helper.js';
+import {ElementMetadata} from './element-metadata.js';
+import type {EntityMetadata} from './entity-metadata.js';
 
 export type EmbeddedElementOptions = Partial<Omit<EmbeddedElementMetadata, 'entity' | 'name' | 'kind' | 'type'>>;
 

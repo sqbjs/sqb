@@ -1,5 +1,5 @@
-import {EntityMetadata} from '../model/entity-metadata';
-import {TypeThunk} from '../orm.type';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {TypeThunk} from '../orm.type.js';
 
 export function ForeignKey(type: TypeThunk, targetKey?: string): PropertyDecorator {
     return function (target: Object | Function, propertyKey?: string | symbol): void {

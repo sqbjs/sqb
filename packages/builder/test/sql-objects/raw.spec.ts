@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Raw, Select, SerializationType} from '@sqb/builder';
+import {Raw, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Raw"', () => {
 
@@ -9,14 +7,14 @@ describe('serialize "Raw"', () => {
     };
 
     it('should initialize Raw', () => {
-        assert.strictEqual(Raw('')._type, SerializationType.RAW);
+        expect(Raw('')._type).toStrictEqual(SerializationType.RAW);
     });
 
     it('should serialize Raw', () => {
         const query = Select(Raw('\'John\'\'s Bike\' f1'))
             .from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select \'John\'\'s Bike\' f1 from table1');
+        expect(result.sql).toStrictEqual('select \'John\'\'s Bike\' f1 from table1');
     });
 
 });

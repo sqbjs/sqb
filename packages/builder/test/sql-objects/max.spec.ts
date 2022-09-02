@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Field, Max, Select, SerializationType} from '@sqb/builder';
+import {Field, Max, Select, SerializationType} from '../../src/index.js';
 
 describe('serialize "Max"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "Max"', function () {
     };
 
     it('should initialize Max', function () {
-        assert.strictEqual(Max('A')._type, SerializationType.MAX_STATEMENT);
+        expect(Max('A')._type).toStrictEqual(SerializationType.MAX_STATEMENT);
     });
 
     it('should serialize values', function () {
@@ -18,7 +16,7 @@ describe('serialize "Max"', function () {
             Max('ABC')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select max('ABC') from table1`);
+        expect(result.sql).toStrictEqual(`select max('ABC') from table1`);
     });
 
     it('should serialize Field names', function () {
@@ -26,7 +24,7 @@ describe('serialize "Max"', function () {
             Max(Field('a'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select max(a) from table1`);
+        expect(result.sql).toStrictEqual(`select max(a) from table1`);
     });
 
     it('should serialize sub query', function () {
@@ -34,7 +32,7 @@ describe('serialize "Max"', function () {
             Max(Select().from('table2'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select max((select * from table2)) from table1`);
+        expect(result.sql).toStrictEqual(`select max((select * from table2)) from table1`);
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "Max"', function () {
             Max(1).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, 'select max(1) col1 from table1');
+        expect(result.sql).toStrictEqual('select max(1) col1 from table1');
     });
 
 });

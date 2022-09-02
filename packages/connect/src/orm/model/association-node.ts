@@ -1,4 +1,4 @@
-import {Association} from './association';
+import {Association} from './association.js';
 
 export class AssociationNode extends Association {
     prior?: AssociationNode;

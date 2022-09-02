@@ -1,10 +1,11 @@
 {
   "name": "@sqb/connect",
   "description": "Multi-dialect database connection framework written with TypeScript",
-  "version": "4.2.1",
+  "version": "4.3.0",
   "author": "Panates",
   "contributors": [
-    "Eray Hanoglu <e.hanoglu@panates.com>"
+    "Eray Hanoglu <e.hanoglu@panates.com>",
+    "Ilker Gurelli <i.gurelli@panates.com>"
   ],
   "license": "Apache-2.0",
   "repository": {
@@ -12,23 +13,21 @@
     "url": "https://github.com/sqbjs/sqb.git",
     "directory": "packages/connect"
   },
-  "keywords": [
-    "javascript",
-    "typescript",
-    "sqb",
-    "rdbms",
-    "sql",
-    "client",
-    "dialect",
-    "multi-dialect",
-    "database",
-    "oracle",
-    "postgres",
-    "pg",
-    "mssql",
-    "sqlite",
-    "mysql"
-  ],
+  "scripts": {
+    "compile": "tsc",
+    "prebuild": "npm run lint && npm run clean",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect && cp ../../package.cjs.json ../../build/connect/cjs/package.json",
+    "lint": "eslint .",
+    "test": "jest",
+    "cover": "jest --collect-coverage",
+    "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
+    "clean:src": "ts-cleanup -s src --all",
+    "clean:dist": "rimraf ../../build/connectt",
+    "clean:cover": "rimraf ../../coverage/connect"
+  },
   "dependencies": {
     "debug": "^4.3.4",
     "lightning-pool": "^3.1.4",
@@ -44,33 +43,47 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.182"
+    "@types/lodash": "^4.14.184"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.2.0"
+    "@sqb/builder": "^4.3.0"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "default": "./esm/index.js"
+    },
+    "./cjs": "./cjs/index.js",
+    "./esm": "./esm/index.js"
+  },
   "engines": {
-    "node": ">= 16.0"
-  },
-  "directories": {
-    "lib": "dist",
-    "test": "test"
+    "node": ">=16.0",
+    "npm": ">=7.0.0"
   },
   "files": [
+    "bin/",
+    "cjs/",
+    "esm/",
     "LICENSE",
-    "README.md",
-    "dist/"
+    "README.md"
   ],
-  "scripts": {
-    "build": "tsc -b tsconfig-build.json",
-    "prebuild": "npm run lint && npm run clean:dist",
-    "postbuild": "copyfiles package.json README.md LICENSE ../../build/connect",
-    "clean": "ts-cleanup -s src --all & ts-cleanup -s test",
-    "clean:dist": "rimraf ../../build/connect",
-    "compile": "tsc",
-    "lint": "eslint src/** --no-error-on-unmatched-pattern",
-    "test": "TS_NODE_PROJECT='./test/tsconfig.json' mocha -r ts-node/register -r tsconfig-paths/register --reporter spec test/**/*.spec.ts"
-  }
+  "keywords": [
+    "sqb",
+    "rdbms",
+    "sql",
+    "client",
+    "dialect",
+    "multi-dialect",
+    "database",
+    "oracle",
+    "postgres",
+    "pg",
+    "mssql",
+    "sqlite",
+    "mysql"
+  ]
 }

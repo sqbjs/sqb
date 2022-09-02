@@ -1,6 +1,6 @@
 import {DataType} from '@sqb/builder';
-import {ColumnElementOptions} from '../model/column-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
+import {ColumnElementOptions} from '../model/column-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
 
 export function Column(type?: DataType): PropertyDecorator
 export function Column(options?: ColumnElementOptions): PropertyDecorator

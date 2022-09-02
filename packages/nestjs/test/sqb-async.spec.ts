@@ -1,16 +1,14 @@
+import '@sqb/postgres';
+import {Server} from 'http';
+import request from 'supertest';
 import {INestApplication} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
-import request from 'supertest';
-import {AsyncApplicationModule} from './_support/photo-app/app-async.module';
-import {Server} from 'http';
-import {createSchema} from './_support/create-schema';
+import {AsyncApplicationModule} from './_support/photo-app/app-async.module.js';
 
 describe('Sqb-Nestjs (async configuration)', () => {
 
     let server: Server;
     let app: INestApplication;
-
-    before(() => createSchema());
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({

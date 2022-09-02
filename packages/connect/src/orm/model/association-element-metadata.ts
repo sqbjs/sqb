@@ -1,6 +1,6 @@
-import {AssociationNode} from './association-node';
-import {ElementMetadata} from './element-metadata';
-import type {EntityMetadata} from './entity-metadata';
+import {AssociationNode} from './association-node.js';
+import {ElementMetadata} from './element-metadata.js';
+import type {EntityMetadata} from './entity-metadata.js';
 
 export interface AssociationElementMetadata extends ElementMetadata {
     readonly kind: 'association';

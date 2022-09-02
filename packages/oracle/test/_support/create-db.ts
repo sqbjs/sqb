@@ -1,7 +1,7 @@
 import oracledb from 'oracledb';
-import {ClientConfiguration} from '@sqb/connect/src';
-import {getInsertSQLsForTestData} from '@sqb/connect/test/_shared/adapter-tests';
-import {clientConfigurationToDriver} from '@sqb/oracle/src/helpers';
+import {ClientConfiguration} from '@sqb/connect';
+import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests.js';
+import {clientConfigurationToDriver} from '../../src/helpers.js';
 
 const schema = process.env.ORASCHEMA || 'test';
 let schemaCreated = false;
@@ -10,7 +10,7 @@ export const sqls: string[] = [];
 export const dbConfig: ClientConfiguration = {
     driver: 'oracledb',
     host: process.env.ORAHOST,
-    port: parseInt(process.env.ORAPORT, 10) || 1521,
+    port: parseInt(process.env.ORAPORT || '0', 10) || 1521,
     database: process.env.ORADATABASE,
     user: process.env.ORAUSER,
     password: process.env.ORAPASSWORD,

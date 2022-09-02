@@ -1,6 +1,6 @@
-import {EntityMetadata} from '../model/entity-metadata';
-import {IndexMetadata} from '../model/index-metadata';
-import {Column} from './column.decorator';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {IndexMetadata} from '../model/index-metadata.js';
+import {Column} from './column.decorator.js';
 
 export function PrimaryKey(fields: string | string[], options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>): ClassDecorator
 export function PrimaryKey(options?: Omit<IndexMetadata, 'columns' | 'unique' | 'primary'>): PropertyDecorator

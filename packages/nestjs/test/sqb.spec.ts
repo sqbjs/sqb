@@ -1,15 +1,13 @@
+import '@sqb/postgres';
+import {Server} from 'http';
+import request from 'supertest';
 import {INestApplication} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
-import request from 'supertest';
-import {ApplicationModule} from './_support/photo-app/app.module';
-import {Server} from 'http';
-import {createSchema} from './_support/create-schema';
+import {ApplicationModule} from './_support/photo-app/app.module.js';
 
 describe('Sqb-Nestjs', () => {
     let server: Server;
     let app: INestApplication;
-
-    before(() => createSchema());
 
     beforeEach(async () => {
         const module = await Test.createTestingModule({

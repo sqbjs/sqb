@@ -1,22 +1,22 @@
 import {
-    DataType,
     BaseEntity,
-    Embedded,
     Column,
+    DataType,
+    Embedded,
     Entity,
+    Link, linkFromMany, LinkFromOne, linkFromOne,
+    LinkToOne, linkToOne, Parse,
     PrimaryKey,
-    Parse,
     Serialize,
-    LinkToOne, LinkFromOne, Link, linkToOne, linkFromMany, linkFromOne,
 } from '@sqb/connect';
-import {PersonName} from './person-name.type';
-import {Country} from '../_support/country.entity';
-import {CustomerDetail} from './customer-detail.entity';
-import {Continent} from '../_support/continent.entity';
-import {CustomerTag} from '../_support/customer-tag.entity';
-import {Tag} from '../_support/tags.entity';
-import {CustomerVip} from '../_support/customer-vip.entity';
-import {Address} from './address';
+import {Continent} from '../_support/continent.entity.js';
+import {Country} from '../_support/country.entity.js';
+import {CustomerTag} from '../_support/customer-tag.entity.js';
+import {CustomerVip} from '../_support/customer-vip.entity.js';
+import {Tag} from '../_support/tags.entity.js';
+import {Address} from './address.js';
+import {CustomerDetail} from './customer-detail.entity.js';
+import {PersonName} from './person-name.type.js';
 
 const GenderMap = {
     M: 'Male',

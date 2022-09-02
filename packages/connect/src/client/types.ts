@@ -1,10 +1,10 @@
 import type {PoolConfiguration} from 'lightning-pool';
 import {Maybe} from 'ts-gems';
 import {DataType, ParamOptions} from '@sqb/builder';
-import type {Adapter} from './Adapter';
-import type {Cursor} from './Cursor';
-import type {FieldInfoMap} from './FieldInfoMap';
-import type {SqbConnection} from './SqbConnection';
+import type {Adapter} from './adapter';
+import type {Cursor} from './cursor';
+import type {FieldInfoMap} from './field-info-map';
+import type {SqbConnection} from './sqb-connection';
 
 export {DataType} from '@sqb/builder';
 
@@ -180,22 +180,12 @@ export interface QueryExecuteOptions {
 export interface QueryResult {
     executeTime: number;
     fields?: FieldInfoMap;
-    rows?: Record<string, any>[] | any[][];
+    rows?: any;
     rowType?: RowType;
     query?: QueryRequest
     returns?: any;
     rowsAffected?: number;
     cursor?: Cursor;
-}
-
-export interface ObjectQueryResult extends QueryResult {
-    rows?: Record<string, any>[];
-    rowType?: 'object';
-}
-
-export interface ArrayQueryResult extends QueryResult {
-    rows?: any[][];
-    rowType?: 'array';
 }
 
 export type FieldInfo = {

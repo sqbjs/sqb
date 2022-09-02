@@ -1,7 +1,8 @@
-import './_support/env';
-import assert from 'assert';
-import {registerSerializer, unRegisterSerializer, Select, SerializationType, SerializerExtension} from '@sqb/builder';
-import {serializers} from '../src/extensions';
+import {serializers} from '../src/extensions.js';
+import {
+    registerSerializer,
+    Select, SerializationType, SerializerExtension, unRegisterSerializer
+} from '../src/index.js';
 
 describe('Serializer Extensions', function () {
 
@@ -16,9 +17,9 @@ describe('Serializer Extensions', function () {
             isReservedWord: () => true
         }
         registerSerializer(extension1, extension2);
-        assert.strictEqual(serializers.length, oldLen + 2);
-        assert.strictEqual(serializers[oldLen], extension1);
-        assert.strictEqual(serializers[oldLen + 1], extension2);
+        expect(serializers.length).toStrictEqual(oldLen + 2);
+        expect(serializers[oldLen]).toStrictEqual(extension1);
+        expect(serializers[oldLen + 1]).toStrictEqual(extension2);
         unRegisterSerializer(extension1, extension2);
     });
 
@@ -34,7 +35,7 @@ describe('Serializer Extensions', function () {
         registerSerializer(ext);
         const query = Select('*').addColumn().from('table1 t1');
         const result = query.generate({dialect: 'any-dialect'});
-        assert.strictEqual(result.sql, 'select * from TABLE1 T1');
+        expect(result.sql).toStrictEqual('select * from TABLE1 T1');
         unRegisterSerializer(ext);
     });
 
@@ -48,7 +49,7 @@ describe('Serializer Extensions', function () {
         registerSerializer(ext);
         const query = Select('hello').addColumn().from('table1');
         const result = query.generate({dialect: 'any-dialect'});
-        assert.strictEqual(result.sql, 'select "hello" from table1');
+        expect(result.sql).toStrictEqual('select "hello" from table1');
         unRegisterSerializer(ext);
     });
 

@@ -1,11 +1,11 @@
 import {And, Param, Update} from '@sqb/builder';
-import {SqbConnection} from '../../client/SqbConnection';
-import {ColumnElementMetadata} from '../model/column-element-metadata';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
-import {Repository} from '../repository.class';
-import {isColumnElement, isEmbeddedElement} from '../util/orm.helper';
-import {prepareFilter} from './command.helper';
+import {SqbConnection} from '../../client/sqb-connection.js';
+import {ColumnElementMetadata} from '../model/column-element-metadata.js';
+import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {Repository} from '../repository.class.js';
+import {isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {prepareFilter} from './command.helper.js';
 
 export type UpdateCommandArgs = {
     entity: EntityMetadata;

@@ -1,6 +1,6 @@
-import {EmbeddedElementOptions} from '../model/embedded-element-metadata';
-import {EntityMetadata} from '../model/entity-metadata';
-import {TypeThunk} from '../orm.type';
+import {EmbeddedElementOptions} from '../model/embedded-element-metadata.js';
+import {EntityMetadata} from '../model/entity-metadata.js';
+import {TypeThunk} from '../orm.type.js';
 
 export function Embedded(type?: TypeThunk, options?: EmbeddedElementOptions): PropertyDecorator {
     return (target: Object, propertyKey: string | symbol): void => {

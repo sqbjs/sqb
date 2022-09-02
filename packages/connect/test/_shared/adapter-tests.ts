@@ -1,5 +1,4 @@
-/* eslint-disable camelcase */
-import assert from "assert";
+/* eslint-disable @typescript-eslint/no-non-null-assertion,camelcase */
 import fs from "fs";
 import path from "path";
 import {DataType, Insert, Param, Query, Select, Update} from '@sqb/builder';
@@ -7,7 +6,7 @@ import {Adapter, ClientConfiguration, QueryRequest, registerAdapter, unRegisterA
 
 export function initAdapterTests(adapter: Adapter,
                                  config?: Partial<ClientConfiguration>) {
-    let connection: Adapter.Connection;
+    let connection!: Adapter.Connection;
     let lastInsertId;
     const clientConfig: ClientConfiguration = {
         ...config,
@@ -18,8 +17,8 @@ export function initAdapterTests(adapter: Adapter,
         }
     }
 
-    before(() => registerAdapter(adapter));
-    after(() => unRegisterAdapter(adapter));
+    beforeAll(() => registerAdapter(adapter));
+    afterAll(() => unRegisterAdapter(adapter));
     afterEach(() => connection && connection.close());
 
     async function adapterExecute(query: Query,
@@ -48,22 +47,23 @@ export function initAdapterTests(adapter: Adapter,
     }
 
     it('should create connection instance with ' + adapter.driver + ' driver', async function () {
-        this.timeout(10000);
-        this.slow(2000);
         connection = await adapter.connect(clientConfig);
-        assert.ok(connection);
-    });
+        expect(connection).toBeDefined();
+    }, 10000);
 
-    if (adapter.features.schema) {
-        it('should set active working schema', async function () {
+    if (adapter.features?.schema) {
+        it('should set active working schema', async () => {
             connection = await adapter.connect(clientConfig);
-            await connection.setSchema(clientConfig.schema);
+            expect(clientConfig.schema).toBeDefined();
+            expect(() => connection.setSchema!(clientConfig.schema || '')
+            ).not.toThrow()
         });
 
-        it('should get active working schema', async function () {
+        it('should get active working schema', async () => {
             connection = await adapter.connect(clientConfig);
-            assert.strictEqual((await connection.getSchema()).toUpperCase(),
-                clientConfig.schema.toUpperCase());
+            expect(
+                (await connection.getSchema!()).toUpperCase()
+            ).toStrictEqual((clientConfig.schema || '').toUpperCase());
         });
     }
 
@@ -71,27 +71,27 @@ export function initAdapterTests(adapter: Adapter,
         connection = await adapter.connect(clientConfig);
         const query = Select('id').from('customers').orderBy('id').limit(10);
         const result = await adapterExecute(query, {objectRows: false});
-        assert.ok(result);
-        assert.ok(result.rows && result.rows.length);
-        assert.ok(result.rowType);
-        assert.ok(result.fields);
-        assert.strictEqual(result.objRows[0].id, 1);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rows!.length).toBeGreaterThan(0);
+        expect(result.rowType).toBeDefined();
+        expect(result.fields).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(1);
     });
 
     it('should execute a select query and return fields and rows (objectRows=true)', async function () {
         connection = await adapter.connect(clientConfig);
         const query = Select('id').from('customers').orderBy('id');
         const result = await adapterExecute(query, {objectRows: true});
-        assert.ok(result);
-        assert.ok(result.rows && result.rows.length);
-        assert.ok(result.rowType);
-        assert.ok(result.fields);
-        assert.strictEqual(result.objRows[0].id, 1);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rows!.length).toBeGreaterThan(0);
+        expect(result.fields).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(1);
     });
 
     it('should return cursor', async function () {
         if (!adapter.features?.cursor) {
-            this.skip();
             return;
         }
         connection = await adapter.connect(clientConfig);
@@ -99,17 +99,17 @@ export function initAdapterTests(adapter: Adapter,
         const result = await adapterExecute(query, {
             objectRows: false, cursor: true
         });
-        assert.ok(result);
-        assert.ok(result.rowType);
-        assert.ok(result.fields);
-        assert.ok(result.cursor);
-        const rows = await result.cursor.fetch(1);
-        assert.ok(rows);
-        assert.strictEqual(rows.length, 1);
+        expect(result).toBeDefined();
+        expect(result.rowType).toBeDefined();
+        expect(result.fields).toBeDefined();
+        expect(result.cursor).toBeDefined();
+        const rows = await result.cursor!.fetch(1);
+        expect(rows).toBeDefined();
+        expect(rows!.length).toStrictEqual(1);
         if (result.rowType === 'array')
-            assert.strictEqual(rows[0][0], 1);
+            expect(rows![0][0]).toStrictEqual(1);
         else
-            assert.strictEqual(rows[0][result.fields[0].fieldName], 1);
+            expect(rows![0][result.fields![0].fieldName]).toStrictEqual(1);
     });
 
     it('should fetchRows option limit row count', async function () {
@@ -119,9 +119,9 @@ export function initAdapterTests(adapter: Adapter,
             objectRows: false,
             fetchRows: 5
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rows.length, 5);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rows!.length).toStrictEqual(5);
     });
 
     if (adapter.features?.fetchAsString?.includes(DataType.DATE)) {
@@ -133,10 +133,10 @@ export function initAdapterTests(adapter: Adapter,
                 fetchRows: 1,
                 fetchAsString: [DataType.DATE]
             });
-            assert.ok(result);
-            assert.ok(result.rows);
-            assert.strictEqual(result.rows.length, 1);
-            assert.strictEqual(typeof result.rows[0][0], 'string');
+            expect(result).toBeDefined();
+            expect(result.rows).toBeDefined();
+            expect(result.rows!.length).toStrictEqual(1);
+            expect(typeof result.rows![0][0]).toStrictEqual('string');
         });
     }
 
@@ -149,16 +149,17 @@ export function initAdapterTests(adapter: Adapter,
                 fetchRows: 1,
                 fetchAsString: [DataType.TIMESTAMP]
             });
-            assert.ok(result);
-            assert.ok(result.rows);
-            assert.strictEqual(result.rows.length, 1);
-            assert.strictEqual(typeof result.rows[0][0], 'string');
+            expect(result).toBeDefined();
+            expect(result.rows).toBeDefined();
+            expect(result.rows!.length).toStrictEqual(1);
+            expect(typeof result.rows![0][0]).toStrictEqual('string');
         });
     }
 
     it('should return error if sql is invalid', async function () {
         connection = await adapter.connect(clientConfig);
-        await assert.rejects(() => connection.execute({sql: 'invalid sql'}));
+        await expect(() => connection.execute({sql: 'invalid sql'}))
+            .rejects.toBeDefined();
     });
 
     it('should insert record with returning', async function () {
@@ -173,10 +174,10 @@ export function initAdapterTests(adapter: Adapter,
             autoCommit: true,
             objectRows: false
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rowsAffected, 1);
-        assert.ok(result.objRows[0].id > 0);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rowsAffected).toStrictEqual(1);
+        expect(result.objRows[0].id).toBeGreaterThan(0);
         lastInsertId = result.objRows[0].id;
     });
 
@@ -192,12 +193,12 @@ export function initAdapterTests(adapter: Adapter,
             autoCommit: true,
             params: {givenName, familyName}
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rowsAffected, 1);
-        assert.ok(result.objRows[0].id > 0);
-        assert.strictEqual(result.objRows[0].given_name, givenName);
-        assert.strictEqual(result.objRows[0].family_name, familyName);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rowsAffected).toStrictEqual(1);
+        expect(result.objRows[0].id).toBeGreaterThan(0);
+        expect(result.objRows[0].given_name).toStrictEqual(givenName);
+        expect(result.objRows[0].family_name).toStrictEqual(familyName);
     });
 
     it('should update record with returning', async function () {
@@ -210,10 +211,10 @@ export function initAdapterTests(adapter: Adapter,
             autoCommit: true,
             objectRows: false
         });
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.rowsAffected, 1);
-        assert.strictEqual(result.objRows[0].city, city);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.rowsAffected).toStrictEqual(1);
+        expect(result.objRows[0].city).toStrictEqual(city);
     });
 
     it('should commit a transaction', async function () {
@@ -221,9 +222,9 @@ export function initAdapterTests(adapter: Adapter,
         let r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        expect(r).toBeDefined();
+        expect(r.rows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
         const oldCity = r.objRows[0].city;
 
         await connection.startTransaction();
@@ -237,21 +238,21 @@ export function initAdapterTests(adapter: Adapter,
             Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.objRows[0].id, lastInsertId);
-        assert.strictEqual(result.objRows[0].city, newCity);
-        assert.notStrictEqual(result.objRows[0].city, oldCity);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(result.objRows[0].city).toStrictEqual(newCity);
+        expect(result.objRows[0].city).not.toStrictEqual(oldCity);
         await connection.commit();
 
         r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
-        assert.notStrictEqual(r.objRows[0].city, oldCity);
-        assert.strictEqual(r.objRows[0].city, newCity);
+        expect(r).toBeDefined();
+        expect(r.rows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(r.objRows[0].city).not.toStrictEqual(oldCity);
+        expect(r.objRows[0].city).toStrictEqual(newCity);
     });
 
     it('should rollback a transaction', async function () {
@@ -259,11 +260,10 @@ export function initAdapterTests(adapter: Adapter,
         let r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        expect(r).toBeDefined();
+        expect(r.objRows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
         const oldCity = r.objRows[0].city;
-
 
         await connection.startTransaction();
         const city = 'X' + Math.floor(Math.random() * 10000);
@@ -275,20 +275,20 @@ export function initAdapterTests(adapter: Adapter,
             Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
-        assert.ok(result);
-        assert.ok(result.objRows);
-        assert.strictEqual(result.objRows[0].id, lastInsertId);
-        assert.strictEqual(result.objRows[0].city, city);
-        assert.notStrictEqual(result.objRows[0].city, oldCity);
+        expect(result).toBeDefined();
+        expect(result.objRows).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(result.objRows[0].city).toStrictEqual(city);
+        expect(result.objRows[0].city).not.toStrictEqual(oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
-        assert.strictEqual(r.objRows[0].city, oldCity);
+        expect(r).toBeDefined();
+        expect(r.rows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(r.objRows[0].city).toStrictEqual(oldCity);
     });
 
     it('should start transaction when autoCommit is off', async function () {
@@ -296,9 +296,9 @@ export function initAdapterTests(adapter: Adapter,
         let r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        expect(r).toBeDefined();
+        expect(r.rows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
         const oldCity = r.objRows[0].city;
 
         const city = 'X' + Math.floor(Math.random() * 10000);
@@ -310,20 +310,20 @@ export function initAdapterTests(adapter: Adapter,
             Select().from('customers').where({id: lastInsertId}),
             {autoCommit: false}
         );
-        assert.ok(result);
-        assert.ok(result.rows);
-        assert.strictEqual(result.objRows[0].id, lastInsertId);
-        assert.strictEqual(result.objRows[0].city, city);
-        assert.notStrictEqual(result.objRows[0].city, oldCity);
+        expect(result).toBeDefined();
+        expect(result.rows).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(result.objRows[0].city).toStrictEqual(city);
+        expect(result.objRows[0].city).not.toStrictEqual(oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.rows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
-        assert.strictEqual(r.objRows[0].city, oldCity);
+        expect(r).toBeDefined();
+        expect(r.rows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(r.objRows[0].city).toStrictEqual(oldCity);
     });
 
     it('should commit a transaction when autoCommit is on', async function () {
@@ -331,9 +331,9 @@ export function initAdapterTests(adapter: Adapter,
         let r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
+        expect(r).toBeDefined();
+        expect(r.objRows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
         const oldCity = r.objRows[0].city;
         const newCity = 'X' + Math.floor(Math.random() * 10000);
         await adapterExecute(
@@ -343,21 +343,21 @@ export function initAdapterTests(adapter: Adapter,
         const result = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(result);
-        assert.ok(result.objRows);
-        assert.strictEqual(result.objRows[0].id, lastInsertId);
-        assert.strictEqual(result.objRows[0].city, newCity);
-        assert.notStrictEqual(result.objRows[0].city, oldCity);
+        expect(result).toBeDefined();
+        expect(result.objRows).toBeDefined();
+        expect(result.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(result.objRows[0].city).toStrictEqual(newCity);
+        expect(result.objRows[0].city).not.toStrictEqual(oldCity);
         await connection.rollback();
 
         r = await adapterExecute(
             Select().from('customers').where({id: lastInsertId})
         );
-        assert.ok(r);
-        assert.ok(r.objRows);
-        assert.strictEqual(r.objRows[0].id, lastInsertId);
-        assert.notStrictEqual(r.objRows[0].city, oldCity);
-        assert.strictEqual(r.objRows[0].city, newCity);
+        expect(r).toBeDefined();
+        expect(r.objRows).toBeDefined();
+        expect(r.objRows[0].id).toStrictEqual(lastInsertId);
+        expect(r.objRows[0].city).not.toStrictEqual(oldCity);
+        expect(r.objRows[0].city).toStrictEqual(newCity);
     });
 
     it('should call startTransaction() more than one', async function () {
@@ -396,7 +396,7 @@ export function getInsertSQLsForTestData(opts: {
             path.join(repositoryRoot, 'support/test-data', f + '.json'), 'utf8')));
 
     for (const table of dataFiles) {
-        const file = {table, scripts: []};
+        const file = {table, scripts: [] as string[]};
         for (const row of table.rows) {
             const x = Insert((opts.schema ? opts.schema + '.' : '') + table.name, row)
                 .generate({dialect: opts.dialect});

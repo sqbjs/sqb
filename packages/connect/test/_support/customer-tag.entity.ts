@@ -7,7 +7,7 @@ export class CustomerTag {
         fieldName: 'customer_id',
         notNull: true
     })
-    @ForeignKey(async () => (await import('./customer.entity')).Customer)
+    @ForeignKey(async () => (await import('./customer.entity.js')).Customer)
     customerId: number;
 
     @Column({fieldName: 'tag_id', notNull: true})

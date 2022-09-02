@@ -1,6 +1,4 @@
-import '../_support/env';
-import assert from 'assert';
-import {Field, Select, SerializationType, StringAGG} from '@sqb/builder';
+import {Field, Select, SerializationType, StringAGG} from '../../src/index.js';
 
 describe('serialize "StringAGG"', function () {
 
@@ -10,7 +8,7 @@ describe('serialize "StringAGG"', function () {
     };
 
     it('should initialize StringAGG', function () {
-        assert.strictEqual(StringAGG('A')._type, SerializationType.STRINGAGG_STATEMENT);
+        expect(StringAGG('A')._type).toStrictEqual(SerializationType.STRINGAGG_STATEMENT);
     });
 
     it('should serialize values', function () {
@@ -18,7 +16,7 @@ describe('serialize "StringAGG"', function () {
             StringAGG('ABC')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg(ABC,',') from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg(ABC,',') from table1`);
     });
 
     it('should serialize Field names', function () {
@@ -26,7 +24,7 @@ describe('serialize "StringAGG"', function () {
             StringAGG(Field('a'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg(a,',') from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg(a,',') from table1`);
     });
 
     it('should serialize sub query', function () {
@@ -34,7 +32,7 @@ describe('serialize "StringAGG"', function () {
             StringAGG(Select().from('table2'))
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg((select * from table2),',') from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg((select * from table2),',') from table1`);
     });
 
     it('should serialize alias', function () {
@@ -42,7 +40,7 @@ describe('serialize "StringAGG"', function () {
             StringAGG(Field('a')).as('col1')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg(a,',') col1 from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg(a,',') col1 from table1`);
     });
 
     it('should serialize delimiter', function () {
@@ -50,15 +48,15 @@ describe('serialize "StringAGG"', function () {
             StringAGG(Field('a')).delimiter('&')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg(a,'&') from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg(a,'&') from table1`);
     });
 
     it('should serialize order by', function () {
         const query = Select(
-            StringAGG(Field('a')).delimiter('&').orderBy('a','b')
+            StringAGG(Field('a')).delimiter('&').orderBy('a', 'b')
         ).from('table1');
         const result = query.generate(options);
-        assert.strictEqual(result.sql, `select string_agg(a,'&' order by a, b) from table1`);
+        expect(result.sql).toStrictEqual(`select string_agg(a,'&' order by a, b) from table1`);
     });
 
 });
