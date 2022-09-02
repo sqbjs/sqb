@@ -3,7 +3,7 @@ import {
     LogicalOperator, Raw, Select, SelectQuery
 } from '@sqb/builder';
 import {AssociationNode} from '../model/association-node.js';
-import {EmbeddedElementMetadata} from '../model/embedded-element-metadata.js';
+import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
 
@@ -126,7 +126,7 @@ export async function prepareFilter(
                         if (isColumnElement(col))
                             throw new Error(`Invalid column (${item._left}) defined in filter`);
                         if (isEmbeddedElement(col)) {
-                            _curEntity = await EmbeddedElementMetadata.resolveType(col);
+                            _curEntity = await EmbeddedFieldMetadata.resolveType(col);
                             _curPrefix = _curPrefix + (col.fieldNamePrefix || '');
                             _curSuffix = (col.fieldNameSuffix || '') + _curSuffix;
                             continue;

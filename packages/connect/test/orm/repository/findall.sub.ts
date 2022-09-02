@@ -17,7 +17,7 @@ describe('findAll()', function () {
         await client.close(0);
     });
 
-    it('should return only data columns if "elements" option is null', async function () {
+    it('should return only non exclusive if "pick" option is null', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({limit: 1});
         expect(rows).toBeDefined();
@@ -28,7 +28,7 @@ describe('findAll()', function () {
         expect(rows[0].country).toBeUndefined();
     });
 
-    it('should return embedded elements', async function () {
+    it('should return embedded fields', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({limit: 1});
         expect(rows).toBeDefined();
@@ -38,7 +38,7 @@ describe('findAll()', function () {
         expect(rows[0].name!.family).toBeDefined();
     });
 
-    it('should return embedded elements with prefix', async function () {
+    it('should return embedded fields with prefix', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({filter: {id: 1}});
         expect(rows).toBeDefined();
@@ -48,9 +48,9 @@ describe('findAll()', function () {
         expect(rows[0].address!.street).toBeDefined();
     });
 
-    it('should return embedded sub elements', async function () {
+    it('should return embedded sub fields', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({limit: 1, elements: ['name.given']});
+        const rows = await repo.findAll({limit: 1, pick: ['name.given']});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].name).toBeDefined();
@@ -59,17 +59,17 @@ describe('findAll()', function () {
 
     it('should return json field as embedded element', async function () {
         const repo = client.getRepository(Customer);
-        const row = await repo.findByPk(1, {elements: ['customData']});
+        const row = await repo.findByPk(1, {pick: ['customData']});
         expect(row).toBeDefined();
         expect(row!.customData).toBeDefined();
         expect(typeof row!.customData).toStrictEqual('object');
     });
 
-    it('should return requested elements if "elements" option set', async function () {
+    it('should return requested fields if "pick" option set', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             limit: 1,
-            elements: ['id', 'givenName']
+            pick: ['id', 'givenName']
         });
         expect(rows).toBeDefined();
         expect(Object.keys(rows[0])).toStrictEqual(['id', 'givenName']);
@@ -100,7 +100,7 @@ describe('findAll()', function () {
         const rows = await repo.findAll({
             limit: 1,
             include: ['country'],
-            exclude: ['familyName', 'country.code']
+            omit: ['familyName', 'country.code']
         });
         expect(rows).toBeDefined();
         expect(rows[0].givenName).toBeDefined();
@@ -229,7 +229,7 @@ describe('findAll()', function () {
     it('should return distinct results', async function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
-            elements: ['countryCode'],
+            pick: ['countryCode'],
             distinct: true
         });
         expect(rows).toBeDefined();

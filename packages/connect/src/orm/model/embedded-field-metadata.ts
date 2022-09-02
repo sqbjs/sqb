@@ -1,21 +1,21 @@
 import {TypeThunk} from '../orm.type.js';
 import {resolveEntityMeta} from '../util/orm.helper.js';
-import {ElementMetadata} from './element-metadata.js';
 import type {EntityMetadata} from './entity-metadata.js';
+import {FieldMetadata} from './field-metadata.js';
 
-export type EmbeddedElementOptions = Partial<Omit<EmbeddedElementMetadata, 'entity' | 'name' | 'kind' | 'type'>>;
+export type EmbeddedFieldOptions = Partial<Omit<EmbeddedFieldMetadata, 'entity' | 'name' | 'kind' | 'type'>>;
 
-export interface EmbeddedElementMetadata extends ElementMetadata {
+export interface EmbeddedFieldMetadata extends FieldMetadata {
     readonly kind: 'object';
     type: TypeThunk;
     fieldNamePrefix?: string;
     fieldNameSuffix?: string;
 }
 
-export namespace EmbeddedElementMetadata {
+export namespace EmbeddedFieldMetadata {
 
-    export function create(entity: EntityMetadata, name: string, type: TypeThunk, options?: EmbeddedElementOptions): EmbeddedElementMetadata {
-        const result: EmbeddedElementMetadata = {
+    export function create(entity: EntityMetadata, name: string, type: TypeThunk, options?: EmbeddedFieldOptions): EmbeddedFieldMetadata {
+        const result: EmbeddedFieldMetadata = {
             kind: 'object',
             entity,
             name,
@@ -28,7 +28,7 @@ export namespace EmbeddedElementMetadata {
         return result;
     }
 
-    export async function resolveType(meta: EmbeddedElementMetadata): Promise<EntityMetadata> {
+    export async function resolveType(meta: EmbeddedFieldMetadata): Promise<EntityMetadata> {
         const typ = await resolveEntityMeta(meta.type);
         if (typ)
             return typ;

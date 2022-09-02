@@ -19,7 +19,7 @@ describe('find() many to many relations', function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             filter: {'id': 1},
-            elements: ['id', 'givenName', 'tags']
+            pick: ['id', 'givenName', 'tags']
         });
         expect(rows.length).toStrictEqual(1);
         expect(rows[0].id).toStrictEqual(1);
@@ -36,7 +36,7 @@ describe('find() many to many relations', function () {
         const repo = client.getRepository(Customer);
         const rows = await repo.findAll({
             filter: {'id': 1},
-            elements: ['id', 'tags.color']
+            pick: ['id', 'tags.color']
         });
         expect(rows).toBeDefined();
         expect(rows.length).toStrictEqual(1);

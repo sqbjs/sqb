@@ -7,12 +7,12 @@ import type {
     EnumValue,
     FieldValue,
 } from '../orm.type.js';
-import {ElementMetadata} from './element-metadata.js';
 import type {EntityMetadata} from './entity-metadata.js';
+import {FieldMetadata} from './field-metadata.js';
 
-export type ColumnElementOptions = Partial<Omit<ColumnElementMetadata, 'entity' | 'name' | 'kind'>>;
+export type DataFieldOptions = Partial<Omit<ColumnFieldMetadata, 'entity' | 'name' | 'kind'>>;
 
-export interface ColumnElementMetadata extends ElementMetadata {
+export interface ColumnFieldMetadata extends FieldMetadata {
     readonly kind: 'column';
 
     /**
@@ -81,11 +81,6 @@ export interface ColumnElementMetadata extends ElementMetadata {
     notNull?: boolean;
 
     /**
-     * Indicates whether or not to hide this column by default when making queries.
-     */
-    hidden?: boolean;
-
-    /**
      * Indicates if column value is used in update queries
      */
     noUpdate?: boolean;
@@ -100,25 +95,25 @@ export interface ColumnElementMetadata extends ElementMetadata {
 
 }
 
-export namespace ColumnElementMetadata {
+export namespace ColumnFieldMetadata {
 
-    export function create(entity: EntityMetadata, name: string, options: ColumnElementOptions = {}): ColumnElementMetadata {
-        const result: ColumnElementMetadata = {
+    export function create(entity: EntityMetadata, name: string, options: DataFieldOptions = {}): ColumnFieldMetadata {
+        const result: ColumnFieldMetadata = {
             kind: 'column',
             entity,
             name,
             fieldName: name
         }
         if (options)
-            ColumnElementMetadata.assign(result, options);
+            ColumnFieldMetadata.assign(result, options);
         return result;
     }
 
-    export function assign(target: ColumnElementMetadata, options: ColumnElementOptions) {
+    export function assign(target: ColumnFieldMetadata, options: DataFieldOptions) {
         Object.assign(target, _.omit(options, ['entity', 'name', 'kind']));
     }
 
-    export function checkEnumValue(col: ColumnElementMetadata, v: FieldValue) {
+    export function checkEnumValue(col: ColumnFieldMetadata, v: FieldValue) {
         if (v === undefined || !col.enum || (v == null && !col.notNull))
             return;
         const enumKeys = Array.isArray(col.enum) ? col.enum : Object.keys(col.enum);

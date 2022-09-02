@@ -232,7 +232,7 @@ export class RowConverter {
 
     private _checkCircularDep(t: Type): void {
         if (this.resultType === t)
-            throw new Error('Circular elements requested');
+            throw new Error('Circular fields requested');
         if (this.parent)
             this.parent._checkCircularDep(t);
     }

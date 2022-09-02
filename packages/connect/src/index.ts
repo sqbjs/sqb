@@ -19,10 +19,10 @@ export * from './orm/base-entity.js';
 export * from './orm/repository.class.js';
 
 export * from './orm/model/entity-metadata.js';
-export * from './orm/model/element-metadata.js';
-export * from './orm/model/column-element-metadata.js';
-export * from './orm/model/embedded-element-metadata.js';
-export * from './orm/model/association-element-metadata.js';
+export * from './orm/model/field-metadata.js';
+export * from './orm/model/column-field-metadata.js';
+export * from './orm/model/embedded-field-metadata.js';
+export * from './orm/model/association-field-metadata.js';
 export * from './orm/model/association.js';
 export * from './orm/model/association-node.js';
 export * from './orm/model/index-metadata.js';
