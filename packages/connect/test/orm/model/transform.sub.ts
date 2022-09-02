@@ -14,7 +14,7 @@ describe('Parse', function () {
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
         expect(meta!.name).toStrictEqual('MyEntity');
-        const idColumn = EntityMetadata.getColumnElement(meta!, 'id');
+        const idColumn = EntityMetadata.getColumnField(meta!, 'id');
         expect(idColumn).toBeDefined();
         expect(idColumn!.parse).toStrictEqual(fn);
     });
@@ -34,7 +34,7 @@ describe('Serialize', function () {
         const meta = Entity.getMetadata(MyEntity);
         expect(meta).toBeDefined();
         expect(meta!.name).toStrictEqual('MyEntity');
-        const idColumn = EntityMetadata.getColumnElement(meta!, 'id');
+        const idColumn = EntityMetadata.getColumnField(meta!, 'id');
         expect(idColumn).toBeDefined();
         expect(idColumn!.serialize).toStrictEqual(fn);
     });

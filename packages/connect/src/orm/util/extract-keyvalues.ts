@@ -1,5 +1,5 @@
 import {EntityMetadata} from '../model/entity-metadata.js';
-import {isColumnElement} from './orm.helper.js';
+import {isColumnField} from './orm.helper.js';
 
 export function extractKeyValues<T>(
     entityDef: EntityMetadata,
@@ -11,10 +11,10 @@ export function extractKeyValues<T>(
         throw new Error(`No primary fields defined for "${entityDef.name}" entity`);
 
     const validateCol = (k) => {
-        const col = EntityMetadata.getElement(entityDef, k);
+        const col = EntityMetadata.getField(entityDef, k);
         if (!col)
             throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
-        if (!isColumnElement(col))
+        if (!isColumnField(col))
             throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
     }
 

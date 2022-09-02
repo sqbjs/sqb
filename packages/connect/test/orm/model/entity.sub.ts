@@ -152,7 +152,7 @@ describe('Entity', function () {
             code: string
         }
 
-        expect(Entity.getElementNames(Customer)).toStrictEqual(['id', 'name', 'country', 'code']);
+        expect(Entity.getFieldNames(Customer)).toStrictEqual(['id', 'name', 'country', 'code']);
     });
 
     it(`should EntityDefinition.getDataColumnNames() return only data column names`, function () {
@@ -182,7 +182,7 @@ describe('Entity', function () {
             code: string
         }
 
-        expect(Entity.getColumnNames(Customer)).toStrictEqual(['id', 'name', 'code']);
+        expect(Entity.getColumnFieldNames(Customer)).toStrictEqual(['id', 'name', 'code']);
     });
 
     it(`should getInsertColumnNames() return only data column names to insert`, function () {

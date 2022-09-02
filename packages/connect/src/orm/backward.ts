@@ -11,7 +11,7 @@ export function getUpdateColumnNames<T, K extends keyof PickWritable<T>>(ctor: T
 }
 
 export function getNonAssociationElementNames<T, K extends keyof PickWritable<T>>(ctor: Type<T>): K[] {
-    return Entity.getNonAssociationElementNames(ctor) as K[];
+    return Entity.getNonAssociationFieldNames(ctor) as K[];
 }
 
 export function mixinEntities<A, B>(derivedCtor: Type<A>, baseB: Type<B>): Type<A & B>

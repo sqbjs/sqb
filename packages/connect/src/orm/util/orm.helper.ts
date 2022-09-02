@@ -14,15 +14,15 @@ export function isEntityClass(fn: any): fn is Type {
     return isClass(fn) && Reflect.hasMetadata(ENTITY_METADATA_KEY, fn);
 }
 
-export function isColumnElement(f: any): f is ColumnFieldMetadata {
+export function isColumnField(f: any): f is ColumnFieldMetadata {
     return !!(f && f.name && f.kind === 'column');
 }
 
-export const isEmbeddedElement = (f: any): f is EmbeddedFieldMetadata => {
+export const isEmbeddedField = (f: any): f is EmbeddedFieldMetadata => {
     return !!(f && f.name && f.kind === 'object');
 }
 
-export const isAssociationElement = (f: any): f is AssociationFieldMetadata => {
+export const isAssociationField = (f: any): f is AssociationFieldMetadata => {
     return !!(f && f.name && f.kind === 'association');
 }
 

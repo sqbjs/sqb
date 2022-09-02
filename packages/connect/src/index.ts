@@ -39,9 +39,9 @@ export * from './orm/decorators/primarykey.decorator.js';
 export * from './orm/decorators/transform.decorator.js';
 
 export {
-    isColumnElement,
-    isEmbeddedElement,
-    isAssociationElement,
+    isColumnField,
+    isEmbeddedField,
+    isAssociationField,
     isEntityClass
 } from './orm/util/orm.helper.js';
 

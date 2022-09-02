@@ -3,7 +3,7 @@ import {Type} from 'ts-gems';
 export type Ctor = Type | Function;
 
 /* Model related */
-export type ElementKind = 'column' | 'object' | 'association';
+export type FieldKind = 'column' | 'object' | 'association';
 
 export type AssociationKind = 'to' | 'to-many' | 'from' | 'from-many';
 

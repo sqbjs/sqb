@@ -12,6 +12,6 @@ export function Embedded(type?: TypeThunk, options?: EmbeddedFieldOptions): Prop
             throw new Error('"type" must be defined');
 
         const entity = EntityMetadata.define(target.constructor);
-        EntityMetadata.defineEmbeddedElement(entity, propertyKey, type, options);
+        EntityMetadata.defineEmbeddedField(entity, propertyKey, type, options);
     }
 }

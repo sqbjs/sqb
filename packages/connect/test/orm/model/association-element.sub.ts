@@ -9,7 +9,7 @@ import {
     LinkToMany, LinkToOne,
     linkToOne, PrimaryKey
 } from '@sqb/connect';
-import {isAssociationElement} from '../../../src/orm/util/orm.helper.js';
+import {isAssociationField} from '../../../src/orm/util/orm.helper.js';
 
 class Country {
     @PrimaryKey()
@@ -40,8 +40,8 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         expect(meta).toBeDefined();
-        const col = EntityMetadata.getAssociationElement(meta!, 'country');
-        expect(isAssociationElement(col)).toBeDefined();
+        const col = EntityMetadata.getAssociationField(meta!, 'country');
+        expect(isAssociationField(col)).toBeDefined();
         expect(col!.name).toStrictEqual('country');
         expect(col!.association.source).toStrictEqual(Customer);
         expect(col!.association.target).toStrictEqual(Country);
@@ -57,8 +57,8 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         expect(meta).toBeDefined();
-        const col = EntityMetadata.getAssociationElement(meta!, 'country');
-        expect(isAssociationElement(col)).toBeTruthy();
+        const col = EntityMetadata.getAssociationField(meta!, 'country');
+        expect(isAssociationField(col)).toBeTruthy();
         expect(col!.name).toStrictEqual('country');
         expect(col!.association.source).toStrictEqual(Customer);
         expect(col!.association.target).toStrictEqual(Country);
@@ -74,8 +74,8 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         expect(meta).toBeDefined();
-        const col = EntityMetadata.getAssociationElement(meta!, 'country');
-        expect(isAssociationElement(col)).toBeTruthy();
+        const col = EntityMetadata.getAssociationField(meta!, 'country');
+        expect(isAssociationField(col)).toBeTruthy();
         expect(col!.name).toStrictEqual('country');
         expect(col!.association.source).toStrictEqual(Customer);
         expect(col!.association.target).toStrictEqual(Country);
@@ -90,8 +90,8 @@ describe('Nested element', function () {
 
         const meta = Entity.getMetadata(Customer);
         expect(meta).toBeDefined();
-        const col = EntityMetadata.getAssociationElement(meta!, 'countries');
-        expect(isAssociationElement(col)).toBeTruthy();
+        const col = EntityMetadata.getAssociationField(meta!, 'countries');
+        expect(isAssociationField(col)).toBeTruthy();
         expect(col!.name).toStrictEqual('countries');
         expect(col!.association.source).toStrictEqual(Customer);
         expect(col!.association.target).toStrictEqual(Country);

@@ -6,7 +6,7 @@ import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
 import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
 import {EntityMetadata} from '../model/entity-metadata.js';
 import {Repository} from '../repository.class.js';
-import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
+import {isAssociationField, isColumnField, isEmbeddedField} from '../util/orm.helper.js';
 import {joinAssociationGetLast, JoinInfo, prepareFilter} from './command.helper.js';
 import {RowConverter} from './row-converter.js';
 
@@ -28,7 +28,7 @@ export class FindCommand {
     private _joins: JoinInfo[] = [];
     private _selectColumns: Record<string, {
         statement: string;
-        element: ColumnFieldMetadata;
+        field: ColumnFieldMetadata;
     }> = {};
     private _filter = And();
     private _sort?: string[];
@@ -114,7 +114,7 @@ export class FindCommand {
             opts.include.map(x => x.toLowerCase()) : undefined;
 
         const requestedFields = _pick ? [..._pick] :
-            (Entity.getNonAssociationElementNames(entity.ctor) as string[])
+            (Entity.getNonAssociationFieldNames(entity.ctor) as string[])
                 .map(x => x.toLowerCase());
         if (_include)
             requestedFields.push(..._include);
@@ -125,25 +125,22 @@ export class FindCommand {
         const suffix = opts.suffix || '';
 
         for (const key of Object.keys(entity.fields)) {
-            const col = EntityMetadata.getElement(entity, key);
-            if (!col)
+            const col = EntityMetadata.getField(entity, key);
+            if (!col || col.hidden)
                 continue;
             const colNameLower = col.name.toLowerCase();
 
-            // Ignore element if in excluded list
+            // Ignore field if in excluded list
             if (_omit && _omit.includes(colNameLower))
                 continue;
 
-            // Check if element request list
+            // Check if field request list
             if (!requestedFields.find(
                 (x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))
             ) continue;
 
-            if (col.hidden)
-                continue;
-
-            // Add field to select list if element is a column
-            if (isColumnElement(col)) {
+            // Add field to select list if field is a column
+            if (isColumnField(col)) {
                 const fieldAlias = this._selectColumn(tableAlias, col, prefix, suffix);
                 // Add column to converter
                 converter.addValueProperty({
@@ -155,7 +152,7 @@ export class FindCommand {
                 continue;
             }
 
-            if (isEmbeddedElement(col)) {
+            if (isEmbeddedField(col)) {
                 const typ = await EmbeddedFieldMetadata.resolveType(col);
                 const subConverter = converter.addObjectProperty({
                     name: col.name,
@@ -176,7 +173,7 @@ export class FindCommand {
                 continue;
             }
 
-            if (isAssociationElement(col)) {
+            if (isAssociationField(col)) {
 
                 // OtO relation
                 if (!col.association.returnsMany()) {
@@ -246,7 +243,7 @@ export class FindCommand {
             (suffix || '').toLowerCase();
         const fieldAlias = tableAlias + '_' + fieldName;
         this._selectColumns[fieldAlias] = {
-            element: el,
+            field: el,
             statement: tableAlias + '.' + fieldName + ' as ' + fieldAlias
         };
         return fieldAlias;
@@ -271,14 +268,14 @@ export class FindCommand {
             if (elName.includes('.')) {
                 const a: string[] = elName.split('.');
                 while (a.length > 1) {
-                    const col = EntityMetadata.getElement(_entityDef, a.shift() || '');
-                    if (isEmbeddedElement(col)) {
+                    const col = EntityMetadata.getField(_entityDef, a.shift() || '');
+                    if (isEmbeddedField(col)) {
                         _entityDef = await EmbeddedFieldMetadata.resolveType(col);
                         if (col.fieldNamePrefix)
                             prefix += col.fieldNamePrefix;
                         if (col.fieldNameSuffix)
                             suffix = col.fieldNameSuffix + suffix;
-                    } else if (isAssociationElement(col)) {
+                    } else if (isAssociationField(col)) {
                         if (col.association.returnsMany()) {
                             elName = '';
                             break;
@@ -292,10 +289,10 @@ export class FindCommand {
                     continue;
                 elName = a.shift() || '';
             }
-            const col = EntityMetadata.getElement(_entityDef, elName);
+            const col = EntityMetadata.getField(_entityDef, elName);
             if (!col)
-                throw new Error(`Unknown element (${elName}) declared in sort property`);
-            if (!isColumnElement(col))
+                throw new Error(`Unknown field (${elName}) declared in sort property`);
+            if (!isColumnField(col))
                 throw new Error(`Can not sort by "${elName}", because it is not a data column`);
 
             const dir = m[1] || '+';

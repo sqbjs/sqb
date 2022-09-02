@@ -130,7 +130,7 @@ export class Association {
             if (!masterKey) {
                 // snake-case
                 masterKey = detail.name[0].toLowerCase() + detail.name.substring(1) + '_' + detailKey;
-                if (!EntityMetadata.getColumnElement(master, masterKey))
+                if (!EntityMetadata.getColumnField(master, masterKey))
                     masterKey = camelCase(masterKey);
             }
             if (this.sourceBelongsToTarget) {
@@ -141,10 +141,10 @@ export class Association {
                 sourceKey = masterKey;
             }
         }
-        this._targetProperty = EntityMetadata.getColumnElement(target, targetKey);
+        this._targetProperty = EntityMetadata.getColumnField(target, targetKey);
         if (!this._targetProperty)
             throw new Error(`Can't determine target key of ${this.name}`);
-        this._sourceProperty = EntityMetadata.getColumnElement(source, sourceKey);
+        this._sourceProperty = EntityMetadata.getColumnField(source, sourceKey);
         if (!this._sourceProperty)
             throw new Error(`Can't determine source key of ${this.name}`);
         this._targetKey = targetKey;

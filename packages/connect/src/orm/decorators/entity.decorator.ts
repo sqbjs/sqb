@@ -2,7 +2,7 @@ import {Maybe, Type} from 'ts-gems';
 import {AssociationFieldMetadata} from '../model/association-field-metadata.js';
 import {ColumnFieldMetadata} from '../model/column-field-metadata.js';
 import {EmbeddedFieldMetadata} from '../model/embedded-field-metadata.js';
-import {AnyElementMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata.js';
+import {AnyFieldMetadata, EntityMetadata, EntityOptions} from '../model/entity-metadata.js';
 import {IndexMetadata} from '../model/index-metadata.js';
 import {applyMixins} from '../util/apply-mixins.js';
 
@@ -24,59 +24,59 @@ export namespace Entity {
     export const getMetadata = EntityMetadata.get;
     export const getOwnMetadata = EntityMetadata.getOwn;
 
-    export function getElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<AnyElementMetadata> {
+    export function getField<T>(ctor: Type<T>, key: keyof T | string): Maybe<AnyFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getElement(model, key as string);
+        return model && EntityMetadata.getField(model, key as string);
     }
 
-    export function getColumnElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<ColumnFieldMetadata> {
+    export function getColumnField<T>(ctor: Type<T>, key: keyof T | string): Maybe<ColumnFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getColumnElement(model, key as string);
+        return model && EntityMetadata.getColumnField(model, key as string);
     }
 
-    export function getEmbeddedElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<EmbeddedFieldMetadata> {
+    export function getEmbeddedField<T>(ctor: Type<T>, key: keyof T | string): Maybe<EmbeddedFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getEmbeddedElement(model, key as string);
+        return model && EntityMetadata.getEmbeddedField(model, key as string);
     }
 
-    export function getAssociationElement<T>(ctor: Type<T>, key: keyof T | string): Maybe<AssociationFieldMetadata> {
+    export function getAssociationField<T>(ctor: Type<T>, key: keyof T | string): Maybe<AssociationFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getAssociationElement(model, key as string);
+        return model && EntityMetadata.getAssociationField(model, key as string);
     }
 
-    export function getColumnElementByFieldName(ctor: Type, fieldName: string): Maybe<ColumnFieldMetadata> {
+    export function getColumnFieldByFieldName(ctor: Type, fieldName: string): Maybe<ColumnFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.getColumnElementByFieldName(model, fieldName);
+        return model && EntityMetadata.getColumnFieldByFieldName(model, fieldName);
     }
 
-    export function find(ctor: Type, predicate: (el: AnyElementMetadata) => boolean): Maybe<AnyElementMetadata> {
+    export function find(ctor: Type, predicate: (el: AnyFieldMetadata) => boolean): Maybe<AnyFieldMetadata> {
         const model = EntityMetadata.get(ctor);
-        return model && EntityMetadata.findElement(model, predicate);
+        return model && EntityMetadata.findField(model, predicate);
     }
 
-    export function getElementNames(ctor: Type, filter?: (el: AnyElementMetadata) => boolean): string[] {
+    export function getFieldNames(ctor: Type, filter?: (el: AnyFieldMetadata) => boolean): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getElementNames(model, filter)) || [];
+        return (model && EntityMetadata.getFieldNames(model, filter)) || [];
     }
 
-    export function getColumnNames(ctor: Type): string[] {
+    export function getColumnFieldNames(ctor: Type): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getColumnNames(model)) || [];
+        return (model && EntityMetadata.getColumnFieldNames(model)) || [];
     }
 
-    export function getEmbeddedElementNames(ctor: Type): string[] {
+    export function getEmbeddedFieldNames(ctor: Type): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getEmbeddedElementNames(model)) || [];
+        return (model && EntityMetadata.getEmbeddedFieldNames(model)) || [];
     }
 
-    export function getAssociationElementNames(ctor: Type): string[] {
+    export function getAssociationFieldNames(ctor: Type): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getAssociationElementNames(model)) || [];
+        return (model && EntityMetadata.getAssociationFieldNames(model)) || [];
     }
 
-    export function getNonAssociationElementNames(ctor: Type): string[] {
+    export function getNonAssociationFieldNames(ctor: Type): string[] {
         const model = EntityMetadata.get(ctor);
-        return (model && EntityMetadata.getNonAssociationElementNames(model)) || [];
+        return (model && EntityMetadata.getNonAssociationFieldNames(model)) || [];
     }
 
     export function getInsertColumnNames(ctor: Type): string[] {

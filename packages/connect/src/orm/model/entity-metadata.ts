@@ -2,8 +2,8 @@ import {Maybe, Type} from 'ts-gems';
 import {DataType} from '@sqb/builder';
 import {ENTITY_METADATA_KEY} from '../orm.const.js';
 import {Ctor, TypeThunk} from '../orm.type.js';
-import {isAssociationElement, isColumnElement, isEmbeddedElement} from '../util/orm.helper.js';
-import {serializeColumn} from '../util/serialize-element.js';
+import {isAssociationField, isColumnField, isEmbeddedField} from '../util/orm.helper.js';
+import {serializeColumn} from '../util/serialize-field.js';
 import {Association} from './association.js';
 import {AssociationFieldMetadata} from './association-field-metadata.js';
 import {AssociationNode} from './association-node.js';
@@ -11,7 +11,7 @@ import {ColumnFieldMetadata, DataFieldOptions} from './column-field-metadata.js'
 import {EmbeddedFieldMetadata, EmbeddedFieldOptions} from './embedded-field-metadata.js';
 import {IndexMetadata} from './index-metadata.js';
 
-export type AnyElementMetadata = ColumnFieldMetadata | EmbeddedFieldMetadata | AssociationFieldMetadata;
+export type AnyFieldMetadata = ColumnFieldMetadata | EmbeddedFieldMetadata | AssociationFieldMetadata;
 export type EntityOptions = Partial<Pick<EntityMetadata, 'name' | 'schema' | 'comment' | 'tableName'>>;
 
 export interface EntityMetadata {
@@ -20,7 +20,7 @@ export interface EntityMetadata {
     tableName?: string;
     schema?: string;
     comment?: string;
-    fields: Record<string, AnyElementMetadata>;
+    fields: Record<string, AnyFieldMetadata>;
     indexes: IndexMetadata[];
     foreignKeys: Association[];
     eventListeners: Record<string, Function[]>;
@@ -49,13 +49,13 @@ export namespace EntityMetadata {
 
         ctor.prototype.toJSON = function (): Object {
             const obj = {};
-            const elementKeys = Object.keys(meta.fields);
-            const l = elementKeys.length;
+            const fieldKeys = Object.keys(meta.fields);
+            const l = fieldKeys.length;
             let key;
             let v;
             for (let i = 0; i < l; i++) {
-                key = elementKeys[i];
-                const col = EntityMetadata.getElement(meta, key);
+                key = fieldKeys[i];
+                const col = EntityMetadata.getField(meta, key);
                 if (col) {
                     v = this[col.name];
                     if (v !== undefined)
@@ -75,46 +75,46 @@ export namespace EntityMetadata {
         return Reflect.getOwnMetadata(ENTITY_METADATA_KEY, ctor);
     }
 
-    export function getElement(entity: EntityMetadata, elementName: string): Maybe<AnyElementMetadata> {
-        return elementName ? entity.fields[elementName.toLowerCase()] : undefined;
+    export function getField(entity: EntityMetadata, fieldName: string): Maybe<AnyFieldMetadata> {
+        return fieldName ? entity.fields[fieldName.toLowerCase()] : undefined;
     }
 
-    export function getColumnElement(entity: EntityMetadata, elementName: string): Maybe<ColumnFieldMetadata> {
-        const el = getElement(entity, elementName);
-        if (el && !isColumnElement(el))
+    export function getColumnField(entity: EntityMetadata, fieldName: string): Maybe<ColumnFieldMetadata> {
+        const el = getField(entity, fieldName);
+        if (el && !isColumnField(el))
             throw new Error(`"${el.name}" requested as "column" but it is "${el.kind}"`);
         return el as ColumnFieldMetadata;
     }
 
-    export function getEmbeddedElement(entity: EntityMetadata, elementName: string): Maybe<EmbeddedFieldMetadata> {
-        const el = getElement(entity, elementName);
-        if (el && !isEmbeddedElement(el))
+    export function getEmbeddedField(entity: EntityMetadata, fieldName: string): Maybe<EmbeddedFieldMetadata> {
+        const el = getField(entity, fieldName);
+        if (el && !isEmbeddedField(el))
             throw new Error(`"${el.name}" requested as "embedded" but it is "${el.kind}"`);
         return el as EmbeddedFieldMetadata;
     }
 
-    export function getAssociationElement(entity: EntityMetadata, elementName: string): Maybe<AssociationFieldMetadata> {
-        const el = getElement(entity, elementName);
-        if (el && !isAssociationElement(el))
+    export function getAssociationField(entity: EntityMetadata, fieldName: string): Maybe<AssociationFieldMetadata> {
+        const el = getField(entity, fieldName);
+        if (el && !isAssociationField(el))
             throw new Error(`"${el.name}" requested as "association" but it is "${el.kind}"`);
         return el as AssociationFieldMetadata;
     }
 
-    export function findElement(entity: EntityMetadata, predicate: (el: AnyElementMetadata) => boolean): Maybe<AnyElementMetadata> {
+    export function findField(entity: EntityMetadata, predicate: (el: AnyFieldMetadata) => boolean): Maybe<AnyFieldMetadata> {
         return Object.values(entity.fields).find(predicate);
     }
 
-    export function getColumnElementByFieldName(entity: EntityMetadata, fieldName: string): Maybe<ColumnFieldMetadata> {
+    export function getColumnFieldByFieldName(entity: EntityMetadata, fieldName: string): Maybe<ColumnFieldMetadata> {
         if (!fieldName)
             return;
         fieldName = fieldName.toLowerCase();
         for (const prop of Object.values(entity.fields)) {
-            if (isColumnElement(prop) && prop.fieldName.toLowerCase() === fieldName)
+            if (isColumnField(prop) && prop.fieldName.toLowerCase() === fieldName)
                 return prop;
         }
     }
 
-    export function getElementNames(entity: EntityMetadata, filter?: (el: AnyElementMetadata) => boolean): string[] {
+    export function getFieldNames(entity: EntityMetadata, filter?: (el: AnyFieldMetadata) => boolean): string[] {
         if (filter) {
             const out: string[] = [];
             for (const el of Object.values(entity.fields)) {
@@ -124,38 +124,38 @@ export namespace EntityMetadata {
             return out;
         }
         // Create a cached name array
-        if (!Object.prototype.hasOwnProperty.call(entity, '_elementNames'))
-            Object.defineProperty(entity, '_elementNames', {
+        if (!Object.prototype.hasOwnProperty.call(entity, '_fieldNames'))
+            Object.defineProperty(entity, '_fieldNames', {
                 enumerable: false,
                 configurable: true,
                 writable: true,
                 value: Object.values(entity.fields).map(m => m.name)
             });
-        return (entity as any)._elementNames as string[];
+        return (entity as any)._fieldNames as string[];
     }
 
-    export function getColumnNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, isColumnElement);
+    export function getColumnFieldNames(entity: EntityMetadata): string[] {
+        return getFieldNames(entity, isColumnField);
     }
 
-    export function getEmbeddedElementNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, isEmbeddedElement);
+    export function getEmbeddedFieldNames(entity: EntityMetadata): string[] {
+        return getFieldNames(entity, isEmbeddedField);
     }
 
-    export function getAssociationElementNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, isAssociationElement);
+    export function getAssociationFieldNames(entity: EntityMetadata): string[] {
+        return getFieldNames(entity, isAssociationField);
     }
 
-    export function getNonAssociationElementNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, x => !isAssociationElement(x));
+    export function getNonAssociationFieldNames(entity: EntityMetadata): string[] {
+        return getFieldNames(entity, x => !isAssociationField(x));
     }
 
     export function getInsertColumnNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, x => isColumnElement(x) && !x.noInsert);
+        return getFieldNames(entity, x => isColumnField(x) && !x.noInsert);
     }
 
     export function getUpdateColumnNames(entity: EntityMetadata): string[] {
-        return getElementNames(entity, x => isColumnElement(x) && !x.noUpdate);
+        return getFieldNames(entity, x => isColumnField(x) && !x.noUpdate);
     }
 
     export function getPrimaryIndex(entity: EntityMetadata): Maybe<IndexMetadata> {
@@ -167,7 +167,7 @@ export namespace EntityMetadata {
         const out: ColumnFieldMetadata[] = [];
         if (idx) {
             for (const k of idx.columns) {
-                const col = getColumnElement(entity, k);
+                const col = getColumnField(entity, k);
                 if (!col)
                     throw new Error(`Data column "${k}" in primary index of ${entity.name} does not exists`)
                 out.push(col);
@@ -216,14 +216,14 @@ export namespace EntityMetadata {
         entity.eventListeners[event].push(fn);
     }
 
-    export function defineColumnElement(
+    export function defineColumnField(
         entity: EntityMetadata,
         name: string,
         options: DataFieldOptions = {}
     ): ColumnFieldMetadata {
-        delete (entity as any)._elementNames;
-        let prop = EntityMetadata.getElement(entity, name);
-        if (isColumnElement(prop))
+        delete (entity as any)._fieldNames;
+        let prop = EntityMetadata.getField(entity, name);
+        if (isColumnField(prop))
             options = {...prop, ...options};
 
         if (!options.type) {
@@ -282,27 +282,27 @@ export namespace EntityMetadata {
         return prop;
     }
 
-    export function defineEmbeddedElement(
+    export function defineEmbeddedField(
         entity: EntityMetadata,
         name: string,
         type: TypeThunk,
         options?: EmbeddedFieldOptions
     ): EmbeddedFieldMetadata {
-        delete (entity as any)._elementNames;
-        let prop = EntityMetadata.getElement(entity, name);
-        if (isEmbeddedElement(prop))
+        delete (entity as any)._fieldNames;
+        let prop = EntityMetadata.getField(entity, name);
+        if (isEmbeddedField(prop))
             options = {...prop, ...options};
         prop = EmbeddedFieldMetadata.create(entity, name, type, options);
         entity.fields[name.toLowerCase()] = prop;
         return prop;
     }
 
-    export function defineAssociationElement(
+    export function defineAssociationField(
         entity: EntityMetadata,
         propertyKey: string,
         association: AssociationNode
     ): AssociationFieldMetadata {
-        delete (entity as any)._elementNames;
+        delete (entity as any)._fieldNames;
         const prop = AssociationFieldMetadata.create(entity, propertyKey, association);
         let l: AssociationNode | undefined = association;
         let i = 1;
@@ -328,9 +328,9 @@ export namespace EntityMetadata {
     }
 
     export function mixin(derived: EntityMetadata, base: EntityMetadata, filter?: (n: string) => boolean) {
-        const hasElement = (k: string) => !filter || filter(k);
+        const hasField = (k: string) => !filter || filter(k);
 
-        delete (derived as any)._elementNames;
+        delete (derived as any)._fieldNames;
         if (!derived.tableName) {
             derived.tableName = base.tableName;
             derived.schema = base.schema;
@@ -340,7 +340,7 @@ export namespace EntityMetadata {
         if (base.indexes && base.indexes.length) {
             const hasPrimaryIndex = !!getPrimaryIndex(derived);
             for (const idx of base.indexes) {
-                if (!idx.columns.find(x => !hasElement(x))) {
+                if (!idx.columns.find(x => !hasField(x))) {
                     if (hasPrimaryIndex)
                         addIndex(derived, {...idx, primary: undefined});
                     else
@@ -353,7 +353,7 @@ export namespace EntityMetadata {
         if (base.foreignKeys && base.foreignKeys.length) {
             derived.foreignKeys = derived.foreignKeys || [];
             for (const fk of base.foreignKeys) {
-                if (!fk.sourceKey || hasElement(fk.sourceKey)) {
+                if (!fk.sourceKey || hasField(fk.sourceKey)) {
                     const newFk = new Association(fk.name, {...fk, source: derived.ctor});
                     derived.foreignKeys.push(newFk);
                 }
@@ -371,7 +371,7 @@ export namespace EntityMetadata {
         // Copy fields
         derived.fields = derived.fields || {};
         for (const [n, p] of Object.entries(base.fields)) {
-            if (!hasElement(n))
+            if (!hasField(n))
                 continue;
             const o: any = Object.assign({}, p);
             o.entity = derived;
