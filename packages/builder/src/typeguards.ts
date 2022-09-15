@@ -71,7 +71,7 @@ export function isCompOperator(value: any): value is CompOperator {
 }
 
 export function isSelectColumn(value: any): value is FieldExpression {
-    return isSerializable(value) && value._type === SerializationType.SELECT_COLUMN;
+    return isSerializable(value) && value._type === SerializationType.FIELD_NAME;
 }
 
 export function isOrderColumn(value: any): value is OrderColumn {

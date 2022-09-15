@@ -38,22 +38,7 @@ export class SqljsAdapter implements Adapter {
         if (intlDb) {
             intlDb._refCount++;
         } else {
-            const SQL = await initSqlJs({
-                // Fix: This fixes bug in sql.js: https://github.com/sql-js/sql.js/issues/528
-                locateFile: file => {
-                    const dir = path.dirname(_getCallerFile());
-                    const f = 'file:/' + path.resolve(dir, file);
-                    const oldNormalize = path.normalize;
-                    path.normalize = (x) => {
-                        if (x === f) {
-                            path.normalize = oldNormalize;
-                            return f.substring(6);
-                        }
-                        return oldNormalize(x);
-                    }
-                    return f;
-                }
-            });
+            const SQL = await initSqlJs();
             if (isMemory) {
                 intlDb = new SQL.Database() as CachedDatabase;
                 intlDb._refCount = 0;
@@ -86,12 +71,4 @@ export async function closeMemoryDatabase(name?: string): Promise<void> {
         dbCache.delete(memoryDbName);
         memDb.close();
     }
-}
-
-function _getCallerFile() {
-    const err = new Error();
-    Error.prepareStackTrace = (_, stack) => stack;
-    const stack = err.stack;
-    Error.prepareStackTrace = undefined;
-    return (stack as any)[2].getFileName();
 }

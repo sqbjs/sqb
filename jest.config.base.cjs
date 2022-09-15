@@ -1,5 +1,4 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
   'verbose': true,
   'forceExit': true,
@@ -12,12 +11,10 @@ module.exports = {
     '_shared'
   ],
   coverageReporters: ['lcov', 'text'],
-  globals: {
-    'ts-jest': {
-      'isolatedModules': false,
-      'preferTsExts': true,
+  transform: {
+    '^.+.ts?$': ['ts-jest', {
       'tsconfig': '<rootDir>/test/tsconfig.json'
-    }
+    }]
   },
   moduleNameMapper: {
     '^@sqb/(.*)$': ['<rootDir>/../$1/src'],
