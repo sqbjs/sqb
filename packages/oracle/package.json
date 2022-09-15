@@ -30,7 +30,7 @@
   },
   "devDependencies" : {
     "@types/oracledb" : "^5.2.3",
-    "oracledb" : "^5.4.0"
+    "oracledb" : "^5.5.0"
   },
   "peerDependencies" : {
     "@sqb/builder" : "^4.5.0",

@@ -33,13 +33,13 @@
   },
   "devDependencies" : {
     "@types/sql.js" : "^1.4.3",
-    "sql.js" : "^1.7.0"
+    "sql.js" : "^1.8.0"
   },
   "peerDependencies" : {
     "@sqb/builder" : "^4.5.0",
     "@sqb/connect" : "^4.5.0",
     "@sqb/sqlite-dialect" : "^4.5.0",
-    "sql.js" : "^1.7.0"
+    "sql.js" : "^1.8.0"
   },
   "type" : "module",
   "main" : "cjs/index.js",
