@@ -1,7 +1,7 @@
 {
   "name": "@sqb/connect",
   "description": "Multi-dialect database connection framework written with TypeScript",
-  "version": "4.5.1",
+  "version": "4.5.2",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "lightning-pool": "^3.1.4",
+    "lightning-pool": "^4.0.0",
     "lodash": "^4.17.21",
     "putil-isplainobject": "^1.1.4",
     "putil-merge": "^3.8.0",
