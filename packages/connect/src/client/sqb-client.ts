@@ -27,6 +27,7 @@ interface SqbClientEvents {
     close: () => void;
     acquire: (connection: SqbConnection) => Promise<void>;
     terminate: () => void;
+    'connection-return': () => Promise<void>;
 }
 
 export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEventEmitter) {
@@ -74,7 +75,10 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
         const poolFactory: PoolFactory<Adapter.Connection> = {
             create: () => adapter.connect(cfg),
             destroy: instance => instance.close(),
-            reset: instance => instance.reset(),
+            reset: async (instance) => {
+                await this.emitAsyncSerial('connection-return').catch();
+                return instance.reset();
+            },
             validate: instance => instance.test()
         };
 
