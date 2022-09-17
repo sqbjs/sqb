@@ -333,4 +333,9 @@ describe('Client', function () {
         expect(i).toStrictEqual(1);
     });
 
+    it('should emit `connection-return` event when connection returns to the pool', function (done) {
+        client.once('connection-return', () => done());
+        client.execute('select 1').catch();
+    });
+
 });
