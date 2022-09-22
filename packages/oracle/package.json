@@ -39,8 +39,6 @@
     "oracledb": "^5.x.x"
   },
   "type": "module",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
   "types": "esm/index.d.ts",
   "exports": {
     ".": {

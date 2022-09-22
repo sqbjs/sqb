@@ -33,8 +33,6 @@
     "@sqb/connect": "^4.5.0"
   },
   "type": "module",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
   "types": "esm/index.d.ts",
   "exports": {
     ".": {
