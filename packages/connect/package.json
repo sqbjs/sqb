@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "lightning-pool": "^4.0.0",
+    "lightning-pool": "^4.1.0",
     "lodash": "^4.17.21",
     "putil-isplainobject": "^1.1.4",
     "putil-merge": "^3.8.0",
@@ -38,7 +38,7 @@
     "putil-taskqueue": "^2.5.4",
     "putil-varhelpers": "^1.6.4",
     "reflect-metadata": "^0.1.13",
-    "strict-typed-events": "^2.2.0",
+    "strict-typed-events": "^2.3.0",
     "ts-gems": "^2.2.0"
   },
   "devDependencies": {
@@ -46,7 +46,7 @@
     "@types/lodash": "^4.14.185"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.5.0"
+    "@sqb/builder": "^4.5.1"
   },
   "type": "module",
   "types": "esm/index.d.ts",

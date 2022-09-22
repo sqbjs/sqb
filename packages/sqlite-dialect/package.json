@@ -29,7 +29,7 @@
     "clean:cover": "rimraf ../../coverage/sqlite-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.5.0"
+    "@sqb/builder": "^4.5.1"
   },
   "type": "module",
   "types": "esm/index.d.ts",

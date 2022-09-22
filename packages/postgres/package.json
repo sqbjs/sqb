@@ -35,9 +35,9 @@
     "postgresql-client": "^2.3.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.5.0",
-    "@sqb/connect": "^4.5.0",
-    "@sqb/postgres-dialect": "^4.5.0",
+    "@sqb/builder": "^4.5.1",
+    "@sqb/connect": "^4.5.3",
+    "@sqb/postgres-dialect": "^4.5.1",
     "postgresql-client": "^2.x.x"
   },
   "type": "module",

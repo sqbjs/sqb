@@ -33,9 +33,9 @@
     "oracledb": "^5.5.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.5.0",
-    "@sqb/connect": "^4.5.0",
-    "@sqb/oracle-dialect": "^4.5.0",
+    "@sqb/builder": "^4.5.1",
+    "@sqb/connect": "^4.5.3",
+    "@sqb/oracle-dialect": "^4.5.1",
     "oracledb": "^5.x.x"
   },
   "type": "module",
