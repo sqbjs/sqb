@@ -33,7 +33,7 @@
     "debug": "^4.3.4",
     "putil-flattentext": "^2.1.0",
     "putil-isplainobject": "^1.1.4",
-    "putil-merge": "^3.8.0",
+    "putil-merge": "^3.9.0",
     "putil-varhelpers": "^1.6.4"
   },
   "devDependencies": {
