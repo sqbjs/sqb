@@ -32,7 +32,7 @@
     "putil-promisify": "^1.8.5"
   },
   "devDependencies": {
-    "@types/sql.js": "^1.4.3",
+    "@types/sql.js": "^1.4.4",
     "sql.js": "^1.8.0"
   },
   "peerDependencies": {
