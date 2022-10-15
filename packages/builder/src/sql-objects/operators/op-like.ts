@@ -1,7 +1,6 @@
 import {OperatorType} from '../../enums.js';
 import {Serializable} from '../../serializable.js';
 import {SerializeContext} from '../../serialize-context.js';
-import {isSerializable} from '../../typeguards.js';
 import {CompOperator} from './comp-operator.js';
 
 export class OpLike extends CompOperator {
@@ -14,11 +13,10 @@ export class OpLike extends CompOperator {
     }
 
     protected __serialize(ctx: SerializeContext, o: any): string {
-        if (o.right && typeof o.right !== 'string' && !isSerializable(o.right))
-            o.right = ctx.anyToSQL(o.right);
-        if (!o.right)
+        if (!o.right.expression)
             return '';
-        o.right = ctx.anyToSQL(o.right);
+        if (o.right && typeof o.right.expression !== 'string')
+            o.right.expression = String(o.right.expression);
         return ctx.serialize(this._type, o,
             (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
     }

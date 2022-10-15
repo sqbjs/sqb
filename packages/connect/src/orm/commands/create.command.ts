@@ -70,11 +70,13 @@ export class CreateCommand {
         }
     }
 
-    protected static async _prepareParams(ctx: CreateCommandContext,
-                                          entity: EntityMetadata,
-                                          values: any,
-                                          prefix?: string,
-                                          suffix?: string) {
+    protected static async _prepareParams(
+        ctx: CreateCommandContext,
+        entity: EntityMetadata,
+        values: any,
+        prefix?: string,
+        suffix?: string
+    ) {
         let v;
         prefix = prefix || '';
         suffix = suffix || '';

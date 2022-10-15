@@ -76,6 +76,7 @@ export class SerializeContext implements GenerateOptions {
                 return this.serialize(SerializationType.DATE_VALUE, v,
                     () => this.dateToSQL(v));
             }
+            return this.stringToSQL(JSON.stringify(v));
         }
         if (typeof v === 'string') {
             return this.serialize(SerializationType.STRING_VALUE, v,
