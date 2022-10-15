@@ -206,6 +206,8 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
 
     protected async _create(values: EntityInput<T>,
                             options: Repository.CreateOptions & { connection: SqbConnection }): Promise<EntityOutput<T>> {
+        if (!values)
+            throw new TypeError('You must provide values');
         await this._emit('before-create', values, options);
         const keyValues = await CreateCommand.execute({
             ...options,
@@ -222,6 +224,8 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
 
     protected async _createOnly(values: EntityInput<T>,
                                 options: Repository.CreateOptions & { connection: SqbConnection }): Promise<void> {
+        if (!values)
+            throw new TypeError('You must provide values');
         await this._emit('before-create', values, options);
         await CreateCommand.execute({
             ...options,
@@ -313,6 +317,8 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     protected async _update(keyValue: any | Record<string, any>,
                             values: EntityInput<T>,
                             options: Repository.UpdateOptions & { connection: SqbConnection }): Promise<Record<string, any> | undefined> {
+        if (!values)
+            throw new TypeError('You must provide values');
         await this._emit('before-update', keyValue, values, options);
         const keyValues = extractKeyValues(this._entity, keyValue, true);
         const filter = [keyValues];
@@ -335,6 +341,8 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
 
     protected async _updateAll(values: EntityInput<T>,
                                options: Repository.UpdateAllOptions & { connection: SqbConnection }): Promise<number> {
+        if (!values)
+            throw new TypeError('You must provide values');
         await this._emit('before-update-all', values, options);
         const rowsAffected = await UpdateCommand.execute({
             ...options,
