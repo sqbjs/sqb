@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle-dialect",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.5.4",
+  "version": "4.5.5",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -29,7 +29,7 @@
     "clean:cover": "rimraf ../../coverage/oracle-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.5.4"
+    "@sqb/builder": "^4.5.5"
   },
   "type": "module",
   "types": "esm/index.d.ts",
