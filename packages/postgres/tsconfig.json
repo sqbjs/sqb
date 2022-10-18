@@ -7,6 +7,6 @@
       "@sqb/connect": ["../connect/src"]
     }
   },
-  "include": ["src", "test"],
-  "exclude": ["node_modules", "dist", "bin"]
+  "include": ["src"],
+  "exclude": ["node_modules", "test"]
 }

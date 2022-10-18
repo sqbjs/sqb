@@ -1,7 +1,7 @@
 module.exports = {
   testEnvironment: 'node',
-  'verbose': true,
-  'forceExit': true,
+  verbose: true,
+  maxWorkers: '50%',
   coveragePathIgnorePatterns: [
     '/build/',
     '/dist/',
@@ -14,7 +14,8 @@ module.exports = {
   coverageDirectory: "<rootDir>/coverage/",
   transform: {
     '^.+.ts?$': ['ts-jest', {
-      'tsconfig': '<rootDir>/test/tsconfig.json'
+      tsconfig: '<rootDir>/test/tsconfig.json',
+      isolatedModules: true
     }]
   },
   moduleNameMapper: {
