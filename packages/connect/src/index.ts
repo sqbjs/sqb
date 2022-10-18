@@ -1,6 +1,7 @@
 import 'reflect-metadata';
+import {DeepBuildable,DeepPartial, DeepPickWritable, Maybe, Type} from 'ts-gems';
 
-export {Type, Maybe, DeepPartial, DeepPickWritable, DeepBuildable} from 'ts-gems';
+export {Type, Maybe, DeepPartial, DeepPickWritable, DeepBuildable};
 export * from './types.js';
 
 export * from './client/types.js';

@@ -39,7 +39,7 @@
     "putil-varhelpers": "^1.6.4",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.3.1",
-    "ts-gems": "^2.2.1"
+    "ts-gems": "^2.3.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
