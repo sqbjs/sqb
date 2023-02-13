@@ -29,7 +29,7 @@
     "clean:cover": "rimraf ../../coverage/sqljs"
   },
   "dependencies": {
-    "putil-promisify": "^1.8.5"
+    "putil-promisify": "^1.10.0"
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.4",
