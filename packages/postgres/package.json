@@ -29,10 +29,10 @@
     "clean:cover": "rimraf ../../coverage/postgres"
   },
   "dependencies": {
-    "putil-promisify": "^1.8.5"
+    "putil-promisify": "^1.10.0"
   },
   "devDependencies": {
-    "postgresql-client": "^2.5.1"
+    "postgresql-client": "^2.5.2"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.5.5",

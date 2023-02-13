@@ -32,13 +32,13 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@nestjs/common": "^9.1.4",
-    "@nestjs/core": "^9.1.4",
-    "@nestjs/platform-express": "^9.1.4",
-    "@nestjs/testing": "^9.1.4",
-    "postgresql-client": "^2.5.1",
-    "rxjs": "^7.5.7",
-    "supertest": "^6.3.0"
+    "@nestjs/common": "^9.3.8",
+    "@nestjs/core": "^9.3.8",
+    "@nestjs/platform-express": "^9.3.8",
+    "@nestjs/testing": "^9.3.8",
+    "postgresql-client": "^2.5.2",
+    "rxjs": "^7.8.0",
+    "supertest": "^6.3.3"
   },
   "peerDependencies": {
     "@nestjs/common": ">=7.4.0",

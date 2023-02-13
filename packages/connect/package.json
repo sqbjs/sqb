@@ -30,20 +30,20 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "lightning-pool": "^4.2.0",
+    "lightning-pool": "^4.2.1",
     "lodash": "^4.17.21",
-    "putil-isplainobject": "^1.1.4",
-    "putil-merge": "^3.9.0",
-    "putil-promisify": "^1.8.5",
-    "putil-taskqueue": "^2.5.4",
-    "putil-varhelpers": "^1.6.4",
+    "putil-isplainobject": "^1.1.5",
+    "putil-merge": "^3.10.1",
+    "putil-promisify": "^1.10.0",
+    "putil-taskqueue": "^2.5.5",
+    "putil-varhelpers": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.3.1",
     "ts-gems": "^2.3.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.186"
+    "@types/lodash": "^4.14.191"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.5.5"
