@@ -40,10 +40,8 @@ export class DeleteQuery extends Query {
             table: this._table._serialize(ctx),
             where: this._serializeWhere(ctx)
         };
-        let out = 'delete from ' + o.table;
-        if (o.where)
-            out += '\n' + o.where;
-        return out;
+        return 'delete from ' + o.table +
+        o.where ? '\n' + o.where : '';
     }
 
     /**
