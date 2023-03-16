@@ -1,69 +1,67 @@
 {
-  "name" : "@sqb/postgres",
-  "description" : "SQB serialization extension for PostgreSQL database",
-  "version" : "4.5.0",
-  "author" : "Panates",
-  "contributors" : [
+  "name": "@sqb/postgres",
+  "description": "SQB serialization extension for PostgreSQL database",
+  "version": "4.5.6",
+  "author": "Panates",
+  "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"
   ],
-  "license" : "Apache-2.0",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/sqbjs/sqb.git",
-    "directory" : "packages/postgres"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git",
+    "directory": "packages/postgres"
   },
-  "scripts" : {
-    "compile" : "tsc",
-    "prebuild" : "npm run lint && npm run clean",
-    "build" : "npm run build:cjs && npm run build:esm",
-    "build:cjs" : "tsc -b tsconfig-build-cjs.json",
-    "build:esm" : "tsc -b tsconfig-build-esm.json",
-    "postbuild" : "cp README.md package.json ../../LICENSE ../../build/postgres && cp ../../package.cjs.json ../../build/postgres/cjs/package.json",
-    "lint" : "eslint .",
-    "test" : "jest",
-    "cover" : "jest --collect-coverage",
-    "clean" : "npm run clean:src | npm run clean:dist | npm run clean:cover",
-    "clean:src" : "ts-cleanup -s src --all",
-    "clean:dist" : "rimraf ../../build/postgres",
-    "clean:cover" : "rimraf ../../coverage/postgres"
+  "scripts": {
+    "compile": "tsc",
+    "prebuild": "npm run lint && npm run clean",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/postgres && cp ../../package.cjs.json ../../build/postgres/cjs/package.json",
+    "lint": "eslint .",
+    "test": "jest",
+    "cover": "jest --collect-coverage",
+    "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
+    "clean:src": "ts-cleanup -s src --all",
+    "clean:dist": "rimraf ../../build/postgres",
+    "clean:cover": "rimraf ../../coverage/postgres"
   },
-  "dependencies" : {
-    "putil-promisify" : "^1.8.5"
+  "dependencies": {
+    "putil-promisify": "^1.10.0"
   },
-  "devDependencies" : {
-    "postgresql-client" : "^2.1.5"
+  "devDependencies": {
+    "postgresql-client": "^2.5.2"
   },
-  "peerDependencies" : {
-    "@sqb/builder" : "^4.5.0",
-    "@sqb/connect" : "^4.5.0",
-    "@sqb/postgres-dialect" : "^4.5.0",
-    "postgresql-client" : "^2.x.x"
+  "peerDependencies": {
+    "@sqb/builder": "^4.5.6",
+    "@sqb/connect": "^4.5.6",
+    "@sqb/postgres-dialect": "^4.5.6",
+    "postgresql-client": "^2.x.x"
   },
-  "type" : "module",
-  "main" : "cjs/index.js",
-  "module" : "esm/index.js",
-  "types" : "esm/index.d.ts",
-  "exports" : {
-    "." : {
-      "require" : "./cjs/index.js",
-      "default" : "./esm/index.js"
+  "type": "module",
+  "types": "esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "default": "./esm/index.js"
     },
-    "./cjs" : "./cjs/index.js",
-    "./esm" : "./esm/index.js"
+    "./cjs": "./cjs/index.js",
+    "./esm": "./esm/index.js"
   },
-  "engines" : {
-    "node" : ">=16.0",
-    "npm" : ">=7.0.0"
+  "engines": {
+    "node": ">=16.0",
+    "npm": ">=7.0.0"
   },
-  "files" : [
+  "files": [
     "bin/",
     "cjs/",
     "esm/",
     "LICENSE",
     "README.md"
   ],
-  "keywords" : [
+  "keywords": [
     "sqb",
     "postgressql",
     "postgres",

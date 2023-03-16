@@ -53,13 +53,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
         const connectionProvider = {
             provide: getSQBToken(options.name),
             inject: [SQB_MODULE_OPTIONS],
-            useFactory: async (sqbOptions: SqbModuleOptions) => {
-                const name = options.name || sqbOptions.name;
-                return this.createConnection({
-                    ...sqbOptions,
-                    name
-                });
-            }
+            useFactory: async (sqbOptions: SqbModuleOptions) => this.createConnection(sqbOptions)
         };
 
         const asyncProviders = this.createAsyncProviders(options);

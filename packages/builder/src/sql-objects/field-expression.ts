@@ -36,7 +36,7 @@ export class FieldExpression extends BaseField {
     }
 
     get _type(): SerializationType {
-        return SerializationType.SELECT_COLUMN;
+        return SerializationType.FIELD_NAME;
     }
 
     _serialize(ctx: SerializeContext): string {

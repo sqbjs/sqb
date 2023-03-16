@@ -1,76 +1,74 @@
 {
-  "name" : "@sqb/nestjs",
-  "description" : "Nestjs module for data connection using SQB",
-  "version" : "4.5.0",
-  "author" : "Panates",
-  "contributors" : [
+  "name": "@sqb/nestjs",
+  "description": "Nestjs module for data connection using SQB",
+  "version": "4.5.6",
+  "author": "Panates",
+  "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"
   ],
-  "license" : "Apache-2.0",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/sqbjs/sqb.git",
-    "directory" : "packages/nestjs"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git",
+    "directory": "packages/nestjs"
   },
-  "scripts" : {
-    "compile" : "tsc",
-    "prebuild" : "npm run lint && npm run clean",
-    "build" : "npm run build:cjs && npm run build:esm",
-    "build:cjs" : "tsc -b tsconfig-build-cjs.json",
-    "build:esm" : "tsc -b tsconfig-build-esm.json",
-    "postbuild" : "cp README.md package.json ../../LICENSE ../../build/nestjs && cp ../../package.cjs.json ../../build/nestjs/cjs/package.json",
-    "lint" : "eslint .",
-    "test" : "jest",
-    "cover" : "jest --collect-coverage",
-    "clean" : "npm run clean:src | npm run clean:dist | npm run clean:cover",
-    "clean:src" : "ts-cleanup -s src --all",
-    "clean:dist" : "rimraf ../../build/postgres",
-    "clean:cover" : "rimraf ../../coverage/postgres"
+  "scripts": {
+    "compile": "tsc",
+    "prebuild": "npm run lint && npm run clean",
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs && cp ../../package.cjs.json ../../build/nestjs/cjs/package.json",
+    "lint": "eslint .",
+    "test": "jest",
+    "cover": "jest --collect-coverage",
+    "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
+    "clean:src": "ts-cleanup -s src --all",
+    "clean:dist": "rimraf ../../build/postgres",
+    "clean:cover": "rimraf ../../coverage/postgres"
   },
-  "dependencies" : {
-    "reflect-metadata" : "^0.1.13"
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
   },
-  "devDependencies" : {
-    "@nestjs/common" : "^9.0.11",
-    "@nestjs/core" : "^9.0.11",
-    "@nestjs/platform-express" : "^9.0.11",
-    "@nestjs/testing" : "^9.0.11",
-    "postgresql-client" : "^2.1.5",
-    "rxjs" : "^7.5.6",
-    "supertest" : "^6.2.4"
+  "devDependencies": {
+    "@nestjs/common": "^9.3.8",
+    "@nestjs/core": "^9.3.8",
+    "@nestjs/platform-express": "^9.3.8",
+    "@nestjs/testing": "^9.3.8",
+    "postgresql-client": "^2.5.2",
+    "rxjs": "^7.8.0",
+    "supertest": "^6.3.3"
   },
-  "peerDependencies" : {
-    "@nestjs/common" : ">=7.4.0",
-    "@nestjs/core" : ">=7.4.0",
-    "@sqb/builder" : "^4.5.0",
-    "@sqb/connect" : "^4.5.0",
-    "rxjs" : ">=6.6.0"
+  "peerDependencies": {
+    "@nestjs/common": ">=7.4.0",
+    "@nestjs/core": ">=7.4.0",
+    "@sqb/builder": "^4.5.6",
+    "@sqb/connect": "^4.5.6",
+    "rxjs": ">=6.6.0"
   },
-  "type" : "module",
-  "main" : "cjs/index.js",
-  "module" : "esm/index.js",
-  "types" : "esm/index.d.ts",
-  "exports" : {
-    "." : {
-      "require" : "./cjs/index.js",
-      "default" : "./esm/index.js"
+  "type": "module",
+  "types": "esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "default": "./esm/index.js"
     },
-    "./cjs" : "./cjs/index.js",
-    "./esm" : "./esm/index.js"
+    "./cjs": "./cjs/index.js",
+    "./esm": "./esm/index.js"
   },
-  "engines" : {
-    "node" : ">=16.0",
-    "npm" : ">=7.0.0"
+  "engines": {
+    "node": ">=16.0",
+    "npm": ">=7.0.0"
   },
-  "files" : [
+  "files": [
     "bin/",
     "cjs/",
     "esm/",
     "LICENSE",
     "README.md"
   ],
-  "keywords" : [
+  "keywords": [
     "sqb",
     "nestjs",
     "nest"

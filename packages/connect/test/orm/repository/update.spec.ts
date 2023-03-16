@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {DataType, In} from '@sqb/builder';
-import {Column, DeepPartial, Entity, PrimaryKey, SqbClient} from '@sqb/connect';
+import {Column, Entity, EntityOutput, PrimaryKey, SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 import {Tag} from '../../_support/tags.entity.js';
@@ -13,12 +13,11 @@ export class Customer2 {
 
     @Column({fieldName: 'given_name'})
     given?: string;
-
 }
 
 let client: SqbClient;
 
-const createCustomer = async function (values?: any): Promise<DeepPartial<Customer>> {
+const createCustomer = async function (values?: any): Promise<EntityOutput<Customer>> {
     const v = {
         givenName: 'G' + Math.trunc(Math.random() * 10000),
         familyName: 'F' + Math.trunc(Math.random() * 10000),

@@ -1,4 +1,6 @@
-export type MigrationsThunk = () => (string | Migration)[];
+export type MigrationsThunk = (string | Migration)[] |
+    (() => (string | Migration)[]) |
+    (() => Promise<(string | Migration)[]>);
 
 export interface MigrationPackage {
     description: string;

@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import {Connection, stringifyValueForSQL} from 'postgresql-client';
 import {loadTaskFiles} from './load-task-files.js';
 import {InsertDataMigrationTask, Migration, MigrationPackage} from './types.js';
@@ -27,7 +27,7 @@ export class DbMigrator {
     async execute(options: MigrationExecuteOptions): Promise<boolean> {
 
         const {connection, schema} = options;
-        const migrationPackage = DbMigrator.loadMigrationPackage(options.migrationPackage);
+        const migrationPackage = await DbMigrator.loadMigrationPackage(options.migrationPackage);
 
         const targetVersion: number = Math.min(options.targetVersion || Number.MAX_SAFE_INTEGER, migrationPackage.maxVersion);
 
@@ -115,14 +115,14 @@ export class DbMigrator {
         return true;
     }
 
-    static loadMigrationPackage(pkg: MigrationPackage): LoadedMigrationPackage {
+    static async loadMigrationPackage(pkg: MigrationPackage): Promise<LoadedMigrationPackage> {
         const migarr: (string | Migration)[] =
-            typeof pkg.migrations === 'function' ? pkg.migrations() : pkg.migrations;
+            typeof pkg.migrations === 'function' ? await pkg.migrations() : pkg.migrations;
 
         const migrations: Migration[] = [];
         for (const x of migarr) {
             if (typeof x === 'string')
-                locateMigrations(migrations, x);
+                await locateMigrations(migrations, x);
             else
                 migrations.push(x);
         }
@@ -236,12 +236,12 @@ insert into ${schema}.${infTable} (status) values ('init');
 
 }
 
-function locateMigrations(trg: Migration[], dir: string): void {
+async function locateMigrations(trg: Migration[], dir: string): Promise<void> {
 
     for (const f of ['migration.ts', 'migration.js', 'migration.json']) {
         const filename = path.join(dir, f);
         if (fs.existsSync(filename)) {
-            const x = require(filename);
+            const x = await import(filename);
             const fileDir = path.dirname(filename);
             const obj = x.default || x;
             if (obj.version && obj.tasks) {
@@ -258,7 +258,7 @@ function locateMigrations(trg: Migration[], dir: string): void {
     for (const f of files) {
         const dirname = path.join(dir, f);
         if (fs.statSync(dirname).isDirectory()) {
-            locateMigrations(trg, dirname);
+            await locateMigrations(trg, dirname);
         }
     }
 }
