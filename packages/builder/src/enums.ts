@@ -5,7 +5,8 @@ export enum JoinType {
     RIGHT = 'right',
     RIGHT_OUTER = 'right outer',
     OUTER = 'outer',
-    FULL_OUTER = 'full outer'
+    FULL_OUTER = 'full outer',
+    CROSS = 'cross'
 }
 
 export enum SerializationType {
