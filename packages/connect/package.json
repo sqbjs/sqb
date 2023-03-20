@@ -33,7 +33,7 @@
     "lightning-pool": "^4.2.1",
     "lodash": "^4.17.21",
     "putil-isplainobject": "^1.1.5",
-    "putil-merge": "^3.10.1",
+    "putil-merge": "^3.10.3",
     "putil-promisify": "^1.10.0",
     "putil-taskqueue": "^2.5.5",
     "putil-varhelpers": "^1.6.5",

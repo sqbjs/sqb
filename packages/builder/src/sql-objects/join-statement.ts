@@ -61,6 +61,9 @@ export class JoinStatement extends Serializable {
                 case JoinType.FULL_OUTER:
                     out = 'full outer join';
                     break;
+                case JoinType.CROSS:
+                    out = 'cross join';
+                    break;
                 default:
                     out = 'inner join';
                     break;
