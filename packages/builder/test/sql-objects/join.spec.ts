@@ -1,4 +1,5 @@
 import {
+    CrossJoin,
     Eq, FullOuterJoin, InnerJoin, Join,
     LeftJoin, LeftOuterJoin, OuterJoin, Raw,
     RightJoin, RightOuterJoin,
@@ -70,6 +71,13 @@ describe('serialize "Join"', function () {
             .join(FullOuterJoin('table2 t2'));
         const result = query.generate(options);
         expect(result.sql).toStrictEqual('select * from table1 t1 full outer join table2 t2');
+    });
+
+    it('should serialize (crossJoin)', function () {
+        const query = Select().from('table1 t1')
+            .join(CrossJoin('table2 t2'));
+        const result = query.generate(options);
+        expect(result.sql).toStrictEqual('select * from table1 t1 cross join table2 t2');
     });
 
     it('should serialize conditions', function () {
