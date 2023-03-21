@@ -70,6 +70,10 @@ export function FullOuterJoin(table: string | SelectQuery | RawStatement): JoinS
     return new JoinStatement(JoinType.FULL_OUTER, table);
 }
 
+export function CrossJoin(table: string | SelectQuery | RawStatement): JoinStatement {
+    return new JoinStatement(JoinType.CROSS, table);
+}
+
 export function Case(): CaseStatement {
     return new CaseStatement();
 }
