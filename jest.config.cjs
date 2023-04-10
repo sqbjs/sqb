@@ -2,7 +2,7 @@ const base = require('./jest.config.base.cjs');
 
 module.exports = {
   ...base,
-  verbose: true,
+  // verbose: true,
   projects: [
     '<rootDir>/packages/*/jest.config.cjs'
   ],
