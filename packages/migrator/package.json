@@ -1,7 +1,7 @@
 {
   "name": "@sqb/migrator",
   "description": "Database migrator for SQB",
-  "version": "4.6.1",
+  "version": "4.6.2",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -29,8 +29,8 @@
     "clean:cover": "rimraf ../../coverage/migrator"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.6.1",
-    "@sqb/connect": "^4.6.1"
+    "@sqb/builder": "^4.6.2",
+    "@sqb/connect": "^4.6.2"
   },
   "type": "module",
   "types": "esm/index.d.ts",
