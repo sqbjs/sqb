@@ -3,8 +3,7 @@ module.exports = {
   maxWorkers: '50%',
   transform: {
     '^.+.ts?$': ['ts-jest', {
-      tsconfig: '<rootDir>/test/tsconfig.json',
-      isolatedModules: true
+      tsconfig: '<rootDir>/test/tsconfig.json'
     }]
   },
   moduleNameMapper: {
