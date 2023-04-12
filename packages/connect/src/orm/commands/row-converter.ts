@@ -193,12 +193,15 @@ export class RowConverter {
                             fld = fld || _fields.get('' + p.keyField);
                             const keyValue = fld && row[fld.index];
                             if (keyValue != null) {
-                                let arr = map.get(keyValue);
-                                if (!arr) {
-                                    arr = [];
-                                    map.set(keyValue, arr);
-                                }
-                                arr.push(obj);
+                                const keyValues = Array.isArray(keyValue) ? keyValue : [keyValue];
+                                keyValues.forEach(k => {
+                                    let arr = map.get(k);
+                                    if (!arr) {
+                                        arr = [];
+                                        map.set(k, arr);
+                                    }
+                                    arr.push(obj);
+                                });
                             }
                         }
                     });
