@@ -76,8 +76,8 @@ export class OracleSerializer implements SerializerExtension {
     }
 
     private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-        if ((o.right.expression && o.right.expression === 'null') ||
-            ((!o.right.expression || o.right.expression.startsWith(':')) && o.right.value == null)
+        if ((o.right?.expression && o.right?.expression === 'null') ||
+            (o.right && o.right?.value == null && (!o.right.expression || o.right.expression.startsWith(':')))
         ) {
             if (o.right.expression?.startsWith(':')) {
                 if (ctx.params)
