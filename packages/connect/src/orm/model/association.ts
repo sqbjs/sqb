@@ -76,8 +76,8 @@ export class Association {
             return;
         const source = await this.resolveSource();
         const target = await this.resolveTarget();
-        let sourceKey = this.sourceKey;
-        let targetKey = this.targetKey;
+        let sourceKey = this.sourceKey || '';
+        let targetKey = this.targetKey || '';
 
         if (!(sourceKey && targetKey)) {
             // Try to determine key fields from foreign key from source to target
@@ -102,25 +102,34 @@ export class Association {
                 }
             }
 
-            const master = source;
-            const detail = target;
-            let masterKey = sourceKey || '';
-            let detailKey = targetKey || '';
+            if (this.many) {
+                if (!sourceKey) {
+                    const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(source);
+                    sourceKey = primaryIndexColumns && primaryIndexColumns.length === 1 ?
+                        primaryIndexColumns[0].name : 'id';
+                }
+                if (!targetKey && sourceKey) {
+                    // snake-case
+                    let s = source.name[0].toLowerCase() + source.name.substring(1) + '_' + sourceKey;
+                    if (!EntityMetadata.getColumnField(target, s))
+                        s = camelCase(s);
+                    targetKey = s;
+                }
+            } else {
+                if (!targetKey) {
+                    const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(target);
+                    targetKey = primaryIndexColumns && primaryIndexColumns.length === 1 ?
+                        primaryIndexColumns[0].name : 'id';
+                }
 
-            if (!detailKey) {
-                const primaryIndexColumns = EntityMetadata.getPrimaryIndexColumns(detail);
-                detailKey = primaryIndexColumns && primaryIndexColumns.length === 1 ?
-                    primaryIndexColumns[0].name : 'id';
+                if (!sourceKey && targetKey) {
+                    // snake-case
+                    let s = target.name[0].toLowerCase() + target.name.substring(1) + '_' + targetKey;
+                    if (!EntityMetadata.getColumnField(source, s))
+                        s = camelCase(s);
+                    sourceKey = s;
+                }
             }
-
-            if (!masterKey) {
-                // snake-case
-                masterKey = detail.name[0].toLowerCase() + detail.name.substring(1) + '_' + detailKey;
-                if (!EntityMetadata.getColumnField(master, masterKey))
-                    masterKey = camelCase(masterKey);
-            }
-            targetKey = detailKey;
-            sourceKey = masterKey;
         }
         this._targetProperty = EntityMetadata.getColumnField(target, targetKey);
         if (!this._targetProperty)
