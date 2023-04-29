@@ -5,7 +5,7 @@ import {Country} from '../../_support/country.entity.js';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('Repository / findAll()', function () {
+describe('Repository / findMany()', function () {
 
     let client: SqbClient;
 
@@ -19,7 +19,7 @@ describe('Repository / findAll()', function () {
 
     it('should return only non exclusive if "pick" option is null', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({limit: 1});
+        const rows = await repo.findMany({limit: 1});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].id).toBeDefined();
@@ -31,7 +31,7 @@ describe('Repository / findAll()', function () {
 
     it('should return embedded fields', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({limit: 1});
+        const rows = await repo.findMany({limit: 1});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].name).toBeDefined();
@@ -41,7 +41,7 @@ describe('Repository / findAll()', function () {
 
     it('should return embedded fields with prefix', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({filter: {id: 1}});
+        const rows = await repo.findMany({filter: {id: 1}});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].address).toBeDefined();
@@ -51,7 +51,7 @@ describe('Repository / findAll()', function () {
 
     it('should return embedded sub fields', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({limit: 1, pick: ['name.given']});
+        const rows = await repo.findMany({limit: 1, pick: ['name.given']});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].name).toBeDefined();
@@ -68,7 +68,7 @@ describe('Repository / findAll()', function () {
 
     it('should return requested fields if "pick" option set', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             limit: 1,
             pick: ['id', 'givenName']
         });
@@ -78,7 +78,7 @@ describe('Repository / findAll()', function () {
 
     it('should return data columns plus elements specified in "include" option', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             limit: 1,
             include: ['birthDate']
         });
@@ -90,7 +90,7 @@ describe('Repository / findAll()', function () {
 
     it('should exclude exclusive fields if not included', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({limit: 1});
+        const rows = await repo.findMany({limit: 1});
         expect(rows).toBeDefined();
         expect(rows.length).toBeGreaterThan(0);
         expect(rows[0].country).toBeUndefined();
@@ -98,7 +98,7 @@ describe('Repository / findAll()', function () {
 
     it('should exclude result fields', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             limit: 1,
             include: ['country'],
             omit: ['familyName', 'country.code']
@@ -113,12 +113,12 @@ describe('Repository / findAll()', function () {
 
     it('should exclude hidden elements', async function () {
         const repo = client.getRepository(Country);
-        let rows = await repo.findAll({limit: 1});
+        let rows = await repo.findMany({limit: 1});
         expect(rows).toBeDefined();
         expect(rows[0].phoneCode).toBeDefined();
         const col = Entity.getColumnField(Country, 'phoneCode');
         col!.hidden = true;
-        rows = await repo.findAll({limit: 1});
+        rows = await repo.findMany({limit: 1});
         expect(rows).toBeDefined();
         expect(rows[0].phoneCode).toBeUndefined();
         delete col!.hidden;
@@ -126,7 +126,7 @@ describe('Repository / findAll()', function () {
 
     it('should filter with Operator', async function () {
         const repo = client.getRepository<Country>(Country);
-        const rows = await repo.findAll({filter: Eq('continentCode', 'AM')});
+        const rows = await repo.findMany({filter: Eq('continentCode', 'AM')});
         expect(rows.length).toStrictEqual(2);
         expect(rows[0].code).toStrictEqual('CA');
         expect(rows[1].code).toStrictEqual('US');
@@ -134,7 +134,7 @@ describe('Repository / findAll()', function () {
 
     it('should filter with plain object', async function () {
         const repo = client.getRepository<Country>(Country);
-        const rows = await repo.findAll({filter: {continentCode: 'AM'}});
+        const rows = await repo.findMany({filter: {continentCode: 'AM'}});
         expect(rows.length).toStrictEqual(2);
         expect(rows[0].code).toStrictEqual('CA');
         expect(rows[1].code).toStrictEqual('US');
@@ -142,7 +142,7 @@ describe('Repository / findAll()', function () {
 
     it('should filter if field name different than property name', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             filter: {
                 givenName: Param('givenName'),
                 familyName: 'Marsh'
@@ -157,7 +157,7 @@ describe('Repository / findAll()', function () {
 
     it('should filter by embedded sub element', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             filter: {
                 'address.city': Param('city')
             },
@@ -173,7 +173,7 @@ describe('Repository / findAll()', function () {
 
     it('should limit result rows', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             sort: ['id'],
             limit: 5
         });
@@ -185,7 +185,7 @@ describe('Repository / findAll()', function () {
 
     it('should start from given offset', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             sort: ['id'],
             limit: 5,
             offset: 10
@@ -198,7 +198,7 @@ describe('Repository / findAll()', function () {
 
     it('should sort result rows', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({sort: ['-id']});
+        const rows = await repo.findMany({sort: ['-id']});
         const arr1 = rows.map(x => x.id);
         const arr2 = [...arr1];
         arr2.sort((a, b) => b! - a!);
@@ -208,13 +208,13 @@ describe('Repository / findAll()', function () {
     it('should sort by data columns only ', async function () {
         const repo = client.getRepository(Customer);
         return expect(() =>
-            repo.findAll({sort: ['country']})
+            repo.findMany({sort: ['country']})
         ).rejects.toThrow('Can not sort by');
     });
 
     it('should sort by embedded sub element', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({sort: ['name.given', 'name.family']});
+        const rows = await repo.findMany({sort: ['name.given', 'name.family']});
         const arr1 = rows.map(x => x.name!.given);
         const arr2 = [...arr1];
         arr2.sort((a, b) => {
@@ -229,7 +229,7 @@ describe('Repository / findAll()', function () {
 
     it('should return distinct results', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             pick: ['countryCode'],
             distinct: true
         });
@@ -242,7 +242,7 @@ describe('Repository / findAll()', function () {
 
     it('should apply "parse"', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({sort: ['id'], limit: 10});
+        const rows = await repo.findMany({sort: ['id'], limit: 10});
         expect(rows[0].gender).toStrictEqual('Male');
         expect(rows[1].gender).toStrictEqual('Female');
     });

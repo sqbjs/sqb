@@ -2,7 +2,7 @@ import {SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('Repository / destroy()', function () {
+describe('Repository / deleteByPk()', function () {
 
     let client: SqbClient;
 
@@ -14,36 +14,17 @@ describe('Repository / destroy()', function () {
         await client.close(0);
     });
 
-    it('should delete single record (key value as argument)', async function () {
+    it('should delete single record', async function () {
         const values = {
             givenName: 'G' + Math.trunc(Math.random() * 10000),
             familyName: 'F' + Math.trunc(Math.random() * 10000),
             countryCode: 'TR'
         }
-        const repo = client.getRepository<Customer>(Customer);
-        const c = await repo.count();
+        const repo = client.getRepository(Customer);
         const customer = await repo.create(values);
-        let c2 = await repo.count();
-        expect(c2).toStrictEqual(c + 1);
-        await repo.destroy(customer.id);
-        c2 = await repo.count();
-        expect(c2).toStrictEqual(c);
-    });
-
-    it('should delete single record (entity instance as argument)', async function () {
-        const values = {
-            givenName: 'G' + Math.trunc(Math.random() * 10000),
-            familyName: 'F' + Math.trunc(Math.random() * 10000),
-            countryCode: 'TR'
-        }
-        const repo = client.getRepository<Customer>(Customer);
-        const c = await repo.count();
-        const customer = await repo.create(values);
-        let c2 = await repo.count();
-        expect(c2).toStrictEqual(c + 1);
-        await repo.destroy(customer.id);
-        c2 = await repo.count();
-        expect(c2).toStrictEqual(c);
+        expect(await repo.findByPk(customer.id)).toBeDefined();
+        await repo.deleteByPk(customer.id);
+        expect(await repo.findByPk(customer.id)).not.toBeDefined();
     });
 
     it('should execute in transaction', async function () {
@@ -58,7 +39,7 @@ describe('Repository / destroy()', function () {
             const customer = await repo.create(values);
             c = await repo.count();
             await connection.startTransaction();
-            await repo.destroy(customer.id);
+            await repo.deleteByPk(customer.id);
             let c2 = await repo.count();
             expect(c2).toStrictEqual(c - 1);
             await connection.rollback();
@@ -69,7 +50,7 @@ describe('Repository / destroy()', function () {
 
 });
 
-describe('destroyAll()', function () {
+describe('deleteMany()', function () {
 
     let client: SqbClient;
 
@@ -86,18 +67,17 @@ describe('destroyAll()', function () {
             givenName: 'G' + Math.trunc(Math.random() * 10000),
             familyName: 'F' + Math.trunc(Math.random() * 10000),
             countryCode: 'US',
-            city: 'unknown'
+            city: 'city_' + Math.trunc(Math.random() * 10000)
         }
         const repo = client.getRepository<Customer>(Customer);
-        const c = await repo.count();
         await repo.createOnly(values);
         await repo.createOnly(values);
         await repo.createOnly(values);
-        let c2 = await repo.count();
-        expect(c2).toStrictEqual(c + 3);
-        await repo.destroyAll({filter: {city: 'unknown'}});
-        c2 = await repo.count();
-        expect(c2).toStrictEqual(c);
+        let rows = await repo.findMany({filter: {city: values.city}});
+        expect(rows.length).toStrictEqual(3);
+        await repo.deleteMany({filter: {city: values.city}});
+        rows = await repo.findMany({filter: {city: values.city}});
+        expect(rows.length).toStrictEqual(0);
     });
 
 });

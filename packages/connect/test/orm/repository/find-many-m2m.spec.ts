@@ -17,7 +17,7 @@ describe('Repository / find() many to many relations', function () {
 
     it('should return associated instances', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             filter: {'id': 1},
             pick: ['id', 'givenName', 'tags']
         });
@@ -34,7 +34,7 @@ describe('Repository / find() many to many relations', function () {
 
     it('should specify returning elements', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             filter: {'id': 1},
             pick: ['id', 'tags.color']
         });
@@ -51,7 +51,7 @@ describe('Repository / find() many to many relations', function () {
 
     it('should filter by m2m relation', async function () {
         const repo = client.getRepository(Customer);
-        const rows = await repo.findAll({
+        const rows = await repo.findMany({
             include: ['tags'],
             filter: {'tags.color': 'yellow'}
         });

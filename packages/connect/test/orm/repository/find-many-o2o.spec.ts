@@ -24,7 +24,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('return associated row as object property', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'countryCode', 'country']
             });
@@ -43,7 +43,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('dont return associated if not explicitly requested', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)]
             });
             expect(rows).toBeDefined();
@@ -54,7 +54,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('query sub associations', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'country.continent']
             });
@@ -71,7 +71,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('query sub associations (include)', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id'],
                 include: ['country.continent']
@@ -92,7 +92,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('choice which elements will be returned by server', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'country.code', 'country.continent.code']
             });
@@ -109,7 +109,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('filter results by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'countryCode'],
                 filter: Eq('country.continent.code', 'AM')
             });
@@ -122,7 +122,7 @@ describe('Repository / find() one to one relations', function () {
             const repo = client.getRepository(Customer);
             let request: any = {};
             client.once('execute', (req => request = req));
-            await repo.findAll({
+            await repo.findMany({
                 pick: ['id'],
                 filter: [{'country.continent.code': 'AM'}]
             });
@@ -132,7 +132,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('order by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
                 sort: ['country.code']
             });
@@ -149,7 +149,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('return associated row as object property', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'details']
             });
@@ -161,7 +161,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('choice which elements will be returned by server', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'details.notes']
             });
@@ -172,7 +172,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('filter results by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'details'],
                 filter: Eq('details.customerId', 1)
             });
@@ -183,7 +183,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('order by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'details.notes'],
                 sort: ['details.notes']
             });
@@ -200,7 +200,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('return row of last association in the chain as object property', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'countryCode', 'country']
             });
@@ -219,7 +219,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('query sub associations', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'country.continent']
             });
@@ -236,7 +236,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('choice which elements will be returned by server', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'country.code', 'country.continent.code']
             });
@@ -253,7 +253,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('filter by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'countryCode'],
                 filter: Eq('country.continent.code', 'AM')
             });
@@ -266,7 +266,7 @@ describe('Repository / find() one to one relations', function () {
             const repo = client.getRepository(Customer);
             let request: any = {};
             client.once('execute', (req => request = req));
-            await repo.findAll({
+            await repo.findMany({
                 pick: ['id'],
                 filter: [{'country.continent.code': 'AM'}]
             });
@@ -276,7 +276,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('order by associated element', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
                 sort: ['country.code']
             });
@@ -290,7 +290,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('query indirect associations', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 filter: [Eq('id', 1)],
                 pick: ['id', 'continent']
             });
@@ -305,7 +305,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('order by indirect associated elements', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'countryCode', 'country.continentCode'],
                 sort: ['continent.code']
             });
@@ -319,7 +319,7 @@ describe('Repository / find() one to one relations', function () {
 
         it('associations with target conditions', async function () {
             const repo = client.getRepository(Customer);
-            const rows = await repo.findAll({
+            const rows = await repo.findMany({
                 pick: ['id', 'vvipDetails']
             });
             expect(rows).toBeDefined();
