@@ -37,7 +37,7 @@
     "@nestjs/platform-express": "^9.4.0",
     "@nestjs/testing": "^9.4.0",
     "postgresql-client": "^2.5.5",
-    "rxjs": "^7.8.0",
+    "rxjs": "^7.8.1",
     "supertest": "^6.3.3"
   },
   "peerDependencies": {
