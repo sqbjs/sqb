@@ -63,7 +63,7 @@ export class SerializeContext implements GenerateOptions {
         if (Array.isArray(v)) {
             const vv = v.map(x => this.anyToSQL(x));
             return this.serialize(SerializationType.ARRAY, vv,
-                () => '(' + v.join(',')) + ')';
+                () => '(' + vv.join(',')) + ')';
         }
         if (typeof v === 'object') {
             if (isSerializable(v)) {
