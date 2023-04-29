@@ -1,6 +1,6 @@
 module.exports = {
   testEnvironment: 'node',
-  maxWorkers: '50%',
+  maxWorkers: '1',
   transform: {
     '^.+.ts?$': ['ts-jest', {
       tsconfig: '<rootDir>/test/tsconfig.json'
