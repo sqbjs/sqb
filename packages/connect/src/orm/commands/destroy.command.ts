@@ -7,7 +7,7 @@ import {prepareFilter} from './command.helper.js';
 export type DestroyCommandArgs = {
     entity: EntityMetadata;
     connection: SqbConnection;
-} & Repository.DestroyOptions;
+} & Repository.DeleteManyOptions;
 
 export class DestroyCommand {
 
