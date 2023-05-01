@@ -13,7 +13,7 @@ import {RowConverter} from './row-converter.js';
 export type FindCommandArgs = {
     entity: EntityMetadata;
     connection: SqbConnection
-} & Repository.FindAllOptions;
+} & Repository.FindManyOptions;
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
 

@@ -5,7 +5,7 @@ import {Country} from '../../_support/country.entity.js';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
 
-describe('Repository / findMany()', function () {
+describe('Repository.find()', function () {
 
     let client: SqbClient;
 
@@ -60,7 +60,7 @@ describe('Repository / findMany()', function () {
 
     it('should return json field as embedded element', async function () {
         const repo = client.getRepository(Customer);
-        const row = await repo.findByPk(1, {pick: ['customData']});
+        const row = await repo.find(1, {pick: ['customData']});
         expect(row).toBeDefined();
         expect(row!.customData).toBeDefined();
         expect(typeof row!.customData).toStrictEqual('object');

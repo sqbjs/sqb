@@ -11,7 +11,7 @@ export type UpdateCommandArgs = {
     entity: EntityMetadata;
     connection: SqbConnection;
     values: any;
-} & Repository.UpdateAllOptions;
+} & Repository.UpdateManyOptions;
 
 type UpdateCommandContext = {
     entity: EntityMetadata;

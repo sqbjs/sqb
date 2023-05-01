@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {DataType, In} from '@sqb/builder';
+import {DataType} from '@sqb/builder';
 import {Column, Entity, EntityOutput, PrimaryKey, SqbClient} from '@sqb/connect';
 import {Customer} from '../../_support/customer.entity.js';
 import {initClient} from '../../_support/init-client.js';
@@ -15,9 +15,7 @@ export class Customer2 {
     given?: string;
 }
 
-let client: SqbClient;
-
-const createCustomer = async function (values?: any): Promise<EntityOutput<Customer>> {
+export const createCustomer = async function (client: SqbClient, values?: any): Promise<EntityOutput<Customer>> {
     const v = {
         givenName: 'G' + Math.trunc(Math.random() * 10000),
         familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -28,7 +26,8 @@ const createCustomer = async function (values?: any): Promise<EntityOutput<Custo
     return await repo.create(v);
 }
 
-describe('Repository / updateByPk()', function () {
+describe('Repository.update()', function () {
+    let client: SqbClient;
 
     beforeAll(async () => {
         client = await initClient();
@@ -39,11 +38,11 @@ describe('Repository / updateByPk()', function () {
     });
 
     it('should update and return updated columns', async function () {
-        const old = await createCustomer();
+        const old = await createCustomer(client);
 
         const repo = client.getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.updateByPk(old.id, {
+        const updated = await repo.update(old.id, {
             givenName: newGivenName
         });
 
@@ -52,7 +51,7 @@ describe('Repository / updateByPk()', function () {
         expect(updated!.givenName).toStrictEqual(newGivenName);
         expect(updated!.givenName).not.toStrictEqual(old.givenName);
 
-        const c2 = await repo.findByPk(old.id);
+        const c2 = await repo.find(old.id);
         expect(c2).toBeDefined();
         expect(c2!.id).toStrictEqual(old.id);
         expect(c2!.givenName).toStrictEqual(newGivenName);
@@ -60,7 +59,7 @@ describe('Repository / updateByPk()', function () {
     });
 
     it('should update even element name and field name differs', async function () {
-        const old = await createCustomer();
+        const old = await createCustomer(client);
 
         const repo = client.getRepository(Customer2);
         let sql = '';
@@ -68,7 +67,7 @@ describe('Repository / updateByPk()', function () {
             sql = request.sql;
         });
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.updateByPk(old.id, {
+        const updated = await repo.update(old.id, {
             given: newGivenName
         });
 
@@ -78,22 +77,22 @@ describe('Repository / updateByPk()', function () {
         expect(updated!.given).toStrictEqual(newGivenName);
         expect(updated!.given).not.toStrictEqual(old.givenName);
 
-        const c2 = await repo.findByPk(old.id);
+        const c2 = await repo.find(old.id);
         expect(c2).toBeDefined();
         expect(updated!.pk).toStrictEqual(c2!.pk);
         expect(updated!.given).toStrictEqual(c2!.given);
     });
 
     it('should apply serialize function', async function () {
-        const old = await createCustomer();
+        const old = await createCustomer(client);
 
         const repo = client.getRepository(Customer);
         const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        const updated = await repo.updateByPk(old.id, {
+        const updated = await repo.update(old.id, {
             givenName: newGivenName,
             gender: 'Female'
         });
-        const c2 = await repo.findByPk(old.id);
+        const c2 = await repo.find(old.id);
         expect(c2).toBeDefined();
         expect(updated!.id).toStrictEqual(c2!.id);
         expect(updated!.gender).toStrictEqual('Female');
@@ -102,17 +101,17 @@ describe('Repository / updateByPk()', function () {
     it('should work within transaction', async function () {
         return client.acquire(async (connection) => {
             const repo = connection.getRepository(Customer);
-            const old = await createCustomer();
+            const old = await createCustomer(client);
 
             await connection.startTransaction();
             const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-            const updated = await repo.updateByPk(old.id, {
+            const updated = await repo.update(old.id, {
                 givenName: newGivenName
             });
             expect(updated!.givenName).toStrictEqual(newGivenName);
 
             await connection.rollback();
-            const c2 = await repo.findByPk(old.id);
+            const c2 = await repo.find(old.id);
             expect(c2).toBeDefined();
             expect(c2!.givenName).toStrictEqual(old.givenName);
         });
@@ -120,133 +119,15 @@ describe('Repository / updateByPk()', function () {
 
     it('should check enum value', async function () {
         const repo = client.getRepository(Tag);
-        await expect(() => repo.updateByPk(1, {name: 'small', color: 'pink'}))
+        await expect(() => repo.update(1, {name: 'small', color: 'pink'}))
             .rejects.toThrow('value must be one of');
     });
 
     it('should column is required', async function () {
         const repo = client.getRepository(Customer);
-        await expect(() => repo.updateByPk(1, {countryCode: null}))
+        await expect(() => repo.update(1, {countryCode: null}))
             .rejects.toThrow('is required');
     });
 
 });
 
-
-describe('updateByPkOnly()', function () {
-
-    beforeAll(async () => {
-        client = await initClient();
-    })
-
-    afterAll(async () => {
-        await client.close(0);
-    });
-
-    it('should return "true" if update success', async function () {
-        const repo = client.getRepository(Customer);
-        const old = await createCustomer();
-        const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
-        let success = await repo.updateByPkOnly(old.id, {
-            givenName: newGivenName
-        });
-        expect(success).toStrictEqual(true);
-
-        success = await repo.updateByPkOnly(0, {
-            givenName: newGivenName
-        });
-        expect(success).toStrictEqual(false);
-
-        const c2 = await repo.findByPk(old.id);
-        expect(c2).toBeDefined();
-        expect(c2!.id).toStrictEqual(old.id);
-        expect(c2!.givenName).toStrictEqual(newGivenName);
-    });
-
-    it('should not fetch after update for fast execution', async function () {
-        return client.acquire(async (connection) => {
-            const repo = connection.getRepository(Customer);
-            const old = await createCustomer();
-            let sql = '';
-            connection.on('execute', req => {
-                sql = req.sql;
-            });
-            await repo.updateByPkOnly(old.id, {
-                givenName: 'Any name'
-            });
-            expect(sql.includes('select')).toStrictEqual(false)
-        });
-    });
-
-    it('should map embedded elements into fields', async function () {
-        const repo = client.getRepository(Customer);
-        const old = await createCustomer();
-        const newName = {given: 'G' + Math.trunc(Math.random() * 10000)};
-        const c1 = await repo.updateByPk(old.id, {
-            name: newName
-        });
-        expect(c1).toBeDefined();
-        expect(c1 instanceof Customer).toBeTruthy();
-        expect(c1!.id).toStrictEqual(old.id);
-        expect(c1!.name!.given).toStrictEqual(newName.given);
-        expect(c1!.name!.given).not.toStrictEqual(old!.name!.given);
-
-        const c2 = await repo.findByPk(old.id);
-        expect(c2).toBeDefined();
-        expect(c2 instanceof Customer).toBeTruthy();
-        expect(c2!.id).toStrictEqual(old.id);
-        expect(c2!.name!.given).toStrictEqual(newName.given);
-    });
-
-    it('should map embedded elements with prefix into fields', async function () {
-        const repo = client.getRepository(Customer);
-        const old = await createCustomer({
-            address: {city: Math.trunc(Math.random() * 10000)}
-        });
-        const newAddress = {city: 'G' + Math.trunc(Math.random() * 10000)};
-        const c1 = await repo.updateByPk(old.id, {
-            address: newAddress
-        });
-        expect(c1).toBeDefined();
-        expect(c1 instanceof Customer).toStrictEqual(true);
-        expect(c1!.id).toStrictEqual(old.id);
-        expect(c1!.address!.city).toStrictEqual(newAddress.city);
-        expect(c1!.address!.city).not.toStrictEqual(old.address!.city);
-
-        const c2 = await repo.findByPk(old.id);
-        expect(c2).toBeDefined();
-        expect(c2 instanceof Customer).toBeTruthy();
-        expect(c2!.id).toStrictEqual(old.id);
-        expect(c2!.address!.city).toStrictEqual(newAddress.city);
-    });
-
-});
-
-describe('updateAll()', function () {
-
-    beforeAll(async () => {
-        client = await initClient();
-    })
-
-    afterAll(async () => {
-        await client.close(0);
-    });
-
-    it('should update multiple rows', async function () {
-        const oldCity = 'C' + Math.trunc(Math.random() * 10000);
-        const ids: number[] = [];
-        for (let i = 0; i < 10; i++) {
-            const customer = await createCustomer({city: oldCity});
-            ids.push(customer!.id!);
-        }
-        const repo = client.getRepository(Customer);
-        const newCity = 'C' + Math.trunc(Math.random() * 10000);
-        const count = await repo.updateMany({city: newCity}, {filter: In('id', ids)});
-        expect(count).toStrictEqual(ids.length);
-        const rows = await repo.findMany({filter: In('id', ids)});
-        for (const row of rows) {
-            expect(row.city).toStrictEqual(newCity);
-        }
-    });
-
-});

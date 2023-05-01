@@ -1,5 +1,5 @@
 import {AsyncEventEmitter, TypedEventEmitterClass} from 'strict-typed-events';
-import {Type} from 'ts-gems';
+import {StrictOmit, Type} from 'ts-gems';
 import {FieldInfoMap} from '../client/field-info-map.js';
 import {SqbClient} from '../client/sqb-client.js';
 import {SqbConnection} from '../client/sqb-connection.js';
@@ -13,6 +13,17 @@ import {UpdateCommand} from './commands/update.command.js';
 import {EntityMetadata} from './model/entity-metadata.js';
 import {extractKeyValues} from './util/extract-keyvalues.js';
 
+interface Projection {
+    pick?: string[];
+    omit?: string[];
+    include?: string[];
+}
+
+interface Filtering {
+    filter?: any;
+    params?: any;
+}
+
 export namespace Repository {
 
     export type TransformRowFunction = (fields: FieldInfoMap, row: object, obj: object) => void;
@@ -21,65 +32,55 @@ export namespace Repository {
         connection?: SqbConnection;
     }
 
-    export interface CreateOptions extends CommandOptions {
-        pick?: string[];
-        omit?: string[];
-        include?: string[];
+    export interface CreateOptions extends CommandOptions, Projection {
     }
 
-    export interface CountOptions extends CommandOptions {
-        filter?: any;
-        params?: any;
+    export interface CountOptions extends CommandOptions, Filtering {
     }
 
-    export interface ExistsOptions extends CommandOptions {
-        filter?: any;
-        params?: any;
+    export interface ExistsOptions extends CommandOptions, Filtering {
     }
 
-    export interface DestroyOptions extends CommandOptions {
-        filter?: any;
-        params?: any;
+    export interface DeleteOptions extends CommandOptions, Filtering {
     }
 
-    export interface FindOneOptions extends CommandOptions {
-        pick?: string[];
-        omit?: string[];
-        include?: string[];
-        filter?: any;
-        params?: any;
+    export interface DeleteManyOptions extends CommandOptions, Filtering {
+    }
+
+    export interface FindOptions extends CommandOptions, Projection, Filtering {
+    }
+
+    export interface FindOneOptions extends CommandOptions, Projection, Filtering {
         sort?: string[];
         offset?: number;
+    }
+
+    export interface FindManyOptions extends FindOneOptions {
+        limit?: number;
         distinct?: boolean;
+        maxEagerFetch?: number;
+        maxSubQueries?: number;
         onTransformRow?: TransformRowFunction;
     }
 
-    export interface FindAllOptions extends FindOneOptions {
-        limit?: number;
-        maxEagerFetch?: number;
-        maxSubQueries?: number;
+    export interface UpdateOptions extends CommandOptions, Projection, Filtering {
     }
 
-    export interface GetOptions extends CommandOptions {
-        pick?: string[];
-        omit?: string[];
-        include?: string[];
-        filter?: any;
-        params?: any;
+    export interface UpdateManyOptions extends CommandOptions, Filtering {
     }
 
-    export interface UpdateOptions extends CommandOptions {
-        pick?: string[];
-        omit?: string[];
-        include?: string[];
-        filter?: any;
-        params?: any;
-    }
-
-    export interface UpdateAllOptions extends CommandOptions {
-        filter?: any;
-        params?: any;
-    }
+    /**
+     * @deprecated
+     */
+    export type FindAllOptions = FindManyOptions;
+    /**
+     * @deprecated
+     */
+    export type DestroyOptions = DeleteOptions;
+    /**
+     * @deprecated
+     */
+    export type UpdateAllOptions = UpdateManyOptions;
 }
 
 interface RepositoryEvents {
@@ -108,79 +109,118 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return this._entity.ctor;
     }
 
-    create(values: EntityInput<T>, options?: Repository.CreateOptions): Promise<EntityOutput<T>> {
+    create(
+        values: EntityInput<T>,
+        options?: Repository.CreateOptions
+    ): Promise<EntityOutput<T>> {
         return this._execute(async (connection) => {
-            return this._create(values, {...options, connection});
+            const keyValue = await this._create(values, {...options, connection, returning: true});
+            const result = keyValue &&
+                await this._find(keyValue, {...options, connection});
+            if (!result)
+                throw new Error('Unable to insert new row');
+            return result;
         }, options);
     }
 
-    createOnly(values: EntityInput<T>, options?: Repository.CreateOptions): Promise<void> {
+    createOnly(
+        values: EntityInput<T>,
+        options?: StrictOmit<Repository.CreateOptions, keyof Projection>
+    ): Promise<void> {
         return this._execute(async (connection) => {
-            return this._createOnly(values, {...options, connection});
+            await this._create(values, {...options, connection, returning: false});
         }, options);
     }
 
-    exists(keyValue: any | Record<string, any>, options?: Repository.ExistsOptions): Promise<boolean> {
+    exists(
+        keyValue: any | Record<string, any>,
+        options?: Repository.ExistsOptions
+    ): Promise<boolean> {
         return this._execute(async (connection) => {
             return this._exists(keyValue, {...options, connection});
         }, options);
     }
 
-    count(options?: Repository.CountOptions): Promise<number> {
+    count(
+        options?: Repository.CountOptions
+    ): Promise<number> {
         return this._execute(async (connection) => {
             return this._count({...options, connection});
         }, options);
     }
 
-    findByPk(keyValue: any | Record<string, any>, options?: Repository.GetOptions): Promise<EntityOutput<T> | undefined> {
+    find(
+        keyValue: any | Record<string, any>,
+        options?: Repository.FindOptions
+    ): Promise<EntityOutput<T> | undefined> {
         return this._execute(async (connection) => {
-            return this._findByPk(keyValue, {...options, connection});
+            return this._find(keyValue, {...options, connection});
         }, options);
     }
 
-    findOne(options?: Repository.FindOneOptions): Promise<EntityOutput<T> | undefined> {
+    findOne(
+        options?: Repository.FindOneOptions
+    ): Promise<EntityOutput<T> | undefined> {
         return this._execute(async (connection) => {
-            return this._findOne({...options, connection});
+            return await this._findOne({
+                ...options,
+                connection,
+            });
         }, options);
     }
 
-    findMany(options?: Repository.FindAllOptions): Promise<EntityOutput<T>[]> {
+    findMany(
+        options?: Repository.FindManyOptions
+    ): Promise<EntityOutput<T>[]> {
         return this._execute(async (connection) => {
-            return this._findAll({...options, connection});
+            return this._findMany({...options, connection});
         }, options);
     }
 
-    deleteByPk(keyValue: any | Record<string, any>, options?: Repository.DestroyOptions): Promise<boolean> {
+    delete(
+        keyValue: any | Record<string, any>,
+        options?: Repository.DeleteOptions
+    ): Promise<boolean> {
         return this._execute(async (connection) => {
-            return this._destroy(keyValue, {...options, connection});
+            return this._delete(keyValue, {...options, connection});
         }, options);
     }
 
-    deleteMany(options?: Repository.DestroyOptions): Promise<number> {
+    deleteMany(
+        options?: Repository.DeleteManyOptions
+    ): Promise<number> {
         return this._execute(async (connection) => {
-            return this._destroyAll({...options, connection});
+            return this._deleteMany({...options, connection});
         }, options);
     }
 
-    updateByPk(keyValue: any | Record<string, any>, values: EntityInput<T>,
-               options?: Repository.UpdateOptions): Promise<EntityOutput<T> | undefined> {
+    update(
+        keyValue: any | Record<string, any>,
+        values: EntityInput<T>,
+        options?: Repository.UpdateOptions
+    ): Promise<EntityOutput<T> | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
             const keyValues = await this._updateByPk(keyValue, values, opts);
             if (keyValues)
-                return this._findByPk(keyValues, opts);
+                return this._find(keyValues, opts);
         }, options);
     }
 
-    updateByPkOnly(keyValue: any | Record<string, any>, values: EntityInput<T>,
-                   options?: Repository.UpdateOptions): Promise<boolean> {
+    updateOnly(
+        keyValue: any | Record<string, any>,
+        values: EntityInput<T>,
+        options?: StrictOmit<Repository.UpdateOptions, keyof Projection>
+    ): Promise<boolean> {
         return this._execute(async (connection) => {
             return !!(await this._updateByPk(keyValue, values, {...options, connection}));
         }, options);
     }
 
-    updateMany(values: EntityInput<T>,
-               options?: Repository.UpdateAllOptions): Promise<number> {
+    updateMany(
+        values: EntityInput<T>,
+        options?: Repository.UpdateManyOptions
+    ): Promise<number> {
         return this._execute(async (connection) => {
             return this._updateAll(values, {...options, connection});
         })
@@ -190,7 +230,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
      *
      * @deprecated
      */
-    destroy(keyValue: any | Record<string, any>, options?: Repository.DestroyOptions): Promise<boolean> {
+    destroy(keyValue: any | Record<string, any>, options?: Repository.DeleteOptions): Promise<boolean> {
         return this.deleteOne(keyValue, options);
     }
 
@@ -198,7 +238,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
      *
      * @deprecated
      */
-    destroyAll(options?: Repository.DestroyOptions): Promise<number> {
+    destroyAll(options?: Repository.DeleteManyOptions): Promise<number> {
         return this.deleteMany(options);
     }
 
@@ -206,37 +246,21 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
      *
      * @deprecated
      */
-    findAll(options?: Repository.FindAllOptions): Promise<EntityOutput<T>[]> {
+    findAll(options?: Repository.FindManyOptions): Promise<EntityOutput<T>[]> {
         return this.findMany(options);
     }
 
-    /**
-     *
-     * @deprecated
-     */
-    update(keyValue: any | Record<string, any>, values: EntityInput<T>,
-           options?: Repository.UpdateOptions): Promise<EntityOutput<T> | undefined> {
-        return this.updateByPk(keyValue, values, options);
-    }
 
     /**
      *
      * @deprecated
      */
-    updateOnly(keyValue: any | Record<string, any>, values: EntityInput<T>,
-               options?: Repository.UpdateOptions): Promise<boolean> {
-        return this.updateByPkOnly(keyValue, values, options);
-    }
-
-    /**
-     *
-     * @deprecated
-     */
-    updateAll(values: EntityInput<T>,
-              options?: Repository.UpdateAllOptions): Promise<number> {
+    updateAll(
+        values: EntityInput<T>,
+        options?: Repository.UpdateManyOptions
+    ): Promise<number> {
         return this.updateMany(values, options);
     }
-
 
     protected async _execute(fn: TransactionFunction,
                              opts?: Repository.CommandOptions): Promise<any> {
@@ -256,41 +280,31 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         });
     }
 
-    protected async _create(values: EntityInput<T>,
-                            options: Repository.CreateOptions & {
-                                connection: SqbConnection
-                            }): Promise<EntityOutput<T>> {
+    protected async _create(
+        values: EntityInput<T>,
+        options: Repository.CreateOptions & {
+            connection: SqbConnection,
+            returning?: boolean
+        }
+    ): Promise<any> {
         if (!values)
             throw new TypeError('You must provide values');
-        await this._emit('before-create', values, options);
         const keyValues = await CreateCommand.execute({
             ...options,
             entity: this._entity,
-            values,
-            returning: true
+            values
         });
-        const result = keyValues && (await this.findByPk(keyValues, options));
-        if (!result)
+        if (options.returning && !keyValues)
             throw new Error('Unable to insert new row');
-        await this._emit('after-create', result, options);
-        return result;
+        return keyValues;
     }
 
-    protected async _createOnly(values: EntityInput<T>,
-                                options: Repository.CreateOptions & { connection: SqbConnection }): Promise<void> {
-        if (!values)
-            throw new TypeError('You must provide values');
-        await this._emit('before-create', values, options);
-        await CreateCommand.execute({
-            ...options,
-            entity: this._entity,
-            values,
-            returning: false
-        });
-    }
-
-    protected async _exists(keyValue: any | Record<string, any>,
-                            options: Repository.ExistsOptions & { connection: SqbConnection }): Promise<boolean> {
+    protected async _exists(
+        keyValue: any | Record<string, any>,
+        options: Repository.ExistsOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<boolean> {
         const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
@@ -311,7 +325,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         });
     }
 
-    protected async _findAll(options: Repository.FindAllOptions & {
+    protected async _findMany(options: Repository.FindManyOptions & {
         connection: SqbConnection
     }): Promise<EntityOutput<T>[]> {
         return await FindCommand.execute({
@@ -323,18 +337,19 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     protected async _findOne(options: Repository.FindOneOptions & {
         connection: SqbConnection
     }): Promise<EntityOutput<T> | undefined> {
-        const rows = await FindCommand.execute({
+        const rows = await this._findMany({
             ...options,
-            entity: this._entity,
             limit: 1
         });
         return rows && rows[0];
     }
 
-    protected async _findByPk(keyValue: any | Record<string, any>,
-                              options: Repository.GetOptions & {
-                                  connection: SqbConnection
-                              }): Promise<EntityOutput<T> | undefined> {
+    protected async _find(
+        keyValue: any | Record<string, any>,
+        options: Repository.FindOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<EntityOutput<T> | undefined> {
         const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
@@ -344,9 +359,12 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return await this._findOne({...options, filter, offset: 0});
     }
 
-    protected async _destroy(keyValue: any | Record<string, any>,
-                             options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<boolean> {
-        await this._emit('before-destroy', keyValue, options);
+    protected async _delete(
+        keyValue: any | Record<string, any>,
+        options: Repository.DeleteOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<boolean> {
         const filter = [extractKeyValues(this._entity, keyValue, true)];
         if (options && options.filter) {
             if (Array.isArray(options.filter))
@@ -358,30 +376,31 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
             filter,
             entity: this._entity,
         }));
-        await this._emit('after-destroy', result, keyValue, options);
         return result;
     }
 
-    protected async _destroyAll(options: Repository.DestroyOptions & { connection: SqbConnection }): Promise<number> {
-        await this._emit('before-destroy-all', options);
-        const rowsAffected = DestroyCommand.execute({
+    protected async _deleteMany(
+        options: Repository.DeleteManyOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<number> {
+        return DestroyCommand.execute({
             ...options,
             entity: this._entity,
             filter: options?.filter,
             params: options?.params
         });
-        await this._emit('after-destroy-all', rowsAffected, options);
-        return rowsAffected;
     }
 
-    protected async _updateByPk(keyValue: any | Record<string, any>,
-                                values: EntityInput<T>,
-                                options: Repository.UpdateOptions & {
-                                    connection: SqbConnection
-                                }): Promise<Record<string, any> | undefined> {
+    protected async _updateByPk(
+        keyValue: any | Record<string, any>,
+        values: EntityInput<T>,
+        options: Repository.UpdateOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<Record<string, any> | undefined> {
         if (!values)
             throw new TypeError('You must provide values');
-        await this._emit('before-update', keyValue, values, options);
         const keyValues = extractKeyValues(this._entity, keyValue, true);
         const filter = [keyValues];
         if (options.filter) {
@@ -397,31 +416,22 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
             values: updateValues,
             filter
         });
-        await this._emit('after-update', rowsAffected, keyValues, options);
         return rowsAffected ? keyValues : undefined;
     }
 
-    protected async _updateAll(values: EntityInput<T>,
-                               options: Repository.UpdateAllOptions & { connection: SqbConnection }): Promise<number> {
+    protected async _updateAll(
+        values: EntityInput<T>,
+        options: Repository.UpdateManyOptions & {
+            connection: SqbConnection
+        }
+    ): Promise<number> {
         if (!values)
             throw new TypeError('You must provide values');
-        await this._emit('before-update-all', values, options);
-        const rowsAffected = await UpdateCommand.execute({
+        return await UpdateCommand.execute({
             ...options,
             entity: this._entity,
             values
         });
-        await this._emit('after-update-all', rowsAffected, values, options);
-        return rowsAffected;
-    }
-
-    protected async _emit(event: string, ...args: any[]): Promise<void> {
-        const events = this._entity.eventListeners && this._entity.eventListeners[event];
-        if (events) {
-            for (const fn of events) {
-                await fn(this, ...args);
-            }
-        }
     }
 
 }
