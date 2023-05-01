@@ -7,7 +7,7 @@ import {QueryRequest, TransactionFunction} from '../client/types.js';
 import {EntityInput, EntityOutput} from '../types.js';
 import {CountCommand} from './commands/count.command.js';
 import {CreateCommand} from './commands/create.command.js';
-import {DestroyCommand} from './commands/destroy.command.js';
+import {DeleteCommand} from './commands/delete.command.js';
 import {FindCommand} from './commands/find.command.js';
 import {UpdateCommand} from './commands/update.command.js';
 import {EntityMetadata} from './model/entity-metadata.js';
@@ -371,12 +371,11 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
                 filter.push(...options.filter);
             else filter.push(options.filter);
         }
-        const result = !!(await DestroyCommand.execute({
+        return !!(await DeleteCommand.execute({
             ...options,
             filter,
             entity: this._entity,
         }));
-        return result;
     }
 
     protected async _deleteMany(
@@ -384,7 +383,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
             connection: SqbConnection
         }
     ): Promise<number> {
-        return DestroyCommand.execute({
+        return DeleteCommand.execute({
             ...options,
             entity: this._entity,
             filter: options?.filter,

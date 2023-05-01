@@ -9,7 +9,7 @@ export type DestroyCommandArgs = {
     connection: SqbConnection;
 } & Repository.DeleteManyOptions;
 
-export class DestroyCommand {
+export class DeleteCommand {
 
     // istanbul ignore next
     protected constructor() {
