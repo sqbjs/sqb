@@ -2,7 +2,7 @@ import {SerializationType} from '../enums.js';
 import {SerializeContext} from '../serialize-context.js';
 import {BaseField} from './base-field.js';
 
-const RETURNING_COLUMN_PATTERN = /^([a-zA-Z]\w*) *(?:as)? *(\w+)?$/;
+const RETURNING_COLUMN_PATTERN = /^([a-zA-Z_]\w*) *(?:as)? *(\w+)?$/;
 
 export class ReturningColumn extends BaseField {
 
