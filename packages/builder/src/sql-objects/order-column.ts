@@ -2,7 +2,7 @@ import {SerializationType} from '../enums.js';
 import {SerializeContext} from '../serialize-context.js';
 import {BaseField} from './base-field.js';
 
-const ORDER_COLUMN_PATTERN = /^([-+])?((?:[a-zA-Z][\w$]*\.){0,2})([a-zA-Z][\w$]*|\*) *(asc|dsc|desc|ascending|descending)?$/i;
+const ORDER_COLUMN_PATTERN = /^([-+])?((?:[a-zA-Z_][\w$]*\.){0,2})([a-zA-Z_][\w$]*|\*) *(asc|dsc|desc|ascending|descending)?$/i;
 
 export class OrderColumn extends BaseField {
 
