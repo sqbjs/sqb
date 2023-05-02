@@ -14,9 +14,9 @@ describe('serialize "OrderColumn"', function () {
     });
 
     it('should serialize (table.field)', function () {
-        const query = Select().from('table1').orderBy('table1.field1');
+        const query = Select().from('table1').orderBy('table1._field1');
         const result = query.generate(options);
-        expect(result.sql).toStrictEqual('select * from table1 order by table1.field1');
+        expect(result.sql).toStrictEqual('select * from table1 order by table1._field1');
     });
 
     it('should serialize (schema.table.field)', function () {
