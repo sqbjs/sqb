@@ -201,7 +201,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     ): Promise<EntityOutput<T> | undefined> {
         return this._execute(async (connection) => {
             const opts = {...options, connection};
-            const keyValues = await this._updateByPk(keyValue, values, opts);
+            const keyValues = await this._update(keyValue, values, opts);
             if (keyValues)
                 return this._find(keyValues, opts);
         }, options);
@@ -213,7 +213,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         options?: StrictOmit<Repository.UpdateOptions, keyof Projection>
     ): Promise<boolean> {
         return this._execute(async (connection) => {
-            return !!(await this._updateByPk(keyValue, values, {...options, connection}));
+            return !!(await this._update(keyValue, values, {...options, connection}));
         }, options);
     }
 
@@ -222,7 +222,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         options?: Repository.UpdateManyOptions
     ): Promise<number> {
         return this._execute(async (connection) => {
-            return this._updateAll(values, {...options, connection});
+            return this._updateMany(values, {...options, connection});
         })
     }
 
@@ -391,7 +391,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         });
     }
 
-    protected async _updateByPk(
+    protected async _update(
         keyValue: any | Record<string, any>,
         values: EntityInput<T>,
         options: Repository.UpdateOptions & {
@@ -418,7 +418,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
         return rowsAffected ? keyValues : undefined;
     }
 
-    protected async _updateAll(
+    protected async _updateMany(
         values: EntityInput<T>,
         options: Repository.UpdateManyOptions & {
             connection: SqbConnection
