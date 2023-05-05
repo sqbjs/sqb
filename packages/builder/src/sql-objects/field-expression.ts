@@ -22,9 +22,9 @@ export class FieldExpression extends BaseField {
             this._dataType = arg1;
             this._isArray = arg2;
         }
-        const m = expression.match(TABLE_COLUMN_PATTERN);
+        const m = expression?.match(TABLE_COLUMN_PATTERN);
         if (!m)
-            throw new TypeError(`${expression} does not match table column format`);
+            throw new TypeError(`"${expression}" does not match table column format`);
         this._field = m[2];
         if (m[1]) {
             const a = m[1].split(/\./g);
