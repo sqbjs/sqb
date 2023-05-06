@@ -36,6 +36,7 @@
     "putil-merge": "^3.10.3",
     "putil-promisify": "^1.10.0",
     "putil-taskqueue": "^2.5.5",
+    "power-tasks": "^1.6.4",
     "putil-varhelpers": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.3.1",
