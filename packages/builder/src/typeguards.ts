@@ -70,6 +70,10 @@ export function isCompOperator(value: any): value is CompOperator {
     return isSerializable(value) && value._type === SerializationType.COMPARISON_EXPRESSION;
 }
 
+export function isNotOperator(value: any): value is CompOperator {
+  return isSerializable(value) && value._type === SerializationType.NEGATIVE_EXPRESSION;
+}
+
 export function isSelectColumn(value: any): value is FieldExpression {
     return isSerializable(value) && value._type === SerializationType.FIELD_NAME;
 }
