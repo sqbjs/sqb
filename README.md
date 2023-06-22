@@ -9,58 +9,39 @@
 [![NPM Downloads][downloads-image]][downloads-url]
 [![CircleCI][circleci-image]][circleci-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
-[![Dependencies][dependencies-image]][dependencies-url]
-[![Package Quality][quality-image]][quality-url]
 
 
-## About SQB
+## About
 
-SQB is an [extensible](./docs/extensions.md), multi-dialect SQL query builder and Database connection wrapper for NodeJS.
+SQB is a modern all-in-one db framework for small to enterprise grade NodeJS applications.
+It contains multi-dialect query builder, DB connection wrapper with blazing fast connection pooling,
+powerful ORM, database migration utility and also it has built-in NestJS module.
 
 ## Main goals
 
-- Single code base for any sql based database
-- Powerful and simplified query coding scheme
-- Fast applications with low memory requirements
+- Single code base for building multi-dialect applications
+- Fast, efficient and memory optimized applications
 - Let applications work with large data tables efficiently
-- Support latest JavaScript language standards
-- Lightweight and [extensible](./docs/extensions.md) framework. 
+- Expandable to meet all needs.
 
+## Getting started
+Visit [sqbjs.org](https://sqbjs.org/) for documentation
 
-You can report bugs and discuss features on the [GitHub issues](https://github.com/sqbjs/sqb/issues) page
 
 Thanks to all of the great [contributions](https://github.com/sqbjs/sqb/graphs/contributors) to the project.
 
-You may want to check detailed [DOCUMENTATION](https://sqbjs.github.io/sqb/)
-
-
-## Installation
-
-```bash
-$ npm install @sqb/builder --save
-```
-
-## Node Compatibility
-
-  - node >= 14.x
-  
-   
+## Issues
+You can report bugs and discuss features on the [GitHub issues](https://github.com/sqbjs/sqb/issues) page
+ 
 ### License
 SQB is available under [MIT](LICENSE) license.
 
 [npm-image]: https://img.shields.io/npm/v/@sqb/connect.svg
 [npm-url]: https://npmjs.org/package/@sqb/connect
-[circleci-image]: https://circleci.com/gh/sqbjs/@sqb/connect/tree/master.svg?style=shield
-[circleci-url]: https://circleci.com/gh/panates/postgresql-client/tree/master
-[coveralls-image]: https://img.shields.io/coveralls/sqbjs/@sqb/builder/master.svg
-[coveralls-url]: https://coveralls.io/r/sqbjs/@sqb/builder
+[circleci-image]: https://dl.circleci.com/status-badge/img/gh/sqbjs/sqb/tree/master.svg?style=shield
+[circleci-url]: https://dl.circleci.com/status-badge/redirect/gh/sqbjs/sqb/tree/master
+[coveralls-image]: https://coveralls.io/repos/github/sqbjs/sqb/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/github/sqbjs/sqb?branch=master
 [downloads-image]: https://img.shields.io/npm/dm/@sqb/builder.svg
 [downloads-url]: https://npmjs.org/package/@sqb/builder
-[gitter-image]: https://badges.gitter.im/sqbjs/@sqb/builder.svg
-[gitter-url]: https://gitter.im/sqbjs/@sqb/builder?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-[dependencies-image]: https://david-dm.org/sqbjs/@sqb/builder/status.svg
-[dependencies-url]:https://david-dm.org/sqbjs/@sqb/builder
-[devdependencies-image]: https://david-dm.org/sqbjs/@sqb/builder/dev-status.svg
-[devdependencies-url]:https://david-dm.org/sqbjs/@sqb/builder?type=dev
-[quality-image]: http://npm.packagequality.com/shield/@sqb/builder.png
-[quality-url]: http://packagequality.com/#?package=@sqb/builder
+
