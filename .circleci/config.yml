@@ -19,7 +19,7 @@ jobs:
       version:
         type: string
     docker:
-      - image: circleci/node:<< parameters.version >>
+      - image: cimg/node:<< parameters.version >>
       - image: cimg/postgres:14.0
         environment:
           POSTGRES_DB: test
