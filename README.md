@@ -4,13 +4,12 @@
 </p>
 
 <br>
-  
+
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
-[![Build Status][travis-image]][travis-url]
+[![CircleCI][circleci-image]][circleci-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![Dependencies][dependencies-image]][dependencies-url]
-[![DevDependencies][devdependencies-image]][devdependencies-url]
 [![Package Quality][quality-image]][quality-url]
 
 
@@ -49,10 +48,10 @@ $ npm install @sqb/builder --save
 ### License
 SQB is available under [MIT](LICENSE) license.
 
-[npm-image]: https://img.shields.io/npm/v/@sqb/builder.svg
-[npm-url]: https://npmjs.org/package/@sqb/builder
-[travis-image]: https://img.shields.io/travis/sqbjs/@sqb/builder/master.svg
-[travis-url]: https://travis-ci.org/sqbjs/@sqb/builder
+[npm-image]: https://img.shields.io/npm/v/@sqb/connect.svg
+[npm-url]: https://npmjs.org/package/@sqb/connect
+[circleci-image]: https://circleci.com/gh/sqbjs/@sqb/connect/tree/master.svg?style=shield
+[circleci-url]: https://circleci.com/gh/panates/postgresql-client/tree/master
 [coveralls-image]: https://img.shields.io/coveralls/sqbjs/@sqb/builder/master.svg
 [coveralls-url]: https://coveralls.io/r/sqbjs/@sqb/builder
 [downloads-image]: https://img.shields.io/npm/dm/@sqb/builder.svg

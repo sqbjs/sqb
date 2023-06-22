@@ -41,5 +41,4 @@ jobs:
       - run: npm install
       - run: npm run citest
       - run: npm install coveralls --no-save
-      - coveralls/upload:
-          path_to_lcov: ./coverage/lcov.info
+      - coveralls/upload
