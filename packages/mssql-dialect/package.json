@@ -1,7 +1,7 @@
 {
   "name": "@sqb/mssql-dialect",
   "description": "SQB serialization extension for MS-SQL database",
-  "version": "4.9.0",
+  "version": "4.9.1",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -29,7 +29,7 @@
     "clean:cover": "rimraf ../../coverage/mssql-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.9.0"
+    "@sqb/builder": "^4.9.1"
   },
   "type": "module",
   "types": "esm/index.d.ts",
