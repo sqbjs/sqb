@@ -32,7 +32,7 @@
     "putil-promisify": "^1.10.0"
   },
   "devDependencies": {
-    "postgresql-client": "^2.5.5"
+    "postgresql-client": "^2.5.9"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0",

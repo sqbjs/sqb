@@ -29,14 +29,14 @@
     "clean:cover": "rimraf ../../coverage/oracle"
   },
   "devDependencies": {
-    "@types/oracledb": "^5.2.5",
-    "oracledb": "^5.5.0"
+    "@types/oracledb": "^5.3.0",
+    "oracledb": "^6.0.3"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0",
     "@sqb/connect": "^4.9.0",
     "@sqb/oracle-dialect": "^4.9.0",
-    "oracledb": "^5.x.x"
+    "oracledb": "^5.x.x || ^6.x.x"
   },
   "type": "module",
   "types": "esm/index.d.ts",

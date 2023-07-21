@@ -1,6 +1,5 @@
 import { SelectQuery } from './query/select-query.js';
 import { Serializable } from './serializable.js';
-import { Operator } from './sql-objects/operator.js';
 import { WrapOps } from './sql-objects/operators/logical-operator.js';
 import { OpAnd } from './sql-objects/operators/op-and.js';
 import { OpBetween } from './sql-objects/operators/op-between.js';
@@ -23,13 +22,12 @@ import { OpNotILike } from './sql-objects/operators/op-not-ilike.js';
 import { OpNotIn } from './sql-objects/operators/op-not-in.js';
 import { OpNotLike } from './sql-objects/operators/op-not-like.js';
 import { OpOr } from './sql-objects/operators/op-or.js';
-import { RawStatement } from './sql-objects/raw-statement.js';
 
-function And(...args: (Operator | RawStatement)[]) {
+function And(...args: (Serializable | Object)[]) {
   return new OpAnd(...args);
 }
 
-function Or(...args: (Operator | RawStatement)[]) {
+function Or(...args: (Serializable | Object)[]) {
   return new OpOr(...args);
 }
 
@@ -57,6 +55,7 @@ function Lte(expression: string | Serializable, value: any) {
   return new OpLte(expression, value);
 }
 
+function Between(expression: string | Serializable, values: Serializable)
 function Between(expression: string | Serializable, values: any[])
 function Between(expression: string | Serializable, value1: any, value2: any)
 function Between(expression: string | Serializable, value1: any, value2?: any) {
@@ -64,6 +63,7 @@ function Between(expression: string | Serializable, value1: any, value2?: any) {
   return new OpBetween(expression, values);
 }
 
+function NotBetween(expression: string | Serializable, values: Serializable)
 function NotBetween(expression: string | Serializable, values: any[])
 function NotBetween(expression: string | Serializable, value1: any, value2: any)
 function NotBetween(expression: string | Serializable, value1: any, value2?: any) {

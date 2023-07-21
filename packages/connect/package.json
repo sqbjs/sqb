@@ -32,18 +32,18 @@
     "debug": "^4.3.4",
     "lightning-pool": "^4.2.1",
     "lodash": "^4.17.21",
-    "power-tasks": "^1.6.4",
+    "power-tasks": "^1.7.0",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.10.3",
     "putil-promisify": "^1.10.0",
     "putil-varhelpers": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.3.1",
-    "ts-gems": "^2.3.0"
+    "ts-gems": "^2.4.0"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.194"
+    "@types/debug": "^4.1.8",
+    "@types/lodash": "^4.14.195"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0"

@@ -9,7 +9,7 @@
     "sourceMap": true,
     "baseUrl": "./",
     "paths": {
-      "@opra/*": ["../../*/src"],
+      "@sqb/*": ["../../*/src"],
     }
   }
 }

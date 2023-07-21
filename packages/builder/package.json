@@ -37,7 +37,7 @@
     "putil-varhelpers": "^1.6.5"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.7"
+    "@types/debug": "^4.1.8"
   },
   "type": "module",
   "types": "esm/index.d.ts",
