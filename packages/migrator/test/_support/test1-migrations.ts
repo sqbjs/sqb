@@ -1,16 +1,15 @@
 import path from 'path';
-import {MigrationPackage} from '../../src/index.js';
+import { MigrationPackageAsync } from '../../src/index.js';
 
-export const Test1MigrationPackage: MigrationPackage = {
-  description: 'Test Migration',
-  informationTableName: 'info',
+export const Test1MigrationPackage: MigrationPackageAsync = {
+  name: 'Test',
   migrations: [{
     version: 10,
-    tasks: [path.join(__dirname, 'test1', 'v010.sql')]
+    tasks: [path.join(__dirname, 'test1', 'v010.task.sql')]
   },
     {
       version: 11,
-      tasks: [path.join(__dirname, 'test1', 'v011.sql')]
+      tasks: [path.join(__dirname, 'test1', 'v011.task.sql')]
     },
     {
       version: 12,

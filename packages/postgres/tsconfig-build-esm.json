@@ -1,16 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
-    "module": "ESNext",
     "rootDir": "src",
     "outDir": "../../build/postgres/esm",
-    "paths": {
-      "@sqb/builder": ["../../build/builder"],
-      "@sqb/connect": ["../../build/connect"]
-    },
-    "sourceMap": false,
-    "noEmit": false,
-    "declaration": true
-  },
-  "include": ["src"]
+    "declarationDir": "../../build/postgres/types"
+  }
 }

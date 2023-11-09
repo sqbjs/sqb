@@ -13,6 +13,10 @@
     "url": "https://github.com/sqbjs/sqb.git",
     "directory": "packages/sqljs"
   },
+  "type": "module",
+  "module": "./esm/index.js",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
@@ -29,10 +33,10 @@
     "clean:cover": "rimraf ../../coverage/sqljs"
   },
   "dependencies": {
-    "putil-promisify": "^1.10.0"
+    "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
-    "@types/sql.js": "^1.4.4",
+    "@types/sql.js": "^1.4.9",
     "sql.js": "^1.8.0"
   },
   "peerDependencies": {
@@ -40,16 +44,6 @@
     "@sqb/connect": "^4.9.0",
     "@sqb/sqlite-dialect": "^4.9.0",
     "sql.js": "^1.8.0"
-  },
-  "type": "module",
-  "types": "esm/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "default": "./esm/index.js"
-    },
-    "./cjs": "./cjs/index.js",
-    "./esm": "./esm/index.js"
   },
   "engines": {
     "node": ">=16.0",

@@ -20,8 +20,11 @@
       ],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
-        "ecmaVersion": 2020,
-        "project": ["./packages/**/tsconfig-lint.json", "tsconfig-lint.json"],
+        "ecmaVersion": 2022,
+        "project": [
+          "tsconfig.json",
+          "./test/tsconfig.json"
+        ],
         "sourceType": "module"
       },
       "plugins": [
@@ -88,6 +91,8 @@
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/no-unsafe-declaration-merging": "off",
         "arrow-parens": [
           "off",
           "as-needed"

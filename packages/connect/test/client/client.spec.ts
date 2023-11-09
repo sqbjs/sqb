@@ -335,7 +335,7 @@ describe('Client', function () {
 
     it('should emit `connection-return` event when connection returns to the pool', function (done) {
         client.once('connection-return', () => done());
-        client.execute('select 1').catch();
+        void client.execute('select 1').catch(done);
     });
 
 });

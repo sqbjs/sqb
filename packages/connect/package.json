@@ -13,6 +13,10 @@
     "url": "https://github.com/sqbjs/sqb.git",
     "directory": "packages/connect"
   },
+  "type": "module",
+  "module": "./esm/index.js",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
@@ -30,33 +34,23 @@
   },
   "dependencies": {
     "debug": "^4.3.4",
-    "lightning-pool": "^4.2.1",
+    "lightning-pool": "^4.2.2",
     "lodash": "^4.17.21",
-    "power-tasks": "^1.6.4",
+    "power-tasks": "^1.7.2",
     "putil-isplainobject": "^1.1.5",
-    "putil-merge": "^3.10.3",
-    "putil-promisify": "^1.10.0",
+    "putil-merge": "^3.12.1",
+    "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
     "reflect-metadata": "^0.1.13",
-    "strict-typed-events": "^2.3.1",
-    "ts-gems": "^2.3.0"
+    "strict-typed-events": "^2.3.2",
+    "ts-gems": "^2.5.0"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.7",
-    "@types/lodash": "^4.14.194"
+    "@types/debug": "^4.1.12",
+    "@types/lodash": "^4.14.201"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0"
-  },
-  "type": "module",
-  "types": "esm/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "default": "./esm/index.js"
-    },
-    "./cjs": "./cjs/index.js",
-    "./esm": "./esm/index.js"
   },
   "engines": {
     "node": ">=16.0",

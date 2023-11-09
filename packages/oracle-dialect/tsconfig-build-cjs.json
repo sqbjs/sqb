@@ -1,15 +1,9 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
     "module": "CommonJS",
     "rootDir": "src",
     "outDir": "../../build/oracle-dialect/cjs",
-    "paths": {
-      "@sqb/builder": ["../../build/builder"]
-    },
-    "sourceMap": false,
-    "noEmit": false,
-    "declaration": false,
-  },
-  "include": ["src"]
+    "declaration": false
+  }
 }

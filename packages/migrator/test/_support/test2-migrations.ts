@@ -1,8 +1,7 @@
 import path from 'path';
-import {MigrationPackage} from '../../src/index.js';
+import { MigrationPackageAsync } from '../../src/index.js';
 
-export const Test2MigrationPackage: MigrationPackage = {
-  description: 'Test Migration',
-  informationTableName: 'info',
-  migrations: [path.join(__dirname, 'test2')]
+export const Test2MigrationPackage: MigrationPackageAsync = {
+  name: 'Test',
+  migrations: [path.join(__dirname, 'test2/**/*')]
 };

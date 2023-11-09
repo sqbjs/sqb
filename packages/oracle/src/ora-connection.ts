@@ -128,7 +128,6 @@ export class OraConnection implements Adapter.Connection {
 
         const oraOptions: oracledb.ExecuteOptions = {
             autoCommit: request.autoCommit,
-            extendedMetaData: true,
             resultSet: request.cursor,
             outFormat: request.objectRows ? oracledb.OUT_FORMAT_OBJECT : oracledb.OUT_FORMAT_ARRAY
         };

@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS ${schema};
+
 CREATE TABLE ${schema}.table1
 (
     id integer NOT NULL,

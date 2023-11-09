@@ -1,14 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
-    "module": "ESNext",
     "rootDir": "src",
     "outDir": "../../build/builder/esm",
-    "paths": {
-    },
-    "sourceMap": false,
-    "noEmit": false,
-    "declaration": true
-  },
-  "include": ["src"]
+    "declarationDir": "../../build/builder/types"
+  }
 }

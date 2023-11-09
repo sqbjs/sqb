@@ -1,15 +1,8 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
-    "module": "ESNext",
     "rootDir": "src",
     "outDir": "../../build/mssql-dialect/esm",
-    "paths": {
-      "@sqb/builder": ["../../build/builder"]
-    },
-    "sourceMap": false,
-    "noEmit": false,
-    "declaration": true
-  },
-  "include": ["src"]
+    "declarationDir": "../../build/mssql-dialect/types"
+  }
 }

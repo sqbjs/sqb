@@ -13,6 +13,10 @@
     "url": "https://github.com/sqbjs/sqb.git",
     "directory": "packages/migrator"
   },
+  "type": "module",
+  "module": "./esm/index.js",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
@@ -28,19 +32,13 @@
     "clean:dist": "rimraf ../../build/migrator",
     "clean:cover": "rimraf ../../coverage/migrator"
   },
+  "dependencies": {
+    "ts-gems": "^2.5.0"
+  },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0",
-    "@sqb/connect": "^4.9.0"
-  },
-  "type": "module",
-  "types": "esm/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "default": "./esm/index.js"
-    },
-    "./cjs": "./cjs/index.js",
-    "./esm": "./esm/index.js"
+    "@sqb/connect": "^4.9.0",
+    "@sqb/postgres": "^4.9.0"
   },
   "engines": {
     "node": ">=16.0",

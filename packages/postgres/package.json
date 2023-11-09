@@ -13,6 +13,10 @@
     "url": "https://github.com/sqbjs/sqb.git",
     "directory": "packages/postgres"
   },
+  "type": "module",
+  "module": "./esm/index.js",
+  "main": "./cjs/index.js",
+  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
@@ -29,26 +33,16 @@
     "clean:cover": "rimraf ../../coverage/postgres"
   },
   "dependencies": {
-    "putil-promisify": "^1.10.0"
+    "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
-    "postgresql-client": "^2.5.5"
+    "postgresql-client": "^2.10.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.9.0",
     "@sqb/connect": "^4.9.0",
     "@sqb/postgres-dialect": "^4.9.0",
     "postgresql-client": "^2.x.x"
-  },
-  "type": "module",
-  "types": "esm/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "default": "./esm/index.js"
-    },
-    "./cjs": "./cjs/index.js",
-    "./esm": "./esm/index.js"
   },
   "engines": {
     "node": ">=16.0",
