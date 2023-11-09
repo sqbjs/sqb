@@ -7,11 +7,26 @@ workflows:
   main:
     jobs:
       - test:
-          version: '16'
+          version: '16.20'
+          filters:
+            branches:
+              only:
+                - master
+                - dev
       - test:
-          version: '17'
+          version: '18.17'
+          filters:
+            branches:
+              only:
+                - master
+                - dev
       - test:
-          version: '18'
+          version: '20.5'
+          filters:
+            branches:
+              only:
+                - master
+                - dev
 
 jobs:
   test:
@@ -19,7 +34,7 @@ jobs:
       version:
         type: string
     docker:
-      - image: circleci/node:<< parameters.version >>
+      - image: cimg/node:<< parameters.version >>
       - image: cimg/postgres:14.0
         environment:
           POSTGRES_DB: test
@@ -38,6 +53,7 @@ jobs:
           key: v1-deps-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+      - run: sudo npm install -g npm@^9
       - run: npm install
       - run: npm run citest
       - run: npm install coveralls --no-save
