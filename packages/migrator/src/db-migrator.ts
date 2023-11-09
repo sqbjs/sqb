@@ -67,12 +67,19 @@ export class DbMigrator extends AsyncEventEmitter {
       }
 
       // Execute migration tasks
+      let migrationIndex = -1;
       for (const migration of migrations) {
+        migrationIndex++;
         if (migration.version > targetVersion || migrationAdapter.version >= migration.version)
           continue;
+        await this.emitAsync('migration-start', {
+          migration,
+          total: migrations.length,
+          index: migrationIndex
+        });
         for (let index = 0; index < migration.tasks.length; index++) {
           task = migration.tasks[index];
-          await this.emitAsync('task-start', {task, total, index});
+          await this.emitAsync('task-start', {migration, task, total, index});
           await migrationAdapter.update({status: MigrationStatus.busy});
           await migrationAdapter.writeEvent({
             event: MigrationAdapter.EventKind.started,
@@ -98,9 +105,14 @@ export class DbMigrator extends AsyncEventEmitter {
             // noinspection ExceptionCaughtLocallyJS
             throw e;
           }
-          await this.emitAsync('task-finish', {task, total, index});
+          await this.emitAsync('task-finish', {migration, task, total, index});
         }
         await migrationAdapter.update({version: migration.version});
+        await this.emitAsync('migration-finish', {
+          migration,
+          total: migrations.length,
+          index: migrationIndex
+        });
       }
     } catch (e) {
       if (needBackup) {

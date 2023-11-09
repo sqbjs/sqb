@@ -116,7 +116,11 @@ export namespace MigrationPackage {
           } else if (typeof t === 'string') {
             let pattern = t.replace(/\\/g, '/');
             pattern = path.resolve(migration.dirname || baseDir, pattern);
-            const files = await glob(pattern, {absolute: true, onlyFiles: true});
+            const files = await glob(pattern, {
+              absolute: true,
+              onlyFiles: true
+            });
+            files.sort();
             for (const filename of files) {
               const ext = path.extname(filename).toLowerCase();
               if (!path.basename(filename, ext).endsWith('.task'))
