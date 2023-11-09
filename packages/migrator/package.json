@@ -1,7 +1,7 @@
 {
   "name": "@sqb/migrator",
   "description": "Database migrator for SQB",
-  "version": "4.9.0",
+  "version": "4.10.0",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -36,9 +36,9 @@
     "ts-gems": "^2.5.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.9.0",
-    "@sqb/connect": "^4.9.0",
-    "@sqb/postgres": "^4.9.0"
+    "@sqb/builder": "^4.10.0",
+    "@sqb/connect": "^4.10.0",
+    "@sqb/postgres": "^4.10.0"
   },
   "engines": {
     "node": ">=16.0",
