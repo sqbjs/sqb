@@ -56,6 +56,7 @@ export class PgMigrationAdapter extends MigrationAdapter {
     try {
       const adapter = new PgMigrationAdapter();
       adapter._connection = connection;
+      adapter._packageName = options.migrationPackage.name;
       adapter._infoSchema = options.infoSchema || '__migration';
       adapter.defaultVariables.schema = options.connection.schema || '';
       if (!adapter.defaultVariables.schema) {
@@ -132,14 +133,16 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
     const params: any[] = [];
     if (info.status && info.status !== this.status) {
       params.push(info.status);
-      sql += ', status = $' + (params.length);
+      sql += ',\n  status = $' + (params.length);
     }
     if (info.version && info.version !== this.version) {
       params.push(info.version);
-      sql += ', current_version = $' + (params.length);
+      sql += ',\n  current_version = $' + (params.length);
     }
     if (sql) {
-      sql = `update ${this.summaryTableFull} set updated_at = current_timestamp` + sql;
+      params.push(this.packageName);
+      sql = `update ${this.summaryTableFull} set updated_at = current_timestamp` + sql +
+          `\n where package_name =$` + (params.length)
       await this._connection.query(sql, {params});
       if (info.status)
         this._status = info.status;

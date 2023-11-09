@@ -107,7 +107,7 @@ export class DbMigrator extends AsyncEventEmitter {
           }
           await this.emitAsync('task-finish', {migration, task, total, index});
         }
-        await migrationAdapter.update({version: migration.version});
+        await migrationAdapter.update({version: migration.version, status: MigrationStatus.idle});
         await this.emitAsync('migration-finish', {
           migration,
           total: migrations.length,
