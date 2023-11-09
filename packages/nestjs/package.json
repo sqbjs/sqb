@@ -59,6 +59,7 @@
     "bin/",
     "cjs/",
     "esm/",
+    "types/",
     "LICENSE",
     "README.md"
   ],
