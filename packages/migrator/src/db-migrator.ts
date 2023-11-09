@@ -72,7 +72,7 @@ export class DbMigrator extends AsyncEventEmitter {
           continue;
         for (let index = 0; index < migration.tasks.length; index++) {
           task = migration.tasks[index];
-          await this.emitAsync('task-start', {task: task.title, total, index});
+          await this.emitAsync('task-start', {task, total, index});
           await migrationAdapter.update({status: MigrationStatus.busy});
           await migrationAdapter.writeEvent({
             event: MigrationAdapter.EventKind.started,
@@ -98,7 +98,7 @@ export class DbMigrator extends AsyncEventEmitter {
             // noinspection ExceptionCaughtLocallyJS
             throw e;
           }
-          await this.emitAsync('task-finish', {task: task.title, total, index});
+          await this.emitAsync('task-finish', {task, total, index});
         }
         await migrationAdapter.update({version: migration.version});
       }
