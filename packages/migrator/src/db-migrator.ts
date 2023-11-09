@@ -96,11 +96,15 @@ export class DbMigrator extends AsyncEventEmitter {
               version: migration.version,
               message: `Task "${task.title}" completed`
             });
-          } catch (e) {
+          } catch (e: any) {
             await migrationAdapter.writeEvent({
               event: MigrationAdapter.EventKind.error,
               version: migration.version,
-              message: String(e)
+              message: String(e),
+              details: e.message + '\n\n' +
+                  Object.keys(e)
+                      .filter(k => e[k] != null)
+                      .map(k => k + ': ' + e[k]).join('\n')
             });
             // noinspection ExceptionCaughtLocallyJS
             throw e;
