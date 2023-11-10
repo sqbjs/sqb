@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
     if (isSqlScriptMigrationTask(task)) {
       try {
         const script = task.script
-            .replace(/(\${(\w+)})/g,
+            .replace(/(\$\((\w+)\))/g,
                 (s, ...args: string[]) => variables[args[1]] || s);
         await this._connection.execute(script);
       } catch (e: any) {
