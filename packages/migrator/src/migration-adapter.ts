@@ -1,5 +1,5 @@
-import type { MigrationTask } from './migration-package.js';
-import { MigrationStatus } from './types.js';
+import type { Migration, MigrationPackage, MigrationTask } from './migration-package.js';
+import type { MigrationStatus } from './types.js';
 
 export abstract class MigrationAdapter {
 
@@ -18,7 +18,7 @@ export abstract class MigrationAdapter {
 
   abstract writeEvent(event: MigrationAdapter.Event): Promise<void>;
 
-  abstract executeTask(task: MigrationTask, variables: Record<string, any>): Promise<void>;
+  abstract executeTask(migrationPackage: MigrationPackage, migration: Migration, task: MigrationTask, variables: Record<string, any>): Promise<void>;
 
   abstract lockSchema(): Promise<void>;
 
@@ -42,6 +42,8 @@ export namespace MigrationAdapter {
     event: EventKind;
     version: number;
     message: string;
+    title?: string;
+    filename?: string;
     details?: string;
   }
 

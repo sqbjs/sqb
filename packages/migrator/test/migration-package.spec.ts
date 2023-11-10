@@ -16,8 +16,10 @@ describe('MigrationPackage', () => {
     });
     expect(pkg).toEqual({
       name: 'test',
+      baseDir: __dirname,
       migrations: [{
         version: 1,
+        baseDir: '',
         tasks: []
       }]
     });
@@ -35,8 +37,10 @@ describe('MigrationPackage', () => {
     });
     expect(pkg).toEqual({
       name: 'test',
+      baseDir: __dirname,
       migrations: [{
         version: 1,
+        baseDir: '',
         tasks: []
       }]
     });
@@ -54,8 +58,10 @@ describe('MigrationPackage', () => {
     });
     expect(pkg).toEqual({
       name: 'test',
+      baseDir: __dirname,
       migrations: [{
         version: 1,
+        baseDir: '',
         tasks: []
       }]
     });

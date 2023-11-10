@@ -1,11 +1,13 @@
+import path from 'path';
 import { Connection, stringifyValueForSQL } from 'postgresql-client';
+import { StrictOmit } from 'ts-gems';
 import { PgAdapter } from '@sqb/postgres';
 import type { DbMigratorOptions } from '../db-migrator.js';
 import { MigrationAdapter } from '../migration-adapter.js';
 import {
   isCustomMigrationTask,
   isInsertDataMigrationTask,
-  isSqlScriptMigrationTask,
+  isSqlScriptMigrationTask, Migration, MigrationPackage,
   MigrationTask
 } from '../migration-package.js';
 import { MigrationStatus } from '../types.js';
@@ -15,7 +17,7 @@ const pgAdapter = new PgAdapter();
 export class PgMigrationAdapter extends MigrationAdapter {
   protected _connection: Connection;
   protected _infoSchema = 'public';
-  protected _packageName = '';
+  protected _migrationPackage: MigrationPackage;
   protected _version = 0;
   protected _status: MigrationStatus = MigrationStatus.idle;
   protected defaultVariables = {
@@ -27,7 +29,7 @@ export class PgMigrationAdapter extends MigrationAdapter {
   readonly eventTable = 'migration_events';
 
   get packageName(): string {
-    return this._packageName;
+    return this._migrationPackage.name;
   }
 
   get version(): number {
@@ -50,13 +52,17 @@ export class PgMigrationAdapter extends MigrationAdapter {
     return this.infoSchema + '.' + this.eventTable;
   }
 
-  static async create(options: DbMigratorOptions): Promise<PgMigrationAdapter> {
+  static async create(
+      options: StrictOmit<DbMigratorOptions, 'migrationPackage'> & {
+        migrationPackage: MigrationPackage
+      }
+  ): Promise<PgMigrationAdapter> {
     // Create connection
     const connection = (await pgAdapter.connect(options.connection) as any).intlcon as Connection;
     try {
       const adapter = new PgMigrationAdapter();
       adapter._connection = connection;
-      adapter._packageName = options.migrationPackage.name;
+      adapter._migrationPackage = options.migrationPackage;
       adapter._infoSchema = options.infoSchema || '__migration';
       adapter.defaultVariables.schema = options.connection.schema || '';
       if (!adapter.defaultVariables.schema) {
@@ -87,7 +93,9 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
     version integer not null default 0,
     event varchar(16) not null,
     event_time timestamp without time zone not null,
+    title text,
     message text not null,          
+    filename text,
     details text,
     CONSTRAINT pk_${adapter.eventTable} PRIMARY KEY (id)
 )`);
@@ -153,31 +161,41 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
 
   async writeEvent(event: MigrationAdapter.Event): Promise<void> {
     const sql = `insert into ${this.eventTableFull} ` +
-        '(package_name, version, event, event_time, message, details) ' +
-        'values ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5)';
+        '(package_name, version, event, event_time, title, message, filename, details) ' +
+        'values ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5, $6, $7)';
     await this._connection.query(sql, {
       params: [
         this.packageName, event.version, event.event,
-        event.message, event.details
+        event.title, event.message, event.filename, event.details
       ]
     });
   }
 
-  async executeTask(task: MigrationTask, variables: Record<string, any>): Promise<void> {
+  async executeTask(
+      migrationPackage: MigrationPackage,
+      migration: Migration,
+      task: MigrationTask, variables: Record<string, any>
+  ): Promise<void> {
     variables = {
       ...this.defaultVariables,
       ...variables
     };
     if (isSqlScriptMigrationTask(task)) {
       try {
-        const script = task.script
+        let script: string | undefined;
+        if (typeof task.script === 'function') {
+          script = await task.script({migrationPackage, migration, task, variables});
+        } else script = task.script;
+        if (typeof script !== 'string')
+          return;
+        script = script
             .replace(/(\$\((\w+)\))/g,
                 (s, ...args: string[]) => variables[args[1]] || s);
         await this._connection.execute(script);
       } catch (e: any) {
         let msg = `Error in task "${task.title}"`;
         if (task.filename)
-          msg += '\n at ' + task.filename;
+          msg += '\n at ' + path.relative(migrationPackage.baseDir, task.filename);
         if (e.lineNr) {
           if (!task.filename)
             e.message += '\n at';

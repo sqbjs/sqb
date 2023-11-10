@@ -2,12 +2,12 @@ import { AsyncEventEmitter } from 'strict-typed-events';
 import { ClientConfiguration } from '@sqb/connect';
 import { PgMigrationAdapter } from './adapters/pg-migration-adapter.js';
 import { MigrationAdapter } from './migration-adapter.js';
-import { MigrationPackage, MigrationPackageAsync, MigrationTask } from './migration-package.js';
+import { MigrationPackage, MigrationPackageConfig, MigrationTask } from './migration-package.js';
 import { MigrationStatus } from './types.js';
 
 export interface DbMigratorOptions {
   connection: ClientConfiguration;
-  migrationPackage: MigrationPackage | MigrationPackageAsync;
+  migrationPackage: MigrationPackage | MigrationPackageConfig;
   infoSchema?: string;
   scriptVariables?: Record<string, string>;
   targetVersion?: number;
@@ -39,7 +39,7 @@ export class DbMigrator extends AsyncEventEmitter {
     let migrationAdapter: MigrationAdapter;
     switch (options.connection.dialect) {
       case 'postgres': {
-        migrationAdapter = await PgMigrationAdapter.create(options)
+        migrationAdapter = await PgMigrationAdapter.create({...options, migrationPackage});
         break;
       }
       default:
@@ -84,22 +84,31 @@ export class DbMigrator extends AsyncEventEmitter {
           await migrationAdapter.writeEvent({
             event: MigrationAdapter.EventKind.started,
             version: migration.version,
+            title: task.title,
+            filename: task.filename,
             message: `Task "${task.title}" started`
           });
           try {
-            await migrationAdapter.executeTask(task, {
+            await migrationAdapter.executeTask(
+                migrationPackage,
+                migration,
+                task, {
               schema: options.connection.schema,
               ...options.scriptVariables,
             });
             await migrationAdapter.writeEvent({
               event: MigrationAdapter.EventKind.success,
               version: migration.version,
-              message: `Task "${task.title}" completed`
+              title: task.title,
+              filename: task.filename,
+              message: `Task "${task.title}" completed`,
             });
           } catch (e: any) {
             await migrationAdapter.writeEvent({
               event: MigrationAdapter.EventKind.error,
               version: migration.version,
+              title: task.title,
+              filename: task.filename,
               message: String(e),
               details: e.message + '\n\n' +
                   Object.keys(e)
