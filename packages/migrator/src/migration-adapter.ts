@@ -28,6 +28,11 @@ export abstract class MigrationAdapter {
 
   abstract restoreDatabase(): Promise<void>;
 
+  protected replaceVariables(text: string, variables: Record<string, string>): string {
+    return text.replace(/(\$\((\w+)\))/g,
+        (s, ...args: string[]) => variables[args[1]] || s);
+  }
+
 }
 
 export namespace MigrationAdapter {

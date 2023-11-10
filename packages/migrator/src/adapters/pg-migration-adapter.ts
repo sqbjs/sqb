@@ -188,9 +188,7 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
         } else script = task.script;
         if (typeof script !== 'string')
           return;
-        script = script
-            .replace(/(\$\((\w+)\))/g,
-                (s, ...args: string[]) => variables[args[1]] || s);
+        script = this.replaceVariables(script, variables);
         await this._connection.execute(script);
       } catch (e: any) {
         let msg = `Error in task "${task.title}"`;
@@ -215,8 +213,9 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
     }
 
     if (isInsertDataMigrationTask(task)) {
+      const tableName = this.replaceVariables(task.tableName, variables);
       const script = task.rows
-          .map(row => this.rowToSql(variables.schema + '.' + task.tableName, row))
+          .map(row => this.rowToSql(tableName, row))
           .join('\n');
       await this._connection.execute(script);
     }
