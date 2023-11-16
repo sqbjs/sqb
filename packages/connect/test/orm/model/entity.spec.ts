@@ -2,7 +2,6 @@
 import {
     BaseEntity,
     Column,
-    DataType,
     Entity,
     Link,
     PrimaryKey,
@@ -69,60 +68,6 @@ describe('Model / Entity', function () {
         const primaryIndex2 = Entity.getPrimaryIndex(MyEntity);
         expect(primaryIndex2).toBeDefined();
         expect(primaryIndex1!.columns).toStrictEqual(primaryIndex2!.columns);
-    });
-
-    it(`should entity instance serialize to JSON`, () => {
-        @Entity()
-        class MyEntity {
-            @Column(DataType.DATE)
-            date1: Date;
-
-            @Column()
-            date2: Date;
-
-            @Column()
-            buffer: Buffer;
-
-            @Column(DataType.INTEGER)
-            int: number;
-
-            @Column(DataType.SMALLINT)
-            smallint: number;
-
-            @Column()
-            bigint: bigint;
-
-            // noinspection JSMismatchedCollectionQueryUpdate
-            @Column(DataType.INTEGER)
-            arr1: number[];
-
-            declare toJSON: Function;
-        }
-
-        const inst = new MyEntity();
-        inst.date1 = new Date('2008-01-31T01:25:18');
-        inst.date2 = new Date('2008-01-31T01:25:18');
-        inst.buffer = Buffer.from('012345');
-        inst.int = 3.5;
-        inst.smallint = 2.5;
-        inst.bigint = BigInt(12345);
-        inst.arr1 = [1, 2.5, 3.5];
-        const o = inst.toJSON();
-
-        expect(o).toStrictEqual({
-            date1: '2008-01-31',
-            date2: '2008-01-31T01:25:18',
-            buffer: 'MDEyMzQ1',
-            int: 3,
-            smallint: 2,
-            bigint: '12345',
-            arr1: [1, 2, 3]
-        });
-
-        const s = JSON.stringify(inst);
-        expect(s).toStrictEqual('{"date1":"2008-01-31",' +
-            '"date2":"2008-01-31T01:25:18","buffer":"MDEyMzQ1",' +
-            '"int":3,"smallint":2,"bigint":"12345","arr1":[1,2,3]}');
     });
 
     it(`should Entity.getElementNames() return all element names`, function () {

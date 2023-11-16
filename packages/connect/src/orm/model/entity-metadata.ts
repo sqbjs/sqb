@@ -3,7 +3,6 @@ import {DataType} from '@sqb/builder';
 import {ENTITY_METADATA_KEY} from '../orm.const.js';
 import {Ctor, TypeThunk} from '../orm.type.js';
 import {isAssociationField, isColumnField, isEmbeddedField} from '../util/orm.helper.js';
-import {serializeColumn} from '../util/serialize-field.js';
 import {Association} from './association.js';
 import {AssociationFieldMetadata, AssociationFieldOptions} from './association-field-metadata.js';
 import {AssociationNode} from './association-node.js';
@@ -47,23 +46,6 @@ export namespace EntityMetadata {
             EntityMetadata.mixin(meta, baseMeta);
         }
 
-        ctor.prototype.toJSON = function (): Object {
-            const obj = {};
-            const fieldKeys = Object.keys(meta.fields);
-            const l = fieldKeys.length;
-            let key;
-            let v;
-            for (let i = 0; i < l; i++) {
-                key = fieldKeys[i];
-                const col = EntityMetadata.getField(meta, key);
-                if (col) {
-                    v = this[col.name];
-                    if (v !== undefined)
-                        obj[col.name] = serializeColumn(col, v);
-                }
-            }
-            return obj;
-        }
         return meta;
     }
 
