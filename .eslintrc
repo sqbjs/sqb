@@ -93,6 +93,7 @@
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/no-redundant-type-constituents": "off",
         "@typescript-eslint/no-unsafe-declaration-merging": "off",
+        "@typescript-eslint/no-unsafe-enum-comparison": "off",
         "arrow-parens": [
           "off",
           "as-needed"
