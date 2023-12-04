@@ -1,7 +1,7 @@
 {
   "name": "sqb.v4",
   "private": true,
-  "version": "4.0.7",
+  "version": "4.0.8",
   "license": "Apache-2.0",
   "type": "module",
   "repository": {
