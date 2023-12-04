@@ -36,10 +36,10 @@
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@nestjs/common": "^10.2.8",
-    "@nestjs/core": "^10.2.8",
-    "@nestjs/platform-express": "^10.2.8",
-    "@nestjs/testing": "^10.2.8",
+    "@nestjs/common": "^10.2.10",
+    "@nestjs/core": "^10.2.10",
+    "@nestjs/platform-express": "^10.2.10",
+    "@nestjs/testing": "^10.2.10",
     "postgresql-client": "^2.10.1",
     "rxjs": "^7.8.1",
     "supertest": "^6.3.3"

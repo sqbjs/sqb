@@ -33,7 +33,7 @@
     "clean:cover": "rimraf ../../coverage/migrator"
   },
   "dependencies": {
-    "ts-gems": "^2.5.0"
+    "ts-gems": "^2.7.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.10.5",

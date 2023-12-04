@@ -43,11 +43,11 @@
     "putil-varhelpers": "^1.6.5",
     "reflect-metadata": "^0.1.13",
     "strict-typed-events": "^2.3.2",
-    "ts-gems": "^2.5.0"
+    "ts-gems": "^2.7.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/lodash": "^4.14.201"
+    "@types/lodash": "^4.14.202"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.10.5"

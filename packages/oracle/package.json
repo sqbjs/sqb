@@ -39,7 +39,7 @@
     "oracledb": ">= 5.0.0"
   },
   "devDependencies": {
-    "@types/oracledb": "^6.0.3",
+    "@types/oracledb": "^6.0.4",
     "oracledb": "^6.2.0"
   },
   "engines": {
