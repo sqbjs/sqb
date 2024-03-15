@@ -87,6 +87,17 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual('select * from table1 where ID = :ID');
       expect(result.params).toStrictEqual({ID: 5})
     });
+
+    it('Should serialize array parameter in "in" operator', function () {
+      const query = Select().from('table1').where(Eq('ID', Param('ID')));
+      const result = query.generate({
+        dialect: 'oracle',
+        params: {ID: [1, 2, 3]}
+      });
+      expect(result.sql).toStrictEqual('select * from table1 where ID in (1,2,3)');
+      expect(result.params).toStrictEqual({})
+    });
+
   });
 
   describe('Oracle version < 12', function () {

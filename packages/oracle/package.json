@@ -36,7 +36,7 @@
     "@sqb/builder": "^4.10.6",
     "@sqb/connect": "^4.10.6",
     "@sqb/oracle-dialect": "^4.10.6",
-    "oracledb": ">= 5.0.0"
+    "oracledb": ">= 6.4.0"
   },
   "devDependencies": {
     "@types/oracledb": "^6.2.3",

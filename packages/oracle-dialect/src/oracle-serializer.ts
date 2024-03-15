@@ -76,16 +76,34 @@ export class OracleSerializer implements SerializerExtension {
   }
 
   private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
-    if ((o.right?.expression && o.right?.expression === 'null') ||
-        (o.right && o.right?.value == null && (!o.right.expression || o.right.expression.startsWith(':')))
+    if (o.right && o.right.expression?.startsWith(':') && Array.isArray(o.right?.value)) {
+      const s = o.right.expression.substring(1);
+      if (ctx.params)
+        delete ctx.params[s]
+      if (ctx.preparedParams)
+        delete ctx.preparedParams[s]
+      if (ctx.paramOptions)
+        delete ctx.paramOptions[s]
+      o.right.expression = ctx.anyToSQL(o.right.value);
+      o.right.isParam = false;
+      if (o.operatorType === 'eq')
+        return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'in'});
+      if (o.operatorType === 'ne')
+        return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'not in'});
+
+    } else if ((o.right?.expression && o.right?.expression === 'null') ||
+        (o.right && o.right?.value == null &&
+            (!o.right.expression || o.right.expression.startsWith(':'))
+        )
     ) {
       if (o.right.expression?.startsWith(':')) {
+        const s = o.right.expression.substring(1);
         if (ctx.params)
-          delete ctx.params[o.right.expression.substring(1)]
+          delete ctx.params[s]
         if (ctx.preparedParams)
-          delete ctx.preparedParams[o.right.expression.substring(1)]
+          delete ctx.preparedParams[s]
         if (ctx.paramOptions)
-          delete ctx.paramOptions[o.right.expression.substring(1)]
+          delete ctx.paramOptions[s]
         o.right.expression = 'null';
         o.right.isParam = false;
       }

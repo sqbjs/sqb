@@ -6,11 +6,13 @@
   },
   "overrides": [
     {
-      "files": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts"
+      "files": ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+      "plugins": [
+        "@typescript-eslint",
+        "simple-import-sort",
+        "import",
+        "unused-imports",
+        "security"
       ],
       "extends": [
         "plugin:@typescript-eslint/recommended",
@@ -27,14 +29,8 @@
         ],
         "sourceType": "module"
       },
-      "plugins": [
-        "@typescript-eslint",
-        "simple-import-sort",
-        "import",
-        "unused-imports",
-        "security"
-      ],
       "rules": {
+        "import/export": "off",
         "import/no-cycle": "error",
         "import/no-unresolved": ["off", {"commonjs": true, "amd": true}],
         "import/extensions": ["error", "ignorePackages"],
@@ -91,8 +87,11 @@
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/no-misused-promises": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
-        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/no-misused-new": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-unsafe-declaration-merging": "off",
+        "@typescript-eslint/no-redundant-type-constituents": "off",
+        "@typescript-eslint/await-thenable": "off",
         "@typescript-eslint/no-unsafe-enum-comparison": "off",
         "arrow-parens": [
           "off",
@@ -152,6 +151,7 @@
           {
             "line": {
               "markers": [
+                "/",
                 "#region",
                 "#endregion",
                 "region",
@@ -188,6 +188,11 @@
           "jsx": true,
           "modules": true,
           "experimentalObjectRestSpread": true
+        },
+        "babelOptions": {
+          "plugins": [
+            "@babel/plugin-syntax-import-assertions"
+          ]
         }
       },
       "rules": {
@@ -212,7 +217,8 @@
         "prefer-rest-params": 0,
         "require-jsdoc": 0,
         "quotes": 0,
-        "indent": 0
+        "indent": 0,
+        "new-cap": 0
       }
     }
   ]

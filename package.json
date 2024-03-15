@@ -22,7 +22,8 @@
     "citest": "jest --passWithNoTests --coverage --coverageReporters=lcov"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.23.10",
+    "@babel/eslint-parser": "^7.23.9",
+    "@babel/plugin-syntax-import-assertions": "^7.23.3",
     "@tsconfig/recommended": "^1.0.3",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.28",

@@ -1,7 +1,9 @@
 import { DataType, JoinType } from './enums.js';
 import { DeleteQuery } from './query/delete-query.js';
 import { InsertQuery } from './query/insert-query.js';
+import { Query } from './query/query.js';
 import { SelectQuery } from './query/select-query.js';
+import { UnionQuery } from './query/union-query.js';
 import { UpdateQuery } from './query/update-query.js';
 import { Serializable } from './serializable.js';
 import { CaseStatement } from './sql-objects/case-statement.js';
@@ -36,6 +38,14 @@ export function Update(tableName: string | RawStatement, input): UpdateQuery {
 
 export function Delete(tableName: string | RawStatement): DeleteQuery {
   return new DeleteQuery(tableName);
+}
+
+export function Union(...queries: Query[]): UnionQuery {
+  return new UnionQuery(queries);
+}
+
+export function UnionAll(...queries: Query[]): UnionQuery {
+  return new UnionQuery(queries, 'all');
 }
 
 export function Join(table: string | SelectQuery | RawStatement): JoinStatement {
