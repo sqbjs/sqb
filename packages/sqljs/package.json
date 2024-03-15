@@ -24,7 +24,7 @@
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/sqljs && cp ../../package.cjs.json ../../build/sqljs/cjs/package.json",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.9",
-    "sql.js": "^1.9.0"
+    "sql.js": "^1.10.2"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.10.6",

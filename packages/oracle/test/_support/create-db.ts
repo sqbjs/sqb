@@ -1,28 +1,28 @@
 import oracledb from 'oracledb';
-import {ClientConfiguration} from '@sqb/connect';
-import {getInsertSQLsForTestData} from '../../../connect/test/_shared/adapter-tests.js';
-import {clientConfigurationToDriver} from '../../src/helpers.js';
+import { ClientConfiguration } from '@sqb/connect';
+import { getInsertSQLsForTestData } from '../../../connect/test/_shared/adapter-tests.js';
+import { clientConfigurationToDriver } from '../../src/helpers.js';
 
 const schema = process.env.ORASCHEMA || 'test';
 let schemaCreated = false;
 export const sqls: string[] = [];
 
 export const dbConfig: ClientConfiguration = {
-    driver: 'oracledb',
-    host: process.env.ORAHOST,
-    port: parseInt(process.env.ORAPORT || '0', 10) || 1521,
-    database: process.env.ORADATABASE,
-    user: process.env.ORAUSER,
-    password: process.env.ORAPASSWORD,
-    schema: process.env.ORASCHEMA || 'test',
-    defaults: {
-        fieldNaming: 'lowercase'
-    }
+  driver: 'oracledb',
+  host: process.env.ORAHOST,
+  port: parseInt(process.env.ORAPORT || '0', 10) || 1521,
+  database: process.env.ORADATABASE,
+  user: process.env.ORAUSER,
+  password: process.env.ORAPASSWORD,
+  schema: process.env.ORASCHEMA || 'test',
+  defaults: {
+    fieldNaming: 'lowercase'
+  }
 };
 
 // drop sequences
 for (const s of ['customers_id_seq', 'tags_id_seq']) {
-    sqls.push(`
+  sqls.push(`
 BEGIN
 EXECUTE IMMEDIATE 'DROP SEQUENCE ${schema}.${s}';
 EXCEPTION
@@ -33,8 +33,8 @@ END;`);
 
 // drop tables
 for (const s of ['customer_tags', 'customer_details', 'customer_vip_details', 'customers',
-    'tags', 'countries', 'continents']) {
-    sqls.push(`
+  'tags', 'countries', 'continents']) {
+  sqls.push(`
 BEGIN
 EXECUTE IMMEDIATE 'DROP TABLE ${schema}.${s}';
 EXCEPTION
@@ -56,7 +56,7 @@ ALTER TABLE ${schema}.continents ADD CONSTRAINT pk_continents
 `);
 
 sqls.push(
-`CREATE TABLE ${schema}.countries (
+    `CREATE TABLE ${schema}.countries (
   code    VARCHAR2(5),
   name  VARCHAR2(16),
   phone_code VARCHAR2(8),
@@ -178,35 +178,35 @@ ALTER TABLE ${schema}.customer_tags ADD CONSTRAINT FK_cust_tags_tag_id
 );
 
 export async function createTestSchema() {
-    if (schemaCreated)
-        return;
-    const connection = await oracledb.getConnection(clientConfigurationToDriver(dbConfig));
-    try {
-        for (const s of sqls) {
-            try {
-                await connection.execute(s);
-            } catch (e: any) {
-                e.message += '\n' + s;
-                throw e;
-            }
-        }
-        const dataFiles = getInsertSQLsForTestData({dialect: 'oracle', schema});
-        for (const table of dataFiles) {
-            let sql = 'begin\n';
-            for (const s of table.scripts) {
-                sql += `     execute immediate '${s.replace(/'/g, "''")}';\n`;
-            }
-            sql += 'execute immediate \'commit\';\n end;'
-            try {
-                await connection.execute(sql);
-            } catch (e: any) {
-                e.message += '\n' + sql;
-                throw e;
-            }
-
-        }
-        schemaCreated = true;
-    } finally {
-        await connection.close();
+  if (schemaCreated)
+    return;
+  const connection = await oracledb.getConnection(clientConfigurationToDriver(dbConfig));
+  try {
+    for (const s of sqls) {
+      try {
+        await connection.execute(s);
+      } catch (e: any) {
+        e.message += '\n' + s;
+        throw e;
+      }
     }
+    const dataFiles = getInsertSQLsForTestData({dialect: 'oracle', schema});
+    for (const table of dataFiles) {
+      let sql = 'begin\n';
+      for (const s of table.scripts) {
+        sql += `     execute immediate '${s.replace(/'/g, "''")}';\n`;
+      }
+      sql += 'execute immediate \'commit\';\n end;'
+      try {
+        await connection.execute(sql);
+      } catch (e: any) {
+        e.message += '\n' + sql;
+        throw e;
+      }
+
+    }
+    schemaCreated = true;
+  } finally {
+    await connection.close();
+  }
 }

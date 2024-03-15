@@ -1,8 +1,4 @@
 import 'reflect-metadata';
-import {DeepBuildable,DeepPartial, DeepPickWritable, Maybe, Type} from 'ts-gems';
-
-export {Type, Maybe, DeepPartial, DeepPickWritable, DeepBuildable};
-export * from './types.js';
 
 export * from './client/types.js';
 export * from './client/adapter.js';
@@ -10,8 +6,8 @@ export * from './client/sqb-client.js';
 export * from './client/sqb-connection.js';
 export * from './client/cursor.js';
 export {
-    registerAdapter,
-    unRegisterAdapter
+  registerAdapter,
+  unRegisterAdapter
 } from './client/extensions.js';
 
 export * from './orm/orm.type.js';
@@ -40,10 +36,10 @@ export * from './orm/decorators/primarykey.decorator.js';
 export * from './orm/decorators/transform.decorator.js';
 
 export {
-    isColumnField,
-    isEmbeddedField,
-    isAssociationField,
-    isEntityClass
+  isColumnField,
+  isEmbeddedField,
+  isAssociationField,
+  isEntityClass
 } from './orm/util/orm.helper.js';
 
 export * from './orm/backward.js';

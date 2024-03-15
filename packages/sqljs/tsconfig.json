@@ -1,10 +1,14 @@
 {
   "extends": "../../tsconfig-base.json",
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@sqb/connect": ["../connect/src"]
+      "@sqb/connect": [
+        "../connect/src"
+      ]
     }
   }
 }

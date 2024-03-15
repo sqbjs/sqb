@@ -93,9 +93,9 @@ export class DbMigrator extends AsyncEventEmitter {
                 migrationPackage,
                 migration,
                 task, {
-              schema: options.connection.schema,
-              ...options.scriptVariables,
-            });
+                  schema: options.connection.schema,
+                  ...options.scriptVariables,
+                });
             await migrationAdapter.writeEvent({
               event: MigrationAdapter.EventKind.success,
               version: migration.version,

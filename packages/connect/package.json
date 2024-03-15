@@ -24,7 +24,7 @@
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect && cp ../../package.cjs.json ../../build/connect/cjs/package.json",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
@@ -36,18 +36,18 @@
     "debug": "^4.3.4",
     "lightning-pool": "^4.2.2",
     "lodash": "^4.17.21",
-    "power-tasks": "^1.7.2",
+    "power-tasks": "^1.7.3",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.12.1",
     "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
-    "reflect-metadata": "^0.1.13",
-    "strict-typed-events": "^2.3.2",
-    "ts-gems": "^2.7.1"
+    "reflect-metadata": "^0.1.14",
+    "strict-typed-events": "^2.3.3",
+    "ts-gems": "^3.2.1"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/lodash": "^4.14.202"
+    "@types/lodash": "^4.17.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.10.6"

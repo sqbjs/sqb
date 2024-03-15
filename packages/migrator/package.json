@@ -24,7 +24,7 @@
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/migrator && cp ../../package.cjs.json ../../build/migrator/cjs/package.json",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
@@ -33,7 +33,7 @@
     "clean:cover": "rimraf ../../coverage/migrator"
   },
   "dependencies": {
-    "ts-gems": "^2.7.1"
+    "ts-gems": "^3.2.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.10.6",

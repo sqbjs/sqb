@@ -1,5 +1,8 @@
 {
-  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
+  "extends": [
+    "./tsconfig.json",
+    "../../tsconfig-build.json"
+  ],
   "compilerOptions": {
     "module": "CommonJS",
     "rootDir": "src",

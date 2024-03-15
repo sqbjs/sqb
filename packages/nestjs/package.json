@@ -24,7 +24,7 @@
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs && cp ../../package.cjs.json ../../build/nestjs/cjs/package.json",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
@@ -33,16 +33,16 @@
     "clean:cover": "rimraf ../../coverage/postgres"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.14"
   },
   "devDependencies": {
-    "@nestjs/common": "^10.2.10",
-    "@nestjs/core": "^10.2.10",
-    "@nestjs/platform-express": "^10.2.10",
-    "@nestjs/testing": "^10.2.10",
-    "postgresql-client": "^2.10.1",
+    "@nestjs/common": "^10.3.3",
+    "@nestjs/core": "^10.3.3",
+    "@nestjs/platform-express": "^10.3.3",
+    "@nestjs/testing": "^10.3.3",
+    "postgresql-client": "^2.10.6",
     "rxjs": "^7.8.1",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.4"
   },
   "peerDependencies": {
     "@nestjs/common": ">=7.4.0",

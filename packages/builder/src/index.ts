@@ -1,4 +1,4 @@
-export {registerSerializer, unRegisterSerializer} from './extensions.js';
+export { registerSerializer, unRegisterSerializer } from './extensions.js';
 export * from './helpers.js';
 export * from './serializable.js';
 export * from './serialize-context.js';
@@ -16,5 +16,5 @@ export * from './enums.js';
 export * from './sqlobject.initializers.js';
 export * from './op.initializers.js';
 export * from './typeguards.js';
-export {op} from './op.initializers.js';
+export { op } from './op.initializers.js';
 export * as classes from './classes.ns.js';
