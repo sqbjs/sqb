@@ -50,7 +50,7 @@ export abstract class CompOperator extends Operator {
     if (ctx.strictParams && !(x instanceof Serializable) &&
         (typeof x !== 'string' || isRight)) {
       ctx.strictParamGenId = ctx.strictParamGenId || 0;
-      const name = 'strictParam$' + ++ctx.strictParamGenId;
+      const name = 'P$_' + ++ctx.strictParamGenId;
       ctx.params = ctx.params || {};
       ctx.params[name] = x;
       x = Param(name);

@@ -136,8 +136,8 @@ describe('serialize "SelectQuery"', function () {
         .from('table1')
         .where({id: 1})
     const result = query.generate({...options, strictParams: true});
-    expect(result.sql).toStrictEqual('select * from table1 where id = __strictParam$1');
-    expect(result.params.strictParam$1).toStrictEqual(1);
+    expect(result.sql).toStrictEqual('select * from table1 where id = __P$_1');
+    expect(result.params.P$_1).toStrictEqual(1);
   });
 
   it('should serialize distinct query', function () {

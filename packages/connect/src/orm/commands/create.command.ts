@@ -98,7 +98,7 @@ export class CreateCommand {
         }
         ColumnFieldMetadata.checkEnumValue(col, v);
         const fieldName = prefix + col.fieldName + suffix;
-        const k = '$input_' + fieldName;
+        const k = ('I$_' + fieldName).substring(0, 30);
         ctx.queryValues[fieldName] = Param({
           name: k,
           dataType: col.dataType,
