@@ -13,6 +13,7 @@ import { RawStatement } from '../sql-objects/raw-statement.js';
 import { TableName } from '../sql-objects/table-name.js';
 import { isJoinStatement, isSerializable } from '../typeguards.js';
 import { Query } from './query.js';
+import type { UnionQuery } from './union-query';
 
 export class SelectQuery extends Query {
 
@@ -56,7 +57,7 @@ export class SelectQuery extends Query {
   /**
    * Defines "from" part of  query.
    */
-  from(...table: (string | RawStatement | SelectQuery)[]): this {
+  from(...table: (string | RawStatement | SelectQuery | UnionQuery)[]): this {
     this._tables = [];
     for (const arg of table) {
       if (!arg) continue;
