@@ -24,12 +24,12 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.24.1",
     "@babel/plugin-syntax-import-assertions": "^7.24.1",
-    "@tsconfig/recommended": "^1.0.3",
+    "@tsconfig/recommended": "^1.0.5",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.30",
     "@types/wtfnode": "^0.7.3",
-    "@typescript-eslint/eslint-plugin": "^7.3.1",
-    "@typescript-eslint/parser": "^7.3.1",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.29.1",
@@ -42,7 +42,7 @@
     "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "wtfnode": "^0.9.1"
   },
   "engines": {

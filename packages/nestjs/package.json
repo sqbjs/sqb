@@ -33,13 +33,13 @@
     "clean:cover": "rimraf ../../coverage/postgres"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.14"
+    "reflect-metadata": "^0.2.1"
   },
   "devDependencies": {
-    "@nestjs/common": "^10.3.4",
-    "@nestjs/core": "^10.3.4",
-    "@nestjs/platform-express": "^10.3.4",
-    "@nestjs/testing": "^10.3.4",
+    "@nestjs/common": "^10.3.6",
+    "@nestjs/core": "^10.3.6",
+    "@nestjs/platform-express": "^10.3.6",
+    "@nestjs/testing": "^10.3.6",
     "postgresql-client": "^2.10.6",
     "rxjs": "^7.8.1",
     "supertest": "^6.3.4"
