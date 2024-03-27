@@ -1,7 +1,7 @@
 {
   "name": "@sqb/sqlite-dialect",
   "description": "SQB serialization extension for SQLite database",
-  "version": "4.11.1",
+  "version": "4.11.2",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -33,7 +33,7 @@
     "clean:cover": "rimraf ../../coverage/sqlite-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.11.1"
+    "@sqb/builder": "^4.11.2"
   },
   "engines": {
     "node": ">=16.0",
