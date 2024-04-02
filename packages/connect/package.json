@@ -1,7 +1,7 @@
 {
   "name": "@sqb/connect",
   "description": "Multi-dialect database connection framework written with TypeScript",
-  "version": "4.11.2",
+  "version": "4.11.3",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -49,7 +49,7 @@
     "@types/lodash": "^4.17.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.11.2",
+    "@sqb/builder": "^4.11.3",
     "reflect-metadata": "^0.1.14 || ^0.2.2"
   },
   "engines": {
