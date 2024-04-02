@@ -116,7 +116,7 @@ export class SelectQuery extends Query {
   /**
    * Sets alias for sub-select queries
    */
-  as(alias): this {
+  as(alias: string): this {
     this._alias = alias;
     return this;
   }

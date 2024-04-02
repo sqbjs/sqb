@@ -250,7 +250,7 @@ export class FindCommand {
     const fieldName = (prefix || '').toLowerCase() +
         el.fieldName.toUpperCase() +
         (suffix || '').toLowerCase();
-    const fieldAlias = tableAlias + '_' + fieldName;
+    const fieldAlias = (tableAlias + '_' + fieldName).substring(0, 30);
     this._selectColumns[fieldAlias] = {
       field: el,
       statement: tableAlias + '.' + fieldName + ' as ' + fieldAlias
