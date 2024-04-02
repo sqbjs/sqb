@@ -41,7 +41,6 @@
     "putil-merge": "^3.12.1",
     "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
-    "reflect-metadata": "^0.2.1",
     "strict-typed-events": "^2.3.3",
     "ts-gems": "^3.2.1"
   },
@@ -50,7 +49,8 @@
     "@types/lodash": "^4.17.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.11.2"
+    "@sqb/builder": "^4.11.2",
+    "reflect-metadata": "^0.1.14 || ^0.2.2"
   },
   "engines": {
     "node": ">=16.0",
