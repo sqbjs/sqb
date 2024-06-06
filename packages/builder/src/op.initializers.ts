@@ -57,15 +57,15 @@ function Lte(expression: string | Serializable, value: any) {
   return new OpLte(expression, value);
 }
 
-function Between(expression: string | Serializable, values: any[])
-function Between(expression: string | Serializable, value1: any, value2: any)
+function Between(expression: string | Serializable, values: any[]);
+function Between(expression: string | Serializable, value1: any, value2: any);
 function Between(expression: string | Serializable, value1: any, value2?: any) {
   const values = Array.isArray(value1) ? value1 : [value1, value2];
   return new OpBetween(expression, values);
 }
 
-function NotBetween(expression: string | Serializable, values: any[])
-function NotBetween(expression: string | Serializable, value1: any, value2: any)
+function NotBetween(expression: string | Serializable, values: any[]);
+function NotBetween(expression: string | Serializable, value1: any, value2: any);
 function NotBetween(expression: string | Serializable, value1: any, value2?: any) {
   const values = Array.isArray(value1) ? value1 : [value1, value2];
   return new OpNotBetween(expression, values);
@@ -87,11 +87,9 @@ function NotLike(expression: string | Serializable, value: any) {
   return new OpNotLike(expression, value);
 }
 
-
 function Ilike(expression: string | Serializable, value: any) {
   return new OpILike(expression, value);
 }
-
 
 function NotILike(expression: string | Serializable, value: any) {
   return new OpNotILike(expression, value);
@@ -156,8 +154,8 @@ const op = {
   '!is': IsNot,
   exists: Exists,
   notExists: NotExists,
-  '!exists': NotExists
-}
+  '!exists': NotExists,
+};
 
 Object.assign(WrapOps, op);
 
@@ -193,5 +191,5 @@ export {
   IsNot,
   Exists,
   NotExists,
-  Not
-}
+  Not,
+};

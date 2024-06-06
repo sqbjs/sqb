@@ -7,6 +7,6 @@ export async function initClient(config?: ClientConfiguration): Promise<SqbClien
   return new SqbClient({
     dialect: 'postgres',
     schema: 'test_sqb_connect',
-    ...config
-  })
+    ...config,
+  });
 }

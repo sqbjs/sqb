@@ -4,7 +4,6 @@ import { SerializeContext } from '../../serialize-context.js';
 import { Operator } from '../operator.js';
 
 export class OpNot extends Operator {
-
   _operatorType = OperatorType.not;
   _expression: Serializable;
 
@@ -23,6 +22,4 @@ export class OpNot extends Operator {
       return expression ? 'not ' + expression : '';
     });
   }
-
-
 }

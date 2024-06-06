@@ -17,7 +17,7 @@ function readStream(stream: Readable): Promise<string> {
         reject(err);
       }
     });
-  })
+  });
 }
 
 function readObjectStream(stream: Readable): Promise<any> {
@@ -33,17 +33,16 @@ function readObjectStream(stream: Readable): Promise<any> {
         reject(err);
       }
     });
-  })
+  });
 }
 
 describe('CursorStream', function () {
-
   let client: SqbClient;
   let cursor: Cursor;
 
   beforeAll(async () => {
-    client = await initClient({defaults: {cursor: true, objectRows: true}});
-  })
+    client = await initClient({ defaults: { cursor: true, objectRows: true } });
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -66,7 +65,7 @@ describe('CursorStream', function () {
     await client.acquire(async (session: SqbConnection) => {
       const result = await session.execute(Select().from('customers'));
       cursor = result && result.cursor;
-      const stream = cursor.toStream({objectMode: true});
+      const stream = cursor.toStream({ objectMode: true });
       const arr = await readObjectStream(stream);
       expect(Array.isArray(arr)).toStrictEqual(true);
       expect(stream.isClosed).toStrictEqual(true);
@@ -74,27 +73,30 @@ describe('CursorStream', function () {
   });
 
   it('should cursor.close() also close the stream', function (done) {
-    client.acquire(async (session: SqbConnection) => {
-      const result = await session.execute(Select().from('customers'));
-      cursor = result && result.cursor;
-      const stream = cursor.toStream();
-      stream.on('close', () => done());
-      await cursor.close();
-    }).catch(done);
+    client
+      .acquire(async (session: SqbConnection) => {
+        const result = await session.execute(Select().from('customers'));
+        cursor = result && result.cursor;
+        const stream = cursor.toStream();
+        stream.on('close', () => done());
+        await cursor.close();
+      })
+      .catch(done);
   });
 
   it('should handle cursor errors', function (done) {
-    client.acquire(async (session: SqbConnection) => {
-      const result = await session.execute(Select().from('customers'));
-      cursor = result && result.cursor;
-      (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
-      const stream = cursor.toStream();
-      stream.once('error', () => {
-        delete result.cursor._intlcur.close;
-        stream.close().then(done).catch(done);
-      });
-      stream.close().catch(() => 0);
-    }).catch(done);
+    client
+      .acquire(async (session: SqbConnection) => {
+        const result = await session.execute(Select().from('customers'));
+        cursor = result && result.cursor;
+        (cursor as any)._intlcur.close = () => Promise.reject(new Error('Any error'));
+        const stream = cursor.toStream();
+        stream.once('error', () => {
+          delete result.cursor._intlcur.close;
+          stream.close().then(done).catch(done);
+        });
+        stream.close().catch(() => 0);
+      })
+      .catch(done);
   });
-
 });

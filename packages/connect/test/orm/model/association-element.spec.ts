@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,@typescript-eslint/no-unused-vars */
 // noinspection JSUnusedLocalSymbols
 
-import {
-  Column,
-  Entity,
-  EntityMetadata,
-  Link,
-  PrimaryKey
-} from '@sqb/connect';
+import { Column, Entity, EntityMetadata, Link, PrimaryKey } from '@sqb/connect';
 import { isAssociationField } from '../../../src/orm/util/orm.helper.js';
 
 class Country {
@@ -29,9 +23,7 @@ class BaseCustomer {
 }
 
 describe('Model / Link field', function () {
-
   it(`should @Link() decorator define association element`, function () {
-
     class Customer extends BaseCustomer {
       @Link().toOne(Country)
       country: Country;
@@ -62,7 +54,7 @@ describe('Model / Link field', function () {
         @Link()
         countries: Country[];
       }
-    }).toThrow('type information while')
+    }).toThrow('type information while');
   });
 
   it(`should throw if reflection type is not an entity`, async function () {
@@ -71,7 +63,7 @@ describe('Model / Link field', function () {
         @Link()
         countries: String;
       }
-    }).toThrow('No entity metadata found')
+    }).toThrow('No entity metadata found');
   });
 
   it(`should throw if association returns many and property type is not an array`, async function () {
@@ -80,7 +72,7 @@ describe('Model / Link field', function () {
         @Link().toMany(Country)
         countries: Country;
       }
-    }).toThrow('Link returns single instance')
+    }).toThrow('Link returns single instance');
   });
 
   it(`should throw if association returns single and property type is an array`, async function () {
@@ -89,6 +81,6 @@ describe('Model / Link field', function () {
         @Link().toOne(Country)
         countries: Country[];
       }
-    }).toThrow('Link returns array of instances')
+    }).toThrow('Link returns array of instances');
   });
 });

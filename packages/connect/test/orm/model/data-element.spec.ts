@@ -2,18 +2,23 @@
 // noinspection JSUnusedLocalSymbols
 
 import {
-  AfterDestroy, AfterInsert, AfterUpdate, BeforeDestroy, BeforeInsert, BeforeUpdate,
+  AfterDestroy,
+  AfterInsert,
+  AfterUpdate,
+  BeforeDestroy,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   DataType,
-  Entity, EntityMetadata,
+  Entity,
+  EntityMetadata,
 } from '@sqb/connect';
 
 describe('Model / Data Column', function () {
-
   it(`should @Column() decorator init column metadata`, () => {
     class MyEntity {
       @Column()
-      id: string
+      id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -27,7 +32,7 @@ describe('Model / Data Column', function () {
   it(`should @Column(DataType) decorator set dataType`, () => {
     class MyEntity {
       @Column(DataType.GUID)
-      id: string
+      id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -54,9 +59,9 @@ describe('Model / Data Column', function () {
         hidden: true,
         noInsert: true,
         noUpdate: true,
-        enum: [1, 2, 3]
+        enum: [1, 2, 3],
       })
-      id: number
+      id: number;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -73,7 +78,7 @@ describe('Model / Data Column', function () {
     expect(idColumn!.enum).toStrictEqual([1, 2, 3]);
     expect(idColumn!.length).toStrictEqual(5);
     expect(idColumn!.precision).toStrictEqual(8);
-    expect(idColumn!.scale,).toStrictEqual(2);
+    expect(idColumn!.scale).toStrictEqual(2);
     expect(idColumn!.noInsert).toStrictEqual(true);
     expect(idColumn!.noUpdate).toStrictEqual(true);
     expect(idColumn!.notNull).toStrictEqual(false);
@@ -143,10 +148,9 @@ describe('Model / Data Column', function () {
     expect(() => {
       class MyEntity {
         @AfterInsert()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow('Property must be a function');
-
   });
 
   it(`should @AfterDestroy() decorator add after-destroy hook`, () => {
@@ -170,7 +174,7 @@ describe('Model / Data Column', function () {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class MyEntity {
         @AfterDestroy()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -195,10 +199,9 @@ describe('Model / Data Column', function () {
     expect(() => {
       class MyEntity {
         @AfterUpdate()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow('Property must be a function');
-
   });
 
   it(`should @BeforeInsert() decorator add before-insert hook`, () => {
@@ -221,7 +224,7 @@ describe('Model / Data Column', function () {
     expect(() => {
       class MyEntity {
         @BeforeInsert()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -246,7 +249,7 @@ describe('Model / Data Column', function () {
     expect(() => {
       class MyEntity {
         @BeforeDestroy()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow(/Property must be a function/);
   });
@@ -271,10 +274,8 @@ describe('Model / Data Column', function () {
     expect(() => {
       class MyEntity {
         @BeforeUpdate()
-        notAFunction: 12
+        notAFunction: 12;
       }
     }).toThrow('Property must be a function');
-
   });
-
 });

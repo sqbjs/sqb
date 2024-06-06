@@ -7,7 +7,6 @@ import { isRawStatement, isSelectQuery, isSerializable } from '../typeguards.js'
 import { ReturningQuery } from './returning-query.js';
 
 export class InsertQuery extends ReturningQuery {
-
   _table: TableName | RawStatement;
   _input: any;
 
@@ -15,8 +14,7 @@ export class InsertQuery extends ReturningQuery {
     super();
     if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
       throw new TypeError('String or Raw instance required as first argument (tableName) for InsertQuery');
-    if (!input || !((typeof input === 'object' && !Array.isArray(input)) ||
-        input.isSelect))
+    if (!input || !((typeof input === 'object' && !Array.isArray(input)) || input.isSelect))
       throw new TypeError('Object or SelectQuery instance required as second argument (input) for InsertQuery');
     this._table = typeof tableName === 'string' ? new TableName(tableName) : tableName;
     this._input = input;
@@ -34,13 +32,11 @@ export class InsertQuery extends ReturningQuery {
       table: this._table._serialize(ctx),
       columns: this.__serializeColumns(ctx),
       values: this.__serializeValues(ctx),
-      returning: this.__serializeReturning(ctx)
+      returning: this.__serializeReturning(ctx),
     };
 
-    let out = 'insert into ' + o.table + '\n\t(' +
-        o.columns + ')\n\bvalues\n\t(' + o.values + ')\b';
-    if (o.returning)
-      out += '\n' + o.returning;
+    let out = 'insert into ' + o.table + '\n\t(' + o.columns + ')\n\bvalues\n\t(' + o.values + ')\b';
+    if (o.returning) out += '\n' + o.returning;
     return out;
   }
 
@@ -54,24 +50,19 @@ export class InsertQuery extends ReturningQuery {
       const cols = this._input._columns;
       if (cols) {
         for (const col of cols) {
-          if ((col as any)._alias)
-            arr.push((col as any)._alias);
-          else if ((col as any)._field)
-            arr.push((col as any)._field);
+          if ((col as any)._alias) arr.push((col as any)._alias);
+          else if ((col as any)._field) arr.push((col as any)._field);
         }
       }
-    } else
-      arr = Object.keys(this._input);
-    return ctx.serialize(SerializationType.INSERT_QUERY_COLUMNS, arr,
-        () => printArray(arr));
+    } else arr = Object.keys(this._input);
+    return ctx.serialize(SerializationType.INSERT_QUERY_COLUMNS, arr, () => printArray(arr));
   }
 
   /**
    *
    */
   protected __serializeValues(ctx: SerializeContext): string {
-    if (isSerializable(this._input))
-      return this._input._serialize(ctx);
+    if (isSerializable(this._input)) return this._input._serialize(ctx);
 
     const arr: string[] = [];
     const allValues = this._input;
@@ -79,8 +70,6 @@ export class InsertQuery extends ReturningQuery {
       const s = ctx.anyToSQL(allValues[n]) || 'null';
       arr.push(s);
     }
-    return ctx.serialize(SerializationType.INSERT_QUERY_VALUES, arr,
-        () => printArray(arr));
+    return ctx.serialize(SerializationType.INSERT_QUERY_VALUES, arr, () => printArray(arr));
   }
-
 }

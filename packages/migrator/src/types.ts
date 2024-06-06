@@ -6,5 +6,5 @@ export interface MigrationInfo {
 
 export enum MigrationStatus {
   idle = 'idle',
-  busy = 'busy'
+  busy = 'busy',
 }

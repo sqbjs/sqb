@@ -6,5 +6,4 @@ import { PhotoService } from './photo.service.js';
   providers: [PhotoService],
   controllers: [PhotoController],
 })
-export class PhotoModule {
-}
+export class PhotoModule {}

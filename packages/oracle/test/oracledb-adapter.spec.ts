@@ -3,7 +3,6 @@ import { OraAdapter } from '../src/ora-adapter.js';
 import { createTestSchema, dbConfig } from './_support/create-db.js';
 
 describe.skip('OraAdapter', function () {
-
   const adapter = new OraAdapter();
 
   if (process.env.SKIP_CREATE_DB !== 'true') {
@@ -15,9 +14,7 @@ describe.skip('OraAdapter', function () {
         //
       }
       await createTestSchema();
-    }, 30000)
+    }, 30000);
   }
   initAdapterTests(adapter, dbConfig);
-
 });
-

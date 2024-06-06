@@ -9,7 +9,6 @@ import { ParamExpression } from '../param-expression.js';
 const EXPRESSION_PATTERN = /^([\w\\.$]+)(\[])?/;
 
 export abstract class CompOperator extends Operator {
-
   _left: Serializable | string;
   _right?: any | Serializable;
   _symbol?: string;
@@ -19,12 +18,10 @@ export abstract class CompOperator extends Operator {
     super();
     if (typeof left === 'string') {
       const m = left.match(EXPRESSION_PATTERN);
-      if (!m)
-        throw new TypeError(`"${left}" is not a valid expression definition`);
+      if (!m) throw new TypeError(`"${left}" is not a valid expression definition`);
       this._left = m[1];
       this._isArray = !!m[2];
-    } else
-      this._left = left;
+    } else this._left = left;
     this._right = right;
   }
 
@@ -34,21 +31,19 @@ export abstract class CompOperator extends Operator {
 
   _serialize(ctx: SerializeContext): string {
     const left = this.__serializeItem(ctx, this._left);
-    if (this._isArray)
-      left.isArray = true;
+    if (this._isArray) left.isArray = true;
     const right = this.__serializeItem(ctx, this._right, true);
     const o: any = {
       operatorType: this._operatorType,
       symbol: this._symbol,
       left,
-      right
+      right,
     };
     return this.__serialize(ctx, o);
   }
 
   protected __serializeItem(ctx: SerializeContext, x: any, isRight?: boolean): any {
-    if (ctx.strictParams && !(x instanceof Serializable) &&
-        (typeof x !== 'string' || isRight)) {
+    if (ctx.strictParams && !(x instanceof Serializable) && (typeof x !== 'string' || isRight)) {
       ctx.strictParamGenId = ctx.strictParamGenId || 0;
       const name = 'P$_' + ++ctx.strictParamGenId;
       ctx.params = ctx.params || {};
@@ -59,16 +54,15 @@ export abstract class CompOperator extends Operator {
     if (x instanceof Serializable) {
       const expression = ctx.anyToSQL(x);
       const result: any = {
-        expression
-      }
+        expression,
+      };
       if (x instanceof FieldExpression) {
         result.dataType = result._dataType;
         result.isArray = x._isArray;
       }
       if (x instanceof ParamExpression) {
         let value = ctx.params ? ctx.params[x._name] : undefined;
-        if (x._isArray && value != null)
-          value = [value];
+        if (x._isArray && value != null) value = [value];
         result.value = value;
         result.isArray = x._isArray || Array.isArray(value);
         result.isParam = true;
@@ -76,22 +70,18 @@ export abstract class CompOperator extends Operator {
       return result;
     } else {
       const result: any = {
-        expression: (isRight || typeof x !== 'string') ?
-            ctx.anyToSQL(x) : x
-      }
-      if (isRight || typeof x !== 'string')
-        result.isArray = Array.isArray(x);
+        expression: isRight || typeof x !== 'string' ? ctx.anyToSQL(x) : x,
+      };
+      if (isRight || typeof x !== 'string') result.isArray = Array.isArray(x);
       return result;
     }
   }
 
   protected __serialize(ctx: SerializeContext, o: any): string {
-    return ctx.serialize(this._type, o,
-        (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
+    return ctx.serialize(this._type, o, (_ctx: SerializeContext, _o) => this.__defaultSerialize(_ctx, _o));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
     return o.left.expression + ' ' + o.symbol + ' ' + o.right.expression;
   }
-
 }

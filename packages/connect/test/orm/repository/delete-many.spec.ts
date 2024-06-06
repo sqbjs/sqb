@@ -3,12 +3,11 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
 describe('Repository.deleteMany()', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -19,17 +18,16 @@ describe('Repository.deleteMany()', function () {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
       countryCode: 'US',
-      city: 'city_' + Math.trunc(Math.random() * 10000)
-    }
+      city: 'city_' + Math.trunc(Math.random() * 10000),
+    };
     const repo = client.getRepository<Customer>(Customer);
     await repo.createOnly(values);
     await repo.createOnly(values);
     await repo.createOnly(values);
-    let rows = await repo.findMany({filter: {city: values.city}});
+    let rows = await repo.findMany({ filter: { city: values.city } });
     expect(rows.length).toStrictEqual(3);
-    await repo.deleteMany({filter: {city: values.city}});
-    rows = await repo.findMany({filter: {city: values.city}});
+    await repo.deleteMany({ filter: { city: values.city } });
+    rows = await repo.findMany({ filter: { city: values.city } });
     expect(rows.length).toStrictEqual(0);
   });
-
 });

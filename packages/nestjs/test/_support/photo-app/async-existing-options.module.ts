@@ -1,9 +1,5 @@
 import { Module } from '@nestjs/common';
-import {
-  SqbModule,
-  SqbModuleOptions,
-  SqbOptionsFactory,
-} from '@sqb/nestjs';
+import { SqbModule, SqbModuleOptions, SqbOptionsFactory } from '@sqb/nestjs';
 import { dbConfig } from './config.js';
 import { PhotoModule } from './photo/photo.module.js';
 
@@ -17,8 +13,7 @@ class ConfigService implements SqbOptionsFactory {
   providers: [ConfigService],
   exports: [ConfigService],
 })
-class ConfigModule {
-}
+class ConfigModule {}
 
 @Module({
   imports: [
@@ -28,7 +23,6 @@ class ConfigModule {
       useExisting: ConfigService,
     }),
     PhotoModule,
-  ]
+  ],
 })
-export class AsyncOptionsExistingModule {
-}
+export class AsyncOptionsExistingModule {}

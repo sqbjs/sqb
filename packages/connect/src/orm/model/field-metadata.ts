@@ -16,5 +16,4 @@ export interface FieldMetadata {
    * If this set to "true" the field must be requested using "include" or "pick" option.
    */
   exclusive?: boolean;
-
 }

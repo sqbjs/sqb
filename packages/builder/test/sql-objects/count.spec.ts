@@ -1,10 +1,9 @@
 import { Count, Select, SerializationType } from '../../src/index.js';
 
 describe('serialize "Count"', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should initialize Count', function () {
@@ -16,5 +15,4 @@ describe('serialize "Count"', function () {
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select count(*) from table1');
   });
-
 });

@@ -30,7 +30,8 @@
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/oracle",
-    "clean:cover": "rimraf ../../coverage/oracle"
+    "clean:cover": "rimraf ../../coverage/oracle",
+    "format": "prettier . --write --log-level=warn"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.11.3",
@@ -39,8 +40,8 @@
     "oracledb": ">= 6.4.0"
   },
   "devDependencies": {
-    "@types/oracledb": "^6.3.0",
-    "oracledb": "^6.4.0"
+    "@types/oracledb": "^6.5.1",
+    "oracledb": "^6.5.1"
   },
   "engines": {
     "node": ">=16.0",

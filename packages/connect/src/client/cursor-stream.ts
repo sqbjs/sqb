@@ -11,7 +11,6 @@ const inspect = Symbol.for('nodejs.util.inspect.custom');
 const debug = _debug('sqb:cursorstream');
 
 export class CursorStream extends Readable {
-
   private readonly _cursor: Cursor;
   private readonly _objectMode?: boolean;
   private readonly _limit: number;
@@ -30,7 +29,7 @@ export class CursorStream extends Readable {
     });
 
     cursor.once('close', () => this.emit('close'));
-    cursor.on('error', (err) => this.emit('error', err));
+    cursor.on('error', err => this.emit('error', err));
   }
 
   /**
@@ -64,45 +63,41 @@ export class CursorStream extends Readable {
       this.emit('end');
       return;
     }
-    this._cursor.next().then(row => {
-      if (this._eof)
-        return this.push(null);
-      let buf = '';
-      if (this._rowNum < 0) {
-        this._rowNum = 0;
-        if (!this._objectMode)
-          buf += '[';
-      }
-      if (!row) {
-        this._eof = true;
-        if (!this._objectMode) {
-          buf += ']';
-          this.push(buf);
-        } else this.push(null);
-        return;
-      }
-      this._rowNum++;
-      if (this._objectMode)
-        this.push(row);
-      else {
-        if (this._rowNum > 1)
-          buf += ',';
-        this.push(buf + JSON.stringify(row));
-      }
-    }).catch(err => {
-      /* istanbul ignore next */
-      if (typeof this.destroy == 'function')
-        this.destroy(err);
-      else
-        this.emit('error', err);
-      this.close().catch(() => 0);
-    });
+    this._cursor
+      .next()
+      .then(row => {
+        if (this._eof) return this.push(null);
+        let buf = '';
+        if (this._rowNum < 0) {
+          this._rowNum = 0;
+          if (!this._objectMode) buf += '[';
+        }
+        if (!row) {
+          this._eof = true;
+          if (!this._objectMode) {
+            buf += ']';
+            this.push(buf);
+          } else this.push(null);
+          return;
+        }
+        this._rowNum++;
+        if (this._objectMode) this.push(row);
+        else {
+          if (this._rowNum > 1) buf += ',';
+          this.push(buf + JSON.stringify(row));
+        }
+      })
+      .catch(err => {
+        /* istanbul ignore next */
+        if (typeof this.destroy == 'function') this.destroy(err);
+        else this.emit('error', err);
+        this.close().catch(() => 0);
+      });
   }
 
   emit(event: string | symbol, ...args: any[]): boolean {
     try {
-      if (event === 'error' && !this.listenerCount('error'))
-        return false;
+      if (event === 'error' && !this.listenerCount('error')) return false;
       return super.emit(event, ...args);
     } catch (ignored) {
       debug('emit-error', ignored);

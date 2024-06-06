@@ -18,12 +18,12 @@ SQB is an extensible, multi-dialect SQL query builder and Database connection wr
 
 ## Main goals
 
-- Single code base for any sql based database
-- Powerful and simplified query coding scheme
-- Fast applications with low memory requirements
-- Let applications work with large data tables efficiently
-- Support latest JavaScript language standards
-- Lightweight and extensible framework.
+-   Single code base for any sql based database
+-   Powerful and simplified query coding scheme
+-   Fast applications with low memory requirements
+-   Let applications work with large data tables efficiently
+-   Support latest JavaScript language standards
+-   Lightweight and extensible framework.
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/sqbjs/sqb/issues) page
 
@@ -39,40 +39,25 @@ $ npm install @sqb/postgres-dialect --save
 
 ## Node Compatibility
 
-- node >= 16.x
+-   node >= 16.x
 
 ### License
 
 SQB is available under [MIT](LICENSE) license.
 
 [npm-image]: https://img.shields.io/npm/v/@sqb/postgres-dialect.svg
-
 [npm-url]: https://npmjs.org/package/@sqb/postgres-dialect
-
 [travis-image]: https://img.shields.io/travis/sqbjs/@sqb/postgres-dialect/master.svg
-
 [travis-url]: https://travis-ci.org/sqbjs/@sqb/postgres-dialect
-
 [coveralls-image]: https://img.shields.io/coveralls/sqbjs/@sqb/postgres-dialect/master.svg
-
 [coveralls-url]: https://coveralls.io/r/sqbjs/@sqb/postgres-dialect
-
 [downloads-image]: https://img.shields.io/npm/dm/@sqb/postgres-dialect.svg
-
 [downloads-url]: https://npmjs.org/package/@sqb/postgres-dialect
-
 [gitter-image]: https://badges.gitter.im/sqbjs/@sqb/postgres-dialect.svg
-
 [gitter-url]: https://gitter.im/sqbjs/@sqb/postgres-dialect?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-
 [dependencies-image]: https://david-dm.org/sqbjs/@sqb/postgres-dialect/status.svg
-
-[dependencies-url]:https://david-dm.org/sqbjs/@sqb/postgres-dialect
-
+[dependencies-url]: https://david-dm.org/sqbjs/@sqb/postgres-dialect
 [devdependencies-image]: https://david-dm.org/sqbjs/@sqb/postgres-dialect/dev-status.svg
-
-[devdependencies-url]:https://david-dm.org/sqbjs/@sqb/postgres-dialect?type=dev
-
+[devdependencies-url]: https://david-dm.org/sqbjs/@sqb/postgres-dialect?type=dev
 [quality-image]: http://npm.packagequality.com/shield/@sqb/postgres-dialect.png
-
 [quality-url]: http://packagequality.com/#?package=@sqb/postgres-dialect

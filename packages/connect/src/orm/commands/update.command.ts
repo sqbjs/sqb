@@ -19,20 +19,18 @@ type UpdateCommandContext = {
   queryValues: any;
   queryFilter: any[];
   colCount: number;
-}
+};
 
 export class UpdateCommand {
-
   // istanbul ignore next
   protected constructor() {
     throw new Error('This class is abstract');
   }
 
   static async execute(args: UpdateCommandArgs): Promise<number> {
-    const {entity} = args;
+    const { entity } = args;
     const tableName = entity.tableName;
-    if (!tableName)
-      throw new Error(`${entity.ctor.name} is not decorated with @Entity decorator`);
+    if (!tableName) throw new Error(`${entity.ctor.name} is not decorated with @Entity decorator`);
 
     // Create a context
     const ctx: UpdateCommandContext = {
@@ -41,21 +39,18 @@ export class UpdateCommand {
       queryValues: {},
       queryFilter: [],
       colCount: 0,
-    }
+    };
 
     // Prepare
     await this._prepareParams(ctx, entity, args.values);
-    if (!ctx.colCount)
-      return 0;
+    if (!ctx.colCount) return 0;
 
-    if (args.filter)
-      await this._prepareFilter(ctx, args.filter);
-    const query = Update(tableName + ' as T', ctx.queryValues)
-        .where(...ctx.queryFilter);
+    if (args.filter) await this._prepareFilter(ctx, args.filter);
+    const query = Update(tableName + ' as T', ctx.queryValues).where(...ctx.queryFilter);
     const qr = await args.connection.execute(query, {
       params: args.params ? [...args.params, ctx.queryParams] : ctx.queryParams,
       objectRows: false,
-      cursor: false
+      cursor: false,
     });
     return qr.rowsAffected || 0;
   }
@@ -68,34 +63,31 @@ export class UpdateCommand {
     }
   }
 
-  protected static async _prepareParams(ctx: UpdateCommandContext,
-                                        entity: EntityMetadata,
-                                        values: any,
-                                        prefix?: string,
-                                        suffix?: string) {
+  protected static async _prepareParams(
+    ctx: UpdateCommandContext,
+    entity: EntityMetadata,
+    values: any,
+    prefix?: string,
+    suffix?: string,
+  ) {
     let v;
     prefix = prefix || '';
     suffix = suffix || '';
     for (const col of Object.values(entity.fields)) {
       v = values[col.name];
-      if (v === undefined)
-        continue;
+      if (v === undefined) continue;
       if (isColumnField(col)) {
-        if (col.noUpdate)
-          continue;
-        if (typeof col.serialize === 'function')
-          v = col.serialize(v, col.name);
-        if (v === null && col.notNull)
-          throw new Error(`${entity.name}.${col.name} is required and can't be null`);
-        if (v === undefined)
-          continue;
+        if (col.noUpdate) continue;
+        if (typeof col.serialize === 'function') v = col.serialize(v, col.name);
+        if (v === null && col.notNull) throw new Error(`${entity.name}.${col.name} is required and can't be null`);
+        if (v === undefined) continue;
         ColumnFieldMetadata.checkEnumValue(col, v);
         const fieldName = prefix + col.fieldName + suffix;
         const k = ('I$_' + fieldName).substring(0, 30);
         ctx.queryValues[fieldName] = Param({
           name: k,
           dataType: col.dataType,
-          isArray: col.isArray
+          isArray: col.isArray,
         });
         ctx.queryParams[k] = v;
         ctx.colCount++;
@@ -105,5 +97,4 @@ export class UpdateCommand {
       }
     }
   }
-
 }

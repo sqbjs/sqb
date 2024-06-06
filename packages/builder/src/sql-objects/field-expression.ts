@@ -5,11 +5,10 @@ import { BaseField } from './base-field.js';
 const TABLE_COLUMN_PATTERN = /^((?:[a-zA-Z_][\w$_]*\.){0,2}) *([0-9a-zA-Z_][\w$_]*|\*) *(?:as)? *([a-zA-Z_][\w$_]*)?$/;
 
 export class FieldExpression extends BaseField {
-
   _alias?: string;
 
   constructor(expression: string, dataType?: DataType, isArray?: boolean);
-  constructor(args: { expression: string, dataType?: DataType, isArray?: boolean })
+  constructor(args: { expression: string; dataType?: DataType; isArray?: boolean });
   constructor(arg0: any, arg1?: any, arg2?: any) {
     super();
     let expression: string;
@@ -23,8 +22,7 @@ export class FieldExpression extends BaseField {
       this._isArray = arg2;
     }
     const m = expression?.match(TABLE_COLUMN_PATTERN);
-    if (!m)
-      throw new TypeError(`"${expression}" does not match table column format`);
+    if (!m) throw new TypeError(`"${expression}" does not match table column format`);
     this._field = m[2];
     if (m[1]) {
       const a = m[1].split(/\./g);
@@ -45,15 +43,16 @@ export class FieldExpression extends BaseField {
       table: this._table,
       field: this._field,
       alias: this._alias,
-      isReservedWord: !!(this._field && ctx.isReservedWord(this._field))
+      isReservedWord: !!(this._field && ctx.isReservedWord(this._field)),
     };
     return ctx.serialize(this._type, o, () => {
-      const prefix = ctx.escapeReserved(this._schema ? this._schema + '.' : '') +
-          (this._table ? this._table + '.' : '');
-      return prefix +
-          (!prefix && o.isReservedWord ? '"' + this._field + '"' : this._field) +
-          (this._alias ? ' as ' + this._alias : '');
+      const prefix =
+        ctx.escapeReserved(this._schema ? this._schema + '.' : '') + (this._table ? this._table + '.' : '');
+      return (
+        prefix +
+        (!prefix && o.isReservedWord ? '"' + this._field + '"' : this._field) +
+        (this._alias ? ' as ' + this._alias : '')
+      );
     });
   }
-
 }

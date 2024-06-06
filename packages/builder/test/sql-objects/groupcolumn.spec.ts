@@ -1,10 +1,9 @@
 import { Select } from '../../src/index.js';
 
 describe('serialize "GroupColumn"', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should serialize (field)', function () {
@@ -32,21 +31,14 @@ describe('serialize "GroupColumn"', function () {
   });
 
   it('should validate schema name', function () {
-    expect(() =>
-        Select().from('table1').groupBy('1sch.field1')
-    ).toThrow('does not match group column format');
+    expect(() => Select().from('table1').groupBy('1sch.field1')).toThrow('does not match group column format');
   });
 
   it('should validate table name', function () {
-    expect(() =>
-        Select().from('table1').groupBy('schema.-field1')
-    ).toThrow('does not match group column format');
+    expect(() => Select().from('table1').groupBy('schema.-field1')).toThrow('does not match group column format');
   });
 
   it('should validate order word', function () {
-    expect(() =>
-        Select().from('table1').groupBy('schema.field1 dss')
-    ).toThrow('does not match group column format');
+    expect(() => Select().from('table1').groupBy('schema.field1 dss')).toThrow('does not match group column format');
   });
-
 });

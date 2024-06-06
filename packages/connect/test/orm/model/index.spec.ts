@@ -2,12 +2,9 @@
 import { Entity, Index } from '@sqb/connect';
 
 describe('Model / Index', function () {
-
   it(`should define index field with string argument`, () => {
     @Index('id')
-    class MyEntity {
-
-    }
+    class MyEntity {}
 
     const meta = Entity.getMetadata(MyEntity);
     expect(meta).toBeDefined();
@@ -16,11 +13,8 @@ describe('Model / Index', function () {
   });
 
   it(`should define index field with object definition`, () => {
-
-    @Index(['name'], {name: 'idx_myentity_name', unique: true})
-    class MyEntity {
-
-    }
+    @Index(['name'], { name: 'idx_myentity_name', unique: true })
+    class MyEntity {}
 
     const meta = Entity.getMetadata(MyEntity);
     expect(meta).toBeDefined();
@@ -31,11 +25,9 @@ describe('Model / Index', function () {
   });
 
   it(`should be used as PropertyDecorator`, () => {
-
     class MyEntity {
-      @Index({unique: true})
+      @Index({ unique: true })
       id: string;
-
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -46,22 +38,16 @@ describe('Model / Index', function () {
   });
 
   it(`should throw error on invalid argument`, () => {
-
     expect(() => {
       // @ts-ignore
       @Index()
-      class MyEntity {
-
-      }
+      class MyEntity {}
     }).toThrow('You must specify index column');
 
     expect(() => {
       // @ts-ignore
       @Index({})
-      class MyEntity {
-
-      }
+      class MyEntity {}
     }).toThrow('You must specify index column');
   });
-
 });

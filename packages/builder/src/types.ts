@@ -1,8 +1,12 @@
 import { DataType, SerializationType } from './enums.js';
 import type { SerializeContext } from './serialize-context.js';
 
-export type SerializeFunction = (ctx: SerializeContext, type: SerializationType | string, obj: any,
-                                 defFn: DefaultSerializeFunction) => string | undefined;
+export type SerializeFunction = (
+  ctx: SerializeContext,
+  type: SerializationType | string,
+  obj: any,
+  defFn: DefaultSerializeFunction,
+) => string | undefined;
 export type DefaultSerializeFunction = (ctx: SerializeContext, o: any) => string;
 export type IsReservedWordFunction = (ctx: SerializeContext, s: string) => boolean;
 
@@ -32,5 +36,5 @@ export interface GenerateResult {
   sql: string;
   params?: any;
   paramOptions?: Record<string, ParamOptions> | ParamOptions[];
-  returningFields?: { field: string, alias?: string }[];
+  returningFields?: { field: string; alias?: string }[];
 }

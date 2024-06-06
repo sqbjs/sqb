@@ -124,22 +124,20 @@ export function SequenceCurr(expression: string): SequenceGetterStatement {
   return new SequenceGetterStatement(expression, false);
 }
 
-export function Param(name: string, dataType?: DataType, isArray?: boolean): ParamExpression
-export function Param(args: { name: string, dataType?: DataType, isArray?: boolean }): ParamExpression
+export function Param(name: string, dataType?: DataType, isArray?: boolean): ParamExpression;
+export function Param(args: { name: string; dataType?: DataType; isArray?: boolean }): ParamExpression;
 export function Param(arg0: any, arg1?: any, arg2?: any): ParamExpression {
-  if (typeof arg0 === 'object')
-    return new ParamExpression(arg0);
+  if (typeof arg0 === 'object') return new ParamExpression(arg0);
   return new ParamExpression({
     name: arg0,
     dataType: arg1,
-    isArray: arg2
+    isArray: arg2,
   });
 }
 
-export function Field(name: string, dataType?: DataType, isArray?: boolean): FieldExpression
-export function Field(args: { name: string, dataType?: DataType, isArray?: boolean }): FieldExpression
+export function Field(name: string, dataType?: DataType, isArray?: boolean): FieldExpression;
+export function Field(args: { name: string; dataType?: DataType; isArray?: boolean }): FieldExpression;
 export function Field(arg0: any, arg1?: any, arg2?: any): FieldExpression {
-  if (typeof arg0 === 'object')
-    return new FieldExpression(arg0);
+  if (typeof arg0 === 'object') return new FieldExpression(arg0);
   return new FieldExpression(arg0, arg1, arg2);
 }

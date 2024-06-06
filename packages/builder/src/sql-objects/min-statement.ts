@@ -3,7 +3,6 @@ import { Serializable } from '../serializable.js';
 import { SerializeContext } from '../serialize-context.js';
 
 export class MinStatement extends Serializable {
-
   _expression: any;
   _alias?: string;
 
@@ -32,18 +31,13 @@ export class MinStatement extends Serializable {
    * @override
    */
   _serialize(ctx: SerializeContext): string {
-    if (!this._expression)
-      return '';
+    if (!this._expression) return '';
     const q = ctx.anyToSQL(this._expression);
 
-
-    return ctx.serialize(this._type, q,
-        () => this.__defaultSerialize(ctx, q));
+    return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-    return 'min(' + o + ')' +
-        (this._alias ? ' ' + this._alias : '');
+    return 'min(' + o + ')' + (this._alias ? ' ' + this._alias : '');
   }
-
 }

@@ -10,22 +10,20 @@ export type CountCommandArgs = {
 } & Repository.CountOptions;
 
 export class CountCommand {
-
   // istanbul ignore next
   protected constructor() {
     throw new Error('This class is abstract');
   }
 
   static async execute(args: CountCommandArgs): Promise<number> {
-    const {connection, entity, filter, params} = args;
+    const { connection, entity, filter, params } = args;
     let where: LogicalOperator | undefined;
     if (filter) {
       where = And();
       await prepareFilter(entity, filter, where, 'T');
     }
     const query = Select(Count()).from(entity.tableName + ' T');
-    if (where)
-      query.where(where);
+    if (where) query.where(where);
     // Execute query
     const resp = await connection.execute(query, {
       params,

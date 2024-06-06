@@ -93,4 +93,3 @@ export function isReturningColumn(value: any): value is ReturningColumn {
 export function isTableName(value: any): value is TableName {
   return isSerializable(value) && value._type === SerializationType.TABLE_NAME;
 }
-

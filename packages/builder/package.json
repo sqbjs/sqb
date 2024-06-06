@@ -31,10 +31,11 @@
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/builder",
-    "clean:cover": "rimraf ../../coverage/builder"
+    "clean:cover": "rimraf ../../coverage/builder",
+    "format": "prettier . --write --log-level=warn"
   },
   "dependencies": {
-    "debug": "^4.3.4",
+    "debug": "^4.3.5",
     "putil-flattentext": "^2.1.1",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.12.1",

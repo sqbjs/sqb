@@ -2,7 +2,6 @@ import type { Migration, MigrationPackage, MigrationTask } from './migration-pac
 import type { MigrationStatus } from './types.js';
 
 export abstract class MigrationAdapter {
-
   abstract readonly packageName: string;
   abstract readonly status: MigrationStatus;
   abstract readonly version: number;
@@ -11,14 +10,16 @@ export abstract class MigrationAdapter {
 
   abstract refresh(): Promise<void>;
 
-  abstract update(info: {
-    status?: MigrationStatus,
-    version?: number;
-  }): Promise<void>;
+  abstract update(info: { status?: MigrationStatus; version?: number }): Promise<void>;
 
   abstract writeEvent(event: MigrationAdapter.Event): Promise<void>;
 
-  abstract executeTask(migrationPackage: MigrationPackage, migration: Migration, task: MigrationTask, variables: Record<string, any>): Promise<void>;
+  abstract executeTask(
+    migrationPackage: MigrationPackage,
+    migration: Migration,
+    task: MigrationTask,
+    variables: Record<string, any>,
+  ): Promise<void>;
 
   abstract lockSchema(): Promise<void>;
 
@@ -29,18 +30,15 @@ export abstract class MigrationAdapter {
   abstract restoreDatabase(): Promise<void>;
 
   protected replaceVariables(text: string, variables: Record<string, string>): string {
-    return text.replace(/(\$\((\w+)\))/g,
-        (s, ...args: string[]) => variables[args[1]] || s);
+    return text.replace(/(\$\((\w+)\))/g, (s, ...args: string[]) => variables[args[1]] || s);
   }
-
 }
 
 export namespace MigrationAdapter {
-
   export enum EventKind {
     started = 'started',
     success = 'success',
-    error = 'error'
+    error = 'error',
   }
 
   export interface Event {
@@ -51,9 +49,4 @@ export namespace MigrationAdapter {
     filename?: string;
     details?: string;
   }
-
 }
-
-
-
-

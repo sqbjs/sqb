@@ -13,26 +13,26 @@ export interface EmbeddedFieldMetadata extends FieldMetadata {
 }
 
 export namespace EmbeddedFieldMetadata {
-
-  export function create(entity: EntityMetadata, name: string, type: TypeThunk, options?: EmbeddedFieldOptions): EmbeddedFieldMetadata {
+  export function create(
+    entity: EntityMetadata,
+    name: string,
+    type: TypeThunk,
+    options?: EmbeddedFieldOptions,
+  ): EmbeddedFieldMetadata {
     const result: EmbeddedFieldMetadata = {
       kind: 'object',
       entity,
       name,
-      type
-    }
-    if (options?.fieldNamePrefix)
-      result.fieldNamePrefix = options.fieldNamePrefix;
-    if (options?.fieldNameSuffix)
-      result.fieldNameSuffix = options.fieldNameSuffix;
+      type,
+    };
+    if (options?.fieldNamePrefix) result.fieldNamePrefix = options.fieldNamePrefix;
+    if (options?.fieldNameSuffix) result.fieldNameSuffix = options.fieldNameSuffix;
     return result;
   }
 
   export async function resolveType(meta: EmbeddedFieldMetadata): Promise<EntityMetadata> {
     const typ = await resolveEntityMeta(meta.type);
-    if (typ)
-      return typ;
+    if (typ) return typ;
     throw new Error(`Can't resolve type of ${meta.entity.name}.${meta.name}`);
   }
-
 }

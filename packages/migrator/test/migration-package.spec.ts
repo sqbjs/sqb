@@ -1,27 +1,26 @@
-import {
-  isInsertDataMigrationTask,
-  isSqlScriptMigrationTask,
-  MigrationPackage
-} from '../src/migration-package.js';
+import { isInsertDataMigrationTask, isSqlScriptMigrationTask, MigrationPackage } from '../src/migration-package.js';
 
 describe('MigrationPackage', () => {
-
   it('should load sync', async () => {
     const pkg = await MigrationPackage.load({
       name: 'test',
-      migrations: [{
-        version: 1,
-        tasks: []
-      }]
+      migrations: [
+        {
+          version: 1,
+          tasks: [],
+        },
+      ],
     });
     expect(pkg).toEqual({
       name: 'test',
       baseDir: __dirname,
-      migrations: [{
-        version: 1,
-        baseDir: '',
-        tasks: []
-      }]
+      migrations: [
+        {
+          version: 1,
+          baseDir: '',
+          tasks: [],
+        },
+      ],
     });
   });
 
@@ -31,18 +30,20 @@ describe('MigrationPackage', () => {
       migrations: [
         () => ({
           version: 1,
-          tasks: []
-        })
-      ]
+          tasks: [],
+        }),
+      ],
     });
     expect(pkg).toEqual({
       name: 'test',
       baseDir: __dirname,
-      migrations: [{
-        version: 1,
-        baseDir: '',
-        tasks: []
-      }]
+      migrations: [
+        {
+          version: 1,
+          baseDir: '',
+          tasks: [],
+        },
+      ],
     });
   });
 
@@ -52,25 +53,27 @@ describe('MigrationPackage', () => {
       migrations: [
         async () => ({
           version: 1,
-          tasks: []
-        })
-      ]
+          tasks: [],
+        }),
+      ],
     });
     expect(pkg).toEqual({
       name: 'test',
       baseDir: __dirname,
-      migrations: [{
-        version: 1,
-        baseDir: '',
-        tasks: []
-      }]
+      migrations: [
+        {
+          version: 1,
+          baseDir: '',
+          tasks: [],
+        },
+      ],
     });
   });
 
   it('should load migrations from glob pattern', async () => {
     const pkg = await MigrationPackage.load({
       name: 'test',
-      migrations: ['_support/test2/**/*']
+      migrations: ['_support/test2/**/*'],
     });
     expect(pkg.migrations.length).toEqual(2);
     const tasks = pkg.migrations[0].tasks;
@@ -83,10 +86,12 @@ describe('MigrationPackage', () => {
   it('should load tasks from glob pattern', async () => {
     const pkg = await MigrationPackage.load({
       name: 'test',
-      migrations: [async () => ({
-        version: 1,
-        tasks: ['_support/test1/*']
-      })]
+      migrations: [
+        async () => ({
+          version: 1,
+          tasks: ['_support/test1/*'],
+        }),
+      ],
     });
     const tasks = pkg.migrations[0].tasks;
     expect(tasks).toBeDefined();
@@ -94,6 +99,4 @@ describe('MigrationPackage', () => {
     expect(isSqlScriptMigrationTask(tasks[0])).toBeTruthy();
     expect(isSqlScriptMigrationTask(tasks[1])).toBeTruthy();
   });
-
-
 });

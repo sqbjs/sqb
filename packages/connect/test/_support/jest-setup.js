@@ -1,4 +1,4 @@
-import {Connection} from 'postgresql-client';
+import { Connection } from 'postgresql-client';
 
 export default async function createSchema() {
   const connection = new Connection();

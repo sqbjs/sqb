@@ -18,12 +18,12 @@ SQB is an extensible, multi-dialect SQL query builder and Database connection wr
 
 ## Main goals
 
-- Single code base for any sql based database
-- Powerful and simplified query coding scheme
-- Fast applications with low memory requirements
-- Let applications work with large data tables efficiently
-- Support latest JavaScript language standards
-- Lightweight and extensible framework.
+-   Single code base for any sql based database
+-   Powerful and simplified query coding scheme
+-   Fast applications with low memory requirements
+-   Let applications work with large data tables efficiently
+-   Support latest JavaScript language standards
+-   Lightweight and extensible framework.
 
 You can report bugs and discuss features on the [GitHub issues](https://github.com/sqbjs/sqb/issues) page
 
@@ -39,40 +39,25 @@ $ npm install @sqb/oracle --save
 
 ## Node Compatibility
 
-- node >= 16.x
+-   node >= 16.x
 
 ### License
 
 SQB is available under [MIT](LICENSE) license.
 
 [npm-image]: https://img.shields.io/npm/v/@sqb/oracle.svg
-
 [npm-url]: https://npmjs.org/package/@sqb/oracle
-
 [travis-image]: https://img.shields.io/travis/sqbjs/@sqb/oracle/master.svg
-
 [travis-url]: https://travis-ci.org/sqbjs/@sqb/oracle
-
 [coveralls-image]: https://img.shields.io/coveralls/sqbjs/@sqb/oracle/master.svg
-
 [coveralls-url]: https://coveralls.io/r/sqbjs/@sqb/oracle
-
 [downloads-image]: https://img.shields.io/npm/dm/@sqb/oracle.svg
-
 [downloads-url]: https://npmjs.org/package/@sqb/oracle
-
 [gitter-image]: https://badges.gitter.im/sqbjs/@sqb/oracle.svg
-
 [gitter-url]: https://gitter.im/sqbjs/@sqb/oracle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
-
 [dependencies-image]: https://david-dm.org/sqbjs/@sqb/oracle/status.svg
-
-[dependencies-url]:https://david-dm.org/sqbjs/@sqb/oracle
-
+[dependencies-url]: https://david-dm.org/sqbjs/@sqb/oracle
 [devdependencies-image]: https://david-dm.org/sqbjs/@sqb/oracle/dev-status.svg
-
-[devdependencies-url]:https://david-dm.org/sqbjs/@sqb/oracle?type=dev
-
+[devdependencies-url]: https://david-dm.org/sqbjs/@sqb/oracle?type=dev
 [quality-image]: http://npm.packagequality.com/shield/@sqb/oracle.png
-
 [quality-url]: http://packagequality.com/#?package=@sqb/oracle

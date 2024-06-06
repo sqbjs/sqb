@@ -11,17 +11,15 @@ type CachedDatabase = Database & { _refCount: number };
 const dbCache = new Map<string, CachedDatabase>();
 
 export class SqljsAdapter implements Adapter {
-
   driver = 'sqljs';
   dialect = 'sqlite';
   features = {
     cursor: true,
     // fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
-  }
+  };
 
   async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
-    if (!config.database)
-      throw new Error('You must provide sqlite database file for sql.js driver');
+    if (!config.database) throw new Error('You must provide sqlite database file for sql.js driver');
 
     let dbName = '';
     let isMemory = false;
@@ -52,16 +50,13 @@ export class SqljsAdapter implements Adapter {
 
     const _intlDb = intlDb;
     return new SqljsConnection(_intlDb, () => {
-      if (isMemory)
-        return;
+      if (isMemory) return;
       if (--_intlDb._refCount <= 0) {
         _intlDb.close();
         dbCache.delete(dbName);
       }
     });
-
   }
-
 }
 
 export async function closeMemoryDatabase(name?: string): Promise<void> {

@@ -3,8 +3,7 @@ import { PhotoService } from './photo.service.js';
 
 @Controller('photo')
 export class PhotoController {
-  constructor(private readonly photoService: PhotoService) {
-  }
+  constructor(private readonly photoService: PhotoService) {}
 
   @Post()
   create(): Promise<any> {

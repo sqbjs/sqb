@@ -4,29 +4,22 @@ import { Adapter, ClientConfiguration, DataType } from '@sqb/connect';
 import { PgConnection } from './pg-connection.js';
 
 export class PgAdapter implements Adapter {
-
   driver = 'postgresql-client';
   dialect = 'postgres';
   features = {
     cursor: true,
     schema: true,
-    fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ]
-  }
+    fetchAsString: [DataType.DATE, DataType.TIMESTAMP, DataType.TIMESTAMPTZ],
+  };
 
   async connect(config: ClientConfiguration): Promise<Adapter.Connection> {
-    const cfg: ConnectionConfiguration = {...config.driverOptions};
-    if (config.user)
-      cfg.user = config.user;
-    if (config.password)
-      cfg.password = config.password;
-    if (config.host)
-      cfg.host = config.host;
-    if (config.port)
-      cfg.port = config.port;
-    if (config.database)
-      cfg.database = config.database;
-    if (config.schema)
-      cfg.schema = config.schema;
+    const cfg: ConnectionConfiguration = { ...config.driverOptions };
+    if (config.user) cfg.user = config.user;
+    if (config.password) cfg.password = config.password;
+    if (config.host) cfg.host = config.host;
+    if (config.port) cfg.port = config.port;
+    if (config.database) cfg.database = config.database;
+    if (config.schema) cfg.schema = config.schema;
 
     const connection = new Connection(cfg);
     try {
@@ -37,5 +30,4 @@ export class PgAdapter implements Adapter {
       throw e;
     }
   }
-
 }

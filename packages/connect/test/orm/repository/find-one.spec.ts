@@ -4,12 +4,11 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
 describe('Repository.findOne()', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -17,7 +16,7 @@ describe('Repository.findOne()', function () {
 
   it('should return single instance', async function () {
     const repo = client.getRepository<Customer>(Customer);
-    const row = await repo.findOne({sort: ['id']});
+    const row = await repo.findOne({ sort: ['id'] });
     expect(row).toBeDefined();
     expect(row!.id).toStrictEqual(1);
   });
@@ -26,11 +25,9 @@ describe('Repository.findOne()', function () {
     const repo = client.getRepository<Customer>(Customer);
     const row = await repo.findOne({
       sort: ['id'],
-      offset: 10
+      offset: 10,
     });
     expect(row).toBeDefined();
     expect(row!.id).toStrictEqual(11);
   });
-
 });
-

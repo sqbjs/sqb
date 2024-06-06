@@ -20,9 +20,7 @@ describe('Sqb-Nestjs', () => {
   });
 
   it(`should return created entity`, () => {
-    return request(server)
-        .post('/photo')
-        .expect(201, {name: 'Nest', description: 'Is great!', views: 6000});
+    return request(server).post('/photo').expect(201, { name: 'Nest', description: 'Is great!', views: 6000 });
   });
 
   afterEach(async () => {

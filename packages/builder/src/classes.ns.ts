@@ -1,7 +1,7 @@
 export * from './query/query.js';
 export * from './query/returning-query.js';
 export * from './query/select-query.js';
-export * from './query/insert-query.js'
+export * from './query/insert-query.js';
 export * from './query/update-query.js';
 export * from './query/delete-query.js';
 export * from './sql-objects/field-expression.js';
@@ -36,4 +36,3 @@ export * from './sql-objects/operators/op-gt.js';
 export * from './sql-objects/operators/op-eq.js';
 export * from './sql-objects/operators/op-or.js';
 export * from './sql-objects/operators/comp-operator.js';
-

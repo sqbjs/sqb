@@ -3,8 +3,7 @@ import { Adapter } from './adapter.js';
 export let adapters: Adapter[] = [];
 
 export function registerAdapter(adapter: Adapter): void {
-  if (!adapter.driver)
-    throw new TypeError('A DatabaseAdapter must contain "driver" property');
+  if (!adapter.driver) throw new TypeError('A DatabaseAdapter must contain "driver" property');
   adapters.push(adapter);
 }
 

@@ -6,12 +6,11 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
 describe('Repository.find()', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -19,7 +18,7 @@ describe('Repository.find()', function () {
 
   it('should return only non exclusive if "pick" option is null', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({limit: 1});
+    const rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].id).toBeDefined();
@@ -31,7 +30,7 @@ describe('Repository.find()', function () {
 
   it('should return embedded fields', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({limit: 1});
+    const rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].name).toBeDefined();
@@ -41,7 +40,7 @@ describe('Repository.find()', function () {
 
   it('should return embedded fields with prefix', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({filter: {id: 1}});
+    const rows = await repo.findMany({ filter: { id: 1 } });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].address).toBeDefined();
@@ -51,7 +50,7 @@ describe('Repository.find()', function () {
 
   it('should return embedded sub fields', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({limit: 1, pick: ['name.given']});
+    const rows = await repo.findMany({ limit: 1, pick: ['name.given'] });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].name).toBeDefined();
@@ -60,7 +59,7 @@ describe('Repository.find()', function () {
 
   it('should return json field as embedded element', async function () {
     const repo = client.getRepository(Customer);
-    const row = await repo.find(1, {pick: ['customData']});
+    const row = await repo.find(1, { pick: ['customData'] });
     expect(row).toBeDefined();
     expect(row!.customData).toBeDefined();
     expect(typeof row!.customData).toStrictEqual('object');
@@ -70,7 +69,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       limit: 1,
-      pick: ['id', 'givenName']
+      pick: ['id', 'givenName'],
     });
     expect(rows).toBeDefined();
     expect(Object.keys(rows[0])).toStrictEqual(['id', 'givenName']);
@@ -80,7 +79,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       limit: 1,
-      include: ['birthDate']
+      include: ['birthDate'],
     });
     expect(rows).toBeDefined();
     expect(rows[0].givenName).toBeDefined();
@@ -90,7 +89,7 @@ describe('Repository.find()', function () {
 
   it('should exclude exclusive fields if not included', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({limit: 1});
+    const rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].country).toBeUndefined();
@@ -101,7 +100,7 @@ describe('Repository.find()', function () {
     const rows = await repo.findMany({
       limit: 1,
       include: ['country'],
-      omit: ['familyName', 'country.code']
+      omit: ['familyName', 'country.code'],
     });
     expect(rows).toBeDefined();
     expect(rows[0].givenName).toBeDefined();
@@ -113,12 +112,12 @@ describe('Repository.find()', function () {
 
   it('should exclude hidden elements', async function () {
     const repo = client.getRepository(Country);
-    let rows = await repo.findMany({limit: 1});
+    let rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
     expect(rows[0].phoneCode).toBeDefined();
     const col = Entity.getColumnField(Country, 'phoneCode');
     col!.hidden = true;
-    rows = await repo.findMany({limit: 1});
+    rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
     expect(rows[0].phoneCode).toBeUndefined();
     delete col!.hidden;
@@ -126,7 +125,7 @@ describe('Repository.find()', function () {
 
   it('should filter with Operator', async function () {
     const repo = client.getRepository<Country>(Country);
-    const rows = await repo.findMany({filter: Eq('continentCode', 'AM')});
+    const rows = await repo.findMany({ filter: Eq('continentCode', 'AM') });
     expect(rows.length).toStrictEqual(2);
     expect(rows[0].code).toStrictEqual('CA');
     expect(rows[1].code).toStrictEqual('US');
@@ -134,7 +133,7 @@ describe('Repository.find()', function () {
 
   it('should filter with plain object', async function () {
     const repo = client.getRepository<Country>(Country);
-    const rows = await repo.findMany({filter: {continentCode: 'AM'}});
+    const rows = await repo.findMany({ filter: { continentCode: 'AM' } });
     expect(rows.length).toStrictEqual(2);
     expect(rows[0].code).toStrictEqual('CA');
     expect(rows[1].code).toStrictEqual('US');
@@ -145,11 +144,11 @@ describe('Repository.find()', function () {
     const rows = await repo.findMany({
       filter: {
         givenName: Param('givenName'),
-        familyName: 'Marsh'
+        familyName: 'Marsh',
       },
       params: {
-        givenName: 'Belle'
-      }
+        givenName: 'Belle',
+      },
     });
     expect(rows.length).toStrictEqual(1);
     expect(rows[0].id).toStrictEqual(3);
@@ -159,11 +158,11 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       filter: {
-        'address.city': Param('city')
+        'address.city': Param('city'),
       },
       params: {
-        city: 'Dallas'
-      }
+        city: 'Dallas',
+      },
     });
     for (const row of rows) {
       expect(row.address).toBeDefined();
@@ -175,7 +174,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       sort: ['id'],
-      limit: 5
+      limit: 5,
     });
     expect(rows).toBeDefined();
     expect(rows.length).toStrictEqual(5);
@@ -188,7 +187,7 @@ describe('Repository.find()', function () {
     const rows = await repo.findMany({
       sort: ['id'],
       limit: 5,
-      offset: 10
+      offset: 10,
     });
     expect(rows).toBeDefined();
     expect(rows.length).toStrictEqual(5);
@@ -198,7 +197,7 @@ describe('Repository.find()', function () {
 
   it('should sort result rows', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({sort: ['-id']});
+    const rows = await repo.findMany({ sort: ['-id'] });
     const arr1 = rows.map(x => x.id);
     const arr2 = [...arr1];
     arr2.sort((a, b) => b! - a!);
@@ -207,21 +206,17 @@ describe('Repository.find()', function () {
 
   it('should sort by data columns only ', async function () {
     const repo = client.getRepository(Customer);
-    return expect(() =>
-        repo.findMany({sort: ['country']})
-    ).rejects.toThrow('Can not sort by');
+    return expect(() => repo.findMany({ sort: ['country'] })).rejects.toThrow('Can not sort by');
   });
 
   it('should sort by embedded sub element', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({sort: ['name.given', 'name.family']});
+    const rows = await repo.findMany({ sort: ['name.given', 'name.family'] });
     const arr1 = rows.map(x => x.name!.given);
     const arr2 = [...arr1];
     arr2.sort((a, b) => {
-      if (a!.toLowerCase() < b!.toLowerCase())
-        return -1
-      if (a!.toLowerCase() > b!.toLowerCase())
-        return 1
+      if (a!.toLowerCase() < b!.toLowerCase()) return -1;
+      if (a!.toLowerCase() > b!.toLowerCase()) return 1;
       return 0;
     });
     expect(arr1).toStrictEqual(arr2);
@@ -231,7 +226,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       pick: ['countryCode'],
-      distinct: true
+      distinct: true,
     });
     expect(rows).toBeDefined();
     const a = rows.map(customer => customer.countryCode);
@@ -242,9 +237,8 @@ describe('Repository.find()', function () {
 
   it('should apply "parse"', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({sort: ['id'], limit: 10});
+    const rows = await repo.findMany({ sort: ['id'], limit: 10 });
     expect(rows[0].gender).toStrictEqual('Male');
     expect(rows[1].gender).toStrictEqual('Female');
   });
-
 });

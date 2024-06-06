@@ -25,7 +25,7 @@ export class UnionQuery extends Query {
     const queries = this._queries.map(q => q._serialize(ctx));
     const q = {
       queries,
-      unionType: this._unionType
+      unionType: this._unionType,
     };
     return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
   }
@@ -33,5 +33,4 @@ export class UnionQuery extends Query {
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
     return o.queries.join(o.unionType === 'all' ? '\nUNION ALL\n' : '\nUNION\n');
   }
-
 }

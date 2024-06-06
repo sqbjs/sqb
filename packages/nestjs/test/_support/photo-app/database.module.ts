@@ -5,12 +5,10 @@ import { dbConfig } from './config.js';
 @Module({})
 export class DatabaseModule {
   static async forRoot(): Promise<DynamicModule> {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     return {
       module: DatabaseModule,
-      imports: [
-        SqbModule.forRoot(dbConfig)
-      ]
+      imports: [SqbModule.forRoot(dbConfig)],
     };
   }
 }

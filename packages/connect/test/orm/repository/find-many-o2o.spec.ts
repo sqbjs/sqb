@@ -9,24 +9,22 @@ function toJSON(obj: any): any {
 }
 
 describe('Repository.findMany() | one to one relations', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
   });
 
   describe('linkToOne', function () {
-
     it('return associated row as object property', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'countryCode', 'country']
+        pick: ['id', 'countryCode', 'country'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -37,14 +35,14 @@ describe('Repository.findMany() | one to one relations', function () {
         name: 'United States',
         hasMarket: true,
         phoneCode: '+1',
-        continentCode: 'AM'
+        continentCode: 'AM',
       });
     });
 
     it('dont return associated if not explicitly requested', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        filter: [Eq('id', 1)]
+        filter: [Eq('id', 1)],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -56,7 +54,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.continent']
+        pick: ['id', 'country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -64,8 +62,8 @@ describe('Repository.findMany() | one to one relations', function () {
       expect(toJSON(rows[0].country)).toStrictEqual({
         continent: {
           code: 'AM',
-          name: 'America'
-        }
+          name: 'America',
+        },
       });
     });
 
@@ -74,7 +72,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
         pick: ['id'],
-        include: ['country.continent']
+        include: ['country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -84,9 +82,9 @@ describe('Repository.findMany() | one to one relations', function () {
         country: {
           continent: {
             code: 'AM',
-            name: 'America'
-          }
-        }
+            name: 'America',
+          },
+        },
       });
     });
 
@@ -94,7 +92,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.code', 'country.continent.code']
+        pick: ['id', 'country.code', 'country.continent.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -102,8 +100,8 @@ describe('Repository.findMany() | one to one relations', function () {
       expect(toJSON(rows[0].country)).toStrictEqual({
         code: 'US',
         continent: {
-          code: 'AM'
-        }
+          code: 'AM',
+        },
       });
     });
 
@@ -111,7 +109,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'countryCode'],
-        filter: Eq('country.continent.code', 'AM')
+        filter: Eq('country.continent.code', 'AM'),
       });
       for (const row of rows) {
         expect(row.countryCode === 'CA' || row.countryCode === 'US').toBeTruthy();
@@ -121,10 +119,10 @@ describe('Repository.findMany() | one to one relations', function () {
     it('use "exists" when filtering by associated element', async function () {
       const repo = client.getRepository(Customer);
       let request: any = {};
-      client.once('execute', (req => request = req));
+      client.once('execute', req => (request = req));
       await repo.findMany({
         pick: ['id'],
-        filter: [{'country.continent.code': 'AM'}]
+        filter: [{ 'country.continent.code': 'AM' }],
       });
       expect(request.sql.includes('exists')).toBeTruthy();
       expect(request.params).toStrictEqual(['AM']);
@@ -134,24 +132,23 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
-        sort: ['country.code']
+        sort: ['country.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
       const left = rows.map(x => x.country!.code);
-      const sorted = [...left]
+      const sorted = [...left];
       sorted.sort();
       expect(left).toStrictEqual(sorted);
     });
-  })
+  });
 
   describe('linkFromOne', function () {
-
     it('return associated row as object property', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'details']
+        pick: ['id', 'details'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -163,7 +160,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'details.notes']
+        pick: ['id', 'details.notes'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -174,7 +171,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'details'],
-        filter: Eq('details.customerId', 1)
+        filter: Eq('details.customerId', 1),
       });
       expect(rows.length).toStrictEqual(1);
       expect(rows[0].id).toStrictEqual(1);
@@ -185,24 +182,23 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'details.notes'],
-        sort: ['details.notes']
+        sort: ['details.notes'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
-      const left = rows.map(x => x.details ? x.details.notes : undefined);
-      const sorted = [...left]
+      const left = rows.map(x => (x.details ? x.details.notes : undefined));
+      const sorted = [...left];
       sorted.sort();
       expect(left).toStrictEqual(sorted);
     });
-  })
+  });
 
   describe('Association chain', function () {
-
     it('return row of last association in the chain as object property', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'countryCode', 'country']
+        pick: ['id', 'countryCode', 'country'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -213,7 +209,7 @@ describe('Repository.findMany() | one to one relations', function () {
         name: 'United States',
         hasMarket: true,
         phoneCode: '+1',
-        continentCode: 'AM'
+        continentCode: 'AM',
       });
     });
 
@@ -221,7 +217,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.continent']
+        pick: ['id', 'country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -229,8 +225,8 @@ describe('Repository.findMany() | one to one relations', function () {
       expect(toJSON(rows[0].country)).toStrictEqual({
         continent: {
           code: 'AM',
-          name: 'America'
-        }
+          name: 'America',
+        },
       });
     });
 
@@ -238,7 +234,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.code', 'country.continent.code']
+        pick: ['id', 'country.code', 'country.continent.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -246,8 +242,8 @@ describe('Repository.findMany() | one to one relations', function () {
       expect(toJSON(rows[0].country)).toStrictEqual({
         code: 'US',
         continent: {
-          code: 'AM'
-        }
+          code: 'AM',
+        },
       });
     });
 
@@ -255,7 +251,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'countryCode'],
-        filter: Eq('country.continent.code', 'AM')
+        filter: Eq('country.continent.code', 'AM'),
       });
       for (const row of rows) {
         expect(row.countryCode === 'CA' || row.countryCode === 'US').toBeTruthy();
@@ -265,10 +261,10 @@ describe('Repository.findMany() | one to one relations', function () {
     it('use "exists" when filtering by associated element', async function () {
       const repo = client.getRepository(Customer);
       let request: any = {};
-      client.once('execute', (req => request = req));
+      client.once('execute', req => (request = req));
       await repo.findMany({
         pick: ['id'],
-        filter: [{'country.continent.code': 'AM'}]
+        filter: [{ 'country.continent.code': 'AM' }],
       });
       expect(request.sql.includes('exists')).toStrictEqual(true);
       expect(request.params).toStrictEqual(['AM']);
@@ -278,12 +274,12 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
-        sort: ['country.code']
+        sort: ['country.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
       const left = rows.map(x => x.country!.code);
-      const sorted = [...left]
+      const sorted = [...left];
       sorted.sort();
       expect(left).toStrictEqual(sorted);
     });
@@ -292,14 +288,14 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'continent']
+        pick: ['id', 'continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
       expect(rows[0].id).toStrictEqual(1);
       expect(toJSON(rows[0].continent)).toStrictEqual({
         code: 'AM',
-        name: 'America'
+        name: 'America',
       });
     });
 
@@ -307,12 +303,12 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         pick: ['id', 'countryCode', 'country.continentCode'],
-        sort: ['continent.code']
+        sort: ['continent.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
       const left = rows.map(x => x.country!.code);
-      const sorted = [...left]
+      const sorted = [...left];
       sorted.sort();
       expect(left).toStrictEqual(sorted);
     });
@@ -320,19 +316,15 @@ describe('Repository.findMany() | one to one relations', function () {
     it('associations with target conditions', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'vvipDetails']
+        pick: ['id', 'vvipDetails'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
       const a = rows.filter(x => x.vvipDetails);
       expect(a.length).toBeGreaterThan(0);
       for (const customer of rows) {
-        if (customer.vvipDetails)
-          expect(customer.vvipDetails.rank).toBeGreaterThanOrEqual(5);
+        if (customer.vvipDetails) expect(customer.vvipDetails.rank).toBeGreaterThanOrEqual(5);
       }
     });
-
-
-  })
-
+  });
 });

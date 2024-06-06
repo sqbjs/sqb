@@ -5,7 +5,6 @@ import { isSelectQuery } from '../../typeguards.js';
 import { CompOperator } from './comp-operator.js';
 
 export class OpExists extends CompOperator {
-
   _operatorType = OperatorType.exists;
   _symbol = 'exists';
 
@@ -17,12 +16,11 @@ export class OpExists extends CompOperator {
 
   _serialize(ctx: SerializeContext): string {
     const left = this.__serializeItem(ctx, this._left);
-    if (this._isArray)
-      left.isArray = true;
+    if (this._isArray) left.isArray = true;
     const o: any = {
       operatorType: this._operatorType,
       symbol: this._symbol,
-      left
+      left,
     };
     return this.__serialize(ctx, o);
   }
@@ -30,5 +28,4 @@ export class OpExists extends CompOperator {
   protected __defaultSerialize(ctx: SerializeContext, o) {
     return o.left.expression ? o.symbol + ' ' + o.left.expression : '';
   }
-
 }

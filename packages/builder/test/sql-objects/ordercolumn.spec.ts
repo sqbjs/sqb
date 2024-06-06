@@ -1,10 +1,9 @@
 import { Select } from '../../src/index.js';
 
 describe('serialize "OrderColumn"', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should serialize (field)', function () {
@@ -68,21 +67,14 @@ describe('serialize "OrderColumn"', function () {
   });
 
   it('should validate schema name', function () {
-    expect(() =>
-        Select().from('table1').orderBy('1sch.field1')
-    ).toThrow('does not match order column format');
+    expect(() => Select().from('table1').orderBy('1sch.field1')).toThrow('does not match order column format');
   });
 
   it('should validate table name', function () {
-    expect(() =>
-        Select().from('table1').orderBy('schema.1field1')
-    ).toThrow('does not match order column format');
+    expect(() => Select().from('table1').orderBy('schema.1field1')).toThrow('does not match order column format');
   });
 
   it('should validate order word', function () {
-    expect(() =>
-        Select().from('table1').orderBy('schema.field1 dss')
-    ).toThrow('does not match order column format');
+    expect(() => Select().from('table1').orderBy('schema.field1 dss')).toThrow('does not match order column format');
   });
-
 });

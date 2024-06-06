@@ -1,10 +1,9 @@
 import { Select } from '../../src/index.js';
 
 describe('serialize "TableName"', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should serialize (table)', function () {
@@ -32,21 +31,14 @@ describe('serialize "TableName"', function () {
   });
 
   it('should validate schema name', function () {
-    expect(() =>
-        Select().from('1sch.table1')
-    ).toThrow('does not match table name format');
+    expect(() => Select().from('1sch.table1')).toThrow('does not match table name format');
   });
 
   it('should validate table name', function () {
-    expect(() =>
-        Select().from('sch.1table1')
-    ).toThrow('does not match table name format');
+    expect(() => Select().from('sch.1table1')).toThrow('does not match table name format');
   });
 
   it('should validate alias', function () {
-    expect(() =>
-        Select().from('sch.table1 c+')
-    ).toThrow('does not match table name format');
+    expect(() => Select().from('sch.table1 c+')).toThrow('does not match table name format');
   });
-
 });

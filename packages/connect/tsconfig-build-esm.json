@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "./tsconfig.json",
-    "../../tsconfig-build.json"
-  ],
+  "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "../../build/connect/esm",

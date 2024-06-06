@@ -2,12 +2,11 @@
 import { Column, Embedded, Entity, EntityMetadata } from '@sqb/connect';
 
 describe('Model / Embedded object element', function () {
-
   class PersonName {
     @Column()
-    given: string
+    given: string;
     @Column()
-    family: string
+    family: string;
   }
 
   it(`should define embedded element metadata`, () => {
@@ -28,7 +27,7 @@ describe('Model / Embedded object element', function () {
     class MyEntity {
       @Embedded(PersonName, {
         fieldNamePrefix: 'prefix',
-        fieldNameSuffix: 'suffix'
+        fieldNameSuffix: 'suffix',
       })
       name: PersonName;
     }
@@ -42,5 +41,4 @@ describe('Model / Embedded object element', function () {
     expect(name!.fieldNamePrefix).toStrictEqual('prefix');
     expect(name!.fieldNameSuffix).toStrictEqual('suffix');
   });
-
 });

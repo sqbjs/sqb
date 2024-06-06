@@ -6,7 +6,6 @@ import { FieldExpression } from './field-expression.js';
 import { OrderColumn } from './order-column.js';
 
 export class StringAGGStatement extends Serializable {
-
   _field: Serializable;
   _delimiter: string;
   _orderBy?: (OrderColumn | Serializable)[];
@@ -59,7 +58,7 @@ export class StringAGGStatement extends Serializable {
       field: ctx.anyToSQL(this._field),
       delimiter: this._delimiter,
       orderBy: this.__serializeOrderColumns(ctx),
-      alias: this._alias
+      alias: this._alias,
     };
 
     return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
@@ -71,8 +70,7 @@ export class StringAGGStatement extends Serializable {
       for (const t of this._orderBy) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
-        if (s)
-          arr.push(s);
+        if (s) arr.push(s);
       }
     return ctx.serialize(SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
       const s = printArray(arr);
@@ -81,9 +79,15 @@ export class StringAGGStatement extends Serializable {
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-    return 'string_agg(' + o.field +
-        ',\'' + o.delimiter + '\'' +
-        (o.orderBy ? ' ' + o.orderBy : '') + ')' +
-        (o.alias ? ' ' + o.alias : '');
+    return (
+      'string_agg(' +
+      o.field +
+      ",'" +
+      o.delimiter +
+      "'" +
+      (o.orderBy ? ' ' + o.orderBy : '') +
+      ')' +
+      (o.alias ? ' ' + o.alias : '')
+    );
   }
 }

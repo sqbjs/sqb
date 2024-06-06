@@ -1,19 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  Link,
-  PrimaryKey,
-} from '@sqb/connect';
+import { BaseEntity, Column, Entity, Link, PrimaryKey } from '@sqb/connect';
 
 describe('Model / Entity', function () {
-
   it(`should @Entity() decorator attach metadata to class`, () => {
     @Entity()
-    class MyEntity {
-
-    }
+    class MyEntity {}
 
     const meta = Entity.getMetadata(MyEntity);
     expect(meta).toBeDefined();
@@ -22,9 +13,7 @@ describe('Model / Entity', function () {
 
   it(`should @Entity(string) decorator set tableName`, () => {
     @Entity('CustomEntity')
-    class MyEntity {
-
-    }
+    class MyEntity {}
 
     const meta = Entity.getMetadata(MyEntity);
     expect(meta).toBeDefined();
@@ -36,11 +25,9 @@ describe('Model / Entity', function () {
     @Entity({
       tableName: 'CustomEntity',
       schema: 'my_schema',
-      comment: 'comment'
+      comment: 'comment',
     })
-    class MyEntity {
-
-    }
+    class MyEntity {}
 
     const meta = Entity.getMetadata(MyEntity);
     expect(meta).toBeDefined();
@@ -54,17 +41,17 @@ describe('Model / Entity', function () {
     class Base {
       @Column()
       @PrimaryKey()
-      id: number
+      id: number;
     }
 
-    @Entity({schema: 'my_schema', comment: 'comment'})
+    @Entity({ schema: 'my_schema', comment: 'comment' })
     class MyEntity extends Base {
       @Column()
-      code: string
+      code: string;
     }
 
     const primaryIndex1 = Entity.getPrimaryIndex(Base);
-    expect(primaryIndex1).toBeDefined()
+    expect(primaryIndex1).toBeDefined();
     const primaryIndex2 = Entity.getPrimaryIndex(MyEntity);
     expect(primaryIndex2).toBeDefined();
     expect(primaryIndex1!.columns).toStrictEqual(primaryIndex2!.columns);
@@ -79,7 +66,6 @@ describe('Model / Entity', function () {
 
     @Entity()
     class BaseCustomer extends BaseEntity {
-
       @Column()
       id: string;
 
@@ -88,13 +74,12 @@ describe('Model / Entity', function () {
 
       @Link()
       country: Country;
-
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string
+      code: string;
     }
 
     expect(Entity.getFieldNames(Customer)).toStrictEqual(['id', 'name', 'country', 'code']);
@@ -109,7 +94,6 @@ describe('Model / Entity', function () {
 
     @Entity()
     class BaseCustomer extends BaseEntity {
-
       @Column()
       id: string;
 
@@ -118,13 +102,12 @@ describe('Model / Entity', function () {
 
       @Link()
       country: Country;
-
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string
+      code: string;
     }
 
     expect(Entity.getColumnFieldNames(Customer)).toStrictEqual(['id', 'name', 'code']);
@@ -139,22 +122,20 @@ describe('Model / Entity', function () {
 
     @Entity()
     class BaseCustomer extends BaseEntity {
-
-      @Column({noInsert: true})
+      @Column({ noInsert: true })
       id: string;
 
-      @Column({noUpdate: true})
+      @Column({ noUpdate: true })
       name: number;
 
       @Link()
       country: Country;
-
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string
+      code: string;
     }
 
     expect(Entity.getInsertColumnNames(Customer)).toStrictEqual(['name', 'code']);
@@ -169,25 +150,22 @@ describe('Model / Entity', function () {
 
     @Entity()
     class BaseCustomer extends BaseEntity {
-
-      @Column({noInsert: true})
+      @Column({ noInsert: true })
       id: string;
 
-      @Column({noUpdate: true})
+      @Column({ noUpdate: true })
       name: number;
 
       @Link()
       country: Country;
-
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string
+      code: string;
     }
 
     expect(Entity.getUpdateColumnNames(Customer)).toStrictEqual(['id', 'code']);
   });
-
 });

@@ -30,14 +30,15 @@
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/sqljs",
-    "clean:cover": "rimraf ../../coverage/sqljs"
+    "clean:cover": "rimraf ../../coverage/sqljs",
+    "format": "prettier . --write --log-level=warn"
   },
   "dependencies": {
     "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.9",
-    "sql.js": "^1.10.2"
+    "sql.js": "^1.10.3"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.11.3",

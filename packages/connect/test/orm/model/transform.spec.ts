@@ -2,13 +2,12 @@
 import { Entity, EntityMetadata, Parse, Serialize } from '@sqb/connect';
 
 describe('Model / Parse', function () {
-
   it(`should @Parse() decorator set "parse" property of metadata`, () => {
-    const fn = (v) => '>' + v;
+    const fn = v => '>' + v;
 
     class MyEntity {
       @Parse(fn)
-      id: string
+      id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -18,17 +17,15 @@ describe('Model / Parse', function () {
     expect(idColumn).toBeDefined();
     expect(idColumn!.parse).toStrictEqual(fn);
   });
-
 });
 
 describe('Model / Serialize', function () {
-
   it(`should @Serialize() decorator set "parse" property of metadata`, () => {
-    const fn = (v) => '>' + v;
+    const fn = v => '>' + v;
 
     class MyEntity {
       @Serialize(fn)
-      id: string
+      id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -38,5 +35,4 @@ describe('Model / Serialize', function () {
     expect(idColumn).toBeDefined();
     expect(idColumn!.serialize).toStrictEqual(fn);
   });
-
 });

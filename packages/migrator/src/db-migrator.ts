@@ -17,29 +17,28 @@ export class DbMigrator extends AsyncEventEmitter {
   protected adapter: MigrationAdapter;
 
   async execute(options: DbMigratorOptions): Promise<boolean> {
-    if (!options.connection.dialect)
-      throw new TypeError(`You must provide connection.dialect`);
+    if (!options.connection.dialect) throw new TypeError(`You must provide connection.dialect`);
 
     const migrationPackage = await MigrationPackage.load(options.migrationPackage);
 
-    let minVersion = migrationPackage.migrations
-        .reduce((a, m) => Math.min(a, m.version), Number.MAX_SAFE_INTEGER);
-    if (minVersion === Number.MAX_SAFE_INTEGER)
-      minVersion = 0;
-    const maxVersion = migrationPackage.migrations
-        .reduce((a, m) => Math.max(a, m.version), 0);
+    let minVersion = migrationPackage.migrations.reduce((a, m) => Math.min(a, m.version), Number.MAX_SAFE_INTEGER);
+    if (minVersion === Number.MAX_SAFE_INTEGER) minVersion = 0;
+    const maxVersion = migrationPackage.migrations.reduce((a, m) => Math.max(a, m.version), 0);
 
     const targetVersion: number = Math.min(options?.targetVersion || Number.MAX_SAFE_INTEGER, maxVersion);
 
-    if (targetVersion && targetVersion < minVersion) { // noinspection ExceptionCaughtLocallyJS
-      throw new Error(`Version mismatch. Target schema version (${targetVersion}) is lower than ` +
-          `migration package min version (${minVersion})`);
+    if (targetVersion && targetVersion < minVersion) {
+      // noinspection ExceptionCaughtLocallyJS
+      throw new Error(
+        `Version mismatch. Target schema version (${targetVersion}) is lower than ` +
+          `migration package min version (${minVersion})`,
+      );
     }
 
     let migrationAdapter: MigrationAdapter;
     switch (options.connection.dialect) {
       case 'postgres': {
-        migrationAdapter = await PgMigrationAdapter.create({...options, migrationPackage});
+        migrationAdapter = await PgMigrationAdapter.create({ ...options, migrationPackage });
         break;
       }
       default:
@@ -47,14 +46,16 @@ export class DbMigrator extends AsyncEventEmitter {
     }
     let needBackup = false;
     try {
-      if (migrationAdapter.version && migrationAdapter.version < minVersion - 1) { // noinspection ExceptionCaughtLocallyJS
-        throw new Error(`This package can migrate starting from ${minVersion - 1} but current version is ${migrationAdapter.version}`);
+      if (migrationAdapter.version && migrationAdapter.version < minVersion - 1) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new Error(
+          `This package can migrate starting from ${minVersion - 1} but current version is ${migrationAdapter.version}`,
+        );
       }
 
-      const {migrations} = migrationPackage;
+      const { migrations } = migrationPackage;
       // calculate total scripts;
-      const total = migrations
-          .reduce((i, x) => i + x.tasks.length, 0);
+      const total = migrations.reduce((i, x) => i + x.tasks.length, 0);
       needBackup = !!migrations.find(x => !!x.backup);
 
       await this.emitAsync('start');
@@ -70,32 +71,28 @@ export class DbMigrator extends AsyncEventEmitter {
       let migrationIndex = -1;
       for (const migration of migrations) {
         migrationIndex++;
-        if (migration.version > targetVersion || migrationAdapter.version >= migration.version)
-          continue;
+        if (migration.version > targetVersion || migrationAdapter.version >= migration.version) continue;
         await this.emitAsync('migration-start', {
           migration,
           total: migrations.length,
-          index: migrationIndex
+          index: migrationIndex,
         });
         for (let index = 0; index < migration.tasks.length; index++) {
           task = migration.tasks[index];
-          await this.emitAsync('task-start', {migration, task, total, index});
-          await migrationAdapter.update({status: MigrationStatus.busy});
+          await this.emitAsync('task-start', { migration, task, total, index });
+          await migrationAdapter.update({ status: MigrationStatus.busy });
           await migrationAdapter.writeEvent({
             event: MigrationAdapter.EventKind.started,
             version: migration.version,
             title: task.title,
             filename: task.filename,
-            message: `Task "${task.title}" started`
+            message: `Task "${task.title}" started`,
           });
           try {
-            await migrationAdapter.executeTask(
-                migrationPackage,
-                migration,
-                task, {
-                  schema: options.connection.schema,
-                  ...options.scriptVariables,
-                });
+            await migrationAdapter.executeTask(migrationPackage, migration, task, {
+              schema: options.connection.schema,
+              ...options.scriptVariables,
+            });
             await migrationAdapter.writeEvent({
               event: MigrationAdapter.EventKind.success,
               version: migration.version,
@@ -110,21 +107,24 @@ export class DbMigrator extends AsyncEventEmitter {
               title: task.title,
               filename: task.filename,
               message: String(e),
-              details: e.message + '\n\n' +
-                  Object.keys(e)
-                      .filter(k => e[k] != null)
-                      .map(k => k + ': ' + e[k]).join('\n')
+              details:
+                e.message +
+                '\n\n' +
+                Object.keys(e)
+                  .filter(k => e[k] != null)
+                  .map(k => k + ': ' + e[k])
+                  .join('\n'),
             });
             // noinspection ExceptionCaughtLocallyJS
             throw e;
           }
-          await this.emitAsync('task-finish', {migration, task, total, index});
+          await this.emitAsync('task-finish', { migration, task, total, index });
         }
-        await migrationAdapter.update({version: migration.version, status: MigrationStatus.idle});
+        await migrationAdapter.update({ version: migration.version, status: MigrationStatus.idle });
         await this.emitAsync('migration-finish', {
           migration,
           total: migrations.length,
-          index: migrationIndex
+          index: migrationIndex,
         });
       }
     } catch (e) {
@@ -143,5 +143,4 @@ export class DbMigrator extends AsyncEventEmitter {
     await this.emitAsync('finish');
     return true;
   }
-
 }

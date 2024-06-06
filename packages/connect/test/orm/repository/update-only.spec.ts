@@ -8,10 +8,9 @@ import { createCustomer } from './update.spec.js';
 let client: SqbClient;
 
 describe('Repository.updateOnly()', function () {
-
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -22,12 +21,12 @@ describe('Repository.updateOnly()', function () {
     const old = await createCustomer(client);
     const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
     let success = await repo.updateOnly(old.id, {
-      givenName: newGivenName
+      givenName: newGivenName,
     });
     expect(success).toStrictEqual(true);
 
     success = await repo.updateOnly(0, {
-      givenName: newGivenName
+      givenName: newGivenName,
     });
     expect(success).toStrictEqual(false);
 
@@ -38,7 +37,7 @@ describe('Repository.updateOnly()', function () {
   });
 
   it('should not fetch after update for fast execution', async function () {
-    return client.acquire(async (connection) => {
+    return client.acquire(async connection => {
       const repo = connection.getRepository(Customer);
       const old = await createCustomer(client);
       let sql = '';
@@ -46,18 +45,18 @@ describe('Repository.updateOnly()', function () {
         sql = req.sql;
       });
       await repo.updateOnly(old.id, {
-        givenName: 'Any name'
+        givenName: 'Any name',
       });
-      expect(sql.includes('select')).toStrictEqual(false)
+      expect(sql.includes('select')).toStrictEqual(false);
     });
   });
 
   it('should map embedded elements into fields', async function () {
     const repo = client.getRepository(Customer);
     const old = await createCustomer(client);
-    const newName = {given: 'G' + Math.trunc(Math.random() * 10000)};
+    const newName = { given: 'G' + Math.trunc(Math.random() * 10000) };
     const c1 = await repo.update(old.id, {
-      name: newName
+      name: newName,
     });
     expect(c1).toBeDefined();
     expect(c1 instanceof Customer).toBeTruthy();
@@ -75,11 +74,11 @@ describe('Repository.updateOnly()', function () {
   it('should map embedded elements with prefix into fields', async function () {
     const repo = client.getRepository(Customer);
     const old = await createCustomer(client, {
-      address: {city: Math.trunc(Math.random() * 10000)}
+      address: { city: Math.trunc(Math.random() * 10000) },
     });
-    const newAddress = {city: 'G' + Math.trunc(Math.random() * 10000)};
+    const newAddress = { city: 'G' + Math.trunc(Math.random() * 10000) };
     const c1 = await repo.update(old.id, {
-      address: newAddress
+      address: newAddress,
     });
     expect(c1).toBeDefined();
     expect(c1 instanceof Customer).toStrictEqual(true);
@@ -93,14 +92,12 @@ describe('Repository.updateOnly()', function () {
     expect(c2!.id).toStrictEqual(old.id);
     expect(c2!.address!.city).toStrictEqual(newAddress.city);
   });
-
 });
 
 describe('updateAll()', function () {
-
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -110,17 +107,16 @@ describe('updateAll()', function () {
     const oldCity = 'C' + Math.trunc(Math.random() * 10000);
     const ids: number[] = [];
     for (let i = 0; i < 10; i++) {
-      const customer = await createCustomer(client, {city: oldCity});
+      const customer = await createCustomer(client, { city: oldCity });
       ids.push(customer!.id!);
     }
     const repo = client.getRepository(Customer);
     const newCity = 'C' + Math.trunc(Math.random() * 10000);
-    const count = await repo.updateMany({city: newCity}, {filter: In('id', ids)});
+    const count = await repo.updateMany({ city: newCity }, { filter: In('id', ids) });
     expect(count).toStrictEqual(ids.length);
-    const rows = await repo.findMany({filter: In('id', ids)});
+    const rows = await repo.findMany({ filter: In('id', ids) });
     for (const row of rows) {
       expect(row.city).toStrictEqual(newCity);
     }
   });
-
 });

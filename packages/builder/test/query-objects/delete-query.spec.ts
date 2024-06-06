@@ -1,10 +1,9 @@
 import { Delete, Eq, Raw, SerializationType } from '../../src/index.js';
 
 describe('Serialize delete query', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should initialize DeleteQuery', function () {
@@ -13,8 +12,7 @@ describe('Serialize delete query', function () {
   });
 
   it('should serialize delete', function () {
-    const query = Delete('table1')
-        .where(Eq('id', 1));
+    const query = Delete('table1').where(Eq('id', 1));
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('delete from table1 where id = 1');
   });
@@ -27,9 +25,8 @@ describe('Serialize delete query', function () {
 
   it('should validate first (tableName) argument', function () {
     expect(
-        // @ts-ignore
-        () => Delete(null)
+      // @ts-ignore
+      () => Delete(null),
     ).toThrow('required as first argument');
   });
-
 });

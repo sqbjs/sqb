@@ -1,7 +1,6 @@
 import { SerializationType, SerializeContext } from '../../src/index.js';
 
 export class TestSerializer {
-
   dialect = 'test';
 
   serialize(ctx, type, o, defFn) {
@@ -19,9 +18,7 @@ export class TestSerializer {
   private _serializeParameter(ctx: SerializeContext, o: any): string {
     const prmValue = ctx.params && ctx.params[o.name];
     ctx.preparedParams = ctx.preparedParams || {};
-    if (prmValue !== undefined)
-      ctx.preparedParams[o.name] = prmValue;
+    if (prmValue !== undefined) ctx.preparedParams[o.name] = prmValue;
     return '__' + o.name;
   }
-
 }

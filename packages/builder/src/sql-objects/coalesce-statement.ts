@@ -3,7 +3,6 @@ import { Serializable } from '../serializable.js';
 import { SerializeContext } from '../serialize-context.js';
 
 export class CoalesceStatement extends Serializable {
-
   _expressions: any[];
   _alias?: string;
 
@@ -32,8 +31,7 @@ export class CoalesceStatement extends Serializable {
    * @override
    */
   _serialize(ctx: SerializeContext): string {
-    if (!this._expressions.length)
-      return '';
+    if (!this._expressions.length) return '';
     const q = {
       expressions: [] as any[],
     };
@@ -41,13 +39,10 @@ export class CoalesceStatement extends Serializable {
       q.expressions.push(ctx.anyToSQL(x));
     }
 
-    return ctx.serialize(this._type, q,
-        () => this.__defaultSerialize(ctx, q));
+    return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-    return 'coalesce(' + o.expressions.join(', ') + ')' +
-        (this._alias ? ' ' + this._alias : '');
+    return 'coalesce(' + o.expressions.join(', ') + ')' + (this._alias ? ' ' + this._alias : '');
   }
-
 }

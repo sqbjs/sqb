@@ -14,7 +14,9 @@ import {
   ClientDefaults,
   ConnectionOptions,
   QueryExecuteOptions,
-  QueryRequest, QueryResult, TransactionFunction,
+  QueryRequest,
+  QueryResult,
+  TransactionFunction,
 } from './types.js';
 
 const debug = _debug('sqb:client');
@@ -38,21 +40,17 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
 
   constructor(config: ClientConfiguration) {
     super();
-    if (!(config && typeof config === 'object'))
-      throw new TypeError('Configuration object required');
+    if (!(config && typeof config === 'object')) throw new TypeError('Configuration object required');
 
     let adapter;
     if (config.driver) {
       adapter = adapters.find(x => x.driver === config.driver);
-      if (!adapter)
-        throw new Error(`No database adapter registered for "${config.driver}" driver`);
+      if (!adapter) throw new Error(`No database adapter registered for "${config.driver}" driver`);
     } else if (config.dialect) {
       adapter = adapters.find(x => x.dialect === config.dialect);
-      if (!adapter)
-        throw new Error(`No database adapter registered for "${config.dialect}" dialect`);
+      if (!adapter) throw new Error(`No database adapter registered for "${config.dialect}" dialect`);
     }
-    if (!adapter)
-      throw new Error(`You must provide one of "driver" or "dialect" properties`);
+    if (!adapter) throw new Error(`You must provide one of "driver" or "dialect" properties`);
 
     this._adapter = adapter;
 
@@ -71,12 +69,12 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
     poolOptions.minIdle = coerceToInt(popts.minIdle, 0);
     poolOptions.validation = coerceToBoolean(popts.validation, false);
 
-    const cfg = {...config};
+    const cfg = { ...config };
     const poolFactory: PoolFactory<Adapter.Connection> = {
       create: () => adapter.connect(cfg),
       destroy: instance => instance.close(),
       reset: async instance => instance.reset(),
-      validate: instance => instance.test()
+      validate: instance => instance.test(),
     };
 
     this._pool = createPool<Adapter.Connection>(poolFactory, poolOptions);
@@ -123,7 +121,7 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
   /**
    * Obtains a connection from the connection pool.
    */
-  async acquire(options?: ConnectionOptions): Promise<SqbConnection>
+  async acquire(options?: ConnectionOptions): Promise<SqbConnection>;
   async acquire(arg0?: any, arg1?: any): Promise<any> {
     debug('acquire');
     if (typeof arg0 === 'function') {
@@ -136,15 +134,12 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
     }
     const options = arg1 as ConnectionOptions;
     const adapterConnection = await this._pool.acquire();
-    const opts = {autoCommit: this.defaults.autoCommit, ...options}
+    const opts = { autoCommit: this.defaults.autoCommit, ...options };
     const connection = new SqbConnection(this, adapterConnection, opts);
     await this.emitAsyncSerial('acquire', connection);
-    connection.on('execute', (request: QueryRequest) =>
-        this.emit('execute', request));
-    connection.on('error', (error: Error) =>
-        this.emit('error', error));
-    connection.on('close', () =>
-        this.emitAsyncSerial('connection-return', connection));
+    connection.on('execute', (request: QueryRequest) => this.emit('execute', request));
+    connection.on('error', (error: Error) => this.emit('error', error));
+    connection.on('close', () => this.emitAsyncSerial('connection-return', connection));
     return connection;
   }
 
@@ -190,12 +185,10 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
     let ctor;
     if (typeof entity === 'string') {
       ctor = this.getEntity<T>(entity);
-      if (!ctor)
-        throw new Error(`Repository "${entity}" is not registered`);
+      if (!ctor) throw new Error(`Repository "${entity}" is not registered`);
     } else ctor = entity;
     const entityDef = EntityMetadata.get(ctor);
-    if (!entityDef)
-      throw new Error(`You must provide an @Entity annotated constructor`);
+    if (!entityDef) throw new Error(`You must provide an @Entity annotated constructor`);
     return new Repository<T>(entityDef, this, opts?.schema);
   }
 
@@ -204,12 +197,10 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
   }
 
   toString() {
-    return '[object ' + Object.getPrototypeOf(this).constructor.name + '(' +
-        this.dialect + ')]';
+    return '[object ' + Object.getPrototypeOf(this).constructor.name + '(' + this.dialect + ')]';
   }
 
   [inspect]() {
     return this.toString();
   }
-
 }

@@ -10,15 +10,16 @@
       "plugins": [
         "@typescript-eslint",
         "simple-import-sort",
-        "import",
+        "import-x",
         "unused-imports",
         "security"
       ],
       "extends": [
+        "plugin:import-x/recommended",
+        "plugin:import-x/typescript",
+        "plugin:prettier/recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:import/recommended",
-        "plugin:import/typescript"
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
       ],
       "parser": "@typescript-eslint/parser",
       "parserOptions": {
@@ -30,10 +31,10 @@
         "sourceType": "module"
       },
       "rules": {
-        "import/export": "off",
-        "import/no-cycle": "error",
-        "import/no-unresolved": ["off", {"commonjs": true, "amd": true}],
-        "import/extensions": ["error", "ignorePackages"],
+        "import-x/export": "off",
+        "import-x/no-cycle": "error",
+        "import-x/no-unresolved": ["off", {"commonjs": true, "amd": true}],
+        "import-x/extensions": ["error", "ignorePackages"],
         "@typescript-eslint/array-type": "error",
         "@typescript-eslint/explicit-member-accessibility": [
           "off",
@@ -92,7 +93,6 @@
         "@typescript-eslint/no-unsafe-declaration-merging": "off",
         "@typescript-eslint/no-redundant-type-constituents": "off",
         "@typescript-eslint/await-thenable": "off",
-        "@typescript-eslint/no-unsafe-enum-comparison": "off",
         "arrow-parens": [
           "off",
           "as-needed"
@@ -110,7 +110,7 @@
         "guard-for-in": "error",
         "id-blacklist": "error",
         "id-match": "error",
-        "import/order": "off",
+        "import-x/order": "off",
         "max-classes-per-file": "off",
         "max-len": [
           "error",
@@ -177,7 +177,8 @@
       },
       "extends": [
         "eslint:recommended",
-        "google"
+        "plugin:import-x/recommended",
+        "plugin:prettier/recommended"
       ],
       "parser": "@babel/eslint-parser",
       "parserOptions": {

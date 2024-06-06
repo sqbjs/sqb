@@ -8,9 +8,7 @@ export class BaseEntity {
   constructor(partial?: any) {
     const fields = Entity.getColumnFieldNames(Object.getPrototypeOf(this).constructor);
     if (fields && partial) {
-      for (const k of fields)
-        if (partial[k] !== undefined)
-          this[k] = partial[k];
+      for (const k of fields) if (partial[k] !== undefined) this[k] = partial[k];
     }
   }
 

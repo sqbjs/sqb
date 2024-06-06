@@ -12,7 +12,7 @@ import { RowConverter } from './row-converter.js';
 
 export type FindCommandArgs = {
   entity: EntityMetadata;
-  connection: SqbConnection
+  connection: SqbConnection;
 } & Repository.FindManyOptions;
 
 const SORT_ORDER_PATTERN = /^([-+])?(.*)$/;
@@ -26,10 +26,13 @@ export class FindCommand {
   readonly mainAlias: string = 'T';
   resultAlias: string = 'T';
   private _joins: JoinInfo[] = [];
-  private _selectColumns: Record<string, {
-    statement: string;
-    field: ColumnFieldMetadata;
-  }> = {};
+  private _selectColumns: Record<
+    string,
+    {
+      statement: string;
+      field: ColumnFieldMetadata;
+    }
+  > = {};
   private _filter = And();
   private _sort?: string[];
 
@@ -39,10 +42,13 @@ export class FindCommand {
     this.converter = new RowConverter(outputEntity.ctor);
   }
 
-  static async create(source: EntityMetadata | AssociationNode, opts: {
-    maxSubQueries?: number;
-    maxEagerFetch?: number;
-  } = {}): Promise<FindCommand> {
+  static async create(
+    source: EntityMetadata | AssociationNode,
+    opts: {
+      maxSubQueries?: number;
+      maxEagerFetch?: number;
+    } = {},
+  ): Promise<FindCommand> {
     let command: FindCommand;
     let listingEntity: EntityMetadata;
     if (source instanceof AssociationNode) {
@@ -50,8 +56,7 @@ export class FindCommand {
       listingEntity = await node.resolveTarget();
       const resultEntity = await node.getLast().resolveTarget();
       command = new FindCommand(listingEntity, resultEntity);
-      if (node.conditions)
-        await command.filter(node.conditions);
+      if (node.conditions) await command.filter(node.conditions);
       if (node.next) {
         const join = await joinAssociationGetLast(command._joins, node.next, command.mainAlias);
         command.resultAlias = join.joinAlias;
@@ -60,12 +65,9 @@ export class FindCommand {
       listingEntity = source;
       command = new FindCommand(listingEntity, listingEntity);
     }
-    if (!listingEntity.tableName)
-      throw new Error(`${listingEntity.ctor.name} is not decorated with @Entity decorator`);
-    if (typeof opts.maxSubQueries === 'number')
-      command.maxSubQueries = opts.maxSubQueries;
-    if (typeof opts.maxEagerFetch === 'number')
-      command.maxEagerFetch = opts.maxEagerFetch;
+    if (!listingEntity.tableName) throw new Error(`${listingEntity.ctor.name} is not decorated with @Entity decorator`);
+    if (typeof opts.maxSubQueries === 'number') command.maxSubQueries = opts.maxSubQueries;
+    if (typeof opts.maxEagerFetch === 'number') command.maxEagerFetch = opts.maxEagerFetch;
     return command;
   }
 
@@ -79,74 +81,62 @@ export class FindCommand {
       pick: args.pick,
       include: args.include,
       omit: args.omit,
-      sort: args.sort
+      sort: args.sort,
     });
 
-    if (args.filter)
-      await command.filter(args.filter);
-    if (args.sort)
-      await command.sort(args.sort);
+    if (args.filter) await command.filter(args.filter);
+    if (args.sort) await command.sort(args.sort);
 
     return await command.execute(args);
   }
 
-  async addFields(opts: {
-                    tableAlias?: string;
-                    converter?: RowConverter;
-                    entity?: EntityMetadata;
-                    pick?: string[];
-                    omit?: string[];
-                    include?: string[];
-                    sort?: string[];
-                    prefix?: string;
-                    suffix?: string;
-                  } = {}
+  async addFields(
+    opts: {
+      tableAlias?: string;
+      converter?: RowConverter;
+      entity?: EntityMetadata;
+      pick?: string[];
+      omit?: string[];
+      include?: string[];
+      sort?: string[];
+      prefix?: string;
+      suffix?: string;
+    } = {},
   ): Promise<void> {
     const tableAlias = opts.tableAlias || this.resultAlias;
     const entity = opts.entity || this._getEntityFromAlias(tableAlias);
     const converter = opts.converter || this.converter;
 
-    const _pick = opts.pick ?
-        opts.pick.map(x => x.toLowerCase()) : undefined;
-    const _omit = opts.omit ?
-        opts.omit.map(x => x.toLowerCase()) : undefined;
-    const _include = opts.include ?
-        opts.include.map(x => x.toLowerCase()) : undefined;
+    const _pick = opts.pick ? opts.pick.map(x => x.toLowerCase()) : undefined;
+    const _omit = opts.omit ? opts.omit.map(x => x.toLowerCase()) : undefined;
+    const _include = opts.include ? opts.include.map(x => x.toLowerCase()) : undefined;
 
     let requestedFields: string[];
-    if (_pick)
-      requestedFields = [..._pick];
+    if (_pick) requestedFields = [..._pick];
     else {
       requestedFields = Entity.getFieldNames(entity.ctor).reduce((a, x) => {
         const f = Entity.getField(entity.ctor, x);
-        if (f && !f.exclusive)
-          a.push(x.toLowerCase())
+        if (f && !f.exclusive) a.push(x.toLowerCase());
         return a;
-      }, [] as string[])
+      }, [] as string[]);
     }
 
-    if (_include)
-      requestedFields.push(..._include);
+    if (_include) requestedFields.push(..._include);
 
-    const sortFields = opts.sort && opts.sort.length ?
-        opts.sort.map(x => x.toLowerCase()) : undefined;
+    const sortFields = opts.sort && opts.sort.length ? opts.sort.map(x => x.toLowerCase()) : undefined;
     const prefix = opts.prefix || '';
     const suffix = opts.suffix || '';
 
     for (const key of Object.keys(entity.fields)) {
       const col = EntityMetadata.getField(entity, key);
-      if (!col || col.hidden)
-        continue;
+      if (!col || col.hidden) continue;
       const colNameLower = col.name.toLowerCase();
 
       // Ignore field if in excluded list
-      if (_omit && _omit.includes(colNameLower))
-        continue;
+      if (_omit && _omit.includes(colNameLower)) continue;
 
       // Check if field request list
-      if (!requestedFields.find(
-          (x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))
-      ) continue;
+      if (!requestedFields.find((x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))) continue;
 
       // Add field to select list if field is a column
       if (isColumnField(col)) {
@@ -156,7 +146,7 @@ export class FindCommand {
           name: col.name,
           fieldAlias,
           dataType: col.dataType,
-          parse: col.parse
+          parse: col.parse,
         });
         continue;
       }
@@ -165,7 +155,7 @@ export class FindCommand {
         const typ = await EmbeddedFieldMetadata.resolveType(col);
         const subConverter = converter.addObjectProperty({
           name: col.name,
-          type: typ.ctor
+          type: typ.ctor,
         }).converter;
         await this.addFields({
           tableAlias,
@@ -173,8 +163,7 @@ export class FindCommand {
           entity: typ,
           prefix: col.fieldNamePrefix,
           suffix: col.fieldNameSuffix,
-          pick: _pick?.includes(colNameLower) ? undefined :
-              extractSubFields(colNameLower, _pick),
+          pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
           include: extractSubFields(colNameLower, _include),
           omit: extractSubFields(colNameLower, _omit),
           sort: extractSubFields(colNameLower, sortFields),
@@ -183,21 +172,19 @@ export class FindCommand {
       }
 
       if (isAssociationField(col)) {
-
         // OtO relation
         if (!col.association.returnsMany()) {
           const joinInfo = await joinAssociationGetLast(this._joins, col.association, tableAlias);
           const subConverter = converter.addObjectProperty({
             name: col.name,
-            type: joinInfo.targetEntity.ctor
+            type: joinInfo.targetEntity.ctor,
           }).converter;
           // Add join fields to select columns list
           await this.addFields({
             tableAlias: joinInfo.joinAlias,
             converter: subConverter,
             entity: joinInfo.targetEntity,
-            pick: _pick?.includes(colNameLower) ? undefined :
-                extractSubFields(colNameLower, _pick),
+            pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
             include: extractSubFields(colNameLower, _include),
             omit: extractSubFields(colNameLower, _omit),
             sort: extractSubFields(colNameLower, sortFields),
@@ -215,20 +202,18 @@ export class FindCommand {
 
           const findCommand = await FindCommand.create(col.association, {
             maxSubQueries: this.maxSubQueries - 1,
-            maxEagerFetch: this.maxEagerFetch
+            maxEagerFetch: this.maxEagerFetch,
           });
           findCommand.converter.parent = this.converter;
           await findCommand.filter(In(targetCol.name, Param(parentField)));
           const sort = sortFields && extractSubFields(colNameLower, sortFields);
           await findCommand.addFields({
-            pick: _pick?.includes(colNameLower) ? undefined :
-                extractSubFields(colNameLower, _pick),
+            pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
             include: extractSubFields(colNameLower, _include),
             omit: extractSubFields(colNameLower, _omit),
             sort,
           });
-          if (sort)
-            await findCommand.sort(sort);
+          if (sort) await findCommand.sort(sort);
           const keyField = findCommand._selectColumn(findCommand.mainAlias, targetCol);
 
           const resultType = await col.association.getLast().resolveTarget();
@@ -238,22 +223,19 @@ export class FindCommand {
             findCommand,
             parentField,
             keyField,
-            sort: extractSubFields(colNameLower, sortFields)
+            sort: extractSubFields(colNameLower, sortFields),
           });
         }
       }
     }
   }
 
-  private _selectColumn(tableAlias: string, el: ColumnFieldMetadata,
-                        prefix?: string, suffix?: string): string {
-    const fieldName = (prefix || '').toLowerCase() +
-        el.fieldName.toUpperCase() +
-        (suffix || '').toLowerCase();
+  private _selectColumn(tableAlias: string, el: ColumnFieldMetadata, prefix?: string, suffix?: string): string {
+    const fieldName = (prefix || '').toLowerCase() + el.fieldName.toUpperCase() + (suffix || '').toLowerCase();
     const fieldAlias = (tableAlias + '_' + fieldName).substring(0, 30);
     this._selectColumns[fieldAlias] = {
       field: el,
-      statement: tableAlias + '.' + fieldName + ' as ' + fieldAlias
+      statement: tableAlias + '.' + fieldName + ' as ' + fieldAlias,
     };
     return fieldAlias;
   }
@@ -266,8 +248,7 @@ export class FindCommand {
     const out: string[] = [];
     for (const item of sortFields) {
       const m = item.match(SORT_ORDER_PATTERN);
-      if (!m)
-        throw new Error(`"${item}" is not a valid order expression`);
+      if (!m) throw new Error(`"${item}" is not a valid order expression`);
 
       let elName = m[2];
       let prefix = '';
@@ -280,10 +261,8 @@ export class FindCommand {
           const col = EntityMetadata.getField(_entityDef, a.shift() || '');
           if (isEmbeddedField(col)) {
             _entityDef = await EmbeddedFieldMetadata.resolveType(col);
-            if (col.fieldNamePrefix)
-              prefix += col.fieldNamePrefix;
-            if (col.fieldNameSuffix)
-              suffix = col.fieldNameSuffix + suffix;
+            if (col.fieldNamePrefix) prefix += col.fieldNamePrefix;
+            if (col.fieldNameSuffix) suffix = col.fieldNameSuffix + suffix;
           } else if (isAssociationField(col)) {
             if (col.association.returnsMany()) {
               elName = '';
@@ -294,15 +273,12 @@ export class FindCommand {
             _entityDef = joinInfo.targetEntity;
           } else throw new Error(`Invalid column (${elName}) declared in sort property`);
         }
-        if (!elName)
-          continue;
+        if (!elName) continue;
         elName = a.shift() || '';
       }
       const col = EntityMetadata.getField(_entityDef, elName);
-      if (!col)
-        throw new Error(`Unknown field (${elName}) declared in sort property`);
-      if (!isColumnField(col))
-        throw new Error(`Can not sort by "${elName}", because it is not a data column`);
+      if (!col) throw new Error(`Unknown field (${elName}) declared in sort property`);
+      if (!isColumnField(col)) throw new Error(`Can not sort by "${elName}", because it is not a data column`);
 
       const dir = m[1] || '+';
       out.push((dir || '') + tableAlias + '.' + prefix + col.fieldName + suffix);
@@ -310,28 +286,23 @@ export class FindCommand {
     this._sort = out;
   }
 
-  async execute(args: Pick<FindCommandArgs, 'connection' | 'distinct' |
-      'offset' | 'limit' | 'params' | 'onTransformRow'>
+  async execute(
+    args: Pick<FindCommandArgs, 'connection' | 'distinct' | 'offset' | 'limit' | 'params' | 'onTransformRow'>,
   ): Promise<any[]> {
     // Generate select query
-    const columnSqls = Object.keys(this._selectColumns)
-        .map(x => this._selectColumns[x].statement);
-    if (!columnSqls.length)
-      columnSqls.push('1');
+    const columnSqls = Object.keys(this._selectColumns).map(x => this._selectColumns[x].statement);
+    if (!columnSqls.length) columnSqls.push('1');
 
-    const query = Select(...columnSqls)
-        .from(this.mainEntity.tableName + ' as ' + this.mainAlias);
+    const query = Select(...columnSqls).from(this.mainEntity.tableName + ' as ' + this.mainAlias);
 
-    if (args.distinct)
-      query.distinct();
+    if (args.distinct) query.distinct();
 
     query.where(...this._filter._items);
 
     if (this._sort) {
       query.orderBy(...this._sort);
     }
-    if (args.offset)
-      query.offset(args.offset);
+    if (args.offset) query.offset(args.offset);
 
     // joins must be added last
     if (this._joins)
@@ -344,7 +315,7 @@ export class FindCommand {
       params: args?.params,
       fetchRows: args?.limit,
       objectRows: false,
-      cursor: false
+      cursor: false,
     });
 
     // Create objects
@@ -355,31 +326,22 @@ export class FindCommand {
   }
 
   private _getEntityFromAlias(tableAlias: string): EntityMetadata {
-    if (tableAlias === this.mainAlias)
-      return this.mainEntity;
-    if (tableAlias === this.resultAlias)
-      return this.resultEntity;
+    if (tableAlias === this.mainAlias) return this.mainEntity;
+    if (tableAlias === this.resultAlias) return this.resultEntity;
     if (this._joins) {
       const join = this._joins.find(j => j.joinAlias === tableAlias);
-      if (join)
-        return join.targetEntity;
+      if (join) return join.targetEntity;
     }
     throw new Error(`Unknown table alias "${tableAlias}"`);
   }
-
 }
 
 function extractSubFields(colNameLower: string, fields?: string[]): string[] | undefined {
-  if (!(fields && fields.length))
-    return;
+  if (!(fields && fields.length)) return;
   if (fields) {
     return fields.reduce((trg: string[], v: string) => {
-      if (v.startsWith(colNameLower + '.'))
-        trg.push(v.substring(colNameLower.length + 1).toLowerCase())
+      if (v.startsWith(colNameLower + '.')) trg.push(v.substring(colNameLower.length + 1).toLowerCase());
       return trg;
     }, [] as string[]);
   }
-
 }
-
-

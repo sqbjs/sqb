@@ -6,7 +6,6 @@ import { Test } from '@nestjs/testing';
 import { AsyncApplicationModule } from './_support/photo-app/app-async.module.js';
 
 describe('Sqb-Nestjs (async configuration)', () => {
-
   let server: Server;
   let app: INestApplication;
 
@@ -21,9 +20,7 @@ describe('Sqb-Nestjs (async configuration)', () => {
   });
 
   it(`should return created entity`, () => {
-    return request(server)
-        .post('/photo')
-        .expect(201, {name: 'Nest', description: 'Is great!', views: 6000});
+    return request(server).post('/photo').expect(201, { name: 'Nest', description: 'Is great!', views: 6000 });
   });
 
   afterEach(async () => {

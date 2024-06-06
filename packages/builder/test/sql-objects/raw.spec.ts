@@ -1,9 +1,8 @@
 import { Raw, Select, SerializationType } from '../../src/index.js';
 
 describe('serialize "Raw"', () => {
-
   const options = {
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should initialize Raw', () => {
@@ -11,10 +10,8 @@ describe('serialize "Raw"', () => {
   });
 
   it('should serialize Raw', () => {
-    const query = Select(Raw('\'John\'\'s Bike\' f1'))
-        .from('table1');
+    const query = Select(Raw("'John''s Bike' f1")).from('table1');
     const result = query.generate(options);
-    expect(result.sql).toStrictEqual('select \'John\'\'s Bike\' f1 from table1');
+    expect(result.sql).toStrictEqual("select 'John''s Bike' f1 from table1");
   });
-
 });

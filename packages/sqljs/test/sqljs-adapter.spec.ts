@@ -5,7 +5,7 @@ describe('SqljsAdapter', function () {
   const adapter = new SqljsAdapter();
 
   beforeAll(async () => {
-    const connection = await adapter.connect({database: ':memory:'})
+    const connection = await adapter.connect({ database: ':memory:' });
     try {
       await createTestSchema((connection as any).intlcon);
     } finally {
@@ -13,14 +13,11 @@ describe('SqljsAdapter', function () {
     }
   }, 30000);
 
-  initAdapterTests(adapter, {database: ':memory:'});
+  initAdapterTests(adapter, { database: ':memory:' });
 });
 
 async function createTestSchema(connection) {
-  connection.exec(
-      (await import('./_support/db_schema.js')).sql
-  );
-  const dataFiles = getInsertSQLsForTestData({dialect: 'sqlite'});
-  for (const table of dataFiles)
-    connection.exec(table.scripts.join(';\n'));
+  connection.exec((await import('./_support/db_schema.js')).sql);
+  const dataFiles = getInsertSQLsForTestData({ dialect: 'sqlite' });
+  for (const table of dataFiles) connection.exec(table.scripts.join(';\n'));
 }

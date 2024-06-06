@@ -3,7 +3,6 @@ import { Serializable } from '../serializable.js';
 import { SerializeContext } from '../serialize-context.js';
 
 export class RawStatement extends Serializable {
-
   _text: string;
 
   constructor(str: string) {

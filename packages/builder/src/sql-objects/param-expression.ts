@@ -5,10 +5,10 @@ import { ParamOptions } from '../types.js';
 
 export class ParamExpression extends Serializable {
   _name: string;
-  _dataType?: DataType
+  _dataType?: DataType;
   _isArray?: boolean;
 
-  constructor(arg: string | { name: string, dataType?: DataType, isArray?: boolean }) {
+  constructor(arg: string | { name: string; dataType?: DataType; isArray?: boolean }) {
     super();
     if (typeof arg === 'object') {
       this._name = arg.name;
@@ -30,36 +30,30 @@ export class ParamExpression extends Serializable {
       dataType: this._dataType,
       isArray: this._isArray,
     };
-    return ctx.serialize(this._type, o,
-        () => this.__defaultSerialize(ctx, o));
+    return ctx.serialize(this._type, o, () => this.__defaultSerialize(ctx, o));
   }
 
-  protected __defaultSerialize(ctx: SerializeContext,
-                               o: {
-                                 name: string,
-                                 dataType?: DataType,
-                                 isArray?: boolean
-                               }): string {
+  protected __defaultSerialize(
+    ctx: SerializeContext,
+    o: {
+      name: string;
+      dataType?: DataType;
+      isArray?: boolean;
+    },
+  ): string {
     let prmValue = (ctx.params && ctx.params[o.name]) ?? null;
-    if (prmValue != null && o.isArray && !Array.isArray(prmValue))
-      prmValue = [prmValue];
+    if (prmValue != null && o.isArray && !Array.isArray(prmValue)) prmValue = [prmValue];
     ctx.preparedParams = ctx.preparedParams || {};
-    if (Array.isArray(ctx.preparedParams))
-      ctx.preparedParams.push(prmValue);
-    else
-      ctx.preparedParams[o.name] = prmValue;
+    if (Array.isArray(ctx.preparedParams)) ctx.preparedParams.push(prmValue);
+    else ctx.preparedParams[o.name] = prmValue;
 
     const paramOps: ParamOptions = {
       dataType: this._dataType,
       isArray: this._isArray,
-    }
-    ctx.paramOptions = ctx.paramOptions ||
-        (Array.isArray(ctx.preparedParams) ? [] : {});
-    if (Array.isArray(ctx.paramOptions))
-      ctx.paramOptions.push(paramOps);
-    else
-      ctx.paramOptions[o.name] = paramOps;
+    };
+    ctx.paramOptions = ctx.paramOptions || (Array.isArray(ctx.preparedParams) ? [] : {});
+    if (Array.isArray(ctx.paramOptions)) ctx.paramOptions.push(paramOps);
+    else ctx.paramOptions[o.name] = paramOps;
     return ':' + o.name;
   }
-
 }

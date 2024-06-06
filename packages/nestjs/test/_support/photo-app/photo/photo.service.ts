@@ -6,10 +6,9 @@ import { InjectSQB } from '@sqb/nestjs';
 @Injectable()
 export class PhotoService {
   constructor(
-      @InjectSQB('db1')
-      private readonly client: SqbClient
-  ) {
-  }
+    @InjectSQB('db1')
+    private readonly client: SqbClient,
+  ) {}
 
   async create(): Promise<any> {
     // noinspection SuspiciousTypeOfGuard
@@ -17,7 +16,7 @@ export class PhotoService {
     return {
       name: 'Nest',
       description: 'Is great!',
-      views: 6000
+      views: 6000,
     };
   }
 }

@@ -30,7 +30,8 @@
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/sqlite-dialect",
-    "clean:cover": "rimraf ../../coverage/sqlite-dialect"
+    "clean:cover": "rimraf ../../coverage/sqlite-dialect",
+    "format": "prettier . --write --log-level=warn"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.11.3"

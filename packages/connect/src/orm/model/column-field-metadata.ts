@@ -92,20 +92,17 @@ export interface ColumnFieldMetadata extends FieldMetadata {
 
   parse?: ColumnTransformFunction;
   serialize?: ColumnTransformFunction;
-
 }
 
 export namespace ColumnFieldMetadata {
-
   export function create(entity: EntityMetadata, name: string, options: ColumnFieldOptions = {}): ColumnFieldMetadata {
     const result: ColumnFieldMetadata = {
       kind: 'column',
       entity,
       name,
-      fieldName: name
-    }
-    if (options)
-      ColumnFieldMetadata.assign(result, options);
+      fieldName: name,
+    };
+    if (options) ColumnFieldMetadata.assign(result, options);
     return result;
   }
 
@@ -114,10 +111,8 @@ export namespace ColumnFieldMetadata {
   }
 
   export function checkEnumValue(col: ColumnFieldMetadata, v: FieldValue) {
-    if (v === undefined || !col.enum || (v == null && !col.notNull))
-      return;
+    if (v === undefined || !col.enum || (v == null && !col.notNull)) return;
     const enumKeys = Array.isArray(col.enum) ? col.enum : Object.keys(col.enum);
-    if (!enumKeys.includes(v))
-      throw new Error(`${col.entity.name}.${col.name} value must be one of (${enumKeys})`);
+    if (!enumKeys.includes(v)) throw new Error(`${col.entity.name}.${col.name} value must be one of (${enumKeys})`);
   }
 }

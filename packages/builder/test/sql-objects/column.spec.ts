@@ -1,10 +1,9 @@
 import { DataType, Field, Select } from '../../src/index.js';
 
 describe('serialize "TableField"', function () {
-
   const options = {
     dialect: 'test',
-    prettyPrint: false
+    prettyPrint: false,
   };
 
   it('should initialize from string', function () {
@@ -66,21 +65,15 @@ describe('serialize "TableField"', function () {
   });
 
   it('should not table name start with "$" character', function () {
-    expect(() =>
-        Select('$table1.field1 f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('$table1.field1 f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should not column name start with "$" character', function () {
-    expect(() =>
-        Select('table1.$field1 f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('table1.$field1 f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should not alias name start with "$" character', function () {
-    expect(() =>
-        Select('table1.field1 $f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('table1.field1 $f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should not print alias if field is *', function () {
@@ -96,27 +89,18 @@ describe('serialize "TableField"', function () {
   });
 
   it('should validate schema name', function () {
-    expect(() =>
-        Select('a+.table1.field1 f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('a+.table1.field1 f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should validate table name', function () {
-    expect(() =>
-        Select('a+.field1 f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('a+.field1 f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should validate field name', function () {
-    expect(() =>
-        Select('a+ f1').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('a+ f1').from('table1')).toThrow('does not match table column format');
   });
 
   it('should validate alias', function () {
-    expect(() =>
-        Select('field1 a+').from('table1')
-    ).toThrow('does not match table column format');
+    expect(() => Select('field1 a+').from('table1')).toThrow('does not match table column format');
   });
-
 });

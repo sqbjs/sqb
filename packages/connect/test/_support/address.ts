@@ -7,6 +7,6 @@ export class Address {
   @Column()
   street: string;
 
-  @Column({fieldName: 'zip_code'})
+  @Column({ fieldName: 'zip_code' })
   zipCode: string;
 }

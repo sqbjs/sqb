@@ -3,7 +3,6 @@ import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { ClientConfiguration } from '@sqb/connect';
 
 export type SqbModuleOptions = {
-
   /**
    * Connection name
    */
@@ -45,8 +44,7 @@ export interface SqbOptionsFactory {
   createSqbOptions(connectionName?: string): Promise<SqbModuleOptions> | SqbModuleOptions;
 }
 
-export interface SqbModuleAsyncOptions
-    extends Pick<ModuleMetadata, 'imports'> {
+export interface SqbModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
   name?: string;
   useExisting?: Type<SqbOptionsFactory>;
   useClass?: Type<SqbOptionsFactory>;

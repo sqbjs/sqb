@@ -1,29 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import {
-  Column,
-  Entity, EntityMetadata,
-  ForeignKey, Index
-} from '@sqb/connect';
+import { Column, Entity, EntityMetadata, ForeignKey, Index } from '@sqb/connect';
 
 describe('Model / Entity mapping', function () {
-
   describe('UnionEntity()', function () {
-
     it(`should combine properties`, () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityB {
         @Column()
-        name: string
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Union(EntityA, EntityB) {
-      }
+      class NewEntityClass extends Entity.Union(EntityA, EntityB) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -36,26 +29,25 @@ describe('Model / Entity mapping', function () {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityC {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityB {
         @Column()
-        name: string
+        name: string;
 
         @Column()
         @ForeignKey(EntityC)
-        cId: string
+        cId: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Union(EntityA, EntityB) {
-      }
+      class NewEntityClass extends Entity.Union(EntityA, EntityB) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -69,19 +61,17 @@ describe('Model / Entity mapping', function () {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityB {
         @Column()
         @Index()
-        name: string
-
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Union(EntityA, EntityB) {
-      }
+      class NewEntityClass extends Entity.Union(EntityA, EntityB) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -89,22 +79,20 @@ describe('Model / Entity mapping', function () {
       expect(meta!.indexes.length).toStrictEqual(1);
       expect(meta!.indexes[0].columns).toStrictEqual(['name']);
     });
-  })
+  });
 
   describe('Entity.Pick()', function () {
-
     it(`should pick given properties`, () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
         @Column()
-        name: string
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Pick(EntityA, ['id']) {
-      }
+      class NewEntityClass extends Entity.Pick(EntityA, ['id']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -117,25 +105,24 @@ describe('Model / Entity mapping', function () {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityB {
         @Column()
-        name: string
+        name: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId1: string
+        aId1: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId2: string
+        aId2: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Pick(EntityB, ['name', 'aId1']) {
-      }
+      class NewEntityClass extends Entity.Pick(EntityB, ['name', 'aId1']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -151,16 +138,15 @@ describe('Model / Entity mapping', function () {
       class EntityA {
         @Column()
         @Index()
-        id: number
+        id: number;
 
         @Column()
         @Index()
-        name: string
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Pick(EntityA, ['name']) {
-      }
+      class NewEntityClass extends Entity.Pick(EntityA, ['name']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -168,23 +154,20 @@ describe('Model / Entity mapping', function () {
       expect(meta!.indexes.length).toStrictEqual(1);
       expect(meta!.indexes[0].columns).toStrictEqual(['name']);
     });
-
-  })
+  });
 
   describe('Entity.Omit()', function () {
-
     it(`should omit given properties`, () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
         @Column()
-        name: string
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Omit(EntityA, ['id']) {
-      }
+      class NewEntityClass extends Entity.Omit(EntityA, ['id']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -197,25 +180,24 @@ describe('Model / Entity mapping', function () {
       @Entity()
       class EntityA {
         @Column()
-        id: number
+        id: number;
       }
 
       class EntityB {
         @Column()
-        name: string
+        name: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId1: string
+        aId1: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId2: string
+        aId2: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Omit(EntityB, ['name', 'aId1']) {
-      }
+      class NewEntityClass extends Entity.Omit(EntityB, ['name', 'aId1']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -231,16 +213,15 @@ describe('Model / Entity mapping', function () {
       class EntityA {
         @Column()
         @Index()
-        id: number
+        id: number;
 
         @Column()
         @Index()
-        name: string
+        name: string;
       }
 
       @Entity()
-      class NewEntityClass extends Entity.Omit(EntityA, ['name']) {
-      }
+      class NewEntityClass extends Entity.Omit(EntityA, ['name']) {}
 
       const meta = Entity.getMetadata(NewEntityClass);
       expect(meta).toBeDefined();
@@ -248,8 +229,5 @@ describe('Model / Entity mapping', function () {
       expect(meta!.indexes.length).toStrictEqual(1);
       expect(meta!.indexes[0].columns).toStrictEqual(['id']);
     });
-
-  })
-
-
+  });
 });

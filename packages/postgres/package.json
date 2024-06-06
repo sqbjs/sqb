@@ -30,13 +30,14 @@
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/postgres",
-    "clean:cover": "rimraf ../../coverage/postgres"
+    "clean:cover": "rimraf ../../coverage/postgres",
+    "format": "prettier . --write --log-level=warn"
   },
   "dependencies": {
     "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
-    "postgresql-client": "^2.10.6"
+    "postgresql-client": "^2.11.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.11.3",

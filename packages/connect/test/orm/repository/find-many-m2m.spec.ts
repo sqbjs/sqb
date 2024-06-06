@@ -4,12 +4,11 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
 describe('Repository.findMany() | many to many relations', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -18,8 +17,8 @@ describe('Repository.findMany() | many to many relations', function () {
   it('should return associated instances', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
-      filter: {'id': 1},
-      pick: ['id', 'givenName', 'tags']
+      filter: { id: 1 },
+      pick: ['id', 'givenName', 'tags'],
     });
     expect(rows.length).toStrictEqual(1);
     expect(rows[0].id).toStrictEqual(1);
@@ -35,8 +34,8 @@ describe('Repository.findMany() | many to many relations', function () {
   it('should specify returning elements', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
-      filter: {'id': 1},
-      pick: ['id', 'tags.color']
+      filter: { id: 1 },
+      pick: ['id', 'tags.color'],
     });
     expect(rows).toBeDefined();
     expect(rows.length).toStrictEqual(1);
@@ -53,7 +52,7 @@ describe('Repository.findMany() | many to many relations', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       include: ['tags'],
-      filter: {'tags.color': 'yellow'}
+      filter: { 'tags.color': 'yellow' },
     });
     expect(rows).toBeDefined();
     expect(rows.length).toStrictEqual(1);
@@ -63,5 +62,4 @@ describe('Repository.findMany() | many to many relations', function () {
       expect(customer.tags!.find(tag => tag.color === 'yellow')).toBeDefined();
     }
   });
-
 });

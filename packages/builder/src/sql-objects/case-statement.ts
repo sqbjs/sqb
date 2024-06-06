@@ -7,8 +7,7 @@ import { OpAnd } from './operators/op-and.js';
 import { RawStatement } from './raw-statement.js';
 
 export class CaseStatement extends Serializable {
-
-  _expressions: { condition: Serializable, value: any }[];
+  _expressions: { condition: Serializable; value: any }[];
   _elseValue: any;
   _condition?: LogicalOperator;
   _alias?: string;
@@ -26,8 +25,7 @@ export class CaseStatement extends Serializable {
    * Defines "when" part of Case expression.
    */
   when(...condition: (Operator | RawStatement)[]): this {
-    if (condition.length)
-      this._condition = new OpAnd(...condition);
+    if (condition.length) this._condition = new OpAnd(...condition);
     else this._condition = undefined;
     return this;
   }
@@ -39,7 +37,7 @@ export class CaseStatement extends Serializable {
     if (this._condition)
       this._expressions.push({
         condition: this._condition,
-        value
+        value,
       });
     return this;
   }
@@ -68,23 +66,20 @@ export class CaseStatement extends Serializable {
    * @override
    */
   _serialize(ctx: SerializeContext): string {
-    if (!this._expressions.length)
-      return '';
+    if (!this._expressions.length) return '';
     const q = {
       expressions: [] as any,
-      elseValue: this._elseValue !== undefined ?
-          ctx.anyToSQL(this._elseValue) : undefined
+      elseValue: this._elseValue !== undefined ? ctx.anyToSQL(this._elseValue) : undefined,
     };
     for (const x of this._expressions) {
       const o = {
         condition: x.condition._serialize(ctx),
-        value: ctx.anyToSQL(x.value)
+        value: ctx.anyToSQL(x.value),
       };
       q.expressions.push(o);
     }
 
-    return ctx.serialize(this._type, q,
-        () => this.__defaultSerialize(ctx, q));
+    return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
@@ -92,10 +87,8 @@ export class CaseStatement extends Serializable {
     for (const x of o.expressions) {
       out += 'when ' + x.condition + ' then ' + x.value + '\n';
     }
-    if (o.elseValue !== undefined)
-      out += 'else ' + o.elseValue + '\n';
+    if (o.elseValue !== undefined) out += 'else ' + o.elseValue + '\n';
     out += '\bend' + (this._alias ? ' ' + this._alias : '');
     return out;
   }
-
 }

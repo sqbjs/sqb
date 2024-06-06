@@ -3,7 +3,6 @@ import { Serializable } from '../serializable.js';
 import { SerializeContext } from '../serialize-context.js';
 
 export class SequenceGetterStatement extends Serializable {
-
   _expression: string;
   _next: boolean;
   _alias?: string;
@@ -39,21 +38,17 @@ export class SequenceGetterStatement extends Serializable {
    * @override
    */
   _serialize(ctx: SerializeContext): string {
-    if (!this._expression)
-      return '';
+    if (!this._expression) return '';
 
     const q = {
       genName: this._expression,
       next: this._next,
-      alias: this._alias
+      alias: this._alias,
     };
-    return ctx.serialize(this._type, q,
-        () => this.__defaultSerialize(ctx, q));
+    return ctx.serialize(this._type, q, () => this.__defaultSerialize(ctx, q));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-    return (o.next ? 'nextval' : 'currval') + '(\'' + o.genName + '\')' +
-        (o.alias ? ' ' + o.alias : '');
+    return (o.next ? 'nextval' : 'currval') + "('" + o.genName + "')" + (o.alias ? ' ' + o.alias : '');
   }
-
 }

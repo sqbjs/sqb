@@ -9,7 +9,6 @@ import { RawStatement } from './raw-statement.js';
 import { TableName } from './table-name.js';
 
 export class JoinStatement extends Serializable {
-
   _joinType: JoinType;
   _table: TableName | SelectQuery | RawStatement;
   _conditions: LogicalOperator = new OpAnd();
@@ -17,9 +16,7 @@ export class JoinStatement extends Serializable {
   constructor(joinType: JoinType, table: string | TableName | SelectQuery | RawStatement) {
     super();
     // noinspection SuspiciousTypeOfGuard
-    if (!(isSelectQuery(table) || isRawStatement(table) || isTableName(table) ||
-        typeof table === 'string')
-    )
+    if (!(isSelectQuery(table) || isRawStatement(table) || isTableName(table) || typeof table === 'string'))
       throw new TypeError('Table name, select query or raw object required for Join');
     this._joinType = joinType;
     this._table = typeof table === 'string' ? new TableName(table) : table;
@@ -38,7 +35,7 @@ export class JoinStatement extends Serializable {
     const o = {
       joinType: this._joinType,
       table: this._table._serialize(ctx),
-      conditions: this.__serializeConditions(ctx, this)
+      conditions: this.__serializeConditions(ctx, this),
     };
     return ctx.serialize(this._type, o, () => {
       let out;
@@ -71,15 +68,11 @@ export class JoinStatement extends Serializable {
       const lf = o.table.length > 40;
       if (isSelectQuery(this._table)) {
         const alias = (this._table as SelectQuery)._alias;
-        if (!alias)
-          throw new Error('Alias required for sub-select in Join');
-        out += ' (' + (lf ? '\n\t' : '') + o.table + (lf ? '\n\b' : '') + ')' +
-            ' ' + alias;
-      } else
-        out += ' ' + o.table;
+        if (!alias) throw new Error('Alias required for sub-select in Join');
+        out += ' (' + (lf ? '\n\t' : '') + o.table + (lf ? '\n\b' : '') + ')' + ' ' + alias;
+      } else out += ' ' + o.table;
 
-      if (o.conditions)
-        out += ' ' + o.conditions;
+      if (o.conditions) out += ' ' + o.conditions;
 
       return out + (lf ? '\b' : '');
     });
@@ -88,10 +81,8 @@ export class JoinStatement extends Serializable {
   protected __serializeConditions(ctx, join: JoinStatement) {
     if (join._conditions._items.length) {
       const s = join._conditions._serialize(ctx);
-      return ctx.serialize(SerializationType.JOIN_CONDITIONS, s,
-          () => s ? 'on ' + s : '');
+      return ctx.serialize(SerializationType.JOIN_CONDITIONS, s, () => (s ? 'on ' + s : ''));
     }
     return '';
   }
-
 }

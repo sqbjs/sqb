@@ -1,24 +1,27 @@
 import {
   DefaultSerializeFunction,
   OperatorType,
-  SerializationType, SerializeContext,
-  SerializerExtension
+  SerializationType,
+  SerializeContext,
+  SerializerExtension,
 } from '@sqb/builder';
 
 const reservedWords = ['comment'];
 
 export class PostgresSerializer implements SerializerExtension {
-
   dialect = 'postgres';
 
   isReservedWord(ctx, s) {
-    return s && typeof s === 'string' &&
-        reservedWords.includes(s.toLowerCase());
+    return s && typeof s === 'string' && reservedWords.includes(s.toLowerCase());
   }
 
-  serialize(ctx: SerializeContext, type: SerializationType | string, o: any,
-            defFn: DefaultSerializeFunction): string | undefined {
-    switch (type) {
+  serialize(
+    ctx: SerializeContext,
+    type: SerializationType | string,
+    o: any,
+    defFn: DefaultSerializeFunction,
+  ): string | undefined {
+    switch (type as any) {
       case SerializationType.SELECT_QUERY:
         return this._serializeSelect(ctx, o, defFn);
       case SerializationType.COMPARISON_EXPRESSION:
@@ -31,11 +34,9 @@ export class PostgresSerializer implements SerializerExtension {
   private _serializeSelect(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
     let out = defFn(ctx, o);
     const limit = o.limit || 0;
-    const offset = Math.max((o.offset || 0), 0);
-    if (limit)
-      out += '\nLIMIT ' + limit;
-    if (offset)
-      out += (!limit ? '\n' : ' ') + 'OFFSET ' + offset;
+    const offset = Math.max(o.offset || 0, 0);
+    if (limit) out += '\nLIMIT ' + limit;
+    if (offset) out += (!limit ? '\n' : ' ') + 'OFFSET ' + offset;
     return out;
   }
 
@@ -43,10 +44,8 @@ export class PostgresSerializer implements SerializerExtension {
     if (o.right) {
       if (!Array.isArray(o.right)) {
         if (o.right.expression.toLowerCase() === 'null') {
-          if (o.operatorType === 'eq')
-            return defFn(ctx, {...o, operatorType: OperatorType.is, symbol: 'is'});
-          if (o.operatorType === 'ne')
-            return defFn(ctx, {...o, operatorType: OperatorType.isNot, symbol: 'is not'});
+          if (o.operatorType === 'eq') return defFn(ctx, { ...o, operatorType: OperatorType.is, symbol: 'is' });
+          if (o.operatorType === 'ne') return defFn(ctx, { ...o, operatorType: OperatorType.isNot, symbol: 'is not' });
         }
       }
 
@@ -56,7 +55,7 @@ export class PostgresSerializer implements SerializerExtension {
       if (o.right.isParam && o.right.isArray && o.right.value != null && !Array.isArray(o.right.value))
         o.right.value = [o.right.value];
 
-      if ((o.operatorType === 'in' || o.operatorType === 'notIn')) {
+      if (o.operatorType === 'in' || o.operatorType === 'notIn') {
         if (o.left.isArray && !o.right.isArray && o.right.isParam) {
           const left = o.left;
           const right = o.right;
@@ -66,24 +65,22 @@ export class PostgresSerializer implements SerializerExtension {
             operatorType: OperatorType.eq,
             symbol: o.operatorType === 'notIn' ? '!=' : '=',
             left: right,
-            right: left
+            right: left,
           });
         }
         if (o.left.isArray && o.right.isArray) {
-          if (o.operatorType === 'notIn')
-            o.left.expression = 'not ' + o.left.expression;
-          return defFn(ctx, {...o, symbol: '&&'});
+          if (o.operatorType === 'notIn') o.left.expression = 'not ' + o.left.expression;
+          return defFn(ctx, { ...o, symbol: '&&' });
         }
         if (!o.left.isArray && o.right.isArray && o.right.isParam) {
           o.right.expression = 'ANY(' + o.right.expression + ')';
           return defFn(ctx, {
             ...o,
             operatorType: OperatorType.eq,
-            symbol: o.operatorType === 'notIn' ? '!=' : '='
+            symbol: o.operatorType === 'notIn' ? '!=' : '=',
           });
         }
       }
-
     }
     return defFn(ctx, o);
   }

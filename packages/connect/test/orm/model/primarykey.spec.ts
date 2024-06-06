@@ -2,12 +2,9 @@
 import { Entity, PrimaryKey } from '@sqb/connect';
 
 describe('Model / PrimaryKey', function () {
-
   it(`should define primary index field with string argument`, () => {
     @PrimaryKey('id')
-    class MyEntity {
-
-    }
+    class MyEntity {}
 
     const primaryIndex = Entity.getPrimaryIndex(MyEntity);
     expect(primaryIndex).toBeDefined();
@@ -16,11 +13,8 @@ describe('Model / PrimaryKey', function () {
   });
 
   it(`should define primary index field with object definition`, () => {
-
-    @PrimaryKey(['id'], {name: 'px_myentity_id'})
-    class MyEntity {
-
-    }
+    @PrimaryKey(['id'], { name: 'px_myentity_id' })
+    class MyEntity {}
 
     const primaryIndex = Entity.getPrimaryIndex(MyEntity);
     expect(primaryIndex).toBeDefined();
@@ -30,11 +24,9 @@ describe('Model / PrimaryKey', function () {
   });
 
   it(`should be used as PropertyDecorator`, () => {
-
     class MyEntity {
-      @PrimaryKey({name: 'px_myentity_id'})
+      @PrimaryKey({ name: 'px_myentity_id' })
       id: string;
-
     }
 
     const primaryIndex = Entity.getPrimaryIndex(MyEntity);
@@ -45,22 +37,16 @@ describe('Model / PrimaryKey', function () {
   });
 
   it(`should throw error on invalid argument`, () => {
-
     expect(() => {
       // @ts-ignore
       @PrimaryKey()
-      class MyEntity {
-
-      }
+      class MyEntity {}
     }).toThrow('You must specify primary index column');
 
     expect(() => {
       // @ts-ignore
       @PrimaryKey({})
-      class MyEntity {
-
-      }
+      class MyEntity {}
     }).toThrow('You must specify primary index column');
   });
-
 });

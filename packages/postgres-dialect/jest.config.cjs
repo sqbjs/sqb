@@ -5,5 +5,5 @@ const packageName = packageJson.name;
 
 module.exports = {
   ...base,
-  displayName: packageName
+  displayName: packageName,
 };

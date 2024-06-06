@@ -1,9 +1,4 @@
-import {
-  Column,
-  Entity,
-  Link,
-  PrimaryKey
-} from '@sqb/connect';
+import { Column, Entity, Link, PrimaryKey } from '@sqb/connect';
 import { Continent } from './continent.entity.js';
 import type { Customer } from './customer.entity.js';
 
@@ -16,27 +11,28 @@ export class Country {
   @Column()
   name: string;
 
-  @Column({fieldName: 'phone_code'})
+  @Column({ fieldName: 'phone_code' })
   phoneCode: string;
 
-  @Column({fieldName: 'continent_code'})
+  @Column({ fieldName: 'continent_code' })
   continentCode: string;
 
-  @Column({fieldName: 'has_market', default: true})
+  @Column({ fieldName: 'has_market', default: true })
   hasMarket: boolean;
 
-  @Link({exclusive: true})
+  @Link({ exclusive: true })
   readonly continent: Continent;
 
-  @Link({exclusive: true})
-      .toMany(async () => (await import('./customer.entity.js')).Customer,
-          {sourceKey: 'code', targetKey: 'countryCode'})
+  @Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
+    sourceKey: 'code',
+    targetKey: 'countryCode',
+  })
   readonly customers: Customer[];
 
-  @Link({exclusive: true}).toMany(
-      async () => (await import('./customer.entity.js')).Customer,
-      {sourceKey: 'code', targetKey: 'countryCode', where: {vip: true}}
-  )
+  @Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
+    sourceKey: 'code',
+    targetKey: 'countryCode',
+    where: { vip: true },
+  })
   readonly vipCustomers: Customer[];
-
 }

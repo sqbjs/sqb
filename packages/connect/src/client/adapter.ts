@@ -1,11 +1,6 @@
 import { Maybe } from 'ts-gems';
 import { classes } from '@sqb/builder';
-import {
-  ClientConfiguration,
-  DataType,
-  QueryRequest,
-  RowType
-} from './types.js';
+import { ClientConfiguration, DataType, QueryRequest, RowType } from './types.js';
 
 export interface Adapter {
   driver: string;
@@ -19,7 +14,6 @@ export interface Adapter {
 }
 
 export namespace Adapter {
-
   export interface Connection {
     sessionId: any;
     execute: (request: QueryRequest) => Promise<Response>;
@@ -65,5 +59,4 @@ export namespace Adapter {
     precision?: number;
     _inf: any;
   }
-
 }

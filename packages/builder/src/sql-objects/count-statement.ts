@@ -25,15 +25,16 @@ export class CountStatement extends Serializable {
    * @override
    */
   _serialize(ctx: SerializeContext): string {
-    return ctx.serialize(this._type, undefined,
-        () => this.__defaultSerialize(ctx, undefined));
+    return ctx.serialize(this._type, undefined, () => this.__defaultSerialize(ctx, undefined));
   }
 
   // noinspection JSUnusedLocalSymbols
   protected __defaultSerialize(
-      /* eslint-disable-next-line */
-      ctx: SerializeContext, o: any): string {
+    /* eslint-disable-next-line */
+    ctx: SerializeContext,
+    /* eslint-disable-next-line */
+    o: any,
+  ): string {
     return 'count(*)';
   }
-
 }

@@ -7,8 +7,10 @@ import { MigrationAdapter } from '../migration-adapter.js';
 import {
   isCustomMigrationTask,
   isInsertDataMigrationTask,
-  isSqlScriptMigrationTask, Migration, MigrationPackage,
-  MigrationTask
+  isSqlScriptMigrationTask,
+  Migration,
+  MigrationPackage,
+  MigrationTask,
 } from '../migration-package.js';
 import { MigrationStatus } from '../types.js';
 
@@ -23,8 +25,8 @@ export class PgMigrationAdapter extends MigrationAdapter {
   protected defaultVariables = {
     tablespace: 'pg_default',
     schema: 'public',
-    owner: 'postgres'
-  }
+    owner: 'postgres',
+  };
   readonly summaryTable = 'migration_summary';
   readonly eventTable = 'migration_events';
 
@@ -53,12 +55,12 @@ export class PgMigrationAdapter extends MigrationAdapter {
   }
 
   static async create(
-      options: StrictOmit<DbMigratorOptions, 'migrationPackage'> & {
-        migrationPackage: MigrationPackage
-      }
+    options: StrictOmit<DbMigratorOptions, 'migrationPackage'> & {
+      migrationPackage: MigrationPackage;
+    },
   ): Promise<PgMigrationAdapter> {
     // Create connection
-    const connection = (await pgAdapter.connect(options.connection) as any).intlcon as Connection;
+    const connection = ((await pgAdapter.connect(options.connection)) as any).intlcon as Connection;
     try {
       const adapter = new PgMigrationAdapter();
       adapter._connection = connection;
@@ -66,8 +68,8 @@ export class PgMigrationAdapter extends MigrationAdapter {
       adapter._infoSchema = options.infoSchema || '__migration';
       adapter.defaultVariables.schema = options.connection.schema || '';
       if (!adapter.defaultVariables.schema) {
-        const r = await connection.query('SELECT CURRENT_SCHEMA ', {objectRows: true});
-        adapter.defaultVariables.schema = (r.rows?.[0]?.current_schema) || 'public';
+        const r = await connection.query('SELECT CURRENT_SCHEMA ', { objectRows: true });
+        adapter.defaultVariables.schema = r.rows?.[0]?.current_schema || 'public';
       }
 
       // Check if migration schema
@@ -101,13 +103,14 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
 )`);
 
       // Insert summary record if not exists
-      const r = await connection.query(
-          `SELECT status FROM ${adapter.summaryTableFull} WHERE package_name = $1`,
-          {params: [adapter.packageName], objectRows: true});
+      const r = await connection.query(`SELECT status FROM ${adapter.summaryTableFull} WHERE package_name = $1`, {
+        params: [adapter.packageName],
+        objectRows: true,
+      });
       if (!(r && r.rows?.length)) {
-        await connection.query(`insert into ${adapter.summaryTableFull} ` +
-            '(package_name, status) values ($1, $2)',
-            {params: [adapter.packageName, MigrationStatus.idle]});
+        await connection.query(`insert into ${adapter.summaryTableFull} ` + '(package_name, status) values ($1, $2)', {
+          params: [adapter.packageName, MigrationStatus.idle],
+        });
       }
 
       await adapter.refresh();
@@ -123,83 +126,76 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
   }
 
   async refresh(): Promise<void> {
-    const r = await this._connection.query(
-        `SELECT * FROM ${this.summaryTableFull} WHERE package_name = $1`,
-        {params: [this.packageName], objectRows: true});
+    const r = await this._connection.query(`SELECT * FROM ${this.summaryTableFull} WHERE package_name = $1`, {
+      params: [this.packageName],
+      objectRows: true,
+    });
     const row = r.rows && r.rows[0];
-    if (!row)
-      throw new Error('Summary record did not created');
+    if (!row) throw new Error('Summary record did not created');
     this._version = row.current_version;
     this._status = row.status;
   }
 
-  async update(info: {
-    status?: MigrationStatus,
-    version?: number;
-  }): Promise<void> {
+  async update(info: { status?: MigrationStatus; version?: number }): Promise<void> {
     let sql = '';
     const params: any[] = [];
     if (info.status && info.status !== this.status) {
       params.push(info.status);
-      sql += ',\n  status = $' + (params.length);
+      sql += ',\n  status = $' + params.length;
     }
     if (info.version && info.version !== this.version) {
       params.push(info.version);
-      sql += ',\n  current_version = $' + (params.length);
+      sql += ',\n  current_version = $' + params.length;
     }
     if (sql) {
       params.push(this.packageName);
-      sql = `update ${this.summaryTableFull} set updated_at = current_timestamp` + sql +
-          `\n where package_name =$` + (params.length)
-      await this._connection.query(sql, {params});
-      if (info.status)
-        this._status = info.status;
-      if (info.version)
-        this._version = info.version;
+      sql =
+        `update ${this.summaryTableFull} set updated_at = current_timestamp` +
+        sql +
+        `\n where package_name =$` +
+        params.length;
+      await this._connection.query(sql, { params });
+      if (info.status) this._status = info.status;
+      if (info.version) this._version = info.version;
     }
   }
 
   async writeEvent(event: MigrationAdapter.Event): Promise<void> {
-    const sql = `insert into ${this.eventTableFull} ` +
-        '(package_name, version, event, event_time, title, message, filename, details) ' +
-        'values ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5, $6, $7)';
+    const sql =
+      `insert into ${this.eventTableFull} ` +
+      '(package_name, version, event, event_time, title, message, filename, details) ' +
+      'values ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5, $6, $7)';
     await this._connection.query(sql, {
-      params: [
-        this.packageName, event.version, event.event,
-        event.title, event.message, event.filename, event.details
-      ]
+      params: [this.packageName, event.version, event.event, event.title, event.message, event.filename, event.details],
     });
   }
 
   async executeTask(
-      migrationPackage: MigrationPackage,
-      migration: Migration,
-      task: MigrationTask, variables: Record<string, any>
+    migrationPackage: MigrationPackage,
+    migration: Migration,
+    task: MigrationTask,
+    variables: Record<string, any>,
   ): Promise<void> {
     variables = {
       ...this.defaultVariables,
-      ...variables
+      ...variables,
     };
     if (isSqlScriptMigrationTask(task)) {
       try {
         let script: string | undefined;
         if (typeof task.script === 'function') {
-          script = await task.script({migrationPackage, migration, task, variables});
+          script = await task.script({ migrationPackage, migration, task, variables });
         } else script = task.script;
-        if (typeof script !== 'string')
-          return;
+        if (typeof script !== 'string') return;
         script = this.replaceVariables(script, variables);
         await this._connection.execute(script);
       } catch (e: any) {
         let msg = `Error in task "${task.title}"`;
-        if (task.filename)
-          msg += '\n at ' + path.relative(migrationPackage.baseDir, task.filename);
+        if (task.filename) msg += '\n at ' + path.relative(migrationPackage.baseDir, task.filename);
         if (e.lineNr) {
-          if (!task.filename)
-            e.message += '\n at';
+          if (!task.filename) e.message += '\n at';
           msg += ` (${e.lineNr},${e.colNr}):\n` + e.line;
-          if (e.colNr)
-            msg += '\n' + ' '.repeat(e.colNr - 1) + '^';
+          if (e.colNr) msg += '\n' + ' '.repeat(e.colNr - 1) + '^';
         }
         e.message = msg + '\n\n' + e.message;
         throw e;
@@ -214,9 +210,7 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
 
     if (isInsertDataMigrationTask(task)) {
       const tableName = this.replaceVariables(task.tableName, variables);
-      const script = task.rows
-          .map(row => this.rowToSql(tableName, row))
-          .join('\n');
+      const script = task.rows.map(row => this.rowToSql(tableName, row)).join('\n');
       await this._connection.execute(script);
     }
   }
@@ -247,5 +241,4 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
     sql += ');\n';
     return sql;
   }
-
 }

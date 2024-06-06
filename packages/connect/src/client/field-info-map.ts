@@ -9,13 +9,13 @@ export class FieldInfoMap {
       enumerable: false,
       configurable: false,
       writable: true,
-      value: {}
+      value: {},
     });
     Object.defineProperty(this, '_arr', {
       enumerable: false,
       configurable: false,
       writable: true,
-      value: []
+      value: [],
     });
   }
 
@@ -31,13 +31,12 @@ export class FieldInfoMap {
       enumerable: false,
       configurable: false,
       writable: true,
-      value: _obj
+      value: _obj,
     });
   }
 
   get(k: string | number): FieldInfo {
-    if (typeof k === 'number')
-      return this._arr[k];
+    if (typeof k === 'number') return this._arr[k];
     return this._obj[k.toUpperCase()];
   }
 
@@ -54,7 +53,6 @@ export class FieldInfoMap {
   }
 
   toJSON(): Record<string, FieldInfo> {
-    return {...this._obj};
+    return { ...this._obj };
   }
-
 }

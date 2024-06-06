@@ -8,7 +8,6 @@ import { isRawStatement } from '../typeguards.js';
 import { Query } from './query.js';
 
 export class DeleteQuery extends Query {
-
   _table: TableName | RawStatement;
   _where?: LogicalOperator;
 
@@ -38,28 +37,24 @@ export class DeleteQuery extends Query {
   _serialize(ctx: SerializeContext): string {
     const o = {
       table: this._table._serialize(ctx),
-      where: this._serializeWhere(ctx)
+      where: this._serializeWhere(ctx),
     };
     return ctx.serialize(this._type, o, () => this.__defaultSerialize(ctx, o));
   }
 
   protected __defaultSerialize(ctx: SerializeContext, o: any): string {
-    return 'delete from ' + o.table +
-        (o.where ? '\n' + o.where : '');
+    return 'delete from ' + o.table + (o.where ? '\n' + o.where : '');
   }
 
   /**
    *
    */
   _serializeWhere(ctx: SerializeContext): string {
-    if (!this._where)
-      return '';
+    if (!this._where) return '';
     const s = this._where._serialize(ctx);
     return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
       /* istanbul ignore next */
       return s ? 'where ' + s : '';
     });
-
   }
-
 }

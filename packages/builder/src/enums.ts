@@ -6,7 +6,7 @@ export enum JoinType {
   RIGHT_OUTER = 'right outer',
   OUTER = 'outer',
   FULL_OUTER = 'full outer',
-  CROSS = 'cross'
+  CROSS = 'cross',
 }
 
 export enum SerializationType {
@@ -50,7 +50,7 @@ export enum SerializationType {
   EXTERNAL_PARAMETER = 'external_parameter',
   ARRAY = 'array',
   SEQUENCE_GETTER_STATEMENT = 'sequence_getter_statement',
-  STRINGAGG_STATEMENT = 'String_agg_statement'
+  STRINGAGG_STATEMENT = 'String_agg_statement',
 }
 
 export enum OperatorType {
@@ -74,7 +74,7 @@ export enum OperatorType {
   isNot = 'isNot',
   exists = 'exists',
   notExists = 'notExists',
-  not = 'not'
+  not = 'not',
 }
 
 export enum DataType {
@@ -94,5 +94,5 @@ export enum DataType {
   BINARY = 'BINARY',
   TEXT = 'TEXT',
   GUID = 'GUID',
-  JSON = 'JSON'
+  JSON = 'JSON',
 }

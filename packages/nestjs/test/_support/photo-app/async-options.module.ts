@@ -7,10 +7,9 @@ import { PhotoModule } from './photo/photo.module.js';
   imports: [
     SqbModule.forRootAsync({
       name: 'db1',
-      useFactory: () => (dbConfig),
+      useFactory: () => dbConfig,
     }),
     PhotoModule,
   ],
 })
-export class AsyncOptionsFactoryModule {
-}
+export class AsyncOptionsFactoryModule {}

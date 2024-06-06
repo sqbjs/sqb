@@ -5,12 +5,11 @@ import { CustomerTag } from '../../_support/customer-tag.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
 describe('Repository.find()', function () {
-
   let client: SqbClient;
 
   beforeAll(async () => {
     client = await initClient();
-  })
+  });
 
   afterAll(async () => {
     await client.close(0);
@@ -26,7 +25,7 @@ describe('Repository.find()', function () {
 
   it('should return single instance by object instance', async function () {
     const repo = client.getRepository<Country>(Country);
-    const row = await repo.find({code: 'TR'});
+    const row = await repo.find({ code: 'TR' });
     expect(row).toBeDefined();
     expect(row!.code).toStrictEqual('TR');
     expect(row!.name).toStrictEqual('Turkey');
@@ -34,10 +33,9 @@ describe('Repository.find()', function () {
 
   it('should return instance from multi-key entities', async function () {
     const repo = client.getRepository<CustomerTag>(CustomerTag);
-    const row = await repo.find({customerId: 1, tagId: 1});
+    const row = await repo.find({ customerId: 1, tagId: 1 });
     expect(row).toBeDefined();
     expect(row!.customerId).toStrictEqual(1);
     expect(row!.tagId).toStrictEqual(1);
   });
-
 });

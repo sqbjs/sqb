@@ -10,7 +10,7 @@ export function printArray(arr: string[], sep?: string, lfLen?: number): string 
   for (const s of arr) {
     /* istanbul ignore next */
     if (s === undefined) continue;
-    line += (k > 0 ? sep : '');
+    line += k > 0 ? sep : '';
     if (line.length > lfLen) {
       out += (out ? '\n' : '') + line;
       line = '';
@@ -18,8 +18,6 @@ export function printArray(arr: string[], sep?: string, lfLen?: number): string 
     line += s;
     k++;
   }
-  if (line)
-    out += (out ? '\n' : '') + line;
+  if (line) out += (out ? '\n' : '') + line;
   return out;
 }
-

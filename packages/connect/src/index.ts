@@ -5,10 +5,7 @@ export * from './client/adapter.js';
 export * from './client/sqb-client.js';
 export * from './client/sqb-connection.js';
 export * from './client/cursor.js';
-export {
-  registerAdapter,
-  unRegisterAdapter
-} from './client/extensions.js';
+export { registerAdapter, unRegisterAdapter } from './client/extensions.js';
 
 export * from './orm/orm.type.js';
 export * from './orm/orm.const.js';
@@ -35,11 +32,6 @@ export * from './orm/decorators/link.decorator.js';
 export * from './orm/decorators/primarykey.decorator.js';
 export * from './orm/decorators/transform.decorator.js';
 
-export {
-  isColumnField,
-  isEmbeddedField,
-  isAssociationField,
-  isEntityClass
-} from './orm/util/orm.helper.js';
+export { isColumnField, isEmbeddedField, isAssociationField, isEntityClass } from './orm/util/orm.helper.js';
 
 export * from './orm/backward.js';

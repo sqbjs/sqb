@@ -10,14 +10,13 @@ export type DestroyCommandArgs = {
 } & Repository.DeleteManyOptions;
 
 export class DeleteCommand {
-
   // istanbul ignore next
   protected constructor() {
     throw new Error('This class is abstract');
   }
 
   static async execute(args: DestroyCommandArgs): Promise<number> {
-    const {connection, entity, filter, params} = args;
+    const { connection, entity, filter, params } = args;
 
     let where: LogicalOperator | undefined;
     if (filter) {
@@ -25,8 +24,7 @@ export class DeleteCommand {
       await prepareFilter(entity, filter, where);
     }
     const query = Delete(entity.tableName + ' T');
-    if (where)
-      query.where(...where._items);
+    if (where) query.where(...where._items);
     // Execute query
     const resp = await connection.execute(query, {
       params,
@@ -36,4 +34,3 @@ export class DeleteCommand {
     return (resp && resp.rowsAffected) || 0;
   }
 }
-

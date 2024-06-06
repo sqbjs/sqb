@@ -18,7 +18,6 @@ describe('PgAdapter', function () {
     database: env.PGDATABASE,
     user: env.PGUSER,
     password: env.PGPASSWORD,
-    schema: 'test_sqb_postgres'
+    schema: 'test_sqb_postgres',
   });
-
 });

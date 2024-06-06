@@ -14,15 +14,19 @@ export type ValueTransformFunction = (value: any, fieldInfo?: FieldInfo) => any;
 export type TransactionFunction = (connection: SqbConnection) => Promise<any>;
 
 export type RowType = 'array' | 'object';
-export type FieldNaming = 'original' | 'lowercase' | 'uppercase' | 'camelcase' |
-    'pascalcase' | ((fieldName: string) => Maybe<string>);
+export type FieldNaming =
+  | 'original'
+  | 'lowercase'
+  | 'uppercase'
+  | 'camelcase'
+  | 'pascalcase'
+  | ((fieldName: string) => Maybe<string>);
 export type ObjectRow = Record<string, any>;
 export type ArrayRow = any[];
 export type ObjectRowset = ObjectRow[];
 export type ArrayRowset = ArrayRow[];
 
 export interface ClientConfiguration {
-
   /**
    * Dialect to be used
    */
@@ -83,7 +87,6 @@ export interface ClientConfiguration {
    * Default options
    */
   defaults?: ClientDefaults;
-
 }
 
 export interface ClientDefaults {
@@ -167,14 +170,13 @@ export interface QueryExecuteOptions {
    * If set true, result object contains executed sql and values.
    * Default = false
    */
-  showSql?: boolean
+  showSql?: boolean;
 
   prettyPrint?: boolean;
 
   action?: string;
 
   fetchAsString?: DataType[];
-
 }
 
 export interface QueryResult {
@@ -182,7 +184,7 @@ export interface QueryResult {
   fields?: FieldInfoMap;
   rows?: any;
   rowType?: RowType;
-  query?: QueryRequest
+  query?: QueryRequest;
   returns?: any;
   rowsAffected?: number;
   cursor?: Cursor;
@@ -199,7 +201,7 @@ export interface QueryRequest {
   sql: string;
   params?: any;
   paramOptions?: Record<string, ParamOptions> | ParamOptions[];
-  returningFields?: { field: string, alias?: string }[];
+  returningFields?: { field: string; alias?: string }[];
   autoCommit?: boolean;
   cursor?: boolean;
   objectRows?: boolean;
