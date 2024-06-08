@@ -4,7 +4,7 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 import { Tag } from '../../_support/tags.entity.js';
 
-describe('Repository / create()', function () {
+describe('Repository.create()', function () {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -32,7 +32,7 @@ describe('Repository / create()', function () {
     expect(customer.givenName).toStrictEqual(values.givenName);
     expect(customer.familyName).toStrictEqual(values.familyName);
     expect(customer.countryCode).toStrictEqual(values.countryCode);
-    const x = await repo.find(customer.id, {
+    const x = await repo.findById(customer.id, {
       projection: ['id', 'givenName', 'familyName', 'countryCode', 'country'],
     });
     const c2 = await repo.count();
@@ -68,7 +68,7 @@ describe('Repository / create()', function () {
     const repo = client.getRepository<Customer>(Customer);
     const customer = await repo.create(values);
     expect(customer).toBeDefined();
-    const x = await repo.find(customer.id, { projection: ['id', 'gender'] });
+    const x = await repo.findById(customer.id, { projection: ['id', 'gender'] });
     expect(x).toBeDefined();
     expect(x!.id).toStrictEqual(customer.id);
     expect(x!.gender).toStrictEqual('Male');
@@ -91,7 +91,7 @@ describe('Repository / create()', function () {
     expect(customer.id).toBeDefined();
     expect(customer.id).toBeGreaterThan(0);
     expect({ ...customer.name }).toStrictEqual(values.name);
-    const x = await repo.find(customer.id, {
+    const x = await repo.findById(customer.id, {
       projection: ['id', 'name'],
     });
     const c2 = await repo.count();

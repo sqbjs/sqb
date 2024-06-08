@@ -114,12 +114,6 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     }, options);
   }
 
-  /** @deprecated - Use findById instead */
-  // todo
-  find(keyValue: any | Record<string, any>, options?: Repository.FindOptions): Promise<PartialDTO<T> | undefined> {
-    return this.findById(keyValue, options);
-  }
-
   findById(keyValue: any | Record<string, any>, options?: Repository.FindOptions): Promise<PartialDTO<T> | undefined> {
     return this._execute(async connection => {
       return this._find(keyValue, { ...options, connection });

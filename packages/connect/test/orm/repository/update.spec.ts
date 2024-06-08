@@ -52,7 +52,7 @@ describe('Repository.update()', function () {
     expect(updated!.givenName).toStrictEqual(newGivenName);
     expect(updated!.givenName).not.toStrictEqual(old.givenName);
 
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(c2!.id).toStrictEqual(old.id);
     expect(c2!.givenName).toStrictEqual(newGivenName);
@@ -78,7 +78,7 @@ describe('Repository.update()', function () {
     expect(updated!.given).toStrictEqual(newGivenName);
     expect(updated!.given).not.toStrictEqual(old.givenName);
 
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(updated!.pk).toStrictEqual(c2!.pk);
     expect(updated!.given).toStrictEqual(c2!.given);
@@ -93,7 +93,7 @@ describe('Repository.update()', function () {
       givenName: newGivenName,
       gender: 'Female',
     });
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(updated!.id).toStrictEqual(c2!.id);
     expect(updated!.gender).toStrictEqual('Female');
@@ -112,7 +112,7 @@ describe('Repository.update()', function () {
       expect(updated!.givenName).toStrictEqual(newGivenName);
 
       await connection.rollback();
-      const c2 = await repo.find(old.id);
+      const c2 = await repo.findById(old.id);
       expect(c2).toBeDefined();
       expect(c2!.givenName).toStrictEqual(old.givenName);
     });

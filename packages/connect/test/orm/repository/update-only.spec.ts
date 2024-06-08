@@ -30,7 +30,7 @@ describe('Repository.updateOnly()', function () {
     });
     expect(success).toStrictEqual(false);
 
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(c2!.id).toStrictEqual(old.id);
     expect(c2!.givenName).toStrictEqual(newGivenName);
@@ -64,7 +64,7 @@ describe('Repository.updateOnly()', function () {
     expect(c1!.name!.given).toStrictEqual(newName.given);
     expect(c1!.name!.given).not.toStrictEqual(old!.name!.given);
 
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(c2 instanceof Customer).toBeTruthy();
     expect(c2!.id).toStrictEqual(old.id);
@@ -86,7 +86,7 @@ describe('Repository.updateOnly()', function () {
     expect(c1!.address!.city).toStrictEqual(newAddress.city);
     expect(c1!.address!.city).not.toStrictEqual(old.address!.city);
 
-    const c2 = await repo.find(old.id);
+    const c2 = await repo.findById(old.id);
     expect(c2).toBeDefined();
     expect(c2 instanceof Customer).toBeTruthy();
     expect(c2!.id).toStrictEqual(old.id);

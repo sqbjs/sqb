@@ -21,9 +21,9 @@ describe('Repository.delete()', function () {
     };
     const repo = client.getRepository(Customer);
     const customer = await repo.create(values);
-    expect(await repo.find(customer.id)).toBeDefined();
+    expect(await repo.findById(customer.id)).toBeDefined();
     await repo.delete(customer.id);
-    expect(await repo.find(customer.id)).not.toBeDefined();
+    expect(await repo.findById(customer.id)).not.toBeDefined();
   });
 
   it('should execute in transaction', async function () {

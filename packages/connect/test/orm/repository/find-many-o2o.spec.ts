@@ -8,7 +8,7 @@ function toJSON(obj: any): any {
   return obj ? JSON.parse(JSON.stringify(obj)) : undefined;
 }
 
-describe('Repository.findMany() | one to one relations', function () {
+describe('Repository.findMany() (OneToOne)', function () {
   let client: SqbClient;
 
   beforeAll(async () => {
