@@ -6,7 +6,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse comma seperated field names', async () => {
     const out = parseFieldsProjection('a,b,c');
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {},
       b: {},
       c: {},
@@ -15,7 +15,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse array of field names', async () => {
     const out = parseFieldsProjection(['a', 'b', 'c,d']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {},
       b: {},
       c: {},
@@ -25,7 +25,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse array of fields paths', async () => {
     const out = parseFieldsProjection(['a', 'b.a', 'b.b.a', 'b.b.b']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {},
       b: {
         projection: {
@@ -43,7 +43,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should ignore sub paths if whole path required', async () => {
     const out = parseFieldsProjection(['a.a', 'a.b', 'a', 'b.b.a', 'b.b']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {},
       b: {
         projection: {
@@ -55,7 +55,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse signs', async () => {
     const out = parseFieldsProjection(['+a', '-b']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: { sign: '+' },
       b: { sign: '-' },
     });
@@ -63,7 +63,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse signs of sub fields', async () => {
     const out = parseFieldsProjection(['a', 'b.+a', 'b.+b.-a']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {},
       b: {
         projection: {
@@ -81,7 +81,7 @@ describe('parseFieldsProjection()', function () {
 
   it('Should parse parentheses', async () => {
     const out = parseFieldsProjection(['a(+b,-c(+a,b))']);
-    expect(out).toStrictEqual({
+    expect(out).toEqual({
       a: {
         projection: {
           b: { sign: '+' },

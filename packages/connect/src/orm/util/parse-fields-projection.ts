@@ -3,19 +3,21 @@ import { splitString } from 'fast-tokenizer';
 const FIELD_PATTERN = /^([+-])?([a-z_$]\w*)$/i;
 const NO_DOT_BRACKET_PATTERN = /[^.]\(/g;
 
-export interface FieldsProjection {
-  [key: string]: ProjectionItem;
+export class FieldsProjection {
+  [key: string]: FieldsProjection.Item;
 }
 
-interface ProjectionItem {
-  sign?: string;
-  projection?: FieldsProjection;
+export namespace FieldsProjection {
+  export class Item {
+    sign?: string;
+    projection?: FieldsProjection;
+  }
 }
 
 export function parseFieldsProjection(projection: string | string[], keepCase?: boolean): FieldsProjection | undefined {
   const arr = Array.isArray(projection) ? projection : [projection];
   if (!(arr && arr.length)) return;
-  const out = {} as FieldsProjection;
+  const out = new FieldsProjection();
   for (let s of arr) {
     if (!keepCase) s = s.toLowerCase();
     parse(s, out);
@@ -51,13 +53,13 @@ export function parse(input: string, target: FieldsProjection) {
     if (!m) throw new TypeError(`Invalid field path (${input})`);
 
     const fieldName = m[2];
-    const treeItem = (target[fieldName] = target[fieldName] || {});
+    const treeItem = (target[fieldName] = target[fieldName] || new FieldsProjection.Item());
     if (m[1]) treeItem.sign = m[1];
 
     if (i === fields.length - 1) {
       delete treeItem.projection;
     } else {
-      target = treeItem.projection = (treeItem.projection || {}) as FieldsProjection;
+      target = treeItem.projection = treeItem.projection || new FieldsProjection();
     }
   }
 }

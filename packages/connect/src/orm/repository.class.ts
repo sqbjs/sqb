@@ -217,11 +217,12 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
       if (Array.isArray(options.filter)) filter.push(...options.filter);
       else filter.push(options.filter);
     }
-    return !!(await CountCommand.execute({
+    const resp = await FindCommand.execute({
       ...options,
       filter,
       entity: this._entity,
-    }));
+    });
+    return resp.length > 0;
   }
 
   protected async _count(options: Repository.CountOptions & { connection: SqbConnection }): Promise<number> {
