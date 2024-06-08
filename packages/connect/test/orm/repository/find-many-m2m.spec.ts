@@ -18,7 +18,7 @@ describe('Repository.findMany() | many to many relations', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       filter: { id: 1 },
-      pick: ['id', 'givenName', 'tags'],
+      projection: ['id', 'givenName', 'tags'],
     });
     expect(rows.length).toStrictEqual(1);
     expect(rows[0].id).toStrictEqual(1);
@@ -35,7 +35,7 @@ describe('Repository.findMany() | many to many relations', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       filter: { id: 1 },
-      pick: ['id', 'tags.color'],
+      projection: ['id', 'tags.color'],
     });
     expect(rows).toBeDefined();
     expect(rows.length).toStrictEqual(1);
@@ -51,7 +51,7 @@ describe('Repository.findMany() | many to many relations', function () {
   it('should filter by m2m relation', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
-      include: ['tags'],
+      projection: '+tags',
       filter: { 'tags.color': 'yellow' },
     });
     expect(rows).toBeDefined();

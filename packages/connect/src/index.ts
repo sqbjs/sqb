@@ -33,5 +33,6 @@ export * from './orm/decorators/primarykey.decorator.js';
 export * from './orm/decorators/transform.decorator.js';
 
 export { isColumnField, isEmbeddedField, isAssociationField, isEntityClass } from './orm/util/orm.helper.js';
+export * from './orm/util/parse-fields-projection.js';
 
 export * from './orm/backward.js';

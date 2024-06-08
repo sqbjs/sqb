@@ -24,7 +24,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'countryCode', 'country'],
+        projection: 'id,countryCode,country',
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -54,7 +54,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.continent'],
+        projection: ['id', 'country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -71,8 +71,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id'],
-        include: ['country.continent'],
+        projection: ['id', '+country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -92,7 +91,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.code', 'country.continent.code'],
+        projection: ['id', 'country.code', 'country.continent.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -108,7 +107,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('filter results by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'countryCode'],
+        projection: ['id', 'countryCode'],
         filter: Eq('country.continent.code', 'AM'),
       });
       for (const row of rows) {
@@ -121,7 +120,7 @@ describe('Repository.findMany() | one to one relations', function () {
       let request: any = {};
       client.once('execute', req => (request = req));
       await repo.findMany({
-        pick: ['id'],
+        projection: ['id'],
         filter: [{ 'country.continent.code': 'AM' }],
       });
       expect(request.sql.includes('exists')).toBeTruthy();
@@ -131,7 +130,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('order by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
+        projection: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
         sort: ['country.code'],
       });
       expect(rows).toBeDefined();
@@ -148,7 +147,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'details'],
+        projection: ['id', 'details'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -160,7 +159,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'details.notes'],
+        projection: ['id', 'details.notes'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -170,7 +169,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('filter results by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'details'],
+        projection: ['id', 'details'],
         filter: Eq('details.customerId', 1),
       });
       expect(rows.length).toStrictEqual(1);
@@ -181,7 +180,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('order by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'details.notes'],
+        projection: ['id', 'details.notes'],
         sort: ['details.notes'],
       });
       expect(rows).toBeDefined();
@@ -198,7 +197,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'countryCode', 'country'],
+        projection: ['id', 'countryCode', 'country'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -217,7 +216,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.continent'],
+        projection: ['id', 'country.continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -234,7 +233,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'country.code', 'country.continent.code'],
+        projection: ['id', 'country.code', 'country.continent.code'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -250,7 +249,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('filter by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'countryCode'],
+        projection: ['id', 'countryCode'],
         filter: Eq('country.continent.code', 'AM'),
       });
       for (const row of rows) {
@@ -263,7 +262,7 @@ describe('Repository.findMany() | one to one relations', function () {
       let request: any = {};
       client.once('execute', req => (request = req));
       await repo.findMany({
-        pick: ['id'],
+        projection: ['id'],
         filter: [{ 'country.continent.code': 'AM' }],
       });
       expect(request.sql.includes('exists')).toStrictEqual(true);
@@ -273,7 +272,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('order by associated element', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
+        projection: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
         sort: ['country.code'],
       });
       expect(rows).toBeDefined();
@@ -288,7 +287,7 @@ describe('Repository.findMany() | one to one relations', function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
-        pick: ['id', 'continent'],
+        projection: ['id', 'continent'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);
@@ -302,7 +301,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('order by indirect associated elements', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'countryCode', 'country.continentCode'],
+        projection: ['id', 'countryCode', 'country.continentCode'],
         sort: ['continent.code'],
       });
       expect(rows).toBeDefined();
@@ -316,7 +315,7 @@ describe('Repository.findMany() | one to one relations', function () {
     it('associations with target conditions', async function () {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
-        pick: ['id', 'vvipDetails'],
+        projection: ['id', 'vvipDetails'],
       });
       expect(rows).toBeDefined();
       expect(rows.length).toBeGreaterThan(0);

@@ -33,7 +33,7 @@ describe('Repository / create()', function () {
     expect(customer.familyName).toStrictEqual(values.familyName);
     expect(customer.countryCode).toStrictEqual(values.countryCode);
     const x = await repo.find(customer.id, {
-      pick: ['id', 'givenName', 'familyName', 'countryCode', 'country'],
+      projection: ['id', 'givenName', 'familyName', 'countryCode', 'country'],
     });
     const c2 = await repo.count();
     expect(x).toBeDefined();
@@ -68,7 +68,7 @@ describe('Repository / create()', function () {
     const repo = client.getRepository<Customer>(Customer);
     const customer = await repo.create(values);
     expect(customer).toBeDefined();
-    const x = await repo.find(customer.id, { pick: ['id', 'gender'] });
+    const x = await repo.find(customer.id, { projection: ['id', 'gender'] });
     expect(x).toBeDefined();
     expect(x!.id).toStrictEqual(customer.id);
     expect(x!.gender).toStrictEqual('Male');
@@ -92,7 +92,7 @@ describe('Repository / create()', function () {
     expect(customer.id).toBeGreaterThan(0);
     expect({ ...customer.name }).toStrictEqual(values.name);
     const x = await repo.find(customer.id, {
-      pick: ['id', 'name'],
+      projection: ['id', 'name'],
     });
     const c2 = await repo.count();
     expect(x).toBeDefined();

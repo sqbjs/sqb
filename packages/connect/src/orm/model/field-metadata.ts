@@ -13,7 +13,7 @@ export interface FieldMetadata {
 
   /**
    * Indicates whether or not to include this field by default when making queries.
-   * If this set to "true" the field must be requested using "include" or "pick" option.
+   * If this set to "true" the field must be requested using "projection" option.
    */
   exclusive?: boolean;
 }

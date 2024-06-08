@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "debug": "^4.3.5",
+    "fast-tokenizer": "^1.3.0",
     "lightning-pool": "^4.2.2",
     "lodash": "^4.17.21",
     "power-tasks": "^1.7.3",

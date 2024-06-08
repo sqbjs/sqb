@@ -1,12 +1,12 @@
 import { And, In, Param, Select } from '@sqb/builder';
 import { SqbConnection } from '../../client/sqb-connection.js';
-import { Entity } from '../decorators/entity.decorator.js';
 import { AssociationNode } from '../model/association-node.js';
 import { ColumnFieldMetadata } from '../model/column-field-metadata.js';
 import { EmbeddedFieldMetadata } from '../model/embedded-field-metadata.js';
 import { EntityMetadata } from '../model/entity-metadata.js';
 import { Repository } from '../repository.class.js';
 import { isAssociationField, isColumnField, isEmbeddedField } from '../util/orm.helper.js';
+import { FieldsProjection, parseFieldsProjection } from '../util/parse-fields-projection.js';
 import { joinAssociationGetLast, JoinInfo, prepareFilter } from './command.helper.js';
 import { RowConverter } from './row-converter.js';
 
@@ -78,9 +78,7 @@ export class FindCommand {
     });
 
     await command.addFields({
-      pick: args.pick,
-      include: args.include,
-      omit: args.omit,
+      projection: args.projection,
       sort: args.sort,
     });
 
@@ -95,9 +93,7 @@ export class FindCommand {
       tableAlias?: string;
       converter?: RowConverter;
       entity?: EntityMetadata;
-      pick?: string[];
-      omit?: string[];
-      include?: string[];
+      projection?: FieldsProjection | string | string[];
       sort?: string[];
       prefix?: string;
       suffix?: string;
@@ -107,21 +103,11 @@ export class FindCommand {
     const entity = opts.entity || this._getEntityFromAlias(tableAlias);
     const converter = opts.converter || this.converter;
 
-    const _pick = opts.pick ? opts.pick.map(x => x.toLowerCase()) : undefined;
-    const _omit = opts.omit ? opts.omit.map(x => x.toLowerCase()) : undefined;
-    const _include = opts.include ? opts.include.map(x => x.toLowerCase()) : undefined;
-
-    let requestedFields: string[];
-    if (_pick) requestedFields = [..._pick];
-    else {
-      requestedFields = Entity.getFieldNames(entity.ctor).reduce((a, x) => {
-        const f = Entity.getField(entity.ctor, x);
-        if (f && !f.exclusive) a.push(x.toLowerCase());
-        return a;
-      }, [] as string[]);
-    }
-
-    if (_include) requestedFields.push(..._include);
+    const projection =
+      typeof opts.projection === 'string' || Array.isArray(opts.projection)
+        ? parseFieldsProjection(opts.projection)
+        : opts.projection;
+    const defaultFields = !projection || !Object.values(projection).find(p => !p.sign);
 
     const sortFields = opts.sort && opts.sort.length ? opts.sort.map(x => x.toLowerCase()) : undefined;
     const prefix = opts.prefix || '';
@@ -131,12 +117,17 @@ export class FindCommand {
       const col = EntityMetadata.getField(entity, key);
       if (!col || col.hidden) continue;
       const colNameLower = col.name.toLowerCase();
-
-      // Ignore field if in excluded list
-      if (_omit && _omit.includes(colNameLower)) continue;
-
-      // Check if field request list
-      if (!requestedFields.find((x: string) => x === colNameLower || x.startsWith(colNameLower + '.'))) continue;
+      const p = projection?.[colNameLower];
+      if (
+        /** Ignore if field is omitted */
+        p?.sign === '-' ||
+        /** Ignore if default fields and field is not in projection */
+        (!defaultFields && !p) ||
+        /** Ignore if default fields enabled and fields is exclusive */
+        (defaultFields && col.exclusive && !p)
+      ) {
+        continue;
+      }
 
       // Add field to select list if field is a column
       if (isColumnField(col)) {
@@ -163,9 +154,7 @@ export class FindCommand {
           entity: typ,
           prefix: col.fieldNamePrefix,
           suffix: col.fieldNameSuffix,
-          pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
-          include: extractSubFields(colNameLower, _include),
-          omit: extractSubFields(colNameLower, _omit),
+          projection: p?.projection,
           sort: extractSubFields(colNameLower, sortFields),
         });
         continue;
@@ -184,9 +173,7 @@ export class FindCommand {
             tableAlias: joinInfo.joinAlias,
             converter: subConverter,
             entity: joinInfo.targetEntity,
-            pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
-            include: extractSubFields(colNameLower, _include),
-            omit: extractSubFields(colNameLower, _omit),
+            projection: p?.projection,
             sort: extractSubFields(colNameLower, sortFields),
           });
           continue;
@@ -208,9 +195,7 @@ export class FindCommand {
           await findCommand.filter(In(targetCol.name, Param(parentField)));
           const sort = sortFields && extractSubFields(colNameLower, sortFields);
           await findCommand.addFields({
-            pick: _pick?.includes(colNameLower) ? undefined : extractSubFields(colNameLower, _pick),
-            include: extractSubFields(colNameLower, _include),
-            omit: extractSubFields(colNameLower, _omit),
+            projection: p?.projection,
             sort,
           });
           if (sort) await findCommand.sort(sort);

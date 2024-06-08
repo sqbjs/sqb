@@ -14,9 +14,7 @@ import { EntityMetadata } from './model/entity-metadata.js';
 import { extractKeyValues } from './util/extract-keyvalues.js';
 
 interface Projection {
-  pick?: string[];
-  omit?: string[];
-  include?: string[];
+  projection?: string | string[];
 }
 
 interface Filtering {
@@ -57,6 +55,8 @@ export namespace Repository {
   }
 
   export interface UpdateOptions extends CommandOptions, Projection, Filtering {}
+
+  export interface UpdateOnlyOptions extends CommandOptions, Filtering {}
 
   export interface UpdateManyOptions extends CommandOptions, Filtering {}
 }
@@ -115,6 +115,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
   }
 
   /** @deprecated - Use findById instead */
+  // todo
   find(keyValue: any | Record<string, any>, options?: Repository.FindOptions): Promise<PartialDTO<T> | undefined> {
     return this.findById(keyValue, options);
   }
@@ -167,7 +168,7 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
   updateOnly(
     keyValue: any | Record<string, any>,
     values: PatchDTO<T>,
-    options?: StrictOmit<Repository.UpdateOptions, keyof Projection>,
+    options?: Repository.UpdateOnlyOptions,
   ): Promise<boolean> {
     return this._execute(async connection => {
       return !!(await this._update(keyValue, values, { ...options, connection }));

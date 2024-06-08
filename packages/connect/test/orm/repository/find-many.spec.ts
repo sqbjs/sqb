@@ -5,7 +5,7 @@ import { Country } from '../../_support/country.entity.js';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
-describe('Repository.find()', function () {
+describe('Repository.findMany()', function () {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('Repository.find()', function () {
     await client.close(0);
   });
 
-  it('should return only non exclusive if "pick" option is null', async function () {
+  it('should return only non exclusive if "projection" option is null', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({ limit: 1 });
     expect(rows).toBeDefined();
@@ -50,7 +50,7 @@ describe('Repository.find()', function () {
 
   it('should return embedded sub fields', async function () {
     const repo = client.getRepository(Customer);
-    const rows = await repo.findMany({ limit: 1, pick: ['name.given'] });
+    const rows = await repo.findMany({ limit: 1, projection: ['name.given'] });
     expect(rows).toBeDefined();
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0].name).toBeDefined();
@@ -59,17 +59,17 @@ describe('Repository.find()', function () {
 
   it('should return json field as embedded element', async function () {
     const repo = client.getRepository(Customer);
-    const row = await repo.find(1, { pick: ['customData'] });
+    const row = await repo.findById(1, { projection: ['customData'] });
     expect(row).toBeDefined();
     expect(row!.customData).toBeDefined();
     expect(typeof row!.customData).toStrictEqual('object');
   });
 
-  it('should return requested fields if "pick" option set', async function () {
+  it('should return requested fields if "projection" option set', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       limit: 1,
-      pick: ['id', 'givenName'],
+      projection: ['id', 'givenName'],
     });
     expect(rows).toBeDefined();
     expect(Object.keys(rows[0])).toStrictEqual(['id', 'givenName']);
@@ -79,7 +79,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       limit: 1,
-      include: ['birthDate'],
+      projection: ['+birthDate'],
     });
     expect(rows).toBeDefined();
     expect(rows[0].givenName).toBeDefined();
@@ -99,8 +99,7 @@ describe('Repository.find()', function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       limit: 1,
-      include: ['country'],
-      omit: ['familyName', 'country.code'],
+      projection: ['+country', '-familyName', 'country.-code'],
     });
     expect(rows).toBeDefined();
     expect(rows[0].givenName).toBeDefined();
@@ -225,7 +224,7 @@ describe('Repository.find()', function () {
   it('should return distinct results', async function () {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
-      pick: ['countryCode'],
+      projection: ['countryCode'],
       distinct: true,
     });
     expect(rows).toBeDefined();
