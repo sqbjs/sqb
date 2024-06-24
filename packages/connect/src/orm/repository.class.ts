@@ -41,7 +41,7 @@ export namespace Repository {
 
   export interface FindOptions extends CommandOptions, Projection, Filtering {}
 
-  export interface FindOneOptions extends CommandOptions, Projection, Filtering {
+  export interface FindOneOptions extends FindOptions {
     sort?: string[];
     offset?: number;
   }
@@ -105,6 +105,12 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
   exists(keyValue: any | Record<string, any>, options?: Repository.ExistsOptions): Promise<boolean> {
     return this._execute(async connection => {
       return this._exists(keyValue, { ...options, connection });
+    }, options);
+  }
+
+  existsOne(options?: Repository.ExistsOptions): Promise<boolean> {
+    return this._execute(async connection => {
+      return this._existsOne({ ...options, connection });
     }, options);
   }
 
@@ -213,6 +219,22 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     },
   ): Promise<boolean> {
     const filter = [extractKeyValues(this._entity, keyValue, true)];
+    if (options && options.filter) {
+      if (Array.isArray(options.filter)) filter.push(...options.filter);
+      else filter.push(options.filter);
+    }
+    return this._existsOne({
+      ...options,
+      filter,
+    });
+  }
+
+  protected async _existsOne(
+    options: Repository.ExistsOptions & {
+      connection: SqbConnection;
+    },
+  ): Promise<boolean> {
+    const filter: any[] = [];
     if (options && options.filter) {
       if (Array.isArray(options.filter)) filter.push(...options.filter);
       else filter.push(options.filter);

@@ -49,6 +49,7 @@ describe('serialize "Operators"', function () {
         // @ts-ignore
         .where(
           And(
+            // @ts-ignore
             null,
             undefined,
             // @ts-ignore
@@ -95,11 +96,12 @@ describe('serialize "Operators"', function () {
     });
 
     it('should skip empty items', function () {
+      // @ts-ignore
       const query = Select()
         .from('table1')
-        // @ts-ignore
         .where(
           Or(
+            // @ts-ignore
             null,
             undefined,
             // @ts-ignore

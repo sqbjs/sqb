@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/lodash": "^4.17.4"
+    "@types/lodash": "^4.17.5"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.12.0",

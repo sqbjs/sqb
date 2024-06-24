@@ -25,7 +25,7 @@ export function parseFieldsProjection(projection: string | string[], keepCase?: 
   return out;
 }
 
-export function parse(input: string, target: FieldsProjection) {
+function parse(input: string, target: FieldsProjection) {
   /** Add dot before brackets which is required to split fields */
   input = input.replace(NO_DOT_BRACKET_PATTERN, s => {
     return s.charAt(0) + '.' + s.substring(1);
