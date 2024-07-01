@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.12.0",
+  "version": "4.12.1",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -40,9 +40,9 @@
     "postgresql-client": "^2.11.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.12.0",
-    "@sqb/connect": "^4.12.0",
-    "@sqb/postgres-dialect": "^4.12.0",
+    "@sqb/builder": "^4.12.1",
+    "@sqb/connect": "^4.12.1",
+    "@sqb/postgres-dialect": "^4.12.1",
     "postgresql-client": "^2.x.x"
   },
   "engines": {
