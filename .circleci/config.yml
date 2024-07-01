@@ -55,7 +55,7 @@ jobs:
           key: v1-deps-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
-      - run: sudo npm install -g npm@^9
+      - run: sudo npm install -g npm
       - run: npm install
       - run: npm run citest
       - run: npm install coveralls --no-save
