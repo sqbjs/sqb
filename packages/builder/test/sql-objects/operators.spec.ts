@@ -123,6 +123,14 @@ describe('serialize "Operators"', function () {
     it('should serialize', function () {
       const query = Select()
         .from('table1')
+        .where(Or(Eq('id', 1), Eq('id', 2)));
+      const result = query.generate(options);
+      expect(result.sql).toStrictEqual('select * from table1 where (id = 1 or id = 2)');
+    });
+
+    it('should serialize complex', function () {
+      const query = Select()
+        .from('table1')
         .where(Or(And(Eq('id', 1), Eq('id', 2)), Eq('id', 3)));
       const result = query.generate(options);
       expect(result.sql).toStrictEqual('select * from table1 where ((id = 1 and id = 2) or id = 3)');

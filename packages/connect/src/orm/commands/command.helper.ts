@@ -99,7 +99,7 @@ export async function prepareFilter(
   tableAlias = 'T',
 ): Promise<void> {
   let srcOp: LogicalOperator;
-  if (isLogicalOperator(filter)) srcOp = filter;
+  if (isLogicalOperator(filter) && filter._operatorType === trgOp._operatorType) srcOp = filter;
   else {
     srcOp = And();
     if (Array.isArray(filter)) srcOp.add(...filter);
