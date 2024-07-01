@@ -25,13 +25,14 @@
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/sqlite-dialect && cp ../../package.cjs.json ../../build/sqlite-dialect/cjs/package.json",
     "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --max-warnings=0 --fix",
+    "format": "prettier . --write --log-level=warn",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/sqlite-dialect",
-    "clean:cover": "rimraf ../../coverage/sqlite-dialect",
-    "format": "prettier . --write --log-level=warn"
+    "clean:cover": "rimraf ../../coverage/sqlite-dialect"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.12.0"

@@ -25,13 +25,14 @@
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/migrator && cp ../../package.cjs.json ../../build/migrator/cjs/package.json",
     "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --max-warnings=0 --fix",
+    "format": "prettier . --write --log-level=warn",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/migrator",
-    "clean:cover": "rimraf ../../coverage/migrator",
-    "format": "prettier . --write --log-level=warn"
+    "clean:cover": "rimraf ../../coverage/migrator"
   },
   "dependencies": {
     "ts-gems": "^3.4.0"

@@ -25,13 +25,14 @@
     "build:esm": "tsc -b tsconfig-build-esm.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect && cp ../../package.cjs.json ../../build/connect/cjs/package.json",
     "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --max-warnings=0 --fix",
+    "format": "prettier . --write --log-level=warn",
     "test": "jest",
     "cover": "jest --collect-coverage",
     "clean": "npm run clean:src | npm run clean:dist | npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
     "clean:dist": "rimraf ../../build/connectt",
-    "clean:cover": "rimraf ../../coverage/connect",
-    "format": "prettier . --write --log-level=warn"
+    "clean:cover": "rimraf ../../coverage/connect"
   },
   "dependencies": {
     "debug": "^4.3.5",
@@ -48,7 +49,8 @@
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/lodash": "^4.17.5"
+    "@types/lodash": "^4.17.5",
+    "postgresql-client": "^2.11.2"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.12.0",

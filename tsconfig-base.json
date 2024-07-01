@@ -1,23 +1,6 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  "extends": "@panates/tsconfig/node.json",
   "compilerOptions": {
-    "moduleResolution": "Node",
-    "types": ["node", "jest"],
-    "target": "ES2020",
-    "lib": ["ES2020", "ES2021"],
-    "module": "ES2020",
-    "noEmit": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "strictPropertyInitialization": false,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "importHelpers": true,
-    "experimentalDecorators": true,
-    "noLib": false,
-    "noImplicitAny": false,
-    "allowJs": false,
-    "incremental": false
+    "types": ["node", "jest"]
   }
 }

@@ -1,11 +1,6 @@
 {
+  "extends": "@panates/tsconfig/build.json",
   "compilerOptions": {
-    "sourceMap": false,
-    "inlineSourceMap": false,
-    "declaration": true,
-    "noEmit": false,
-    "noEmitOnError": true,
-    "removeComments": false,
     "baseUrl": "./",
     "paths": {
       "@sqb/*": ["./build/*"]
