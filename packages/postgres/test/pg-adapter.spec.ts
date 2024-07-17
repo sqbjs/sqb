@@ -2,7 +2,7 @@ import { initAdapterTests } from '../../connect/test/_shared/adapter-tests.js';
 import { PgAdapter } from '../src/pg-adapter.js';
 import { createTestSchema } from './_support/create-db.js';
 
-describe('PgAdapter', function () {
+describe('PgAdapter', () => {
   const adapter = new PgAdapter();
 
   if (process.env.SKIP_CREATE_DB !== 'true') {

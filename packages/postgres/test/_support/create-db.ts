@@ -161,7 +161,7 @@ export async function createTestSchema(schema: string) {
   await connection.connect();
   try {
     const r = await connection.query(
-      'SELECT schema_name FROM information_schema.schemata ' + "where schema_name = '" + schema + "'",
+      `SELECT schema_name FROM information_schema.schemata where schema_name = '${schema}'`,
     );
     if (r.rows && r.rows.length) return;
     const sql = getSql(schema);

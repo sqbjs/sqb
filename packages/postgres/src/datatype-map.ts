@@ -1,5 +1,5 @@
-import { DataTypeOIDs, OID } from 'postgresql-client';
 import { DataType } from '@sqb/builder';
+import { DataTypeOIDs, OID } from 'postgresql-client';
 
 export function dataTypeToOID(dataType: DataType, isArray?: boolean): OID | undefined {
   if (dataType === DataType.DATE) return isArray ? DataTypeOIDs._date : DataTypeOIDs.date;
