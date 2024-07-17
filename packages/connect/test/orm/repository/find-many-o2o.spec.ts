@@ -127,10 +127,7 @@ describe('Repository.findMany() (OneToOne)', () => {
       expect(request.sql).toEqual(`select T.ID as T_ID from customers T
 where (exists (select 1 from countries K
     inner join continents J1 on J1.code = K.continent_code
-    where K.code = T.country_code and J1.name = $1) or
-    exists (select 1 from countries K
-    inner join continents J1 on J1.code = K.continent_code
-    where K.code = T.country_code and J1.name = $2))`);
+    where K.code = T.country_code and (J1.name = $1 or J1.name = $2)))`);
       expect(request.params).toStrictEqual(['America', 'Europe']);
     });
 
