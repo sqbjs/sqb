@@ -18,13 +18,10 @@ export function isColumnField(f: any): f is ColumnFieldMetadata {
   return !!(f && f.name && f.kind === 'column');
 }
 
-export const isEmbeddedField = (f: any): f is EmbeddedFieldMetadata => {
-  return !!(f && f.name && f.kind === 'object');
-};
+export const isEmbeddedField = (f: any): f is EmbeddedFieldMetadata => !!(f && f.name && f.kind === 'object');
 
-export const isAssociationField = (f: any): f is AssociationFieldMetadata => {
-  return !!(f && f.name && f.kind === 'association');
-};
+export const isAssociationField = (f: any): f is AssociationFieldMetadata =>
+  !!(f && f.name && f.kind === 'association');
 
 export async function resolveEntity(ctorThunk: TypeThunk): Promise<Type | undefined> {
   if (typeof ctorThunk !== 'function') return;

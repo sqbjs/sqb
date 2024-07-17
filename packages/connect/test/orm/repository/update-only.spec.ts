@@ -7,7 +7,7 @@ import { createCustomer } from './update.spec.js';
 
 let client: SqbClient;
 
-describe('Repository.updateOnly()', function () {
+describe('Repository.updateOnly()', () => {
   beforeAll(async () => {
     client = await initClient();
   });
@@ -16,7 +16,7 @@ describe('Repository.updateOnly()', function () {
     await client.close(0);
   });
 
-  it('should return "true" if update success', async function () {
+  it('should return "true" if update success', async () => {
     const repo = client.getRepository(Customer);
     const old = await createCustomer(client);
     const newGivenName = 'G' + Math.trunc(Math.random() * 10000);
@@ -36,8 +36,8 @@ describe('Repository.updateOnly()', function () {
     expect(c2!.givenName).toStrictEqual(newGivenName);
   });
 
-  it('should not fetch after update for fast execution', async function () {
-    return client.acquire(async connection => {
+  it('should not fetch after update for fast execution', async () =>
+    client.acquire(async connection => {
       const repo = connection.getRepository(Customer);
       const old = await createCustomer(client);
       let sql = '';
@@ -48,10 +48,9 @@ describe('Repository.updateOnly()', function () {
         givenName: 'Any name',
       });
       expect(sql.includes('select')).toStrictEqual(false);
-    });
-  });
+    }));
 
-  it('should map embedded elements into fields', async function () {
+  it('should map embedded elements into fields', async () => {
     const repo = client.getRepository(Customer);
     const old = await createCustomer(client);
     const newName = { given: 'G' + Math.trunc(Math.random() * 10000) };
@@ -71,7 +70,7 @@ describe('Repository.updateOnly()', function () {
     expect(c2!.name!.given).toStrictEqual(newName.given);
   });
 
-  it('should map embedded elements with prefix into fields', async function () {
+  it('should map embedded elements with prefix into fields', async () => {
     const repo = client.getRepository(Customer);
     const old = await createCustomer(client, {
       address: { city: Math.trunc(Math.random() * 10000) },
@@ -94,7 +93,7 @@ describe('Repository.updateOnly()', function () {
   });
 });
 
-describe('updateAll()', function () {
+describe('updateAll()', () => {
   beforeAll(async () => {
     client = await initClient();
   });
@@ -103,7 +102,7 @@ describe('updateAll()', function () {
     await client.close(0);
   });
 
-  it('should update multiple rows', async function () {
+  it('should update multiple rows', async () => {
     const oldCity = 'C' + Math.trunc(Math.random() * 10000);
     const ids: number[] = [];
     for (let i = 0; i < 10; i++) {

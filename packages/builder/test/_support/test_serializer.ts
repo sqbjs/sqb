@@ -7,6 +7,8 @@ export class TestSerializer {
     switch (type) {
       case SerializationType.EXTERNAL_PARAMETER:
         return this._serializeParameter(ctx, o);
+      default:
+        break;
     }
     return defFn(ctx, o);
   }

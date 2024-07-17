@@ -37,13 +37,14 @@ export class OrderColumn extends BaseField {
       descending: !!this._descending,
       isReservedWord: !!(this._field && ctx.isReservedWord(this._field)),
     };
-    return ctx.serialize(this._type, o, () => {
-      return (
+    return ctx.serialize(
+      this._type,
+      o,
+      () =>
         (o.schema ? o.schema + '.' : '') +
         (o.table ? o.table + '.' : '') +
         (o.isReservedWord ? '"' + o.field + '"' : o.field) +
-        (o.descending ? ' desc' : '')
-      );
-    });
+        (o.descending ? ' desc' : ''),
+    );
   }
 }

@@ -1,5 +1,5 @@
-import { Database, Statement } from 'sql.js';
 import { Adapter, QueryRequest } from '@sqb/connect';
+import { Database, Statement } from 'sql.js';
 import { SqljsCursor } from './sqljs-cursor.js';
 
 export class SqljsConnection implements Adapter.Connection {
@@ -97,7 +97,7 @@ export class SqljsConnection implements Adapter.Connection {
           return out;
         }
         // Emulate update ... returning
-        else if (m[1].toLowerCase() === 'update') {
+        if (m[1].toLowerCase() === 'update') {
           const m2 = query.sql.match(/where (.+)/);
           query = { ...query };
           query.sql = sql + (m2 ? ' where ' + m2[1] : '');

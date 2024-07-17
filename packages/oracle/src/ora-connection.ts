@@ -1,6 +1,6 @@
+import { Adapter, QueryRequest } from '@sqb/connect';
 import assert from 'assert';
 import oracledb from 'oracledb';
-import { Adapter, QueryRequest } from '@sqb/connect';
 import { OraCursor } from './ora-cursor.js';
 
 export const dataTypeNames = {
@@ -197,7 +197,8 @@ export class OraConnection implements Adapter.Connection {
         }
       }
       return out;
-    } else if (response.resultSet) {
+    }
+    if (response.resultSet) {
       out.rowType = request.objectRows ? 'object' : 'array';
       out.cursor = new OraCursor(response.resultSet, {
         rowType: request.objectRows ? 'object' : 'array',

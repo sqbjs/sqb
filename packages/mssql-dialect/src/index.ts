@@ -1,4 +1,4 @@
-import { registerSerializer } from '@sqb/builder';
+import { SerializerRegistry } from '@sqb/builder';
 import { MSSqlSerializer } from './ms-sql-serializer.js';
 
-registerSerializer(new MSSqlSerializer());
+SerializerRegistry.register(new MSSqlSerializer());

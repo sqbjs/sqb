@@ -85,17 +85,16 @@ export class Association {
         this._targetKey = foreign._targetKey;
         this._targetProperty = foreign._targetProperty;
         return;
-      } else {
-        // Try to determine key fields from foreign key from target to source
-        foreign = await EntityMetadata.getForeignKeyFor(target, source);
-        if (foreign && foreign !== this) {
-          await foreign._resolveKeys();
-          this._sourceKey = foreign._targetKey;
-          this._sourceProperty = foreign._targetProperty;
-          this._targetKey = foreign._sourceKey;
-          this._targetProperty = foreign._sourceProperty;
-          return;
-        }
+      }
+      // Try to determine key fields from foreign key from target to source
+      foreign = await EntityMetadata.getForeignKeyFor(target, source);
+      if (foreign && foreign !== this) {
+        await foreign._resolveKeys();
+        this._sourceKey = foreign._targetKey;
+        this._sourceProperty = foreign._targetProperty;
+        this._targetKey = foreign._sourceKey;
+        this._targetProperty = foreign._sourceProperty;
+        return;
       }
 
       if (this.many) {

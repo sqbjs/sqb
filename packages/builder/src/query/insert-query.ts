@@ -12,10 +12,12 @@ export class InsertQuery extends ReturningQuery {
 
   constructor(tableName: string | RawStatement, input) {
     super();
-    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
+    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName))) {
       throw new TypeError('String or Raw instance required as first argument (tableName) for InsertQuery');
-    if (!input || !((typeof input === 'object' && !Array.isArray(input)) || input.isSelect))
+    }
+    if (!input || !((typeof input === 'object' && !Array.isArray(input)) || input.isSelect)) {
       throw new TypeError('Object or SelectQuery instance required as second argument (input) for InsertQuery');
+    }
     this._table = typeof tableName === 'string' ? new TableName(tableName) : tableName;
     this._input = input;
   }

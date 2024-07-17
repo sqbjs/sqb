@@ -3,9 +3,7 @@ const base = require('./jest.config.base.cjs');
 module.exports = {
   ...base,
   // verbose: true,
-  projects: [
-    '<rootDir>/packages/*/jest.config.cjs'
-  ],
+  projects: ['<rootDir>/packages/*/jest.config.cjs'],
   globalSetup: '<rootDir>/support/jest-setup.js',
   coveragePathIgnorePatterns: [
     '/build/',
@@ -13,8 +11,8 @@ module.exports = {
     '/packages/oracle/',
     '/node_modules/',
     '_support',
-    '_shared'
+    '_shared',
   ],
   coverageReporters: ['lcov', 'text'],
-  coverageDirectory: "<rootDir>/coverage/"
+  coverageDirectory: '<rootDir>/coverage/',
 };

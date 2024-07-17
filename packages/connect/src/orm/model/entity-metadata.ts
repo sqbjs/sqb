@@ -1,5 +1,5 @@
-import { Maybe, Type } from 'ts-gems';
 import { DataType } from '@sqb/builder';
+import { Maybe, Type } from 'ts-gems';
 import { ENTITY_METADATA_KEY } from '../orm.const.js';
 import { Ctor, TypeThunk } from '../orm.type.js';
 import { isAssociationField, isColumnField, isEmbeddedField } from '../util/orm.helper.js';
@@ -73,8 +73,9 @@ export namespace EntityMetadata {
 
   export function getAssociationField(entity: EntityMetadata, fieldName: string): Maybe<AssociationFieldMetadata> {
     const el = getField(entity, fieldName);
-    if (el && !isAssociationField(el))
+    if (el && !isAssociationField(el)) {
       throw new Error(`"${el.name}" requested as "association" but it is "${el.kind}"`);
+    }
     return el as AssociationFieldMetadata;
   }
 
@@ -102,13 +103,14 @@ export namespace EntityMetadata {
       return out;
     }
     // Create a cached name array
-    if (!Object.prototype.hasOwnProperty.call(entity, '_fieldNames'))
+    if (!Object.prototype.hasOwnProperty.call(entity, '_fieldNames')) {
       Object.defineProperty(entity, '_fieldNames', {
         enumerable: false,
         configurable: true,
         writable: true,
         value: Object.values(entity.fields).map(m => m.name),
       });
+    }
     return (entity as any)._fieldNames as string[];
   }
 

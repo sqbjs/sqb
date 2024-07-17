@@ -35,12 +35,17 @@
     "clean:cover": "rimraf ../../coverage/migrator"
   },
   "dependencies": {
+    "fast-glob": "^3.3.2",
+    "strict-typed-events": "^2.3.3",
     "ts-gems": "^3.4.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.12.1",
     "@sqb/connect": "^4.12.1",
     "@sqb/postgres": "^4.12.1"
+  },
+  "devDependencies": {
+    "postgresql-client": "^2.12.0"
   },
   "engines": {
     "node": ">=16.0",

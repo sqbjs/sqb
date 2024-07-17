@@ -1,13 +1,13 @@
+import { classes } from '@sqb/builder';
 import _debug from 'debug';
 import { createPool, Pool as LightningPool, PoolConfiguration, PoolFactory, PoolState } from 'lightning-pool';
 import { coerceToBoolean, coerceToInt } from 'putil-varhelpers';
 import { AsyncEventEmitter, TypedEventEmitterClass } from 'strict-typed-events';
 import { Maybe, Type } from 'ts-gems';
-import { classes } from '@sqb/builder';
 import { EntityMetadata } from '../orm/model/entity-metadata.js';
 import { Repository } from '../orm/repository.class.js';
 import { Adapter } from './adapter.js';
-import { adapters } from './extensions.js';
+import { AdapterRegistry } from './extensions.js';
 import { SqbConnection } from './sqb-connection.js';
 import {
   ClientConfiguration,
@@ -44,10 +44,10 @@ export class SqbClient extends TypedEventEmitterClass<SqbClientEvents>(AsyncEven
 
     let adapter;
     if (config.driver) {
-      adapter = adapters.find(x => x.driver === config.driver);
+      adapter = AdapterRegistry.findDriver(config.driver);
       if (!adapter) throw new Error(`No database adapter registered for "${config.driver}" driver`);
     } else if (config.dialect) {
-      adapter = adapters.find(x => x.dialect === config.dialect);
+      adapter = AdapterRegistry.findDialect(config.dialect);
       if (!adapter) throw new Error(`No database adapter registered for "${config.dialect}" dialect`);
     }
     if (!adapter) throw new Error(`You must provide one of "driver" or "dialect" properties`);

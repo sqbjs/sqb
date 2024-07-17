@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Column, Entity, EntityMetadata, ForeignKey, Index } from '@sqb/connect';
 
-describe('Model / Entity mapping', function () {
-  describe('UnionEntity()', function () {
+describe('Model / Entity mapping', () => {
+  describe('UnionEntity()', () => {
     it(`should combine properties`, () => {
       @Entity()
       class EntityA {
@@ -81,7 +81,7 @@ describe('Model / Entity mapping', function () {
     });
   });
 
-  describe('Entity.Pick()', function () {
+  describe('Entity.Pick()', () => {
     it(`should pick given properties`, () => {
       @Entity()
       class EntityA {
@@ -156,7 +156,7 @@ describe('Model / Entity mapping', function () {
     });
   });
 
-  describe('Entity.Omit()', function () {
+  describe('Entity.Omit()', () => {
     it(`should omit given properties`, () => {
       @Entity()
       class EntityA {

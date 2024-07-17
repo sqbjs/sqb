@@ -10,8 +10,9 @@ export class OpExists extends CompOperator {
 
   constructor(query: SelectQuery) {
     super(query);
-    if (!(typeof query === 'object' && isSelectQuery(query)))
+    if (!(typeof query === 'object' && isSelectQuery(query))) {
       throw new TypeError('You must provide a SelectQuery in `exists()`');
+    }
   }
 
   _serialize(ctx: SerializeContext): string {

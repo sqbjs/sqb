@@ -14,6 +14,8 @@ export class SqliteSerializer implements SerializerExtension {
         return this._serializeSelect(ctx, o, defFn);
       case SerializationType.RETURNING_BLOCK:
         return this._serializeReturning(ctx, o, defFn);
+      default:
+        break;
     }
   }
 

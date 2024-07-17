@@ -1,42 +1,42 @@
-import { Param, registerSerializer, Select, unRegisterSerializer } from '@sqb/builder';
+import { Param, Select, SerializerRegistry } from '@sqb/builder';
 import { MSSqlSerializer } from '../src/ms-sql-serializer.js';
 
-describe('MSSqlSerializer', function () {
+describe('MSSqlSerializer', () => {
   const mssqlSerializer = new MSSqlSerializer();
-  beforeAll(() => registerSerializer(mssqlSerializer));
-  afterAll(() => unRegisterSerializer(mssqlSerializer));
+  beforeAll(() => SerializerRegistry.register(mssqlSerializer));
+  afterAll(() => SerializerRegistry.unRegister(mssqlSerializer));
 
-  it('should serialize "limit"', function () {
+  it('should serialize "limit"', () => {
     const query = Select().from('table1').as('t1').limit(10);
     const result = query.generate({ dialect: 'mssql' });
     expect(result.sql).toStrictEqual('select * from table1 FETCH NEXT 10 ROWS ONLY');
   });
 
-  it('should serialize "limit" pretty print', function () {
+  it('should serialize "limit" pretty print', () => {
     const query = Select().from('table1').as('t1').limit(10);
     const result = query.generate({ dialect: 'mssql', prettyPrint: true });
-    expect(result.sql).toStrictEqual('select * from table1\n' + 'FETCH NEXT 10 ROWS ONLY');
+    expect(result.sql).toStrictEqual('select * from table1\nFETCH NEXT 10 ROWS ONLY');
   });
 
-  it('should serialize "limit/offset"', function () {
+  it('should serialize "limit/offset"', () => {
     const query = Select().from('table1').offset(4).limit(10);
     const result = query.generate({
       dialect: 'mssql',
       prettyPrint: true,
     });
-    expect(result.sql).toStrictEqual('select * from table1\n' + 'OFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
+    expect(result.sql).toStrictEqual('select * from table1\nOFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
   });
 
-  it('should serialize "limit/offset" pretty print', function () {
+  it('should serialize "limit/offset" pretty print', () => {
     const query = Select().from('table1').offset(4).limit(10);
     const result = query.generate({
       dialect: 'mssql',
       prettyPrint: true,
     });
-    expect(result.sql).toStrictEqual('select * from table1\n' + 'OFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
+    expect(result.sql).toStrictEqual('select * from table1\nOFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
   });
 
-  it('Should serialize params', function () {
+  it('Should serialize params', () => {
     const query = Select()
       .from('table1')
       .where({ ID: Param('ID') });

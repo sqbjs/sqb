@@ -1,7 +1,7 @@
 import '@sqb/postgres-dialect';
-import { registerAdapter } from '@sqb/connect';
+import { AdapterRegistry } from '@sqb/connect';
 import { PgAdapter } from './pg-adapter.js';
 
-registerAdapter(new PgAdapter());
+AdapterRegistry.register(new PgAdapter());
 
 export * from './pg-adapter.js';

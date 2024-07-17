@@ -77,18 +77,18 @@ export class Customer extends BaseEntity {
   @Link({ exclusive: true })
   readonly country?: Country;
 
-  @Link({ exclusive: true }).toOne(CustomerVip, { sourceKey: 'id', targetKey: 'customerId' })
+  @(Link({ exclusive: true }).toOne(CustomerVip, { sourceKey: 'id', targetKey: 'customerId' }))
   readonly vipDetails: CustomerVip;
 
-  @Link({ exclusive: true }).toOne(CustomerVip, { sourceKey: 'id', targetKey: 'customerId', where: { 'rank>=': 5 } })
+  @(Link({ exclusive: true }).toOne(CustomerVip, { sourceKey: 'id', targetKey: 'customerId', where: { 'rank>=': 5 } }))
   readonly vvipDetails: CustomerVip;
 
-  @Link({ exclusive: true }).toOne(Country).toOne(Continent)
+  @(Link({ exclusive: true }).toOne(Country).toOne(Continent))
   readonly continent: Continent;
 
-  @Link({ exclusive: true }).toOne(CustomerDetail, { sourceKey: 'id', targetKey: 'customerId' })
+  @(Link({ exclusive: true }).toOne(CustomerDetail, { sourceKey: 'id', targetKey: 'customerId' }))
   readonly details: CustomerDetail;
 
-  @Link({ exclusive: true }).toMany(CustomerTag).toOne(Tag)
+  @(Link({ exclusive: true }).toMany(CustomerTag).toOne(Tag))
   readonly tags?: Tag[];
 }

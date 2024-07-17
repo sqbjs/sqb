@@ -1,5 +1,5 @@
 import { SerializationType } from './enums.js';
-import { serializers } from './extensions.js';
+import { SerializerRegistry } from './extensions.js';
 import { Serializable } from './serializable.js';
 import { isLogicalOperator, isQuery, isSerializable } from './typeguards.js';
 import { DefaultSerializeFunction, GenerateOptions, ParamOptions } from './types.js';
@@ -89,7 +89,7 @@ export class SerializeContext implements GenerateOptions {
         if (s != null) return s;
       }
     }
-    for (const ext of serializers) {
+    for (const ext of SerializerRegistry.items()) {
       if (ext.dialect === this.dialect && ext.serialize) {
         const s = ext.serialize(this, type, o, fallback);
         if (s != null) return s;
@@ -173,7 +173,7 @@ export class SerializeContext implements GenerateOptions {
   isReservedWord(s: string | undefined | null): boolean {
     if (!s) return false;
     if (this.reservedWords.includes(s.toLowerCase())) return true;
-    for (const ext of serializers) {
+    for (const ext of SerializerRegistry.items()) {
       if (ext.dialect === this.dialect && ext.isReservedWord) {
         if (ext.isReservedWord(this, s)) return true;
       }

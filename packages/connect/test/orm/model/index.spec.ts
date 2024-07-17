@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,@typescript-eslint/no-unused-vars */
 import { Entity, Index } from '@sqb/connect';
 
-describe('Model / Index', function () {
+describe('Model / Index', () => {
   it(`should define index field with string argument`, () => {
     @Index('id')
     class MyEntity {}

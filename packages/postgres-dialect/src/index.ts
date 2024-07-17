@@ -1,4 +1,4 @@
-import { registerSerializer } from '@sqb/builder';
+import { SerializerRegistry } from '@sqb/builder';
 import { PostgresSerializer } from './postgres-serializer.js';
 
-registerSerializer(new PostgresSerializer());
+SerializerRegistry.register(new PostgresSerializer());

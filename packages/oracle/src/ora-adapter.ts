@@ -1,6 +1,6 @@
 import '@sqb/oracle-dialect';
-import oracledb from 'oracledb';
 import { Adapter, ClientConfiguration } from '@sqb/connect';
+import oracledb from 'oracledb';
 import { clientConfigurationToDriver } from './helpers.js';
 import { OraConnection } from './ora-connection.js';
 

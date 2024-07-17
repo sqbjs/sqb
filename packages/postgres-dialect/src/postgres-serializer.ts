@@ -28,6 +28,8 @@ export class PostgresSerializer implements SerializerExtension {
         return this._serializeComparison(ctx, o, defFn);
       case SerializationType.EXTERNAL_PARAMETER:
         return this._serializeParameter(ctx, o, defFn);
+      default:
+        return undefined;
     }
   }
 
@@ -49,11 +51,13 @@ export class PostgresSerializer implements SerializerExtension {
         }
       }
 
-      if (o.left.isParam && o.left.isArray && o.left.value != null && !Array.isArray(o.left.value))
+      if (o.left.isParam && o.left.isArray && o.left.value != null && !Array.isArray(o.left.value)) {
         o.left.value = [o.left.value];
+      }
 
-      if (o.right.isParam && o.right.isArray && o.right.value != null && !Array.isArray(o.right.value))
+      if (o.right.isParam && o.right.isArray && o.right.value != null && !Array.isArray(o.right.value)) {
         o.right.value = [o.right.value];
+      }
 
       if (o.operatorType === 'in' || o.operatorType === 'notIn') {
         if (o.left.isArray && !o.right.isArray && o.right.isParam) {

@@ -20,6 +20,8 @@ export class MSSqlSerializer implements SerializerExtension {
         return this._serializeSelect(ctx, o, defFn);
       case SerializationType.EXTERNAL_PARAMETER:
         return this._serializeParameter(ctx, o, defFn);
+      default:
+        break;
     }
   }
 

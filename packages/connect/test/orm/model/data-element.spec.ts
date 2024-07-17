@@ -14,7 +14,7 @@ import {
   EntityMetadata,
 } from '@sqb/connect';
 
-describe('Model / Data Column', function () {
+describe('Model / Data Column', () => {
   it(`should @Column() decorator init column metadata`, () => {
     class MyEntity {
       @Column()

@@ -1,15 +1,7 @@
-import {
-  Eq,
-  Param,
-  Raw,
-  registerSerializer,
-  Select,
-  SerializationType,
-  unRegisterSerializer,
-} from '../../src/index.js';
+import { Eq, Param, Raw, Select, SerializationType, SerializerRegistry } from '../../src/index.js';
 import { TestSerializer } from '../_support/test_serializer.js';
 
-describe('serialize "SelectQuery"', function () {
+describe('serialize "SelectQuery"', () => {
   const options = {
     dialect: 'test',
     prettyPrint: false,
@@ -17,27 +9,27 @@ describe('serialize "SelectQuery"', function () {
 
   const testSerializer = new TestSerializer();
 
-  beforeAll(() => registerSerializer(testSerializer));
-  afterAll(() => unRegisterSerializer(testSerializer));
+  beforeAll(() => SerializerRegistry.register(testSerializer));
+  afterAll(() => SerializerRegistry.unRegister(testSerializer));
 
-  it('should initialize SelectQuery', function () {
+  it('should initialize SelectQuery', () => {
     const q = Select();
     expect(q._type).toStrictEqual(SerializationType.SELECT_QUERY);
   });
 
-  it('should serialize * for when no columns given', function () {
+  it('should serialize * for when no columns given', () => {
     const query = Select('*').addColumn().from('table1');
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select * from table1');
   });
 
-  it('should serialize when no tables given', function () {
+  it('should serialize when no tables given', () => {
     const query = Select();
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select *');
   });
 
-  it('should serialize simple query', function () {
+  it('should serialize simple query', () => {
     const query = Select(
       'field1',
       'field2',
@@ -68,7 +60,7 @@ describe('serialize "SelectQuery"', function () {
     );
   });
 
-  it('should pass array as columns', function () {
+  it('should pass array as columns', () => {
     const query = Select(
       ['field1', 'field2'],
       'field3',
@@ -78,11 +70,11 @@ describe('serialize "SelectQuery"', function () {
     ).from('table1');
     const result = query.generate(options);
     expect(result.sql).toStrictEqual(
-      'select field1, field2, field3, field4, field5, ' + 'field6, field7, field8, field9, field10 from table1',
+      'select field1, field2, field3, field4, field5, field6, field7, field8, field9, field10 from table1',
     );
   });
 
-  it('should skip empty columns, tables, joins, group columns and order columns', function () {
+  it('should skip empty columns, tables, joins, group columns and order columns', () => {
     const query = Select('field1', '')
       .from('schema1.table1 t1', '')
       // @ts-ignore
@@ -93,42 +85,42 @@ describe('serialize "SelectQuery"', function () {
     expect(result.sql).toStrictEqual('select field1 from schema1.table1 t1');
   });
 
-  it('should serialize raw in columns', function () {
+  it('should serialize raw in columns', () => {
     const query = Select(Raw("'John''s Bike' f1")).from('table1');
     const result = query.generate(options);
     expect(result.sql).toStrictEqual("select 'John''s Bike' f1 from table1");
   });
 
-  it('should serialize sub-select in columns', function () {
+  it('should serialize sub-select in columns', () => {
     const sub = Select('id').from('table2').as('id2');
     const query = Select(sub).from('table1');
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select (select id from table2) id2 from table1');
   });
 
-  it('should serialize raw in "from" part', function () {
+  it('should serialize raw in "from" part', () => {
     const query = Select().from('table1', Raw('func1()'));
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select * from table1,func1()');
   });
 
-  it('should serialize sub-select in "from"', function () {
+  it('should serialize sub-select in "from"', () => {
     const query = Select().from(
       Select('field1', 'field2', 'field3', 'field4', 'field5', 'field6', 'field7', 'field8').from('table1').as('t1'),
     );
     const result = query.generate(options);
     expect(result.sql).toStrictEqual(
-      'select * from ' + '(select field1, field2, field3, field4, field5, field6, field7, field8 ' + 'from table1) t1',
+      'select * from (select field1, field2, field3, field4, field5, field6, field7, field8 from table1) t1',
     );
   });
 
-  it('should serialize raw in "order by"', function () {
+  it('should serialize raw in "order by"', () => {
     const query = Select().from('table1').orderBy(Raw('field1'));
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select * from table1 order by field1');
   });
 
-  it('should pretty print - test1', function () {
+  it('should pretty print - test1', () => {
     const query = Select().from(
       Select('field1', 'field2', 'field3', 'field4', 'field5', 'field6', 'field7', 'field8').from('table1').as('t1'),
     );
@@ -140,7 +132,7 @@ describe('serialize "SelectQuery"', function () {
     );
   });
 
-  it('should serialize params', function () {
+  it('should serialize params', () => {
     const query = Select()
       .from('table1')
       .where({ id: Param('id') });
@@ -149,20 +141,20 @@ describe('serialize "SelectQuery"', function () {
     expect(result.params.id).toStrictEqual(1);
   });
 
-  it('should force using params if strictParams=true', function () {
+  it('should force using params if strictParams=true', () => {
     const query = Select().from('table1').where({ id: 1 });
     const result = query.generate({ ...options, strictParams: true });
     expect(result.sql).toStrictEqual('select * from table1 where id = __P$_1');
     expect(result.params.P$_1).toStrictEqual(1);
   });
 
-  it('should serialize distinct query', function () {
+  it('should serialize distinct query', () => {
     const query = Select('id', 'name').distinct().from('table1');
     const result = query.generate(options);
     expect(result.sql).toStrictEqual('select distinct id, name from table1');
   });
 
-  it('should pretty print - test2', function () {
+  it('should pretty print - test2', () => {
     const query = Select()
       .from('table1')
       .where(Eq('ID', 1), Eq('name', 'value of the field should be too long'), Eq('ID', 1), Eq('ID', 12345678))
@@ -176,31 +168,31 @@ describe('serialize "SelectQuery"', function () {
     );
   });
 
-  it('should assign limit ', function () {
+  it('should assign limit ', () => {
     const query = Select().from('table1').limit(5);
     expect(query._limit).toStrictEqual(5);
   });
 
-  it('should assign offset ', function () {
+  it('should assign offset ', () => {
     const query = Select().from('table1').offset(5);
     expect(query._offset).toStrictEqual(5);
   });
 
-  it('should pass only Join instance to join() function', function () {
+  it('should pass only Join instance to join() function', () => {
     expect(() =>
       // @ts-ignore
       Select().from('table1').join('dfd'),
     ).toThrow('Join statement required');
   });
 
-  it('should validate alias for sub-select in columns', function () {
+  it('should validate alias for sub-select in columns', () => {
     expect(() => {
       const query = Select(Select().from('table2')).from('table1 t1');
       query.generate();
     }).toThrow('Alias required for sub-select in columns');
   });
 
-  it('should validate alias for sub-select in "from"', function () {
+  it('should validate alias for sub-select in "from"', () => {
     expect(() => {
       const query = Select().from(Select().from('table2'));
       query.generate();

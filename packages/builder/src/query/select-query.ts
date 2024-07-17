@@ -200,7 +200,7 @@ export class SelectQuery extends Query {
    */
   protected __serializeSelectColumns(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._columns)
+    if (this._columns) {
       for (const t of this._columns) {
         const s = ctx.anyToSQL(t);
         // t._serialize(ctx);
@@ -211,6 +211,7 @@ export class SelectQuery extends Query {
           } else arr.push(s);
         }
       }
+    }
     return ctx.serialize(SerializationType.SELECT_QUERY_COLUMNS, arr, () => printArray(arr) || '*');
   }
 
@@ -219,7 +220,7 @@ export class SelectQuery extends Query {
    */
   protected __serializeFrom(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._tables)
+    if (this._tables) {
       for (const t of this._tables) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
@@ -230,6 +231,7 @@ export class SelectQuery extends Query {
           } else arr.push(s);
         }
       }
+    }
     return ctx.serialize(SerializationType.SELECT_QUERY_FROM, arr, () => {
       const s = arr.join(',');
       return s ? 'from' + (s.substring(0, 1) !== '\n' ? ' ' : '') + s : '';
@@ -241,15 +243,14 @@ export class SelectQuery extends Query {
    */
   protected __serializeJoins(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._joins)
+    if (this._joins) {
       for (const t of this._joins) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
         if (s) arr.push(s);
       }
-    return ctx.serialize(SerializationType.SELECT_QUERY_JOIN, arr, () => {
-      return arr.join('\n');
-    });
+    }
+    return ctx.serialize(SerializationType.SELECT_QUERY_JOIN, arr, () => arr.join('\n'));
   }
 
   /**
@@ -258,10 +259,10 @@ export class SelectQuery extends Query {
   protected __serializeWhere(ctx: SerializeContext): string {
     if (!this._where) return '';
     const s = this._where._serialize(ctx);
-    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
+    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () =>
       /* istanbul ignore next */
-      return s ? 'where ' + s : '';
-    });
+      s ? 'where ' + s : '',
+    );
   }
 
   /**
@@ -269,12 +270,13 @@ export class SelectQuery extends Query {
    */
   protected __serializeGroupColumns(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._groupBy)
+    if (this._groupBy) {
       for (const t of this._groupBy) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
         if (s) arr.push(s);
       }
+    }
     return ctx.serialize(SerializationType.SELECT_QUERY_GROUPBY, arr, () => {
       const s = printArray(arr);
       return s ? 'group by ' + s : '';
@@ -283,12 +285,13 @@ export class SelectQuery extends Query {
 
   protected __serializeOrderColumns(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._orderBy)
+    if (this._orderBy) {
       for (const t of this._orderBy) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
         if (s) arr.push(s);
       }
+    }
     return ctx.serialize(SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
       const s = printArray(arr);
       return s ? 'order by ' + s : '';

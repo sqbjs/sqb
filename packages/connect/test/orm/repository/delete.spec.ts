@@ -2,7 +2,7 @@ import { SqbClient } from '@sqb/connect';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
-describe('Repository.delete()', function () {
+describe('Repository.delete()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -13,7 +13,7 @@ describe('Repository.delete()', function () {
     await client.close(0);
   });
 
-  it('should delete single record', async function () {
+  it('should delete single record', async () => {
     const values = {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -26,7 +26,7 @@ describe('Repository.delete()', function () {
     expect(await repo.findById(customer.id)).not.toBeDefined();
   });
 
-  it('should execute in transaction', async function () {
+  it('should execute in transaction', async () => {
     let c = 0;
     return client.acquire(async connection => {
       const values = {

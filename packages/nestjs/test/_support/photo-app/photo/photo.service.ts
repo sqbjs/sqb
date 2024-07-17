@@ -1,7 +1,7 @@
-import assert from 'assert';
 import { Injectable } from '@nestjs/common';
 import { SqbClient } from '@sqb/connect';
 import { InjectSQB } from '@sqb/nestjs';
+import assert from 'assert';
 
 @Injectable()
 export class PhotoService {

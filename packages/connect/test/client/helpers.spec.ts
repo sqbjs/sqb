@@ -7,7 +7,7 @@ import {
   wrapAdapterFields,
 } from '../../src/client/helpers.js';
 
-describe('Helpers', function () {
+describe('Helpers', () => {
   const arrayRows: ArrayRowset = [
     ['a', 'b', null],
     ['c', 'd', null],
@@ -23,44 +23,44 @@ describe('Helpers', function () {
     { fieldName: 'field_name3' },
   ] as Adapter.Field[];
 
-  describe('applyNamingStrategy', function () {
-    it('should return given value as lowercase', function () {
+  describe('applyNamingStrategy', () => {
+    it('should return given value as lowercase', () => {
       expect(applyNamingStrategy('hello_world', 'lowercase')).toStrictEqual('hello_world');
       // @ts-ignore
       expect(applyNamingStrategy('Hello_World', 'LowerCase')).toStrictEqual('hello_world');
     });
 
-    it('should return given value as uppercase', function () {
+    it('should return given value as uppercase', () => {
       expect(applyNamingStrategy('hello_world', 'uppercase')).toStrictEqual('HELLO_WORLD');
       // @ts-ignore
       expect(applyNamingStrategy('Hello_World', 'UpperCase')).toStrictEqual('HELLO_WORLD');
     });
 
-    it('should return given value as camelcase', function () {
+    it('should return given value as camelcase', () => {
       expect(applyNamingStrategy('helloWorld', 'camelcase')).toStrictEqual('helloWorld');
       expect(applyNamingStrategy('HELLO_WORLD', 'camelcase')).toStrictEqual('helloWorld');
       expect(applyNamingStrategy('hello_world', 'camelcase')).toStrictEqual('helloWorld');
       expect(applyNamingStrategy('Hello_World', 'camelcase')).toStrictEqual('helloWorld');
     });
 
-    it('should return given value as pascalcase', function () {
+    it('should return given value as pascalcase', () => {
       expect(applyNamingStrategy('helloWorld', 'pascalcase')).toStrictEqual('HelloWorld');
       expect(applyNamingStrategy('HELLO_WORLD', 'pascalcase')).toStrictEqual('HelloWorld');
       expect(applyNamingStrategy('hello_world', 'pascalcase')).toStrictEqual('HelloWorld');
       expect(applyNamingStrategy('Hello_World', 'pascalcase')).toStrictEqual('HelloWorld');
     });
 
-    it('should use custom function', function () {
+    it('should use custom function', () => {
       expect(applyNamingStrategy('hello_world', x => x.toUpperCase())).toStrictEqual('HELLO_WORLD');
     });
 
-    it('should do nothing if no strategy given', function () {
+    it('should do nothing if no strategy given', () => {
       expect(applyNamingStrategy('hello_world', undefined)).toStrictEqual('hello_world');
     });
   });
 
-  describe('normalizeFieldMap', function () {
-    it('should convert Adapter.Field[] to FieldInfoMap', function () {
+  describe('normalizeFieldMap', () => {
+    it('should convert Adapter.Field[] to FieldInfoMap', () => {
       const fields = wrapAdapterFields(adapterFields);
       expect(!Array.isArray(fields)).toBeTruthy();
       expect(fields.get('field_name1')).toBeDefined();
@@ -70,7 +70,7 @@ describe('Helpers', function () {
       expect(fields.get(0).index).toStrictEqual(0);
     });
 
-    it('should apply naming strategy', function () {
+    it('should apply naming strategy', () => {
       const fields = wrapAdapterFields(adapterFields, 'camelcase');
       expect(!Array.isArray(fields)).toBeTruthy();
       expect(fields.get('fieldName1')).toBeDefined();
@@ -78,8 +78,8 @@ describe('Helpers', function () {
     });
   });
 
-  describe('normalizeRowsToObjectRows', function () {
-    it('should convert array rows to object rows', function () {
+  describe('normalizeRowsToObjectRows', () => {
+    it('should convert array rows to object rows', () => {
       const fields = wrapAdapterFields(adapterFields);
       const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
       expect(Array.isArray(rows)).toBeTruthy();
@@ -91,7 +91,7 @@ describe('Helpers', function () {
       expect(rows[0].field_name3).toStrictEqual(null);
     });
 
-    it('should keep object rows', function () {
+    it('should keep object rows', () => {
       const fields = wrapAdapterFields(adapterFields);
       const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
       expect(Array.isArray(rows)).toBeTruthy();
@@ -103,7 +103,7 @@ describe('Helpers', function () {
       expect(rows[0].field_name3).toStrictEqual(null);
     });
 
-    it('should apply naming strategy to fields in rows (object rows source)', function () {
+    it('should apply naming strategy to fields in rows (object rows source)', () => {
       const fields = wrapAdapterFields(adapterFields, 'camelcase');
       const rows = normalizeRowsToObjectRows(fields, 'object', objectRows);
       expect(Array.isArray(rows)).toBeTruthy();
@@ -115,7 +115,7 @@ describe('Helpers', function () {
       expect(rows[0].fieldName3).toStrictEqual(null);
     });
 
-    it('should apply naming strategy to fields in rows (array rows source)', function () {
+    it('should apply naming strategy to fields in rows (array rows source)', () => {
       const fields = wrapAdapterFields(adapterFields, 'camelcase');
       const rows = normalizeRowsToObjectRows(fields, 'array', arrayRows as any);
       expect(Array.isArray(rows)).toBeTruthy();
@@ -127,7 +127,7 @@ describe('Helpers', function () {
       expect(rows[0].fieldName3).toStrictEqual(null);
     });
 
-    it('should remove null field values ignoreNulls == true', function () {
+    it('should remove null field values ignoreNulls == true', () => {
       const fields = wrapAdapterFields(adapterFields, 'camelcase');
       const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, { ignoreNulls: true });
       expect(rows[0].fieldName1).toStrictEqual('a');
@@ -135,7 +135,7 @@ describe('Helpers', function () {
       expect(rows[0].fieldName3).toStrictEqual(undefined);
     });
 
-    it('should apply value transform ', function () {
+    it('should apply value transform ', () => {
       const fields = wrapAdapterFields(adapterFields, 'camelcase');
       const rows = normalizeRowsToObjectRows(fields, 'object', objectRows, {
         transform: x => '$' + x,
@@ -145,8 +145,8 @@ describe('Helpers', function () {
     });
   });
 
-  describe('normalizeRowsToArrayRows', function () {
-    it('should convert object rows to array rows if objectRows = false', function () {
+  describe('normalizeRowsToArrayRows', () => {
+    it('should convert object rows to array rows if objectRows = false', () => {
       const fields = wrapAdapterFields(adapterFields);
       const rows = normalizeRowsToArrayRows(fields, 'object', objectRows);
       expect(Array.isArray(rows)).toBeTruthy();
@@ -157,7 +157,7 @@ describe('Helpers', function () {
       expect(rows[0][2]).toStrictEqual(null);
     });
 
-    it('should keep to array rows if objectRows = false', function () {
+    it('should keep to array rows if objectRows = false', () => {
       const fields = wrapAdapterFields(adapterFields);
       const rows = normalizeRowsToArrayRows(fields, 'array', arrayRows as any);
       expect(Array.isArray(rows)).toBeTruthy();

@@ -1,7 +1,7 @@
+import { PgAdapter } from '@sqb/postgres';
 import path from 'path';
 import { Connection, stringifyValueForSQL } from 'postgresql-client';
 import { StrictOmit } from 'ts-gems';
-import { PgAdapter } from '@sqb/postgres';
 import type { DbMigratorOptions } from '../db-migrator.js';
 import { MigrationAdapter } from '../migration-adapter.js';
 import {
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ${adapter.eventTableFull}
         objectRows: true,
       });
       if (!(r && r.rows?.length)) {
-        await connection.query(`insert into ${adapter.summaryTableFull} ` + '(package_name, status) values ($1, $2)', {
+        await connection.query(`insert into ${adapter.summaryTableFull} (package_name, status) values ($1, $2)`, {
           params: [adapter.packageName, MigrationStatus.idle],
         });
       }

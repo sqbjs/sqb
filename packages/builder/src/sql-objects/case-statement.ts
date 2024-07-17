@@ -34,11 +34,12 @@ export class CaseStatement extends Serializable {
    * Defines "then" part of Case expression.
    */
   then(value): this {
-    if (this._condition)
+    if (this._condition) {
       this._expressions.push({
         condition: this._condition,
         value,
       });
+    }
     return this;
   }
 

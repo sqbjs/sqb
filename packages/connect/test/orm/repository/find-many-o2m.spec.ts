@@ -6,7 +6,7 @@ import { Country } from '../../_support/country.entity.js';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
-describe('Repository.findMany() (OneToMany)', function () {
+describe('Repository.findMany() (OneToMany)', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -17,7 +17,7 @@ describe('Repository.findMany() (OneToMany)', function () {
     await client.close(0);
   });
 
-  describe('linkToMany', function () {
+  describe('linkToMany', () => {
     it('return associated rows as array property', async () => {
       const repo = client.getRepository(Continent);
       const rows = await repo.findMany({
@@ -171,7 +171,7 @@ describe('Repository.findMany() (OneToMany)', function () {
     });
   });
 
-  describe('linkFromMany', function () {
+  describe('linkFromMany', () => {
     it('return associated rows as array property', async () => {
       const repo = client.getRepository(Country);
       const rows = await repo.findMany({
@@ -279,7 +279,7 @@ describe('Repository.findMany() (OneToMany)', function () {
     });
   });
 
-  describe('Association chain', function () {
+  describe('Association chain', () => {
     it('associations with target conditions', async () => {
       const repo = client.getRepository(Country);
       const rows = await repo.findMany({

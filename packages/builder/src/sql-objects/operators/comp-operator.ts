@@ -68,13 +68,12 @@ export abstract class CompOperator extends Operator {
         result.isParam = true;
       }
       return result;
-    } else {
-      const result: any = {
-        expression: isRight || typeof x !== 'string' ? ctx.anyToSQL(x) : x,
-      };
-      if (isRight || typeof x !== 'string') result.isArray = Array.isArray(x);
-      return result;
     }
+    const result: any = {
+      expression: isRight || typeof x !== 'string' ? ctx.anyToSQL(x) : x,
+    };
+    if (isRight || typeof x !== 'string') result.isArray = Array.isArray(x);
+    return result;
   }
 
   protected __serialize(ctx: SerializeContext, o: any): string {

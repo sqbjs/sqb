@@ -1,6 +1,6 @@
+import { LogicalOperator } from '@sqb/builder';
 import { AsyncEventEmitter, TypedEventEmitterClass } from 'strict-typed-events';
 import { PartialDTO, PatchDTO, StrictOmit, Type } from 'ts-gems';
-import { LogicalOperator } from '@sqb/builder';
 import { FieldInfoMap } from '../client/field-info-map.js';
 import { SqbClient } from '../client/sqb-client.js';
 import { SqbConnection } from '../client/sqb-connection.js';
@@ -27,6 +27,7 @@ export namespace Repository {
 
   export interface CommandOptions {
     connection?: SqbConnection;
+    prettyPrint?: boolean;
   }
 
   export interface CreateOptions extends CommandOptions, Projection {}
@@ -103,54 +104,42 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
   }
 
   exists(keyValue: any | Record<string, any>, options?: Repository.ExistsOptions): Promise<boolean> {
-    return this._execute(async connection => {
-      return this._exists(keyValue, { ...options, connection });
-    }, options);
+    return this._execute(async connection => this._exists(keyValue, { ...options, connection }), options);
   }
 
   existsOne(options?: Repository.ExistsOptions): Promise<boolean> {
-    return this._execute(async connection => {
-      return this._existsOne({ ...options, connection });
-    }, options);
+    return this._execute(async connection => this._existsOne({ ...options, connection }), options);
   }
 
   count(options?: Repository.CountOptions): Promise<number> {
-    return this._execute(async connection => {
-      return this._count({ ...options, connection });
-    }, options);
+    return this._execute(async connection => this._count({ ...options, connection }), options);
   }
 
   findById(keyValue: any | Record<string, any>, options?: Repository.FindOptions): Promise<PartialDTO<T> | undefined> {
-    return this._execute(async connection => {
-      return this._find(keyValue, { ...options, connection });
-    }, options);
+    return this._execute(async connection => this._find(keyValue, { ...options, connection }), options);
   }
 
   findOne(options?: Repository.FindOneOptions): Promise<PartialDTO<T> | undefined> {
-    return this._execute(async connection => {
-      return await this._findOne({
-        ...options,
-        connection,
-      });
-    }, options);
+    return this._execute(
+      async connection =>
+        await this._findOne({
+          ...options,
+          connection,
+        }),
+      options,
+    );
   }
 
   findMany(options?: Repository.FindManyOptions): Promise<PartialDTO<T>[]> {
-    return this._execute(async connection => {
-      return this._findMany({ ...options, connection });
-    }, options);
+    return this._execute(async connection => this._findMany({ ...options, connection }), options);
   }
 
   delete(keyValue: any | Record<string, any>, options?: Repository.DeleteOptions): Promise<boolean> {
-    return this._execute(async connection => {
-      return this._delete(keyValue, { ...options, connection });
-    }, options);
+    return this._execute(async connection => this._delete(keyValue, { ...options, connection }), options);
   }
 
   deleteMany(options?: Repository.DeleteManyOptions): Promise<number> {
-    return this._execute(async connection => {
-      return this._deleteMany({ ...options, connection });
-    }, options);
+    return this._execute(async connection => this._deleteMany({ ...options, connection }), options);
   }
 
   update(
@@ -170,15 +159,14 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
     values: PatchDTO<T>,
     options?: Repository.UpdateOnlyOptions,
   ): Promise<boolean> {
-    return this._execute(async connection => {
-      return !!(await this._update(keyValue, values, { ...options, connection }));
-    }, options);
+    return this._execute(
+      async connection => !!(await this._update(keyValue, values, { ...options, connection })),
+      options,
+    );
   }
 
   updateMany(values: PartialDTO<T>, options?: Repository.UpdateManyOptions): Promise<number> {
-    return this._execute(async connection => {
-      return this._updateMany(values, { ...options, connection });
-    });
+    return this._execute(async connection => this._updateMany(values, { ...options, connection }));
   }
 
   protected async _execute(fn: TransactionFunction, opts?: Repository.CommandOptions): Promise<any> {

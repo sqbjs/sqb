@@ -10,8 +10,9 @@ export function PrimaryKey(options?: Omit<IndexMetadata, 'columns' | 'unique' | 
 export function PrimaryKey(arg0: any, arg1?: any): ClassDecorator | PropertyDecorator {
   return function (target, propertyKey?: string | symbol): void {
     if (arguments.length === 1) {
-      if (!(typeof arg0 === 'string' || Array.isArray(arg0)))
+      if (!(typeof arg0 === 'string' || Array.isArray(arg0))) {
         throw new Error(`You must specify primary index column(s)`);
+      }
       const meta = EntityMetadata.define(target);
       EntityMetadata.setPrimaryKeys(meta, arg0, arg1);
       return;

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion,camelcase */
+import { DataType, Insert, Param, Query, Select, Update } from '@sqb/builder';
+import { Adapter, AdapterRegistry, ClientConfiguration, QueryRequest } from '@sqb/connect';
 import fs from 'fs';
 import path from 'path';
-import { DataType, Insert, Param, Query, Select, Update } from '@sqb/builder';
-import { Adapter, ClientConfiguration, QueryRequest, registerAdapter, unRegisterAdapter } from '@sqb/connect';
 
 export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfiguration>) {
   let connection!: Adapter.Connection;
@@ -16,8 +16,8 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     },
   };
 
-  beforeAll(() => registerAdapter(adapter));
-  afterAll(() => unRegisterAdapter(adapter));
+  beforeAll(() => AdapterRegistry.register(adapter));
+  afterAll(() => AdapterRegistry.unRegister(adapter));
   afterEach(() => connection && connection.close());
 
   async function adapterExecute(
@@ -48,7 +48,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
 
   it(
     'should create connection instance with ' + adapter.driver + ' driver',
-    async function () {
+    async () => {
       connection = await adapter.connect(clientConfig);
       expect(connection).toBeDefined();
     },
@@ -68,7 +68,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     });
   }
 
-  it('should execute a select query and return fields and rows (objectRows=false)', async function () {
+  it('should execute a select query and return fields and rows (objectRows=false)', async () => {
     connection = await adapter.connect(clientConfig);
     const query = Select('id').from('customers').orderBy('id').limit(10);
     const result = await adapterExecute(query, { objectRows: false });
@@ -80,7 +80,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(result.objRows[0].id).toStrictEqual(1);
   });
 
-  it('should execute a select query and return fields and rows (objectRows=true)', async function () {
+  it('should execute a select query and return fields and rows (objectRows=true)', async () => {
     connection = await adapter.connect(clientConfig);
     const query = Select('id').from('customers').orderBy('id');
     const result = await adapterExecute(query, { objectRows: true });
@@ -91,7 +91,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(result.objRows[0].id).toStrictEqual(1);
   });
 
-  it('should return cursor', async function () {
+  it('should return cursor', async () => {
     if (!adapter.features?.cursor) {
       return;
     }
@@ -112,7 +112,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     else expect(rows![0][result.fields![0].fieldName]).toStrictEqual(1);
   });
 
-  it('should fetchRows option limit row count', async function () {
+  it('should fetchRows option limit row count', async () => {
     connection = await adapter.connect(clientConfig);
     const query = Select('id').from('customers').orderBy('id');
     const result = await adapterExecute(query, {
@@ -125,7 +125,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
   });
 
   if (adapter.features?.fetchAsString?.includes(DataType.DATE)) {
-    it('should fetch date fields as string (fetchAsString)', async function () {
+    it('should fetch date fields as string (fetchAsString)', async () => {
       connection = await adapter.connect(clientConfig);
       const query = Select('birth_date').from('customers');
       const result = await adapterExecute(query, {
@@ -141,7 +141,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
   }
 
   if (adapter.features?.fetchAsString?.includes(DataType.TIMESTAMP)) {
-    it('should fetch timestamp fields as string (fetchAsString)', async function () {
+    it('should fetch timestamp fields as string (fetchAsString)', async () => {
       connection = await adapter.connect(clientConfig);
       const query = Select('created_at').from('customers');
       const result = await adapterExecute(query, {
@@ -156,12 +156,12 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     });
   }
 
-  it('should return error if sql is invalid', async function () {
+  it('should return error if sql is invalid', async () => {
     connection = await adapter.connect(clientConfig);
     await expect(() => connection.execute({ sql: 'invalid sql' })).rejects.toBeDefined();
   });
 
-  it('should insert record with returning', async function () {
+  it('should insert record with returning', async () => {
     connection = await adapter.connect(clientConfig);
     const givenName = 'X' + Math.floor(Math.random() * 1000000);
     const familyName = 'X' + Math.floor(Math.random() * 1000000);
@@ -180,7 +180,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     lastInsertId = result.objRows[0].id;
   });
 
-  it('should execute script with parameters', async function () {
+  it('should execute script with parameters', async () => {
     connection = await adapter.connect(clientConfig);
     const givenName = 'X' + Math.floor(Math.random() * 1000000);
     const familyName = 'X' + Math.floor(Math.random() * 1000000);
@@ -200,7 +200,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(result.objRows[0].family_name).toStrictEqual(familyName);
   });
 
-  it('should update record with returning', async function () {
+  it('should update record with returning', async () => {
     connection = await adapter.connect(clientConfig);
     const city = 'X' + Math.floor(Math.random() * 10000);
     const query = Update('customers', { city }).where({ id: lastInsertId }).returning('city');
@@ -214,7 +214,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(result.objRows[0].city).toStrictEqual(city);
   });
 
-  it('should commit a transaction', async function () {
+  it('should commit a transaction', async () => {
     connection = await adapter.connect(clientConfig);
     let r = await adapterExecute(Select().from('customers').where({ id: lastInsertId }));
     expect(r).toBeDefined();
@@ -242,7 +242,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(r.objRows[0].city).toStrictEqual(newCity);
   });
 
-  it('should rollback a transaction', async function () {
+  it('should rollback a transaction', async () => {
     connection = await adapter.connect(clientConfig);
     let r = await adapterExecute(Select().from('customers').where({ id: lastInsertId }));
     expect(r).toBeDefined();
@@ -268,7 +268,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(r.objRows[0].city).toStrictEqual(oldCity);
   });
 
-  it('should start transaction when autoCommit is off', async function () {
+  it('should start transaction when autoCommit is off', async () => {
     connection = await adapter.connect(clientConfig);
     let r = await adapterExecute(Select().from('customers').where({ id: lastInsertId }));
     expect(r).toBeDefined();
@@ -293,7 +293,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(r.objRows[0].city).toStrictEqual(oldCity);
   });
 
-  it('should commit a transaction when autoCommit is on', async function () {
+  it('should commit a transaction when autoCommit is on', async () => {
     connection = await adapter.connect(clientConfig);
     let r = await adapterExecute(Select().from('customers').where({ id: lastInsertId }));
     expect(r).toBeDefined();
@@ -318,20 +318,20 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     expect(r.objRows[0].city).toStrictEqual(newCity);
   });
 
-  it('should call startTransaction() more than one', async function () {
+  it('should call startTransaction() more than one', async () => {
     connection = await adapter.connect(clientConfig);
     await connection.startTransaction();
     await connection.startTransaction();
   });
 
-  it('should call commit() more than one', async function () {
+  it('should call commit() more than one', async () => {
     connection = await adapter.connect(clientConfig);
     await connection.startTransaction();
     await connection.commit();
     await connection.commit();
   });
 
-  it('should call rollback() more than one', async function () {
+  it('should call rollback() more than one', async () => {
     connection = await adapter.connect(clientConfig);
     await connection.startTransaction();
     await connection.rollback();

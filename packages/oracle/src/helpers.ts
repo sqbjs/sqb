@@ -1,6 +1,6 @@
+import { ClientConfiguration } from '@sqb/connect';
 import { ConnectionAttributes } from 'oracledb';
 import url from 'url';
-import { ClientConfiguration } from '@sqb/connect';
 
 export function clientConfigurationToDriver(config: ClientConfiguration): ConnectionAttributes {
   const cfg: ConnectionAttributes = {

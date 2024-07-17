@@ -23,16 +23,16 @@ export class Country {
   @Link({ exclusive: true })
   readonly continent: Continent;
 
-  @Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
+  @(Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
     sourceKey: 'code',
     targetKey: 'countryCode',
-  })
+  }))
   readonly customers: Customer[];
 
-  @Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
+  @(Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
     sourceKey: 'code',
     targetKey: 'countryCode',
     where: { vip: true },
-  })
+  }))
   readonly vipCustomers: Customer[];
 }

@@ -12,17 +12,19 @@ export function extractKeyValues<T>(
   const validateCol = k => {
     const col = EntityMetadata.getField(entityDef, k);
     if (!col) throw new Error(`Unknown column (${k}) defined as primary key in entity "${entityDef.name}"`);
-    if (!isColumnField(col))
+    if (!isColumnField(col)) {
       throw new Error(`Column (${k}) defined as primary key in entity "${entityDef.name}" is not a data column`);
+    }
   };
 
   // if entity's primary key has more than one key field
   if (primaryIndex.columns.length > 1) {
-    if (typeof valueOrInstance !== 'object')
+    if (typeof valueOrInstance !== 'object') {
       throw new Error(
         `"${entityDef.name}" entity` +
           ` has more than one primary key field and you must provide all values with an key/value pair`,
       );
+    }
 
     const valueKeys = Object.keys(valueOrInstance);
     const valueKeysUpper = valueKeys.map(x => x.toUpperCase());
@@ -49,8 +51,9 @@ export function extractKeyValues<T>(
     const valueKeys = Object.keys(valueOrInstance);
     const valueKeysUpper = valueKeys.map(x => x.toUpperCase());
     const k = valueKeysUpper.indexOf(primaryColumnName.toUpperCase());
-    if (k < 0)
+    if (k < 0) {
       throw new Error(`Value of key field "${entityDef.name}.${primaryColumnName}" required to perform this operation`);
+    }
     const out = { [primaryColumnName]: valueOrInstance[valueKeys[k]] };
     if (keepOther) {
       for (let i = 0; i < valueKeys.length; i++) {

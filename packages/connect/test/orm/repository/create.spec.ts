@@ -4,7 +4,7 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 import { Tag } from '../../_support/tags.entity.js';
 
-describe('Repository.create()', function () {
+describe('Repository.create()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -15,7 +15,7 @@ describe('Repository.create()', function () {
     await client.close(0);
   });
 
-  it('should insert new record and return new values', async function () {
+  it('should insert new record and return new values', async () => {
     const values = {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -45,7 +45,7 @@ describe('Repository.create()', function () {
     expect(x!.country!.code).toStrictEqual(values.countryCode);
   });
 
-  it('should insert new record with json object field', async function () {
+  it('should insert new record with json object field', async () => {
     const values = {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -58,7 +58,7 @@ describe('Repository.create()', function () {
     expect(customer.customData).toStrictEqual(values.customData);
   });
 
-  it('should apply column.serialize() before insert', async function () {
+  it('should apply column.serialize() before insert', async () => {
     const values = {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
@@ -74,7 +74,7 @@ describe('Repository.create()', function () {
     expect(x!.gender).toStrictEqual('Male');
   });
 
-  it('should map embedded elements into fields', async function () {
+  it('should map embedded elements into fields', async () => {
     const values = {
       name: {
         given: 'G' + Math.trunc(Math.random() * 10000),
@@ -101,7 +101,7 @@ describe('Repository.create()', function () {
     expect({ ...x!.name }).toStrictEqual(values.name);
   });
 
-  it('should set default value', async function () {
+  it('should set default value', async () => {
     const values = {
       name: {
         given: 'G' + Math.trunc(Math.random() * 10000),
@@ -115,17 +115,17 @@ describe('Repository.create()', function () {
     expect(customer.active).toStrictEqual(true);
   });
 
-  it('should check enum value', async function () {
+  it('should check enum value', async () => {
     const repo = client.getRepository(Tag);
     await expect(() => repo.create({ name: 'small', color: 'pink' })).rejects.toThrow('value must be one of');
   });
 
-  it('should check column is required', async function () {
+  it('should check column is required', async () => {
     const repo = client.getRepository(Customer);
     await expect(() => repo.create({ givenName: 'aa', familyName: 'bb' })).rejects.toThrow('is required');
   });
 
-  it('should execute in transaction', async function () {
+  it('should execute in transaction', async () => {
     let c = 0;
     return client.acquire(async connection => {
       const values = {
@@ -146,7 +146,7 @@ describe('Repository.create()', function () {
   });
 });
 
-describe('createOnly()', function () {
+describe('createOnly()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -157,8 +157,8 @@ describe('createOnly()', function () {
     await client.close(0);
   });
 
-  it('should not generate "returning" sql query for fast execution', async function () {
-    return client.acquire(async connection => {
+  it('should not generate "returning" sql query for fast execution', async () =>
+    client.acquire(async connection => {
       const values = {
         givenName: 'Abc',
         familyName: 'Def',
@@ -171,6 +171,5 @@ describe('createOnly()', function () {
       });
       await repo.createOnly(values);
       expect(sql.includes('returning')).toBeFalsy();
-    });
-  });
+    }));
 });

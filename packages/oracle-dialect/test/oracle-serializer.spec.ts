@@ -1,25 +1,25 @@
-import { Eq, Param, registerSerializer, Select, SequenceNext, StringAGG, unRegisterSerializer } from '@sqb/builder';
+import { Eq, Param, Select, SequenceNext, SerializerRegistry, StringAGG } from '@sqb/builder';
 import { OracleSerializer } from '../src/oracle-serializer.js';
 
-describe('OracleSerializer', function () {
+describe('OracleSerializer', () => {
   const oracleSerializer = new OracleSerializer();
-  beforeAll(() => registerSerializer(oracleSerializer));
-  afterAll(() => unRegisterSerializer(oracleSerializer));
+  beforeAll(() => SerializerRegistry.register(oracleSerializer));
+  afterAll(() => SerializerRegistry.unRegister(oracleSerializer));
 
-  describe('all versions', function () {
-    it('should use dual when no table given', function () {
+  describe('all versions', () => {
+    it('should use dual when no table given', () => {
       const query = Select().from();
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from dual');
     });
 
-    it('should replace "= null" to "is null": test1', function () {
+    it('should replace "= null" to "is null": test1', () => {
       const query = Select().from().where({ ID: null });
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from dual where ID is null');
     });
 
-    it('should replace "= null" to "is null": test2', function () {
+    it('should replace "= null" to "is null": test2', () => {
       const query = Select()
         .from()
         .where({ ID: Param('cid') });
@@ -27,31 +27,31 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual('select * from dual where ID is null');
     });
 
-    it('should replace "= null" to "is null": test3', function () {
+    it('should replace "= null" to "is null": test3', () => {
       const query = Select().from().where(Eq('ID', null));
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from dual where ID is null');
     });
 
-    it('should replace "!= null" to "is not null": test1', function () {
+    it('should replace "!= null" to "is not null": test1', () => {
       const query = Select().from().where({ 'ID !=': null });
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from dual where ID is not null');
     });
 
-    it('should replace "!= null" to "is not null": test2', function () {
+    it('should replace "!= null" to "is not null": test2', () => {
       const query = Select().from().where({ 'ID !=': null });
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from dual where ID is not null');
     });
 
-    it('should serialize GenId"', function () {
+    it('should serialize GenId"', () => {
       const query = Select(SequenceNext('test'));
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select test.nextval from dual');
     });
 
-    it('should serialize date-time with "to_date()" function', function () {
+    it('should serialize date-time with "to_date()" function', () => {
       const query = Select()
         .from('table1')
         .where(Eq('dt', new Date(Date.UTC(2017, 0, 1, 10, 30, 15))));
@@ -61,7 +61,7 @@ describe('OracleSerializer', function () {
       );
     });
 
-    it('should serialize date with "to_date()" function', function () {
+    it('should serialize date with "to_date()" function', () => {
       const query = Select()
         .from('table1')
         .where(Eq('dt', new Date(Date.UTC(2017, 0, 1, 0, 0, 0))));
@@ -69,13 +69,13 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual("select * from table1 where dt = to_date('2017-01-01', 'yyyy-mm-dd')");
     });
 
-    it('should serialize string-agg function to listagg', function () {
+    it('should serialize string-agg function to listagg', () => {
       const query = Select(StringAGG('abc')).from('table1');
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual(`select listagg(abc,',') within group (order by null) from table1`);
     });
 
-    it('Should serialize params', function () {
+    it('Should serialize params', () => {
       const query = Select()
         .from('table1')
         .where(Eq('ID', Param('ID')));
@@ -87,7 +87,7 @@ describe('OracleSerializer', function () {
       expect(result.params).toStrictEqual({ ID: 5 });
     });
 
-    it('Should serialize array parameter in "in" operator', function () {
+    it('Should serialize array parameter in "in" operator', () => {
       const query = Select()
         .from('table1')
         .where(Eq('ID', Param('ID')));
@@ -100,23 +100,23 @@ describe('OracleSerializer', function () {
     });
   });
 
-  describe('Oracle version < 12', function () {
-    it('should serialize "limit"', function () {
+  describe('Oracle version < 12', () => {
+    it('should serialize "limit"', () => {
       const query = Select().from('table1').limit(10);
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual('select * from (select * from table1) where rownum <= 10');
     });
 
-    it('should serialize "limit" pretty print', function () {
+    it('should serialize "limit" pretty print', () => {
       const query = Select().from('table1').limit(10);
       const result = query.generate({
         dialect: 'oracle',
         prettyPrint: true,
       });
-      expect(result.sql).toStrictEqual('select * from (\n' + '  select * from table1\n' + ') where rownum <= 10');
+      expect(result.sql).toStrictEqual('select * from (\n  select * from table1\n) where rownum <= 10');
     });
 
-    it('should serialize "offset"', function () {
+    it('should serialize "offset"', () => {
       const query = Select().from('table1').offset(4);
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual(
@@ -124,7 +124,7 @@ describe('OracleSerializer', function () {
       );
     });
 
-    it('should serialize "limit/offset"', function () {
+    it('should serialize "limit/offset"', () => {
       const query = Select().from('table1').offset(4).limit(10);
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual(
@@ -133,7 +133,7 @@ describe('OracleSerializer', function () {
       );
     });
 
-    it('should serialize "limit/offset" pretty print', function () {
+    it('should serialize "limit/offset" pretty print', () => {
       const query = Select().from('table1').offset(4).limit(10);
       const result = query.generate({
         dialect: 'oracle',
@@ -148,7 +148,7 @@ describe('OracleSerializer', function () {
       );
     });
 
-    it('should serialize "limit" ordered', function () {
+    it('should serialize "limit" ordered', () => {
       const query = Select().from('table1').orderBy('id').limit(10);
       const result = query.generate({ dialect: 'oracle' });
       expect(result.sql).toStrictEqual(
@@ -157,7 +157,7 @@ describe('OracleSerializer', function () {
       );
     });
 
-    it('should serialize "limit" ordered pretty print', function () {
+    it('should serialize "limit" ordered pretty print', () => {
       const query = Select().from('table1').orderBy('id').offset(21).limit(10);
       const result = query.generate({
         dialect: 'oracle',
@@ -174,8 +174,8 @@ describe('OracleSerializer', function () {
     });
   });
 
-  describe('Oracle version >= 12', function () {
-    it('should serialize "limit"', function () {
+  describe('Oracle version >= 12', () => {
+    it('should serialize "limit"', () => {
       const query = Select().from('table1').limit(10);
       const result = query.generate({
         dialect: 'oracle',
@@ -184,17 +184,17 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual('select * from table1 FETCH FIRST 10 ROWS ONLY');
     });
 
-    it('should serialize "limit" pretty print', function () {
+    it('should serialize "limit" pretty print', () => {
       const query = Select().from('table1').limit(10);
       const result = query.generate({
         dialect: 'oracle',
         dialectVersion: '12',
         prettyPrint: true,
       });
-      expect(result.sql).toStrictEqual('select * from table1\n' + 'FETCH FIRST 10 ROWS ONLY');
+      expect(result.sql).toStrictEqual('select * from table1\nFETCH FIRST 10 ROWS ONLY');
     });
 
-    it('should serialize "offset"', function () {
+    it('should serialize "offset"', () => {
       const query = Select().from('table1').offset(4);
       const result = query.generate({
         dialect: 'oracle',
@@ -203,7 +203,7 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual('select * from table1 OFFSET 4 ROWS');
     });
 
-    it('should serialize "limit/offset"', function () {
+    it('should serialize "limit/offset"', () => {
       const query = Select().from('table1').offset(4).limit(10);
       const result = query.generate({
         dialect: 'oracle',
@@ -212,14 +212,14 @@ describe('OracleSerializer', function () {
       expect(result.sql).toStrictEqual('select * from table1 OFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
     });
 
-    it('should serialize "limit/offset" pretty print', function () {
+    it('should serialize "limit/offset" pretty print', () => {
       const query = Select().from('table1').offset(4).limit(10);
       const result = query.generate({
         dialect: 'oracle',
         dialectVersion: '12',
         prettyPrint: true,
       });
-      expect(result.sql).toStrictEqual('select * from table1\n' + 'OFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
+      expect(result.sql).toStrictEqual('select * from table1\nOFFSET 4 ROWS FETCH NEXT 10 ROWS ONLY');
     });
   });
 });

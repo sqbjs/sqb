@@ -272,7 +272,10 @@ export class FindCommand {
   }
 
   async execute(
-    args: Pick<FindCommandArgs, 'connection' | 'distinct' | 'offset' | 'limit' | 'params' | 'onTransformRow'>,
+    args: Pick<
+      FindCommandArgs,
+      'connection' | 'distinct' | 'offset' | 'limit' | 'params' | 'onTransformRow' | 'prettyPrint'
+    >,
   ): Promise<any[]> {
     // Generate select query
     const columnSqls = Object.keys(this._selectColumns).map(x => this._selectColumns[x].statement);
@@ -290,10 +293,11 @@ export class FindCommand {
     if (args.offset) query.offset(args.offset);
 
     // joins must be added last
-    if (this._joins)
+    if (this._joins) {
       for (const j of this._joins) {
         query.join(j.join);
       }
+    }
 
     // Execute query
     const resp = await args.connection.execute(query, {
@@ -301,6 +305,7 @@ export class FindCommand {
       fetchRows: args?.limit,
       objectRows: false,
       cursor: false,
+      prettyPrint: args.prettyPrint,
     });
 
     // Create objects

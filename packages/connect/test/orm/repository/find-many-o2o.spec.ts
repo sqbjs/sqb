@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { Eq } from '@sqb/builder';
+import { Eq, op } from '@sqb/builder';
 import { SqbClient } from '@sqb/connect';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
@@ -8,7 +8,7 @@ function toJSON(obj: any): any {
   return obj ? JSON.parse(JSON.stringify(obj)) : undefined;
 }
 
-describe('Repository.findMany() (OneToOne)', function () {
+describe('Repository.findMany() (OneToOne)', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -19,8 +19,8 @@ describe('Repository.findMany() (OneToOne)', function () {
     await client.close(0);
   });
 
-  describe('linkToOne', function () {
-    it('return associated row as object property', async function () {
+  describe('linkToOne', () => {
+    it('return associated row as object property', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -39,7 +39,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('dont return associated if not explicitly requested', async function () {
+    it('dont return associated if not explicitly requested', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -50,7 +50,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(rows[0].country).toBeUndefined();
     });
 
-    it('query sub associations', async function () {
+    it('query sub associations', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -67,7 +67,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('query sub associations (include)', async function () {
+    it('query sub associations (include)', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -87,7 +87,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('choice which elements will be returned by server', async function () {
+    it('choice which elements will be returned by server', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -104,7 +104,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('filter results by associated element', async function () {
+    it('filter results by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'countryCode'],
@@ -115,19 +115,26 @@ describe('Repository.findMany() (OneToOne)', function () {
       }
     });
 
-    it('use "exists" when filtering by associated element', async function () {
+    it('use "exists" when filtering by associated element', async () => {
       const repo = client.getRepository(Customer);
       let request: any = {};
       client.once('execute', req => (request = req));
       await repo.findMany({
         projection: ['id'],
-        filter: [{ 'country.continent.code': 'AM' }],
+        filter: [op.or(op.eq('country.continent.name', 'America'), op.eq('country.continent.name', 'Europe'))],
+        prettyPrint: true,
       });
-      expect(request.sql.includes('exists')).toBeTruthy();
-      expect(request.params).toStrictEqual(['AM']);
+      expect(request.sql).toEqual(`select T.ID as T_ID from customers T
+where (exists (select 1 from countries K
+    inner join continents J1 on J1.code = K.continent_code
+    where K.code = T.country_code and J1.name = $1) or
+    exists (select 1 from countries K
+    inner join continents J1 on J1.code = K.continent_code
+    where K.code = T.country_code and J1.name = $2))`);
+      expect(request.params).toStrictEqual(['America', 'Europe']);
     });
 
-    it('order by associated element', async function () {
+    it('order by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
@@ -142,8 +149,8 @@ describe('Repository.findMany() (OneToOne)', function () {
     });
   });
 
-  describe('linkFromOne', function () {
-    it('return associated row as object property', async function () {
+  describe('linkFromOne', () => {
+    it('return associated row as object property', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -155,7 +162,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(rows[0].details!.customerId).toStrictEqual(1);
     });
 
-    it('choice which elements will be returned by server', async function () {
+    it('choice which elements will be returned by server', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -166,7 +173,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(Object.keys(rows[0].details!)).toStrictEqual(['notes']);
     });
 
-    it('filter results by associated element', async function () {
+    it('filter results by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'details'],
@@ -177,7 +184,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(rows[0].details!.customerId).toStrictEqual(1);
     });
 
-    it('order by associated element', async function () {
+    it('order by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'details.notes'],
@@ -192,8 +199,8 @@ describe('Repository.findMany() (OneToOne)', function () {
     });
   });
 
-  describe('Association chain', function () {
-    it('return row of last association in the chain as object property', async function () {
+  describe('Association chain', () => {
+    it('return row of last association in the chain as object property', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -212,7 +219,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('query sub associations', async function () {
+    it('query sub associations', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -229,7 +236,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('choice which elements will be returned by server', async function () {
+    it('choice which elements will be returned by server', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -246,7 +253,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('filter by associated element', async function () {
+    it('filter by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'countryCode'],
@@ -257,7 +264,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       }
     });
 
-    it('use "exists" when filtering by associated element', async function () {
+    it('use "exists" when filtering by associated element', async () => {
       const repo = client.getRepository(Customer);
       let request: any = {};
       client.once('execute', req => (request = req));
@@ -269,7 +276,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(request.params).toStrictEqual(['AM']);
     });
 
-    it('order by associated element', async function () {
+    it('order by associated element', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'countryCode', 'country.code', 'country.phoneCode'],
@@ -283,7 +290,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(left).toStrictEqual(sorted);
     });
 
-    it('query indirect associations', async function () {
+    it('query indirect associations', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         filter: [Eq('id', 1)],
@@ -298,7 +305,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       });
     });
 
-    it('order by indirect associated elements', async function () {
+    it('order by indirect associated elements', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'countryCode', 'country.continentCode'],
@@ -312,7 +319,7 @@ describe('Repository.findMany() (OneToOne)', function () {
       expect(left).toStrictEqual(sorted);
     });
 
-    it('associations with target conditions', async function () {
+    it('associations with target conditions', async () => {
       const repo = client.getRepository(Customer);
       const rows = await repo.findMany({
         projection: ['id', 'vvipDetails'],

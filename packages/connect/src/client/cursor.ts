@@ -214,7 +214,7 @@ export class Cursor extends TypedEventEmitterClass<CursorEvents>(AsyncEventEmitt
 
     const _this = this;
     await this._taskQueue
-      .enqueue(async function () {
+      .enqueue(async () => {
         /* If moving backward */
         if (step < 0) {
           /* Seek cache */

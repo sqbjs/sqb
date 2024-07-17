@@ -5,7 +5,7 @@ import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 import { createCustomer } from './update.spec.js';
 
-describe('Repository.updateMany()', function () {
+describe('Repository.updateMany()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('Repository.updateMany()', function () {
     await client.close(0);
   });
 
-  it('should update multiple rows', async function () {
+  it('should update multiple rows', async () => {
     const oldCity = 'C' + Math.trunc(Math.random() * 10000);
     const ids: number[] = [];
     for (let i = 0; i < 10; i++) {

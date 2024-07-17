@@ -1,10 +1,10 @@
+import { classes } from '@sqb/builder';
 import assert from 'assert';
 import _debug from 'debug';
 import { TaskQueue } from 'power-tasks';
 import { coalesce, coerceToBoolean, coerceToInt, coerceToString } from 'putil-varhelpers';
 import { AsyncEventEmitter, TypedEventEmitterClass } from 'strict-typed-events';
 import { Type } from 'ts-gems';
-import { classes } from '@sqb/builder';
 import { EntityMetadata } from '../orm/model/entity-metadata.js';
 import { Repository } from '../orm/repository.class.js';
 import { Adapter } from './adapter.js';
@@ -225,8 +225,9 @@ export class SqbConnection extends TypedEventEmitterClass<SqbConnectionEvents>(A
 
   async setSavepoint(savepoint: string): Promise<void> {
     if (!this._intlcon) throw new Error('Can not call setSavepoint() on a released connection');
-    if (typeof this._intlcon.setSavepoint !== 'function')
+    if (typeof this._intlcon.setSavepoint !== 'function') {
       throw new Error(this.client.driver + ' does not support setSavepoint method');
+    }
     if (!this.inTransaction) await this.startTransaction();
     await this._intlcon.setSavepoint(savepoint);
     this.emit('set-savepoint');
@@ -234,16 +235,18 @@ export class SqbConnection extends TypedEventEmitterClass<SqbConnectionEvents>(A
 
   async releaseSavepoint(savepoint: string): Promise<void> {
     if (!this._intlcon) throw new Error('Can not call releaseSavepoint() on a released connection');
-    if (typeof this._intlcon.releaseSavepoint !== 'function')
+    if (typeof this._intlcon.releaseSavepoint !== 'function') {
       throw new Error(this.client.driver + ' does not support releaseSavepoint method');
+    }
     await this._intlcon.releaseSavepoint(savepoint);
     this.emit('release-savepoint');
   }
 
   async rollbackSavepoint(savepoint: string): Promise<void> {
     if (!this._intlcon) throw new Error('Can not call rollbackSavepoint() on a released connection');
-    if (typeof this._intlcon.rollbackSavepoint !== 'function')
+    if (typeof this._intlcon.rollbackSavepoint !== 'function') {
       throw new Error(this.client.driver + ' does not support rollbackSavepoint method');
+    }
     await this._intlcon.rollbackSavepoint(savepoint);
     this.emit('rollback-savepoint');
   }

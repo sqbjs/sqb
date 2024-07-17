@@ -1,5 +1,5 @@
-import { Type } from 'ts-gems';
 import { DataType } from '@sqb/builder';
+import { Type } from 'ts-gems';
 import type { FieldInfoMap } from '../../client/field-info-map';
 import { SqbConnection } from '../../client/sqb-connection.js';
 import { ColumnTransformFunction } from '../orm.type.js';
@@ -27,17 +27,11 @@ export interface NestedProperty {
   paramValues: any[];
 }
 
-const isValueProperty = (prop: any): prop is ValueProperty => {
-  return prop.fieldAlias && !prop.converter;
-};
+const isValueProperty = (prop: any): prop is ValueProperty => prop.fieldAlias && !prop.converter;
 
-const isObjectProperty = (prop: any): prop is ObjectProperty => {
-  return prop.converter && !prop.findCommand;
-};
+const isObjectProperty = (prop: any): prop is ObjectProperty => prop.converter && !prop.findCommand;
 
-const isNestedProperty = (prop: any): prop is NestedProperty => {
-  return prop.converter && prop.findCommand;
-};
+const isNestedProperty = (prop: any): prop is NestedProperty => prop.converter && prop.findCommand;
 
 export class RowConverter {
   private _properties: Record<string, ValueProperty | ObjectProperty> = {};
@@ -206,8 +200,9 @@ export class RowConverter {
               }
             },
           });
-          if (r.length > findCommand.maxEagerFetch)
+          if (r.length > findCommand.maxEagerFetch) {
             throw new Error(`Number of returning rows for "${propKey}" exceeds maxEagerFetch limit`);
+          }
 
           for (let i = 0; i < result.length; i++) {
             const row = rows[i];

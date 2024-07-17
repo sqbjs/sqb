@@ -24,15 +24,18 @@ export function Link(options?: AssociationFieldOptions): LinkPropertyDecorator {
     if (typeof propertyKey !== 'string') throw new TypeError('Symbol properties are not allowed');
     const reflectType = Reflect.getMetadata('design:type', target, propertyKey);
     if (!root) {
-      if (reflectType === Array)
+      if (reflectType === Array) {
         throw new TypeError(`Can't get type information while it is an array. Please define entity type`);
+      }
       if (!EntityMetadata.get(reflectType)) throw new TypeError(`No entity metadata found for type "${reflectType}"`);
       fn.toOne(reflectType);
     }
-    if (reflectType !== Array && root.first.returnsMany())
+    if (reflectType !== Array && root.first.returnsMany()) {
       throw new TypeError(`Link returns single instance however property type is an array`);
-    if (reflectType === Array && !root.first.returnsMany())
+    }
+    if (reflectType === Array && !root.first.returnsMany()) {
       throw new TypeError(`Link returns array of instances however property type is not an array`);
+    }
     const entity = EntityMetadata.define(target.constructor as Type);
     // @ts-ignore
     // noinspection JSConstantReassignment

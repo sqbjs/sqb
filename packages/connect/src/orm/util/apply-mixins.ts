@@ -6,8 +6,9 @@ export function applyMixins(derivedCtor: any, baseCtor: any, filter?: (k: string
       name === 'toJSON' ||
       name === 'toString' ||
       (filter && !filter(name))
-    )
+    ) {
       continue;
+    }
     Object.defineProperty(
       derivedCtor.prototype,
       name,

@@ -3,7 +3,7 @@ import { SqbClient } from '@sqb/connect';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
-describe('Repository.findMany() (ManyToMany)', function () {
+describe('Repository.findMany() (ManyToMany)', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -14,7 +14,7 @@ describe('Repository.findMany() (ManyToMany)', function () {
     await client.close(0);
   });
 
-  it('should return associated instances', async function () {
+  it('should return associated instances', async () => {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       filter: { id: 1 },
@@ -31,7 +31,7 @@ describe('Repository.findMany() (ManyToMany)', function () {
     }
   });
 
-  it('should specify returning elements', async function () {
+  it('should specify returning elements', async () => {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       filter: { id: 1 },
@@ -48,7 +48,7 @@ describe('Repository.findMany() (ManyToMany)', function () {
     }
   });
 
-  it('should filter by m2m relation', async function () {
+  it('should filter by m2m relation', async () => {
     const repo = client.getRepository(Customer);
     const rows = await repo.findMany({
       projection: '+tags',

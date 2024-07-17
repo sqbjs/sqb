@@ -22,13 +22,13 @@ class BaseCustomer {
   countryCode: string;
 }
 
-describe('Model / Link field', function () {
-  it(`should @Link() decorator define association element`, function () {
+describe('Model / Link field', () => {
+  it(`should @Link() decorator define association element`, () => {
     class Customer extends BaseCustomer {
-      @Link().toOne(Country)
+      @(Link().toOne(Country))
       country: Country;
 
-      @Link().toMany(Country)
+      @(Link().toMany(Country))
       country2: Country[];
     }
 
@@ -48,7 +48,7 @@ describe('Model / Link field', function () {
     expect(col!.association.returnsMany()).toStrictEqual(true);
   });
 
-  it(`should throw if type is an array an linked entity is not defined`, async function () {
+  it(`should throw if type is an array an linked entity is not defined`, async () => {
     expect(() => {
       class Customer {
         @Link()
@@ -57,7 +57,7 @@ describe('Model / Link field', function () {
     }).toThrow('type information while');
   });
 
-  it(`should throw if reflection type is not an entity`, async function () {
+  it(`should throw if reflection type is not an entity`, async () => {
     expect(() => {
       class Customer {
         @Link()
@@ -66,19 +66,19 @@ describe('Model / Link field', function () {
     }).toThrow('No entity metadata found');
   });
 
-  it(`should throw if association returns many and property type is not an array`, async function () {
+  it(`should throw if association returns many and property type is not an array`, async () => {
     expect(() => {
       class Customer {
-        @Link().toMany(Country)
+        @(Link().toMany(Country))
         countries: Country;
       }
     }).toThrow('Link returns single instance');
   });
 
-  it(`should throw if association returns single and property type is an array`, async function () {
+  it(`should throw if association returns single and property type is an array`, async () => {
     expect(() => {
       class Customer {
-        @Link().toOne(Country)
+        @(Link().toOne(Country))
         countries: Country[];
       }
     }).toThrow('Link returns array of instances');

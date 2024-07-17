@@ -70,8 +70,9 @@ export namespace MigrationPackage {
       migrations: [],
     };
 
-    if (!Array.isArray(asyncConfig.migrations))
+    if (!Array.isArray(asyncConfig.migrations)) {
       throw new TypeError('You must provide array of MigrationConfig in "migrations" property');
+    }
 
     if (asyncConfig.migrations?.length) {
       const srcMigrations: MigrationConfig[] = [];
@@ -150,30 +151,30 @@ export namespace MigrationPackage {
 
     return out;
   }
+}
 
-  async function loadMigrations(baseDir: string, pattern: string): Promise<Migration[]> {
-    const out: Migration[] = [];
-    const files = await glob(path.join(baseDir, pattern), { absolute: true, onlyFiles: true });
-    for (const filename of files) {
-      const ext = path.extname(filename).toLowerCase();
-      if (path.basename(filename, ext) !== 'migration') continue;
-      let json: any;
-      if (['.js', '.ts', '.cjs', '.mjs'].includes(ext)) {
-        json = await import(filename);
-        if (json.__esModule) json = json.default;
-      } else if (ext === '.json') {
-        try {
-          json = JSON.parse(await fs.readFile(filename, 'utf-8'));
-        } catch (e: any) {
-          e.message = `Error in ${filename}\n` + e.message;
-          throw e;
-        }
-      }
-      if (json && typeof json === 'object' && json.version && Array.isArray(json.tasks)) {
-        json.baseDir = path.relative(baseDir, path.dirname(filename));
-        out.push(json);
+async function loadMigrations(baseDir: string, pattern: string): Promise<Migration[]> {
+  const out: Migration[] = [];
+  const files = await glob(path.join(baseDir, pattern), { absolute: true, onlyFiles: true });
+  for (const filename of files) {
+    const ext = path.extname(filename).toLowerCase();
+    if (path.basename(filename, ext) !== 'migration') continue;
+    let json: any;
+    if (['.js', '.ts', '.cjs', '.mjs'].includes(ext)) {
+      json = await import(filename);
+      if (json.__esModule) json = json.default;
+    } else if (ext === '.json') {
+      try {
+        json = JSON.parse(await fs.readFile(filename, 'utf-8'));
+      } catch (e: any) {
+        e.message = `Error in ${filename}\n` + e.message;
+        throw e;
       }
     }
-    return out;
+    if (json && typeof json === 'object' && json.version && Array.isArray(json.tasks)) {
+      json.baseDir = path.relative(baseDir, path.dirname(filename));
+      out.push(json);
+    }
   }
+  return out;
 }

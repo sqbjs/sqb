@@ -1,9 +1,9 @@
-import * as crypto from 'crypto';
-import { defer } from 'rxjs';
-import * as rxjs from 'rxjs';
 import { DynamicModule, Global, Inject, Module, OnApplicationShutdown, Provider } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { SqbClient } from '@sqb/connect';
+import * as crypto from 'crypto';
+import { defer } from 'rxjs';
+import * as rxjs from 'rxjs';
 import { SQB_MODULE_ID, SQB_MODULE_OPTIONS } from './sqb.constants.js';
 import { SqbModuleAsyncOptions, SqbModuleOptions, SqbOptionsFactory } from './sqb.interface.js';
 import { getSQBToken, handleRetry } from './sqb.utils.js';
@@ -65,7 +65,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
   private static createAsyncProviders(options: SqbModuleAsyncOptions): Provider[] {
     if (options.useExisting || options.useFactory) return [this.createAsyncOptionsProvider(options)];
 
-    if (options.useClass)
+    if (options.useClass) {
       return [
         this.createAsyncOptionsProvider(options),
         {
@@ -73,6 +73,7 @@ export class SqbCoreModule implements OnApplicationShutdown {
           useClass: options.useClass,
         },
       ];
+    }
 
     throw new Error('Invalid configuration. Must provide useFactory, useClass or useExisting');
   }
@@ -117,24 +118,23 @@ export class SqbCoreModule implements OnApplicationShutdown {
           ),
         ),
       );
-    } else {
-      // NestJS 7
-      // @ts-ignore
-      return await defer(async () => {
-        const client = new SqbClient(options);
-        await client.test();
-        return client;
-      })
-        .pipe(
-          handleRetry(
-            connectionToken,
-            options.retryAttempts,
-            options.retryDelay,
-            options.verboseRetryLog,
-            options.toRetry,
-          ),
-        )
-        .toPromise();
     }
+    // NestJS 7
+    // @ts-ignore
+    return await defer(async () => {
+      const client = new SqbClient(options);
+      await client.test();
+      return client;
+    })
+      .pipe(
+        handleRetry(
+          connectionToken,
+          options.retryAttempts,
+          options.retryDelay,
+          options.verboseRetryLog,
+          options.toRetry,
+        ),
+      )
+      .toPromise();
   }
 }

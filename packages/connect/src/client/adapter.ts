@@ -1,5 +1,5 @@
-import { Maybe } from 'ts-gems';
 import { classes } from '@sqb/builder';
+import { Maybe } from 'ts-gems';
 import { ClientConfiguration, DataType, QueryRequest, RowType } from './types.js';
 
 export interface Adapter {

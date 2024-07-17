@@ -18,8 +18,6 @@ export class OpNot extends Operator {
 
   _serialize(ctx: SerializeContext): string {
     const expression: string = ctx.anyToSQL(this._expression);
-    return ctx.serialize(this._type, expression, () => {
-      return expression ? 'not ' + expression : '';
-    });
+    return ctx.serialize(this._type, expression, () => (expression ? 'not ' + expression : ''));
   }
 }

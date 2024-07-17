@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { PartialDTO } from 'ts-gems';
 import { DataType } from '@sqb/builder';
 import { Column, Entity, PrimaryKey, SqbClient } from '@sqb/connect';
+import { PartialDTO } from 'ts-gems';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 import { Tag } from '../../_support/tags.entity.js';
@@ -27,7 +27,7 @@ export const createCustomer = async function (client: SqbClient, values?: any): 
   return await repo.create(v);
 };
 
-describe('Repository.update()', function () {
+describe('Repository.update()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -38,7 +38,7 @@ describe('Repository.update()', function () {
     await client.close(0);
   });
 
-  it('should update and return updated columns', async function () {
+  it('should update and return updated columns', async () => {
     const old = await createCustomer(client);
 
     const repo = client.getRepository(Customer);
@@ -59,7 +59,7 @@ describe('Repository.update()', function () {
     expect(c2!.givenName).not.toStrictEqual(old.givenName);
   });
 
-  it('should update even element name and field name differs', async function () {
+  it('should update even element name and field name differs', async () => {
     const old = await createCustomer(client);
 
     const repo = client.getRepository(Customer2);
@@ -84,7 +84,7 @@ describe('Repository.update()', function () {
     expect(updated!.given).toStrictEqual(c2!.given);
   });
 
-  it('should apply serialize function', async function () {
+  it('should apply serialize function', async () => {
     const old = await createCustomer(client);
 
     const repo = client.getRepository(Customer);
@@ -99,8 +99,8 @@ describe('Repository.update()', function () {
     expect(updated!.gender).toStrictEqual('Female');
   });
 
-  it('should work within transaction', async function () {
-    return client.acquire(async connection => {
+  it('should work within transaction', async () =>
+    client.acquire(async connection => {
       const repo = connection.getRepository(Customer);
       const old = await createCustomer(client);
 
@@ -115,15 +115,14 @@ describe('Repository.update()', function () {
       const c2 = await repo.findById(old.id);
       expect(c2).toBeDefined();
       expect(c2!.givenName).toStrictEqual(old.givenName);
-    });
-  });
+    }));
 
-  it('should check enum value', async function () {
+  it('should check enum value', async () => {
     const repo = client.getRepository(Tag);
     await expect(() => repo.update(1, { name: 'small', color: 'pink' })).rejects.toThrow('value must be one of');
   });
 
-  it('should column is required', async function () {
+  it('should column is required', async () => {
     const repo = client.getRepository(Customer);
     await expect(() => repo.update(1, { countryCode: null })).rejects.toThrow('is required');
   });

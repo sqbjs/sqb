@@ -27,6 +27,8 @@ export function applyNamingStrategy(value: string, namingStrategy?: FieldNaming)
       case 'pascalcase':
         if (!value.match(/[a-z]/)) return pascalCase(value.toLowerCase());
         return pascalCase(value);
+      default:
+        break;
     }
   } else if (typeof namingStrategy === 'function') return namingStrategy(value);
   return value;

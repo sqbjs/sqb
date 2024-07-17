@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { BaseEntity, Column, Entity, Link, PrimaryKey } from '@sqb/connect';
 
-describe('Model / Entity', function () {
+describe('Model / Entity', () => {
   it(`should @Entity() decorator attach metadata to class`, () => {
     @Entity()
     class MyEntity {}
@@ -57,7 +57,7 @@ describe('Model / Entity', function () {
     expect(primaryIndex1!.columns).toStrictEqual(primaryIndex2!.columns);
   });
 
-  it(`should Entity.getElementNames() return all element names`, function () {
+  it(`should Entity.getElementNames() return all element names`, () => {
     @Entity()
     class Country {
       @Column()
@@ -85,7 +85,7 @@ describe('Model / Entity', function () {
     expect(Entity.getFieldNames(Customer)).toStrictEqual(['id', 'name', 'country', 'code']);
   });
 
-  it(`should EntityDefinition.getDataColumnNames() return only data column names`, function () {
+  it(`should EntityDefinition.getDataColumnNames() return only data column names`, () => {
     @Entity()
     class Country {
       @Column()
@@ -113,7 +113,7 @@ describe('Model / Entity', function () {
     expect(Entity.getColumnFieldNames(Customer)).toStrictEqual(['id', 'name', 'code']);
   });
 
-  it(`should getInsertColumnNames() return only data column names to insert`, function () {
+  it(`should getInsertColumnNames() return only data column names to insert`, () => {
     @Entity()
     class Country {
       @Column()
@@ -141,7 +141,7 @@ describe('Model / Entity', function () {
     expect(Entity.getInsertColumnNames(Customer)).toStrictEqual(['name', 'code']);
   });
 
-  it(`should EntityDefinition.getInsertColumnNames() return only data column names to insert`, function () {
+  it(`should EntityDefinition.getInsertColumnNames() return only data column names to insert`, () => {
     @Entity()
     class Country {
       @Column()

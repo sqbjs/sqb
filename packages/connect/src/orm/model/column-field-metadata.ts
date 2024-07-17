@@ -1,5 +1,5 @@
-import _ from 'lodash';
 import { DataType } from '@sqb/builder';
+import _ from 'lodash';
 import type {
   ColumnAutoGenerationStrategy,
   ColumnTransformFunction,

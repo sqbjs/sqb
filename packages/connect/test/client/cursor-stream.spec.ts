@@ -1,6 +1,6 @@
-import { Readable } from 'stream';
 import { Select } from '@sqb/builder';
 import { Cursor, SqbClient } from '@sqb/connect';
+import { Readable } from 'stream';
 import { SqbConnection } from '../../src/client/sqb-connection.js';
 import { initClient } from '../_support/init-client.js';
 
@@ -36,7 +36,7 @@ function readObjectStream(stream: Readable): Promise<any> {
   });
 }
 
-describe('CursorStream', function () {
+describe('CursorStream', () => {
   let client: SqbClient;
   let cursor: Cursor;
 
@@ -48,7 +48,7 @@ describe('CursorStream', function () {
     await client.close(0);
   });
 
-  it('should stream string buffer', async function () {
+  it('should stream string buffer', async () => {
     await client.acquire(async (session: SqbConnection) => {
       const result = await session.execute(Select().from('customers'));
       cursor = result && result.cursor;
@@ -61,7 +61,7 @@ describe('CursorStream', function () {
     });
   });
 
-  it('should stream row object if objectMode enabled', async function () {
+  it('should stream row object if objectMode enabled', async () => {
     await client.acquire(async (session: SqbConnection) => {
       const result = await session.execute(Select().from('customers'));
       cursor = result && result.cursor;
@@ -72,7 +72,7 @@ describe('CursorStream', function () {
     });
   });
 
-  it('should cursor.close() also close the stream', function (done) {
+  it('should cursor.close() also close the stream', done => {
     client
       .acquire(async (session: SqbConnection) => {
         const result = await session.execute(Select().from('customers'));
@@ -84,7 +84,7 @@ describe('CursorStream', function () {
       .catch(done);
   });
 
-  it('should handle cursor errors', function (done) {
+  it('should handle cursor errors', done => {
     client
       .acquire(async (session: SqbConnection) => {
         const result = await session.execute(Select().from('customers'));

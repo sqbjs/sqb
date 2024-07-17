@@ -1,5 +1,5 @@
-import { ResultSet } from 'oracledb';
 import { Adapter, RowType } from '@sqb/connect';
+import { ResultSet } from 'oracledb';
 
 export class OraCursor implements Adapter.Cursor {
   private _resultSet?: ResultSet<any>;

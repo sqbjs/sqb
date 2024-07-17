@@ -26,8 +26,10 @@ export class ReturningColumn extends BaseField {
     };
     ctx.returningFields = ctx.returningFields || [];
     ctx.returningFields.push(o);
-    return ctx.serialize(this._type, o, () => {
-      return ctx.escapeReserved(o.field) + (o.alias ? ' as ' + ctx.escapeReserved(o.alias) : '');
-    });
+    return ctx.serialize(
+      this._type,
+      o,
+      () => ctx.escapeReserved(o.field) + (o.alias ? ' as ' + ctx.escapeReserved(o.alias) : ''),
+    );
   }
 }

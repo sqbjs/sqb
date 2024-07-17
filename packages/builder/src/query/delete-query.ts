@@ -13,8 +13,9 @@ export class DeleteQuery extends Query {
 
   constructor(tableName: string | RawStatement) {
     super();
-    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
+    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName))) {
       throw new TypeError('String or Raw instance required as first argument (tableName) for UpdateQuery');
+    }
     this._table = typeof tableName === 'string' ? new TableName(tableName) : tableName;
   }
 
@@ -52,9 +53,9 @@ export class DeleteQuery extends Query {
   _serializeWhere(ctx: SerializeContext): string {
     if (!this._where) return '';
     const s = this._where._serialize(ctx);
-    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
+    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () =>
       /* istanbul ignore next */
-      return s ? 'where ' + s : '';
-    });
+      s ? 'where ' + s : '',
+    );
   }
 }

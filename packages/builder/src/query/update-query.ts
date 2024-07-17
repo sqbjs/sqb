@@ -15,10 +15,12 @@ export class UpdateQuery extends ReturningQuery {
 
   constructor(tableName: string | RawStatement, input: any) {
     super();
-    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName)))
+    if (!tableName || !(typeof tableName === 'string' || isRawStatement(tableName))) {
       throw new TypeError('String or Raw instance required as first argument (tableName) for UpdateQuery');
-    if (!input || !((typeof input === 'object' && !Array.isArray(input)) || input.isSelect))
+    }
+    if (!input || !((typeof input === 'object' && !Array.isArray(input)) || input.isSelect)) {
       throw new TypeError('Object or Raw instance required as second argument (input) for UpdateQuery');
+    }
     this._table = typeof tableName === 'string' ? new TableName(tableName) : tableName;
     this._input = input;
   }
@@ -77,9 +79,9 @@ export class UpdateQuery extends ReturningQuery {
   protected __serializeWhere(ctx: SerializeContext): string {
     if (!this._where) return '';
     const s = this._where._serialize(ctx);
-    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () => {
+    return ctx.serialize(SerializationType.CONDITIONS_BLOCK, s, () =>
       /* istanbul ignore next */
-      return s ? 'where ' + s : '';
-    });
+      s ? 'where ' + s : '',
+    );
   }
 }

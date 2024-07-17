@@ -40,6 +40,8 @@ export class OracleSerializer implements SerializerExtension {
         return this._serializeStringAGG(ctx, o, defFn);
       case SerializationType.SEQUENCE_GETTER_STATEMENT:
         return this._serializeSequenceGetter(ctx, o, defFn);
+      default:
+        break;
     }
   }
 
@@ -66,7 +68,7 @@ export class OracleSerializer implements SerializerExtension {
             '\n\b)';
           if (offset) out += ' where row$number >= ' + (offset + 1);
         } else {
-          out = 'select * from (\n\t' + out + '\n\b' + ') where rownum <= ' + limit;
+          out = 'select * from (\n\t' + out + '\n\b) where rownum <= ' + limit;
         }
       }
     }

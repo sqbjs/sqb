@@ -31,7 +31,7 @@ class CustomerNotes extends Record {
   customerId: number;
 }
 
-describe('Model / Association', function () {
+describe('Model / Association', () => {
   it(`should resolve source entity (entity class)`, async () => {
     const association = new Association('', { source: Customer, target: Country });
     const target = await association.resolveSource();

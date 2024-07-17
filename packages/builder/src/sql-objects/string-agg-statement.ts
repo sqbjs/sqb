@@ -66,12 +66,13 @@ export class StringAGGStatement extends Serializable {
 
   protected __serializeOrderColumns(ctx: SerializeContext): string {
     const arr: string[] = [];
-    if (this._orderBy)
+    if (this._orderBy) {
       for (const t of this._orderBy) {
         const s = t._serialize(ctx);
         /* istanbul ignore else */
         if (s) arr.push(s);
       }
+    }
     return ctx.serialize(SerializationType.SELECT_QUERY_ORDERBY, arr, () => {
       const s = printArray(arr);
       return s ? 'order by ' + s : '';

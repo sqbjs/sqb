@@ -29,12 +29,13 @@ export class GroupColumn extends BaseField {
       field: this._field,
       isReservedWord: !!(this._field && ctx.isReservedWord(this._field)),
     };
-    return ctx.serialize(this._type, o, () => {
-      return (
+    return ctx.serialize(
+      this._type,
+      o,
+      () =>
         (this._schema ? this._schema + '.' : '') +
         (this._table ? this._table + '.' : '') +
-        (o.isReservedWord ? '"' + this._field + '"' : this._field)
-      );
-    });
+        (o.isReservedWord ? '"' + this._field + '"' : this._field),
+    );
   }
 }

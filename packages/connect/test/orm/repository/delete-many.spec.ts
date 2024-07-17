@@ -2,7 +2,7 @@ import { SqbClient } from '@sqb/connect';
 import { Customer } from '../../_support/customer.entity.js';
 import { initClient } from '../../_support/init-client.js';
 
-describe('Repository.deleteMany()', function () {
+describe('Repository.deleteMany()', () => {
   let client: SqbClient;
 
   beforeAll(async () => {
@@ -13,7 +13,7 @@ describe('Repository.deleteMany()', function () {
     await client.close(0);
   });
 
-  it('should delete multiple records by filter', async function () {
+  it('should delete multiple records by filter', async () => {
     const values = {
       givenName: 'G' + Math.trunc(Math.random() * 10000),
       familyName: 'F' + Math.trunc(Math.random() * 10000),
