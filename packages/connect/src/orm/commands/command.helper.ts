@@ -9,6 +9,8 @@ import {
   JoinStatement,
   LeftOuterJoin,
   LogicalOperator,
+  op,
+  OperatorType,
   Raw,
   Select,
   SelectQuery,
@@ -106,6 +108,7 @@ export async function prepareFilter(
     else srcOp.add(filter);
   }
 
+  const associationPathCache: Record<string, any> = {};
   for (const item of srcOp._items) {
     if (isLogicalOperator(item)) {
       const ctor = Object.getPrototypeOf(item).constructor;
@@ -118,27 +121,45 @@ export async function prepareFilter(
       if (typeof item._left === 'string') {
         const itemPath = item._left.split('.');
         const l = itemPath.length;
+
         let pt: string;
         let _curEntity = entityDef;
         let _curAlias = tableAlias;
         let _curPrefix = '';
         let _curSuffix = '';
         let subSelect: SelectQuery | undefined;
-        for (let i = 0; i < l; i++) {
+        let currentOp = trgOp;
+        let i = 0;
+
+        const parentPath = itemPath
+          .slice(0, l - 2)
+          .join('.')
+          .toLowerCase();
+        const cached = associationPathCache[parentPath];
+        if (cached) {
+          /** Jump to last item */
+          i = l - 1;
+          _curEntity = cached._curEntity;
+          _curAlias = cached._curAlias;
+          currentOp = cached.currentOp;
+        }
+
+        for (i; i < l; i++) {
           pt = itemPath[i];
           const col = EntityMetadata.getField(_curEntity, pt);
           if (!col) throw new Error(`Unknown property (${item._left}) defined in filter`);
-          // if last item on path
+          /** if last item on path */
           if (i === l - 1) {
             if (!isColumnField(col)) throw new Error(`Invalid column expression (${item._left}) defined in filter`);
             const ctor = Object.getPrototypeOf(item).constructor;
-            trgOp.add(
+            currentOp.add(
               new ctor(
                 Field(_curAlias + '.' + _curPrefix + col.fieldName + _curSuffix, col.dataType, col.isArray),
                 item._right,
               ),
             );
           } else {
+            /** if not last item on path */
             if (isColumnField(col)) throw new Error(`Invalid column (${item._left}) defined in filter`);
             if (isEmbeddedField(col)) {
               _curEntity = await EmbeddedFieldMetadata.resolveType(col);
@@ -161,8 +182,11 @@ export async function prepareFilter(
                   Field(tableAlias + '.' + keyCol.fieldName, keyCol.dataType, keyCol.isArray),
                 ),
               );
-              trgOp.add(Exists(subSelect));
-              trgOp = subSelect._where as LogicalOperator;
+              currentOp.add(Exists(subSelect));
+              if (currentOp._operatorType !== OperatorType.and) {
+                currentOp = op.or();
+                subSelect.where(currentOp);
+              } else currentOp = subSelect._where as LogicalOperator;
               if (col.association.conditions) {
                 await prepareFilter(_curEntity, col.association.conditions, trgOp, 'K');
               }
@@ -186,6 +210,15 @@ export async function prepareFilter(
               _curEntity = targetEntity;
               _curAlias = joinAlias;
               node = node.next;
+            }
+
+            /** If next path is the last one */
+            if (i === l - 2) {
+              associationPathCache[parentPath] = {
+                _curEntity,
+                _curAlias,
+                currentOp,
+              };
             }
           }
         }
