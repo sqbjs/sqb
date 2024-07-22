@@ -1,5 +1,5 @@
 import { Adapter, DataType, QueryRequest } from '@sqb/connect';
-import { BindParam, Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions } from 'postgresql-client';
+import { BindParam, Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions } from 'postgrejs';
 import { dataTypeToOID } from './datatype-map.js';
 
 const SqbDataTypToOIDMap = {

@@ -45,7 +45,7 @@
     "@sqb/postgres": "^4.13.0"
   },
   "devDependencies": {
-    "postgresql-client": "^2.12.0"
+    "postgrejs": "^2.15.1"
   },
   "engines": {
     "node": ">=16.0",

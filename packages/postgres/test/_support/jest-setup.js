@@ -1,4 +1,4 @@
-import { Connection } from 'postgresql-client';
+import { Connection } from 'postgrejs';
 
 export default async function globalSetup() {
   const connection = new Connection();

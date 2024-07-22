@@ -1,10 +1,10 @@
 import '@sqb/postgres-dialect';
 import { Adapter, ClientConfiguration, DataType } from '@sqb/connect';
-import { Connection, ConnectionConfiguration } from 'postgresql-client';
+import { Connection, ConnectionConfiguration } from 'postgrejs';
 import { PgConnection } from './pg-connection.js';
 
 export class PgAdapter implements Adapter {
-  driver = 'postgresql-client';
+  driver = 'postgrejs';
   dialect = 'postgres';
   features = {
     cursor: true,

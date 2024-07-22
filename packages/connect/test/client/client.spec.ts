@@ -28,15 +28,15 @@ describe('Client', () => {
   });
 
   it('should initialize client with driver name', () => {
-    const _client = new SqbClient({ driver: 'postgresql-client' });
+    const _client = new SqbClient({ driver: 'postgrejs' });
     expect(_client.dialect).toStrictEqual(dialect);
-    expect(_client.driver).toStrictEqual('postgresql-client');
+    expect(_client.driver).toStrictEqual('postgrejs');
   });
 
   it('should initialize client with dialect name', () => {
     const _client = new SqbClient({ dialect });
     expect(_client.dialect).toStrictEqual(dialect);
-    expect(_client.driver).toStrictEqual('postgresql-client');
+    expect(_client.driver).toStrictEqual('postgrejs');
   });
 
   it('should initialize default options', () => {

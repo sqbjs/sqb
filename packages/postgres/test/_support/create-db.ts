@@ -1,4 +1,4 @@
-import { Connection, stringifyValueForSQL } from 'postgresql-client';
+import { Connection, stringifyValueForSQL } from 'postgrejs';
 import { getInsertSQLsForTestData } from '../../../connect/test/_shared/adapter-tests.js';
 
 const schemaCreated = {};

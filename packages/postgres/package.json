@@ -38,13 +38,13 @@
     "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
-    "postgresql-client": "^2.12.0"
+    "postgrejs": "^2.15.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.13.0",
     "@sqb/connect": "^4.13.0",
     "@sqb/postgres-dialect": "^4.13.0",
-    "postgresql-client": "^2.x.x"
+    "postgrejs": ">=2.15.1 <3.0.0"
   },
   "engines": {
     "node": ">=16.0",

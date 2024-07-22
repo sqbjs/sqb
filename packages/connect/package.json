@@ -51,7 +51,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash": "^4.17.7",
-    "postgresql-client": "^2.12.0"
+    "postgrejs": "^2.15.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.13.0",
