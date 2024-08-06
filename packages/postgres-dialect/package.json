@@ -1,7 +1,7 @@
 {
   "name": "@sqb/postgres-dialect",
   "description": "SQB serialization extension for PostgreSQL database",
-  "version": "4.14.0",
+  "version": "4.14.1",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -35,7 +35,7 @@
     "clean:cover": "rimraf ../../coverage/postgres-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.14.0"
+    "@sqb/builder": "^4.14.1"
   },
   "engines": {
     "node": ">=16.0",
