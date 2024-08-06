@@ -1,7 +1,7 @@
 {
   "name": "@sqb/oracle",
   "description": "SQB serialization extension for Oracle database",
-  "version": "4.14.0",
+  "version": "4.14.1",
   "author": "Panates",
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
@@ -35,9 +35,9 @@
     "clean:cover": "rimraf ../../coverage/oracle"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.14.0",
-    "@sqb/connect": "^4.14.0",
-    "@sqb/oracle-dialect": "^4.14.0",
+    "@sqb/builder": "^4.14.1",
+    "@sqb/connect": "^4.14.1",
+    "@sqb/oracle-dialect": "^4.14.1",
     "oracledb": ">= 6.4.0"
   },
   "devDependencies": {
