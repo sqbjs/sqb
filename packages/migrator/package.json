@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.2",
-    "strict-typed-events": "^2.3.3",
+    "strict-typed-events": "^2.4.0",
     "ts-gems": "^3.4.0"
   },
   "peerDependencies": {
@@ -45,7 +45,7 @@
     "@sqb/postgres": "^4.14.0"
   },
   "devDependencies": {
-    "postgrejs": "^2.15.1"
+    "postgrejs": "^2.15.4"
   },
   "engines": {
     "node": ">=16.0",

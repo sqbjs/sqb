@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@types/sql.js": "^1.4.9",
-    "sql.js": "^1.10.3"
+    "sql.js": "^1.11.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.14.0",

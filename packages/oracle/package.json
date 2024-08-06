@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/oracledb": "^6.5.1",
-    "oracledb": "^6.5.1"
+    "oracledb": "^6.6.0"
   },
   "engines": {
     "node": ">=16.0",

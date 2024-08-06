@@ -38,7 +38,7 @@
     "putil-promisify": "^1.10.1"
   },
   "devDependencies": {
-    "postgrejs": "^2.15.1"
+    "postgrejs": "^2.15.4"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.14.0",
