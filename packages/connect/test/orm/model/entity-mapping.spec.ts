@@ -7,12 +7,12 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityB {
         @Column()
-        name: string;
+        declare name: string;
       }
 
       @Entity()
@@ -29,21 +29,21 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityC {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityB {
         @Column()
-        name: string;
+        declare name: string;
 
         @Column()
         @ForeignKey(EntityC)
-        cId: string;
+        declare cId: string;
       }
 
       @Entity()
@@ -61,13 +61,13 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityB {
         @Column()
         @Index()
-        name: string;
+        declare name: string;
       }
 
       @Entity()
@@ -86,9 +86,9 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
         @Column()
-        name: string;
+        declare name: string;
       }
 
       @Entity()
@@ -105,20 +105,20 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityB {
         @Column()
-        name: string;
+        declare name: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId1: string;
+        declare aId1: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId2: string;
+        declare aId2: string;
       }
 
       @Entity()
@@ -138,11 +138,11 @@ describe('Model / Entity mapping', () => {
       class EntityA {
         @Column()
         @Index()
-        id: number;
+        declare id: number;
 
         @Column()
         @Index()
-        name: string;
+        declare name: string;
       }
 
       @Entity()
@@ -161,9 +161,9 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
         @Column()
-        name: string;
+        declare name: string;
       }
 
       @Entity()
@@ -180,20 +180,20 @@ describe('Model / Entity mapping', () => {
       @Entity()
       class EntityA {
         @Column()
-        id: number;
+        declare id: number;
       }
 
       class EntityB {
         @Column()
-        name: string;
+        declare name: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId1: string;
+        declare aId1: string;
 
         @Column()
         @ForeignKey(EntityA)
-        aId2: string;
+        declare aId2: string;
       }
 
       @Entity()
@@ -213,11 +213,11 @@ describe('Model / Entity mapping', () => {
       class EntityA {
         @Column()
         @Index()
-        id: number;
+        declare id: number;
 
         @Column()
         @Index()
-        name: string;
+        declare name: string;
       }
 
       @Entity()

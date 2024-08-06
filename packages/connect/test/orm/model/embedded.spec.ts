@@ -4,15 +4,15 @@ import { Column, Embedded, Entity, EntityMetadata } from '@sqb/connect';
 describe('Model / Embedded object element', () => {
   class PersonName {
     @Column()
-    given: string;
+    declare given: string;
     @Column()
-    family: string;
+    declare family: string;
   }
 
   it(`should define embedded element metadata`, () => {
     class MyEntity {
       @Embedded(PersonName)
-      name: PersonName;
+      declare name: PersonName;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -29,7 +29,7 @@ describe('Model / Embedded object element', () => {
         fieldNamePrefix: 'prefix',
         fieldNameSuffix: 'suffix',
       })
-      name: PersonName;
+      declare name: PersonName;
     }
 
     const meta = Entity.getMetadata(MyEntity);

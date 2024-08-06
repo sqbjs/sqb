@@ -4,31 +4,31 @@ import { Association, Column, Entity, ForeignKey, PrimaryKey } from '@sqb/connec
 class Country {
   @PrimaryKey()
   @Column()
-  code: string;
+  declare code: string;
 
   @Column()
-  name: string;
+  declare name: string;
 }
 
 class Record {
   @PrimaryKey()
   @Column()
-  id: number;
+  declare id: number;
 }
 
 class Deletable {
   @Column()
-  deleted: boolean;
+  declare deleted: boolean;
 }
 
 class Customer extends Entity.Union(Record, Deletable) {
   @Column()
-  countryCode: string;
+  declare countryCode: string;
 }
 
 class CustomerNotes extends Record {
   @Column()
-  customerId: number;
+  declare customerId: number;
 }
 
 describe('Model / Association', () => {
@@ -81,12 +81,12 @@ describe('Model / Association', () => {
     class CustomerPhone {
       @Column()
       @ForeignKey(() => Customer2)
-      idOfCustomer: number;
+      declare idOfCustomer: number;
     }
 
     class Customer2 {
       @PrimaryKey()
-      id: string;
+      declare id: string;
     }
 
     const association = new Association('', { source: Customer2, target: CustomerPhone });
@@ -98,7 +98,7 @@ describe('Model / Association', () => {
     class Customer2 {
       @Column()
       // eslint-disable-next-line camelcase
-      country_code: string;
+      declare country_code: string;
     }
 
     const association = new Association('', { source: Customer2, target: Country });
@@ -110,7 +110,7 @@ describe('Model / Association', () => {
     class Customer2 {
       @Column()
       @ForeignKey(Country)
-      countryCode: string;
+      declare countryCode: string;
     }
 
     const association = new Association('', { source: Customer2, target: Country });
@@ -121,7 +121,7 @@ describe('Model / Association', () => {
     class Customer2 {
       @Column()
       @ForeignKey(Country)
-      countryCode: string;
+      declare countryCode: string;
     }
 
     const association = new Association('', { source: Customer2, target: Country });

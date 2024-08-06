@@ -7,29 +7,29 @@ import { isAssociationField } from '../../../src/orm/util/orm.helper.js';
 class Country {
   @PrimaryKey()
   @Column()
-  code: string;
+  declare code: string;
 
   @Column()
-  name: string;
+  declare name: string;
 }
 
 class BaseCustomer {
   @PrimaryKey()
   @Column()
-  id: number;
+  declare id: number;
 
   @Column()
-  countryCode: string;
+  declare countryCode: string;
 }
 
 describe('Model / Link field', () => {
   it(`should @Link() decorator define association element`, () => {
     class Customer extends BaseCustomer {
       @(Link().toOne(Country))
-      country: Country;
+      declare country: Country;
 
       @(Link().toMany(Country))
-      country2: Country[];
+      declare country2: Country[];
     }
 
     const meta = Entity.getMetadata(Customer);
@@ -52,7 +52,7 @@ describe('Model / Link field', () => {
     expect(() => {
       class Customer {
         @Link()
-        countries: Country[];
+        declare countries: Country[];
       }
     }).toThrow('type information while');
   });
@@ -61,7 +61,7 @@ describe('Model / Link field', () => {
     expect(() => {
       class Customer {
         @Link()
-        countries: String;
+        declare countries: String;
       }
     }).toThrow('No entity metadata found');
   });
@@ -70,7 +70,7 @@ describe('Model / Link field', () => {
     expect(() => {
       class Customer {
         @(Link().toMany(Country))
-        countries: Country;
+        declare countries: Country;
       }
     }).toThrow('Link returns single instance');
   });
@@ -79,7 +79,7 @@ describe('Model / Link field', () => {
     expect(() => {
       class Customer {
         @(Link().toOne(Country))
-        countries: Country[];
+        declare countries: Country[];
       }
     }).toThrow('Link returns array of instances');
   });

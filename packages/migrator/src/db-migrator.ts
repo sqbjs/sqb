@@ -14,7 +14,7 @@ export interface DbMigratorOptions {
 }
 
 export class DbMigrator extends AsyncEventEmitter {
-  protected adapter: MigrationAdapter;
+  protected declare adapter: MigrationAdapter;
 
   async execute(options: DbMigratorOptions): Promise<boolean> {
     if (!options.connection.dialect) throw new TypeError(`You must provide connection.dialect`);

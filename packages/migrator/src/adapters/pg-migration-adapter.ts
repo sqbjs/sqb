@@ -17,9 +17,9 @@ import { MigrationStatus } from '../types.js';
 const pgAdapter = new PgAdapter();
 
 export class PgMigrationAdapter extends MigrationAdapter {
-  protected _connection: Connection;
+  protected declare _connection: Connection;
   protected _infoSchema = 'public';
-  protected _migrationPackage: MigrationPackage;
+  protected declare _migrationPackage: MigrationPackage;
   protected _version = 0;
   protected _status: MigrationStatus = MigrationStatus.idle;
   protected defaultVariables = {

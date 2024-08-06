@@ -112,7 +112,7 @@ export class SqbConnection extends TypedEventEmitterClass<SqbConnectionEvents>(A
     await this.emitAsyncSerial('close');
     const intlcon = this._intlcon;
     this._intlcon = undefined;
-    this.client.pool.release(intlcon, e => {
+    this.client.pool.release(intlcon, (e: any) => {
       if (e) this.client.emit('error', e);
     });
     debug('[%s] closed', intlcon.sessionId);

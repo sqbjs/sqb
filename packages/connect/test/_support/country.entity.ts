@@ -6,33 +6,33 @@ import type { Customer } from './customer.entity.js';
 export class Country {
   @PrimaryKey()
   @Column()
-  code: string;
+  declare code: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @Column({ fieldName: 'phone_code' })
-  phoneCode: string;
+  declare phoneCode: string;
 
   @Column({ fieldName: 'continent_code' })
-  continentCode: string;
+  declare continentCode: string;
 
   @Column({ fieldName: 'has_market', default: true })
-  hasMarket: boolean;
+  declare hasMarket: boolean;
 
   @Link({ exclusive: true })
-  readonly continent: Continent;
+  declare readonly continent: Continent;
 
   @(Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
     sourceKey: 'code',
     targetKey: 'countryCode',
   }))
-  readonly customers: Customer[];
+  declare readonly customers: Customer[];
 
   @(Link({ exclusive: true }).toMany(async () => (await import('./customer.entity.js')).Customer, {
     sourceKey: 'code',
     targetKey: 'countryCode',
     where: { vip: true },
   }))
-  readonly vipCustomers: Customer[];
+  declare readonly vipCustomers: Customer[];
 }

@@ -7,7 +7,7 @@ describe('Model / Parse', () => {
 
     class MyEntity {
       @Parse(fn)
-      id: string;
+      declare id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -25,7 +25,7 @@ describe('Model / Serialize', () => {
 
     class MyEntity {
       @Serialize(fn)
-      id: string;
+      declare id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);

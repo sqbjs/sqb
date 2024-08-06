@@ -41,13 +41,13 @@ describe('Model / Entity', () => {
     class Base {
       @Column()
       @PrimaryKey()
-      id: number;
+      declare id: number;
     }
 
     @Entity({ schema: 'my_schema', comment: 'comment' })
     class MyEntity extends Base {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     const primaryIndex1 = Entity.getPrimaryIndex(Base);
@@ -61,25 +61,25 @@ describe('Model / Entity', () => {
     @Entity()
     class Country {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     @Entity()
     class BaseCustomer extends BaseEntity {
       @Column()
-      id: string;
+      declare id: string;
 
       @Column()
-      name: number;
+      declare name: number;
 
       @Link()
-      country: Country;
+      declare country: Country;
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     expect(Entity.getFieldNames(Customer)).toStrictEqual(['id', 'name', 'country', 'code']);
@@ -89,25 +89,25 @@ describe('Model / Entity', () => {
     @Entity()
     class Country {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     @Entity()
     class BaseCustomer extends BaseEntity {
       @Column()
-      id: string;
+      declare id: string;
 
       @Column()
-      name: number;
+      declare name: number;
 
       @Link()
-      country: Country;
+      declare country: Country;
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     expect(Entity.getColumnFieldNames(Customer)).toStrictEqual(['id', 'name', 'code']);
@@ -117,25 +117,25 @@ describe('Model / Entity', () => {
     @Entity()
     class Country {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     @Entity()
     class BaseCustomer extends BaseEntity {
       @Column({ noInsert: true })
-      id: string;
+      declare id: string;
 
       @Column({ noUpdate: true })
-      name: number;
+      declare name: number;
 
       @Link()
-      country: Country;
+      declare country: Country;
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     expect(Entity.getInsertColumnNames(Customer)).toStrictEqual(['name', 'code']);
@@ -145,25 +145,25 @@ describe('Model / Entity', () => {
     @Entity()
     class Country {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     @Entity()
     class BaseCustomer extends BaseEntity {
       @Column({ noInsert: true })
-      id: string;
+      declare id: string;
 
       @Column({ noUpdate: true })
-      name: number;
+      declare name: number;
 
       @Link()
-      country: Country;
+      declare country: Country;
     }
 
     @Entity()
     class Customer extends BaseCustomer {
       @Column()
-      code: string;
+      declare code: string;
     }
 
     expect(Entity.getUpdateColumnNames(Customer)).toStrictEqual(['id', 'code']);

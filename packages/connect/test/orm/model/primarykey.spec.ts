@@ -26,7 +26,7 @@ describe('Model / PrimaryKey', () => {
   it(`should be used as PropertyDecorator`, () => {
     class MyEntity {
       @PrimaryKey({ name: 'px_myentity_id' })
-      id: string;
+      declare id: string;
     }
 
     const primaryIndex = Entity.getPrimaryIndex(MyEntity);

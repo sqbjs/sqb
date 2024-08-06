@@ -27,7 +27,7 @@ describe('Model / Index', () => {
   it(`should be used as PropertyDecorator`, () => {
     class MyEntity {
       @Index({ unique: true })
-      id: string;
+      declare id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);

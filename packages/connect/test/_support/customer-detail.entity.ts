@@ -5,14 +5,14 @@ import type { Customer } from './customer.entity.js';
 export class CustomerDetail extends BaseEntity {
   @PrimaryKey()
   @Column({ fieldName: 'customer_id' })
-  customerId?: number;
+  declare customerId?: number;
 
   @Column()
-  notes?: string;
+  declare notes?: string;
 
   @Column()
-  alerts?: string;
+  declare alerts?: string;
 
   @(Link({ exclusive: true }).toOne(async () => (await import('./customer.entity.js')).Customer))
-  readonly customer?: Customer;
+  declare readonly customer?: Customer;
 }

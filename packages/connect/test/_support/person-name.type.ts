@@ -2,8 +2,8 @@ import { Column } from '@sqb/connect';
 
 export class PersonName {
   @Column({ fieldName: 'given_name' })
-  given?: string;
+  declare given?: string;
 
   @Column({ fieldName: 'family_name' })
-  family?: string;
+  declare family?: string;
 }

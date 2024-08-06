@@ -18,7 +18,7 @@ describe('Model / Data Column', () => {
   it(`should @Column() decorator init column metadata`, () => {
     class MyEntity {
       @Column()
-      id: string;
+      declare id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -32,7 +32,7 @@ describe('Model / Data Column', () => {
   it(`should @Column(DataType) decorator set dataType`, () => {
     class MyEntity {
       @Column(DataType.GUID)
-      id: string;
+      declare id: string;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -61,7 +61,7 @@ describe('Model / Data Column', () => {
         noUpdate: true,
         enum: [1, 2, 3],
       })
-      id: number;
+      declare id: number;
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -87,22 +87,22 @@ describe('Model / Data Column', () => {
   it(`should @Column() decorator auto detect "type" and "dataType" using reflection`, () => {
     class MyEntity {
       @Column()
-      col1: string;
+      declare col1: string;
 
       @Column()
-      col2: number;
+      declare col2: number;
 
       @Column()
-      col3: boolean;
+      declare col3: boolean;
 
       @Column()
-      col4: Date;
+      declare col4: Date;
 
       @Column()
-      col5: Buffer;
+      declare col5: Buffer;
 
       @Column()
-      col6: any[];
+      declare col6: any[];
     }
 
     const meta = Entity.getMetadata(MyEntity);
@@ -148,7 +148,7 @@ describe('Model / Data Column', () => {
     expect(() => {
       class MyEntity {
         @AfterInsert()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -174,7 +174,7 @@ describe('Model / Data Column', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       class MyEntity {
         @AfterDestroy()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -199,7 +199,7 @@ describe('Model / Data Column', () => {
     expect(() => {
       class MyEntity {
         @AfterUpdate()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -224,7 +224,7 @@ describe('Model / Data Column', () => {
     expect(() => {
       class MyEntity {
         @BeforeInsert()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });
@@ -249,7 +249,7 @@ describe('Model / Data Column', () => {
     expect(() => {
       class MyEntity {
         @BeforeDestroy()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow(/Property must be a function/);
   });
@@ -274,7 +274,7 @@ describe('Model / Data Column', () => {
     expect(() => {
       class MyEntity {
         @BeforeUpdate()
-        notAFunction: 12;
+        declare notAFunction: 12;
       }
     }).toThrow('Property must be a function');
   });

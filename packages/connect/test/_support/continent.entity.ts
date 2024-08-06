@@ -6,23 +6,23 @@ import type { Customer } from './customer.entity.js';
 export class Continent {
   @PrimaryKey()
   @Column()
-  code: string;
+  declare code: string;
 
   @Column()
-  name: string;
+  declare name: string;
 
   @(Link({ exclusive: true }).toMany(async () => (await import('./country.entity.js')).Country, {
     sourceKey: 'code',
     targetKey: 'continentCode',
   }))
-  countries: Country[];
+  declare countries: Country[];
 
   @(Link({ exclusive: true }).toMany(async () => (await import('./country.entity.js')).Country, {
     sourceKey: 'code',
     targetKey: 'continentCode',
     where: { hasMarket: true },
   }))
-  marketCountries: Country[];
+  declare marketCountries: Country[];
 
   @(Link({ exclusive: true })
     .toMany(async () => (await import('./country.entity.js')).Country, {
@@ -33,5 +33,5 @@ export class Continent {
       sourceKey: 'code',
       targetKey: 'countryCode',
     }))
-  customers: Customer[];
+  declare customers: Customer[];
 }
