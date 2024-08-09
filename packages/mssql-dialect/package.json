@@ -1,7 +1,7 @@
 {
   "name": "@sqb/mssql-dialect",
   "description": "SQB serialization extension for MS-SQL database",
-  "version": "4.14.1",
+  "version": "4.15.0",
   "author": "Panates",
   "license": "Apache-2.0",
   "scripts": {
@@ -22,7 +22,7 @@
     "clean:cover": "rimraf ../../coverage/mssql-dialect"
   },
   "peerDependencies": {
-    "@sqb/builder": "^4.14.1"
+    "@sqb/builder": "^4.15.0"
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
