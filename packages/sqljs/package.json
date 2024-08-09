@@ -3,27 +3,14 @@
   "description": "SQB serialization extension for sql.js driver",
   "version": "4.14.1",
   "author": "Panates",
-  "contributors": [
-    "Eray Hanoglu <e.hanoglu@panates.com>",
-    "Ilker Gurelli <i.gurelli@panates.com>"
-  ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sqbjs/sqb.git",
-    "directory": "packages/sqljs"
-  },
-  "type": "module",
-  "module": "./esm/index.js",
-  "main": "./cjs/index.js",
-  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/sqljs && cp ../../package.cjs.json ../../build/sqljs/cjs/package.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/sqljs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -46,6 +33,25 @@
     "@sqb/connect": "^4.14.1",
     "@sqb/sqlite-dialect": "^4.14.1",
     "sql.js": "^1.8.0"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>",
+    "Ilker Gurelli <i.gurelli@panates.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git",
+    "directory": "packages/sqljs"
   },
   "engines": {
     "node": ">=16.0",

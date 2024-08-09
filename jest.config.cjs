@@ -4,7 +4,7 @@ module.exports = {
   ...base,
   // verbose: true,
   projects: ['<rootDir>/packages/*/jest.config.cjs'],
-  globalSetup: '<rootDir>/support/jest-setup.js',
+  globalSetup: '<rootDir>/support/jest-setup.cjs',
   coveragePathIgnorePatterns: [
     '/build/',
     '/dist/',

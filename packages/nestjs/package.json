@@ -3,27 +3,14 @@
   "description": "Nestjs module for data connection using SQB",
   "version": "4.14.1",
   "author": "Panates",
-  "contributors": [
-    "Eray Hanoglu <e.hanoglu@panates.com>",
-    "Ilker Gurelli <i.gurelli@panates.com>"
-  ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sqbjs/sqb.git",
-    "directory": "packages/nestjs"
-  },
-  "type": "module",
-  "module": "./esm/index.js",
-  "main": "./cjs/index.js",
-  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs && cp ../../package.cjs.json ../../build/nestjs/cjs/package.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -39,7 +26,7 @@
     "@nestjs/core": "^10.3.10",
     "@nestjs/platform-express": "^10.3.10",
     "@nestjs/testing": "^10.3.10",
-    "postgrejs": "^2.15.4",
+    "postgrejs": "^2.16.0",
     "rxjs": "^7.8.1",
     "supertest": "^7.0.0"
   },
@@ -50,6 +37,25 @@
     "@sqb/connect": "^4.14.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": ">=6.6.0"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>",
+    "Ilker Gurelli <i.gurelli@panates.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git",
+    "directory": "packages/nestjs"
   },
   "engines": {
     "node": ">=16.0",

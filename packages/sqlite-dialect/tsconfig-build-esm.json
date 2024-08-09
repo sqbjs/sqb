@@ -1,6 +1,7 @@
 {
   "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
+    "module": "NodeNext",
     "rootDir": "src",
     "outDir": "../../build/sqlite-dialect/esm",
     "declarationDir": "../../build/sqlite-dialect/types"

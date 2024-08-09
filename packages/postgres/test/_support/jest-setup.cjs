@@ -1,6 +1,6 @@
-import { Connection } from 'postgrejs';
+const { Connection } = require('postgrejs');
 
-export default async function globalSetup() {
+module.exports = async function globalSetup() {
   const connection = new Connection();
   await connection.connect();
   try {
@@ -8,4 +8,4 @@ export default async function globalSetup() {
   } finally {
     await connection.close(0);
   }
-}
+};

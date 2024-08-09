@@ -3,27 +3,14 @@
   "description": "Multi-dialect database connection framework written with TypeScript",
   "version": "4.14.1",
   "author": "Panates",
-  "contributors": [
-    "Eray Hanoglu <e.hanoglu@panates.com>",
-    "Ilker Gurelli <i.gurelli@panates.com>"
-  ],
   "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sqbjs/sqb.git",
-    "directory": "packages/connect"
-  },
-  "type": "module",
-  "module": "./esm/index.js",
-  "main": "./cjs/index.js",
-  "types": "./types/index.d.ts",
   "scripts": {
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json",
     "build:esm": "tsc -b tsconfig-build-esm.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect && cp ../../package.cjs.json ../../build/connect/cjs/package.json",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -37,25 +24,44 @@
   "dependencies": {
     "debug": "^4.3.6",
     "doublylinked": "^2.5.4",
-    "fast-tokenizer": "^1.3.0",
-    "lightning-pool": "^4.4.3",
+    "fast-tokenizer": "^1.4.0",
+    "lightning-pool": "^4.5.0",
     "lodash": "^4.17.21",
-    "power-tasks": "^1.7.7",
+    "power-tasks": "^1.8.0",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.13.0",
     "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
-    "strict-typed-events": "^2.4.0",
-    "ts-gems": "^3.4.0"
+    "strict-typed-events": "^2.5.0",
+    "ts-gems": "^3.5.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash": "^4.17.7",
-    "postgrejs": "^2.15.4"
+    "postgrejs": "^2.16.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.14.1",
     "reflect-metadata": "^0.2.2"
+  },
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./cjs/index.js",
+      "import": "./esm/index.js",
+      "types": "./types/index.d.ts"
+    }
+  },
+  "contributors": [
+    "Eray Hanoglu <e.hanoglu@panates.com>",
+    "Ilker Gurelli <i.gurelli@panates.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sqbjs/sqb.git",
+    "directory": "packages/connect"
   },
   "engines": {
     "node": ">=16.0",

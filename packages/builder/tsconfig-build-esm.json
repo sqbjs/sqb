@@ -1,6 +1,7 @@
 {
   "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
+    "module": "NodeNext",
     "rootDir": "src",
     "outDir": "../../build/builder/esm",
     "declarationDir": "../../build/builder/types"

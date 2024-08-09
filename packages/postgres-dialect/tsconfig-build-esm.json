@@ -1,6 +1,7 @@
 {
   "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
+    "module": "NodeNext",
     "rootDir": "src",
     "outDir": "../../build/postgres-dialect/esm",
     "declarationDir": "../../build/postgres-dialect/types"
