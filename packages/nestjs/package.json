@@ -26,7 +26,7 @@
     "@nestjs/core": "^10.3.10",
     "@nestjs/platform-express": "^10.3.10",
     "@nestjs/testing": "^10.3.10",
-    "postgrejs": "^2.16.0",
+    "postgrejs": "^2.17.0",
     "rxjs": "^7.8.1",
     "supertest": "^7.0.0"
   },

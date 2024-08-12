@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.2",
-    "strict-typed-events": "^2.5.0",
+    "strict-typed-events": "^2.6.0",
     "ts-gems": "^3.5.0"
   },
   "peerDependencies": {
@@ -32,7 +32,7 @@
     "@sqb/postgres": "^4.15.0"
   },
   "devDependencies": {
-    "postgrejs": "^2.16.0"
+    "postgrejs": "^2.17.0"
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
