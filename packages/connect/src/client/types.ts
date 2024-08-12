@@ -1,10 +1,10 @@
 import { DataType, ParamOptions } from '@sqb/builder';
 import type { PoolConfiguration } from 'lightning-pool';
 import { Maybe } from 'ts-gems';
-import type { Adapter } from './adapter';
-import type { Cursor } from './cursor';
-import type { FieldInfoMap } from './field-info-map';
-import type { SqbConnection } from './sqb-connection';
+import type { Adapter } from './adapter.js';
+import type { Cursor } from './cursor.js';
+import type { FieldInfoMap } from './field-info-map.js';
+import type { SqbConnection } from './sqb-connection.js';
 
 export { DataType } from '@sqb/builder';
 

@@ -13,7 +13,7 @@ import { RawStatement } from '../sql-objects/raw-statement.js';
 import { TableName } from '../sql-objects/table-name.js';
 import { isJoinStatement, isSerializable } from '../typeguards.js';
 import { Query } from './query.js';
-import type { UnionQuery } from './union-query';
+import type { UnionQuery } from './union-query.js';
 
 export class SelectQuery extends Query {
   _tables?: Serializable[];

@@ -6,8 +6,8 @@
     "experimentalDecorators": true,
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../builder/src"],
-      "@sqb/connect": ["../connect/src"]
+      "@sqb/builder": ["../builder/src/index.ts"],
+      "@sqb/connect": ["../connect/src/index.ts"]
     }
   }
 }

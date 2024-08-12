@@ -9,8 +9,8 @@
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig-build-cjs.json",
-    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/builder/cjs/package.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/builder/esm/package.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/builder",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
@@ -27,21 +27,30 @@
     "putil-flattentext": "^2.1.1",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.13.0",
-    "putil-varhelpers": "^1.6.5"
+    "putil-varhelpers": "^1.6.5",
+    "tslib": "^2.6.3"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12"
   },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.ts",
+        "default": "./cjs/index.js"
+      },
+      "default": "./esm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "import": "./esm/index.js",
-      "types": "./types/index.d.ts"
-    }
-  },
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"

@@ -4,7 +4,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@sqb/builder": ["../builder/src"]
+      "@sqb/builder": ["../builder/src/index.ts"]
     }
   }
 }

@@ -8,8 +8,8 @@
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig-build-cjs.json",
-    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/oracle/cjs/package.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/oracle/esm/package.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/oracle",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
@@ -21,6 +21,9 @@
     "clean:dist": "rimraf ../../build/oracle",
     "clean:cover": "rimraf ../../coverage/oracle"
   },
+  "dependencies": {
+    "tslib": "^2.6.3"
+  },
   "peerDependencies": {
     "@sqb/builder": "^4.16.0",
     "@sqb/connect": "^4.16.0",
@@ -31,16 +34,24 @@
     "@types/oracledb": "^6.5.1",
     "oracledb": "^6.6.0"
   },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.ts",
+        "default": "./cjs/index.js"
+      },
+      "default": "./esm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "import": "./esm/index.js",
-      "types": "./types/index.d.ts"
-    }
-  },
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"

@@ -8,8 +8,8 @@
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig-build-cjs.json",
-    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/postgres/cjs/package.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/postgres/esm/package.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/postgres",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
@@ -22,10 +22,11 @@
     "clean:cover": "rimraf ../../coverage/postgres"
   },
   "dependencies": {
-    "putil-promisify": "^1.10.1"
+    "putil-promisify": "^1.10.1",
+    "tslib": "^2.6.3"
   },
   "devDependencies": {
-    "postgrejs": "^2.17.0"
+    "postgrejs": "^2.18.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.16.0",
@@ -33,16 +34,24 @@
     "@sqb/postgres-dialect": "^4.16.0",
     "postgrejs": ">=2.15.1 <3.0.0"
   },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.ts",
+        "default": "./cjs/index.js"
+      },
+      "default": "./esm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "import": "./esm/index.js",
-      "types": "./types/index.d.ts"
-    }
-  },
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"

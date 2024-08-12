@@ -8,8 +8,8 @@
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig-build-cjs.json",
-    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/migrator/cjs/package.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/migrator/esm/package.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/migrator",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
@@ -23,8 +23,9 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.2",
-    "strict-typed-events": "^2.6.0",
-    "ts-gems": "^3.5.0"
+    "strict-typed-events": "^2.7.2",
+    "ts-gems": "^3.5.0",
+    "tslib": "^2.6.3"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.16.0",
@@ -32,18 +33,26 @@
     "@sqb/postgres": "^4.16.0"
   },
   "devDependencies": {
-    "postgrejs": "^2.17.0"
+    "postgrejs": "^2.18.1"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.ts",
+        "default": "./cjs/index.js"
+      },
+      "default": "./esm/index.js"
+    },
+    "./package.json": "./package.json"
   },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "import": "./esm/index.js",
-      "types": "./types/index.d.ts"
-    }
-  },
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"

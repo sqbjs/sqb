@@ -8,8 +8,8 @@
     "compile": "tsc",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
-    "build:cjs": "tsc -b tsconfig-build-cjs.json",
-    "build:esm": "tsc -b tsconfig-build-esm.json",
+    "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/nestjs/cjs/package.json",
+    "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/nestjs/esm/package.json",
     "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
@@ -21,12 +21,15 @@
     "clean:dist": "rimraf ../../build/postgres",
     "clean:cover": "rimraf ../../coverage/postgres"
   },
+  "dependencies": {
+    "tslib": "^2.6.3"
+  },
   "devDependencies": {
-    "@nestjs/common": "^10.3.10",
-    "@nestjs/core": "^10.3.10",
-    "@nestjs/platform-express": "^10.3.10",
-    "@nestjs/testing": "^10.3.10",
-    "postgrejs": "^2.17.0",
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/platform-express": "^10.4.0",
+    "@nestjs/testing": "^10.4.0",
+    "postgrejs": "^2.18.1",
     "rxjs": "^7.8.1",
     "supertest": "^7.0.0"
   },
@@ -38,16 +41,24 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": ">=6.6.0"
   },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./types/index.d.ts",
+        "default": "./esm/index.js"
+      },
+      "require": {
+        "types": "./types/index.d.ts",
+        "default": "./cjs/index.js"
+      },
+      "default": "./esm/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "types": "./types/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./cjs/index.js",
-      "import": "./esm/index.js",
-      "types": "./types/index.d.ts"
-    }
-  },
   "contributors": [
     "Eray Hanoglu <e.hanoglu@panates.com>",
     "Ilker Gurelli <i.gurelli@panates.com>"

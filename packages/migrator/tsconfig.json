@@ -4,8 +4,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@sqb/connect": ["../connect/src"],
-      "@sqb/postgres": ["../postgres/src"]
+      "@sqb/connect": ["../connect/src/index.ts"],
+      "@sqb/postgres": ["../postgres/src/index.ts"]
     }
   }
 }
