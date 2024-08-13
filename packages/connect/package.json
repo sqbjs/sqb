@@ -24,7 +24,7 @@
   "dependencies": {
     "debug": "^4.3.6",
     "doublylinked": "^2.5.4",
-    "fast-tokenizer": "^1.6.0",
+    "fast-tokenizer": "^1.6.1",
     "lightning-pool": "^4.7.3",
     "lodash": "^4.17.21",
     "power-tasks": "^1.10.1",

@@ -1,8 +1,7 @@
 {
   "extends": ["./tsconfig.json", "../../tsconfig-build.json"],
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ES2020",
     "rootDir": "src",
     "outDir": "../../build/mssql-dialect/esm",
     "declarationDir": "../../build/mssql-dialect/types"
