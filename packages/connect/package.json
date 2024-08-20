@@ -10,7 +10,7 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/connect/cjs/package.json",
     "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/connect/esm/package.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/connect && node ../../support/postbuild.cjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -24,22 +24,22 @@
   "dependencies": {
     "debug": "^4.3.6",
     "doublylinked": "^2.5.4",
-    "fast-tokenizer": "^1.6.1",
-    "lightning-pool": "^4.7.3",
+    "fast-tokenizer": "^1.7.0",
+    "lightning-pool": "^4.8.0",
     "lodash": "^4.17.21",
-    "power-tasks": "^1.10.1",
+    "power-tasks": "^1.11.0",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.13.0",
     "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
-    "strict-typed-events": "^2.7.2",
+    "strict-typed-events": "^2.8.0",
     "ts-gems": "^3.5.0",
     "tslib": "^2.6.3"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash": "^4.17.7",
-    "postgrejs": "^2.18.1"
+    "postgrejs": "^2.19.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.16.1",
@@ -53,7 +53,7 @@
         "default": "./esm/index.js"
       },
       "require": {
-        "types": "./types/index.d.ts",
+        "types": "./types/index.d.cts",
         "default": "./cjs/index.js"
       },
       "default": "./esm/index.js"

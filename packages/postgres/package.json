@@ -10,7 +10,7 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/postgres/cjs/package.json",
     "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/postgres/esm/package.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/postgres",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/postgres && node ../../support/postbuild.cjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -26,7 +26,7 @@
     "tslib": "^2.6.3"
   },
   "devDependencies": {
-    "postgrejs": "^2.18.1"
+    "postgrejs": "^2.19.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.16.1",
@@ -42,7 +42,7 @@
         "default": "./esm/index.js"
       },
       "require": {
-        "types": "./types/index.d.ts",
+        "types": "./types/index.d.cts",
         "default": "./cjs/index.js"
       },
       "default": "./esm/index.js"

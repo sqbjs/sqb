@@ -10,7 +10,7 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/nestjs/cjs/package.json",
     "build:esm": "tsc -b tsconfig-build-esm.json && cp ../../support/package.esm.json ../../build/nestjs/esm/package.json",
-    "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs",
+    "postbuild": "cp README.md package.json ../../LICENSE ../../build/nestjs && node ../../support/postbuild.cjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
@@ -29,7 +29,7 @@
     "@nestjs/core": "^10.4.1",
     "@nestjs/platform-express": "^10.4.1",
     "@nestjs/testing": "^10.4.1",
-    "postgrejs": "^2.18.1",
+    "postgrejs": "^2.19.0",
     "rxjs": "^7.8.1",
     "supertest": "^7.0.0"
   },
@@ -49,7 +49,7 @@
         "default": "./esm/index.js"
       },
       "require": {
-        "types": "./types/index.d.ts",
+        "types": "./types/index.d.cts",
         "default": "./cjs/index.js"
       },
       "default": "./esm/index.js"
