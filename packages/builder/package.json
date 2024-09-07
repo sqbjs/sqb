@@ -6,7 +6,7 @@
   "private": false,
   "license": "Apache-2.0",
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc --noEmit",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/builder/cjs/package.json",
@@ -23,12 +23,12 @@
     "clean:cover": "rimraf ../../coverage/builder"
   },
   "dependencies": {
-    "debug": "^4.3.6",
+    "debug": "^4.3.7",
     "putil-flattentext": "^2.1.1",
     "putil-isplainobject": "^1.1.5",
     "putil-merge": "^3.13.0",
     "putil-varhelpers": "^1.6.5",
-    "tslib": "^2.6.3"
+    "tslib": "^2.7.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12"

@@ -5,7 +5,7 @@
   "author": "Panates",
   "license": "Apache-2.0",
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc --noEmit",
     "prebuild": "npm run lint && npm run clean",
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc -b tsconfig-build-cjs.json && cp ../../support/package.cjs.json ../../build/migrator/cjs/package.json",
@@ -25,7 +25,7 @@
     "fast-glob": "^3.3.2",
     "strict-typed-events": "^2.8.0",
     "ts-gems": "^3.5.0",
-    "tslib": "^2.6.3"
+    "tslib": "^2.7.0"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.17.0",
