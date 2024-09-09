@@ -177,7 +177,7 @@ describe('createOnly()', () => {
         countryCode: 'DE',
       };
       const repo = connection.getRepository(Customer);
-      let sqls: string[] = [];
+      const sqls: string[] = [];
       connection.on('execute', req => {
         sqls.push(req.sql);
       });
