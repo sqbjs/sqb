@@ -157,7 +157,7 @@ describe('createOnly()', () => {
     await client.close(0);
   });
 
-  it('should not generate "returning" sql query for fast execution', async () =>
+  it('should return key value of the created record', async () =>
     client.acquire(async connection => {
       const values = {
         givenName: 'Abc',
@@ -165,11 +165,23 @@ describe('createOnly()', () => {
         countryCode: 'DE',
       };
       const repo = connection.getRepository(Customer);
-      let sql = '';
+      const r = await repo.createOnly(values);
+      expect(r).toBeGreaterThan(0);
+    }));
+
+  it('should not generate "select" sql query for fast execution', async () =>
+    client.acquire(async connection => {
+      const values = {
+        givenName: 'Abc',
+        familyName: 'Def',
+        countryCode: 'DE',
+      };
+      const repo = connection.getRepository(Customer);
+      let sqls: string[] = [];
       connection.on('execute', req => {
-        sql = req.sql;
+        sqls.push(req.sql);
       });
       await repo.createOnly(values);
-      expect(sql.includes('returning')).toBeFalsy();
+      expect(sqls.find(x => x.includes('select'))).not.toBeDefined();
     }));
 });

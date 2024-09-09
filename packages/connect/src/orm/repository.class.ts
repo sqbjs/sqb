@@ -116,11 +116,15 @@ export class Repository<T> extends TypedEventEmitterClass<RepositoryEvents>(Asyn
    *
    * @param {PartialDTO<T>} input - The input data
    * @param {Repository.CreateOptions} [options] - The options object
+   * @returns {Promise<any>} A promise that resolves key value(s) of the created record
    * @throws {Error} if an unknown error occurs while creating the resource
    */
-  createOnly(input: PartialDTO<T>, options?: StrictOmit<Repository.CreateOptions, keyof Projection>): Promise<void> {
+  createOnly(input: PartialDTO<T>, options?: StrictOmit<Repository.CreateOptions, keyof Projection>): Promise<any> {
     return this._execute(async connection => {
-      await this._create(input, { ...options, connection, returning: false });
+      const r = await this._create(input, { ...options, connection, returning: true });
+      const primaryIndex = EntityMetadata.getPrimaryIndex(this.entity);
+      if (!primaryIndex || primaryIndex.columns.length > 1) return r;
+      return r[primaryIndex.columns[0]];
     }, options);
   }
 
