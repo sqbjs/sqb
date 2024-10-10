@@ -33,13 +33,13 @@
     "putil-promisify": "^1.10.1",
     "putil-varhelpers": "^1.6.5",
     "strict-typed-events": "^2.8.0",
-    "ts-gems": "^3.5.0",
+    "ts-gems": "^3.5.1",
     "tslib": "^2.7.0"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
-    "@types/lodash": "^4.17.7",
-    "postgrejs": "^2.19.0"
+    "@types/lodash": "^4.17.10",
+    "postgrejs": "^2.21.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.18.0",

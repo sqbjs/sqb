@@ -44,11 +44,20 @@ export class PostgresSerializer implements SerializerExtension {
 
   private _serializeComparison(ctx: SerializeContext, o: any, defFn: DefaultSerializeFunction): string {
     if (o.right) {
-      if (!Array.isArray(o.right)) {
-        if (o.right.expression.toLowerCase() === 'null') {
-          if (o.operatorType === 'eq') return defFn(ctx, { ...o, operatorType: OperatorType.is, symbol: 'is' });
-          if (o.operatorType === 'ne') return defFn(ctx, { ...o, operatorType: OperatorType.isNot, symbol: 'is not' });
+      if (
+        (o.right.expression && o.right?.expression === 'null') ||
+        (o.right.value == null && (!o.right.expression || o.right.expression.startsWith('$')))
+      ) {
+        if (o.right.expression?.startsWith('$')) {
+          const s = o.right.expression.substring(1);
+          if (ctx.params) delete ctx.params[s];
+          if (ctx.preparedParams) delete ctx.preparedParams[s];
+          if (ctx.paramOptions) delete ctx.paramOptions[s];
+          o.right.expression = 'null';
+          o.right.isParam = false;
         }
+        if (o.operatorType === 'eq') return defFn(ctx, { ...o, operatorType: OperatorType.is, symbol: 'is' });
+        if (o.operatorType === 'ne') return defFn(ctx, { ...o, operatorType: OperatorType.isNot, symbol: 'is not' });
       }
 
       if (o.left.isParam && o.left.isArray && o.left.value != null && !Array.isArray(o.left.value)) {

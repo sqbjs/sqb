@@ -26,7 +26,7 @@
     "tslib": "^2.7.0"
   },
   "devDependencies": {
-    "postgrejs": "^2.19.0"
+    "postgrejs": "^2.21.1"
   },
   "peerDependencies": {
     "@sqb/builder": "^4.18.0",

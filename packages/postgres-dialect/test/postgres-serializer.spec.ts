@@ -1,10 +1,42 @@
-import { Param, Raw, Select, SerializerRegistry, Update } from '@sqb/builder';
+import { Eq, Param, Raw, Select, SerializerRegistry, Update } from '@sqb/builder';
 import { PostgresSerializer } from '../src/postgres-serializer.js';
 
 describe('PostgresSerializer', () => {
   const postgresSerializer = new PostgresSerializer();
   beforeAll(() => SerializerRegistry.register(postgresSerializer));
   afterAll(() => SerializerRegistry.unRegister(postgresSerializer));
+
+  it('should replace "= null" to "is null": test1', () => {
+    const query = Select().from('table1').where({ ID: null });
+    const result = query.generate({ dialect: 'postgres' });
+    expect(result.sql).toStrictEqual('select * from table1 where ID is null');
+  });
+
+  it('should replace "= null" to "is null": test2', () => {
+    const query = Select()
+      .from('table1')
+      .where({ ID: Param('cid') });
+    const result = query.generate({ dialect: 'postgres' });
+    expect(result.sql).toStrictEqual('select * from table1 where ID is null');
+  });
+
+  it('should replace "= null" to "is null": test3', () => {
+    const query = Select().from('table1').where(Eq('ID', null));
+    const result = query.generate({ dialect: 'postgres' });
+    expect(result.sql).toStrictEqual('select * from table1 where ID is null');
+  });
+
+  it('should replace "!= null" to "is not null": test1', () => {
+    const query = Select().from('table1').where({ 'ID !=': null });
+    const result = query.generate({ dialect: 'postgres' });
+    expect(result.sql).toStrictEqual('select * from table1 where ID is not null');
+  });
+
+  it('should replace "!= null" to "is not null": test2', () => {
+    const query = Select().from('table1').where({ 'ID !=': null });
+    const result = query.generate({ dialect: 'postgres' });
+    expect(result.sql).toStrictEqual('select * from table1 where ID is not null');
+  });
 
   it('should serialize reserved word', () => {
     const query = Select('comment').from('table1');

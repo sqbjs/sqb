@@ -32,7 +32,7 @@ export abstract class CompOperator extends Operator {
   _serialize(ctx: SerializeContext): string {
     const left = this.__serializeItem(ctx, this._left);
     if (this._isArray) left.isArray = true;
-    const right = this.__serializeItem(ctx, this._right, true);
+    const right = this.__serializeItem(ctx, this._right, left);
     const o: any = {
       operatorType: this._operatorType,
       symbol: this._symbol,
@@ -42,13 +42,14 @@ export abstract class CompOperator extends Operator {
     return this.__serialize(ctx, o);
   }
 
-  protected __serializeItem(ctx: SerializeContext, x: any, isRight?: boolean): any {
-    if (ctx.strictParams && !(x instanceof Serializable) && (typeof x !== 'string' || isRight)) {
+  protected __serializeItem(ctx: SerializeContext, x: string | Serializable, left?: any): any {
+    const isRight = !!left;
+    if (ctx.strictParams && !(x instanceof Serializable) && isRight) {
       ctx.strictParamGenId = ctx.strictParamGenId || 0;
       const name = 'P$_' + ++ctx.strictParamGenId;
       ctx.params = ctx.params || {};
       ctx.params[name] = x;
-      x = Param(name);
+      x = Param(name, left?.dataType, left?.isArray);
     }
 
     if (x instanceof Serializable) {
@@ -57,7 +58,7 @@ export abstract class CompOperator extends Operator {
         expression,
       };
       if (x instanceof FieldExpression) {
-        result.dataType = result._dataType;
+        result.dataType = x._dataType;
         result.isArray = x._isArray;
       }
       if (x instanceof ParamExpression) {
@@ -69,9 +70,11 @@ export abstract class CompOperator extends Operator {
       }
       return result;
     }
+    // noinspection SuspiciousTypeOfGuard
     const result: any = {
       expression: isRight || typeof x !== 'string' ? ctx.anyToSQL(x) : x,
     };
+    // noinspection SuspiciousTypeOfGuard
     if (isRight || typeof x !== 'string') result.isArray = Array.isArray(x);
     return result;
   }

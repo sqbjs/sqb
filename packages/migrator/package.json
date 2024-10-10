@@ -24,7 +24,7 @@
   "dependencies": {
     "fast-glob": "^3.3.2",
     "strict-typed-events": "^2.8.0",
-    "ts-gems": "^3.5.0",
+    "ts-gems": "^3.5.1",
     "tslib": "^2.7.0"
   },
   "peerDependencies": {
@@ -33,7 +33,7 @@
     "@sqb/postgres": "^4.18.0"
   },
   "devDependencies": {
-    "postgrejs": "^2.19.0"
+    "postgrejs": "^2.21.1"
   },
   "type": "module",
   "exports": {
