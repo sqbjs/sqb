@@ -1,24 +1,23 @@
 import { Adapter, DataType, QueryRequest } from '@sqb/connect';
 import { BindParam, Connection, DataTypeOIDs, FieldInfo, OID, QueryOptions } from 'postgrejs';
-import { dataTypeToOID } from './datatype-map.js';
 
 const SqbDataTypToOIDMap = {
-  [DataType.BOOL]: DataTypeOIDs.bool,
-  [DataType.CHAR]: DataTypeOIDs.char,
-  [DataType.VARCHAR]: DataTypeOIDs.varchar,
-  [DataType.SMALLINT]: DataTypeOIDs.int2,
-  [DataType.INTEGER]: DataTypeOIDs.int4,
-  [DataType.BIGINT]: DataTypeOIDs.int8,
-  [DataType.FLOAT]: DataTypeOIDs.float4,
-  [DataType.DOUBLE]: DataTypeOIDs.float8,
-  [DataType.NUMBER]: DataTypeOIDs.float8,
-  [DataType.DATE]: DataTypeOIDs.date,
-  [DataType.TIMESTAMP]: DataTypeOIDs.timestamp,
-  [DataType.TIMESTAMPTZ]: DataTypeOIDs.timestamptz,
-  [DataType.TIME]: DataTypeOIDs.time,
-  [DataType.BINARY]: DataTypeOIDs.bytea,
-  [DataType.TEXT]: DataTypeOIDs.text,
-  [DataType.GUID]: DataTypeOIDs.uuid,
+  [DataType.BOOL]: [DataTypeOIDs.bool, DataTypeOIDs._bool],
+  [DataType.CHAR]: [DataTypeOIDs.char, DataTypeOIDs._char],
+  [DataType.VARCHAR]: [DataTypeOIDs.varchar, DataTypeOIDs._varchar],
+  [DataType.SMALLINT]: [DataTypeOIDs.int2, DataTypeOIDs._int2],
+  [DataType.INTEGER]: [DataTypeOIDs.int4, DataTypeOIDs._int4],
+  [DataType.BIGINT]: [DataTypeOIDs.int8, DataTypeOIDs._int8],
+  [DataType.FLOAT]: [DataTypeOIDs.float4, DataTypeOIDs._float4],
+  [DataType.DOUBLE]: [DataTypeOIDs.float8, DataTypeOIDs._float8],
+  [DataType.NUMBER]: [DataTypeOIDs.float8, DataTypeOIDs._float8],
+  [DataType.DATE]: [DataTypeOIDs.date, DataTypeOIDs._date],
+  [DataType.TIMESTAMP]: [DataTypeOIDs.timestamp, DataTypeOIDs._timestamp],
+  [DataType.TIMESTAMPTZ]: [DataTypeOIDs.timestamptz, DataTypeOIDs._timestamptz],
+  [DataType.TIME]: [DataTypeOIDs.time, DataTypeOIDs._time],
+  [DataType.BINARY]: [DataTypeOIDs.bytea, DataTypeOIDs._bytea],
+  [DataType.TEXT]: [DataTypeOIDs.text, DataTypeOIDs._text],
+  [DataType.GUID]: [DataTypeOIDs.uuid, DataTypeOIDs._uuid],
 };
 
 export class PgConnection implements Adapter.Connection {
@@ -106,7 +105,7 @@ export class PgConnection implements Adapter.Connection {
     const params = query.params?.map((v, i) => {
       const paramOpts = Array.isArray(query.paramOptions) ? query.paramOptions[i] : undefined;
       if (v != null && paramOpts && paramOpts.dataType) {
-        const oid = dataTypeToOID(paramOpts.dataType, paramOpts.isArray);
+        const oid = SqbDataTypToOIDMap[paramOpts.dataType]?.[paramOpts.isArray ? 1 : 0];
         if (oid) return new BindParam(oid, v);
       }
       return v;
@@ -121,7 +120,7 @@ export class PgConnection implements Adapter.Connection {
     };
     if (query.fetchAsString) {
       const items = query.fetchAsString.reduce<OID[]>((a, v) => {
-        const oid = SqbDataTypToOIDMap[v];
+        const oid = SqbDataTypToOIDMap[v][0];
         if (oid) a.push(oid);
         return a;
       }, []);

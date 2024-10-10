@@ -59,7 +59,7 @@ export function initAdapterTests(adapter: Adapter, config?: Partial<ClientConfig
     it('should set active working schema', async () => {
       connection = await adapter.connect(clientConfig);
       expect(clientConfig.schema).toBeDefined();
-      expect(() => connection.setSchema!(clientConfig.schema || '')).not.toThrow();
+      await expect(connection.setSchema!(clientConfig.schema || '')).resolves.not.toThrow();
     });
 
     it('should get active working schema', async () => {
