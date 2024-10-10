@@ -23,6 +23,10 @@ Column[DECORATOR_FACTORY] = function (arg0: any): PropertyDecorator {
       } else options.type = typ;
     }
 
+    if (!options.dataType && typeof options.type === 'function' && EntityMetadata.get(options.type)) {
+      options.dataType = DataType.JSON;
+    }
+
     EntityMetadata.defineColumnField(entity, propertyKey, options);
   };
 };
