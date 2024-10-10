@@ -108,7 +108,7 @@ export async function prepareFilter(
     else srcOp.add(filter);
   }
 
-  const associationPathCache: Record<string, any> = {};
+  // const associationPathCache: Record<string, any> = {};
   for (const item of srcOp._items) {
     if (isLogicalOperator(item)) {
       const ctor = Object.getPrototypeOf(item).constructor;
@@ -131,18 +131,18 @@ export async function prepareFilter(
         let currentOp = trgOp;
         let i = 0;
 
-        const parentPath = itemPath
-          .slice(0, l - 2)
-          .join('.')
-          .toLowerCase();
-        const cached = associationPathCache[parentPath];
-        if (cached) {
-          /** Jump to last item */
-          i = l - 1;
-          _curEntity = cached._curEntity;
-          _curAlias = cached._curAlias;
-          currentOp = cached.currentOp;
-        }
+        // const parentPath = itemPath
+        //   .slice(0, l - 2)
+        //   .join('.')
+        //   .toLowerCase();
+        // const cached = associationPathCache[parentPath];
+        // if (cached) {
+        //   /** Jump to last item */
+        //   i = l - 1;
+        //   _curEntity = cached._curEntity;
+        //   _curAlias = cached._curAlias;
+        //   currentOp = cached.currentOp;
+        // }
 
         for (i; i < l; i++) {
           pt = itemPath[i];
@@ -212,14 +212,14 @@ export async function prepareFilter(
               node = node.next;
             }
 
-            /** If next path is the last one */
-            if (i === l - 2) {
-              associationPathCache[parentPath] = {
-                _curEntity,
-                _curAlias,
-                currentOp,
-              };
-            }
+            // /** If next path is the last one */
+            // if (i === l - 2) {
+            //   associationPathCache[parentPath] = {
+            //     _curEntity,
+            //     _curAlias,
+            //     currentOp,
+            //   };
+            // }
           }
         }
         continue;

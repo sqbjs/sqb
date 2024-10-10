@@ -49,7 +49,7 @@ export abstract class CompOperator extends Operator {
       const name = 'P$_' + ++ctx.strictParamGenId;
       ctx.params = ctx.params || {};
       ctx.params[name] = x;
-      x = Param(name, left?.dataType, left?.isArray);
+      x = Param(name, left?.dataType, left?.isArray || Array.isArray(x));
     }
 
     if (x instanceof Serializable) {
