@@ -49,10 +49,17 @@ export class PostgresSerializer implements SerializerExtension {
         (o.right.value == null && (!o.right.expression || o.right.expression.startsWith('$')))
       ) {
         if (o.right.expression?.startsWith('$')) {
-          const s = o.right.expression.substring(1);
-          if (ctx.params) delete ctx.params[s];
-          if (ctx.preparedParams) delete ctx.preparedParams[s];
-          if (ctx.paramOptions) delete ctx.paramOptions[s];
+          const i = parseInt(o.right.expression.substring(1), 10);
+          if (i > 0) {
+            const _ctx = ctx as any;
+            _ctx.removedParams = _ctx.removedParams || [];
+            if (!_ctx.removedParams.includes(i)) {
+              _ctx.removedParams.push(i);
+              if (Array.isArray(ctx.preparedParams)) ctx.preparedParams.splice(i - 1, 1);
+              if (Array.isArray(ctx.paramOptions)) ctx.paramOptions.splice(i - 1, 1);
+            }
+          }
+
           o.right.expression = 'null';
           o.right.isParam = false;
         }
