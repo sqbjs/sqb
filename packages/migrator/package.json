@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "expect": "^30.5.1",
-    "postgrejs": "^2.23.1"
+    "postgrejs": "^3.0.2"
   },
   "type": "module",
   "module": "./index.js",

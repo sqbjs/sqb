@@ -41,7 +41,7 @@
     "@types/lodash": "^4.17.25",
     "cross-dirname": "^0.1.0",
     "expect": "^30.5.1",
-    "postgrejs": "^2.23.1"
+    "postgrejs": "^3.0.2"
   },
   "peerDependencies": {
     "@sqb/builder": "^6.0.6",
