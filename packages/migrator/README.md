@@ -42,21 +42,27 @@ await migrator.execute({
 });
 ```
 
-PostgreSQL and Oracle are supported today, via the bundled `PgMigrationAdapter` and
-`OracleMigrationAdapter`. The Oracle adapter has a few dialect-driven differences worth knowing:
+PostgreSQL, Oracle, and MySQL are supported today, via the bundled `PgMigrationAdapter`,
+`OracleMigrationAdapter`, and `MysqlMigrationAdapter`. The Oracle and MySQL adapters have a few
+dialect-driven differences worth knowing:
 
-- **No schema auto-creation.** An Oracle "schema" *is* a user, and provisioning one is a DBA-level
-  operation this adapter deliberately doesn't attempt. `infoSchema` (if given) is only used as a
-  table-name prefix for the bookkeeping tables — that schema/user must already exist.
-- **Multi-statement `.sql` scripts follow the standard SQL\*Plus convention**: a PL/SQL block
-  (a trigger, procedure, function, package body, or a bare `BEGIN`/`DECLARE` block) is terminated
-  by a lone `/` on its own line; everything else is plain DDL/DML, `;`-separated — this is
-  required because `oracledb` runs exactly one statement per call, unlike `postgrejs`, which runs
-  a whole multi-statement script at once.
-- **Locking is best-effort.** Oracle DDL always implicitly commits, which would release a
-  transaction-held lock the instant a migration's first `CREATE`/`ALTER` ran, so the adapter uses
-  `DBMS_LOCK` instead (unaffected by that). If it isn't grantable in your environment, migrations
-  still run — just without protection against two runs racing concurrently.
+- **No schema auto-creation on Oracle.** An Oracle "schema" *is* a user, and provisioning one is a
+  DBA-level operation this adapter deliberately doesn't attempt. `infoSchema` (if given) is only
+  used as a table-name prefix for the bookkeeping tables — that schema/user must already exist.
+  MySQL has no such restriction — `CREATE SCHEMA IF NOT EXISTS` is just `CREATE DATABASE`, so the
+  MySQL adapter auto-creates `infoSchema` the same way the PostgreSQL adapter does.
+- **Multi-statement `.sql` scripts follow the standard SQL\*Plus convention on Oracle**: a PL/SQL
+  block (a trigger, procedure, function, package body, or a bare `BEGIN`/`DECLARE` block) is
+  terminated by a lone `/` on its own line; everything else is plain DDL/DML, `;`-separated — this
+  is required because `oracledb` runs exactly one statement per call, unlike `postgrejs`, which
+  runs a whole multi-statement script at once. MySQL scripts need no such splitting — the
+  connection is opened with `multipleStatements` enabled, and the server's own parser correctly
+  treats a trigger/procedure body's internal `;`s as part of one statement.
+- **Locking is best-effort on Oracle, native on MySQL.** Both Oracle and MySQL DDL always
+  implicitly commits, which would release a transaction-held lock the instant a migration's first
+  `CREATE`/`ALTER` ran. The Oracle adapter uses `DBMS_LOCK` instead (unaffected by that), and falls
+  back to running unprotected if it isn't grantable in your environment. The MySQL adapter uses
+  the native, session-scoped `GET_LOCK`/`RELEASE_LOCK` functions, which need no special grant.
 
 ## Main goals
 

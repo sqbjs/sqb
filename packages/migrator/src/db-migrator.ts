@@ -1,5 +1,6 @@
 import type { ClientConfiguration } from '@sqb/connect';
 import { AsyncEventEmitter } from 'strict-typed-events';
+import { MysqlMigrationAdapter } from './adapters/mysql-migration-adapter.js';
 import { OracleMigrationAdapter } from './adapters/oracle-migration-adapter.js';
 import { PgMigrationAdapter } from './adapters/pg-migration-adapter.js';
 import { MigrationAdapter } from './migration-adapter.js';
@@ -68,6 +69,13 @@ export class DbMigrator extends AsyncEventEmitter {
         });
         break;
       }
+      case 'mysql': {
+        migrationAdapter = await MysqlMigrationAdapter.create({
+          ...options,
+          migrationPackage,
+        });
+        break;
+      }
       default:
         throw new TypeError(
           `Migration adapter for "${options.connection.dialect}" dialect is not implemented yet`,
@@ -130,7 +138,9 @@ export class DbMigrator extends AsyncEventEmitter {
               migration,
               task,
               {
-                schema: options.connection.schema,
+                ...(options.connection.schema
+                  ? { schema: options.connection.schema }
+                  : {}),
                 ...options.scriptVariables,
               },
             );
