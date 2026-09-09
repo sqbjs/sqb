@@ -1,7 +1,7 @@
 {
   "name": "@sqb/migrator",
   "description": "Database migrator for SQB",
-  "version": "6.0.7",
+  "version": "6.0.8",
   "author": "Panates",
   "license": "Apache-2.0",
   "scripts": {
@@ -28,15 +28,15 @@
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
-    "@sqb/builder": "^6.0.7",
-    "@sqb/connect": "^6.0.7",
-    "@sqb/mariadb": "^6.0.7",
-    "@sqb/mssql": "^6.0.7",
-    "@sqb/mysql": "^6.0.7",
-    "@sqb/oracle": "^6.0.7",
-    "@sqb/postgres": "^6.0.7",
-    "@sqb/sqlite": "^6.0.7",
-    "@sqb/sqljs": "^6.0.7"
+    "@sqb/builder": "^6.0.8",
+    "@sqb/connect": "^6.0.8",
+    "@sqb/mariadb": "^6.0.8",
+    "@sqb/mssql": "^6.0.8",
+    "@sqb/mysql": "^6.0.8",
+    "@sqb/oracle": "^6.0.8",
+    "@sqb/postgres": "^6.0.8",
+    "@sqb/sqlite": "^6.0.8",
+    "@sqb/sqljs": "^6.0.8"
   },
   "devDependencies": {
     "@types/oracledb": "^7.0.3",
