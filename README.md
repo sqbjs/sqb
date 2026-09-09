@@ -1,6 +1,6 @@
 
 <p style="text-align: center;">
-  <img src="https://user-images.githubusercontent.com/3836517/32965280-1a2b63ce-cbe7-11e7-8ee1-ba47313503c5.png" width="500px" alt="SQB Logo"/>
+  <img src="https://sqb.panates.com/img/github-hero.webp" width="1280" alt="SQB" />
 </p>
 
 <br>
