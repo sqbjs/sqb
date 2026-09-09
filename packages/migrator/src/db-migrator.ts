@@ -1,8 +1,12 @@
 import type { ClientConfiguration } from '@sqb/connect';
 import { AsyncEventEmitter } from 'strict-typed-events';
+import { MariadbMigrationAdapter } from './adapters/mariadb-migration-adapter.js';
+import { MssqlMigrationAdapter } from './adapters/mssql-migration-adapter.js';
 import { MysqlMigrationAdapter } from './adapters/mysql-migration-adapter.js';
 import { OracleMigrationAdapter } from './adapters/oracle-migration-adapter.js';
 import { PgMigrationAdapter } from './adapters/pg-migration-adapter.js';
+import { SqliteMigrationAdapter } from './adapters/sqlite-migration-adapter.js';
+import { SqljsMigrationAdapter } from './adapters/sqljs-migration-adapter.js';
 import { MigrationAdapter } from './migration-adapter.js';
 import {
   MigrationPackage,
@@ -74,6 +78,36 @@ export class DbMigrator extends AsyncEventEmitter {
           ...options,
           migrationPackage,
         });
+        break;
+      }
+      case 'mariadb': {
+        migrationAdapter = await MariadbMigrationAdapter.create({
+          ...options,
+          migrationPackage,
+        });
+        break;
+      }
+      case 'mssql': {
+        migrationAdapter = await MssqlMigrationAdapter.create({
+          ...options,
+          migrationPackage,
+        });
+        break;
+      }
+      case 'sqlite': {
+        // @sqb/sqlite and @sqb/sqljs both register the "sqlite" dialect
+        // (they only differ in driver), so the driver name is what tells
+        // them apart here.
+        migrationAdapter =
+          options.connection.driver === 'sqljs'
+            ? await SqljsMigrationAdapter.create({
+                ...options,
+                migrationPackage,
+              })
+            : await SqliteMigrationAdapter.create({
+                ...options,
+                migrationPackage,
+              });
         break;
       }
       default:

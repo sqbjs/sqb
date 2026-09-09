@@ -10,16 +10,24 @@
     "paths": {
       "@sqb/builder": ["../builder/src/index.js"],
       "@sqb/connect": ["../connect/src/index.js"],
+      "@sqb/mariadb": ["../mariadb/src/index.js"],
+      "@sqb/mssql": ["../mssql/src/index.js"],
       "@sqb/mysql": ["../mysql/src/index.js"],
       "@sqb/oracle": ["../oracle/src/index.js"],
-      "@sqb/postgres": ["../postgres/src/index.js"]
+      "@sqb/postgres": ["../postgres/src/index.js"],
+      "@sqb/sqlite": ["../sqlite/src/index.js"],
+      "@sqb/sqljs": ["../sqljs/src/index.js"]
     }
   },
   "references": [
     { "path": "../builder" },
     { "path": "../connect" },
+    { "path": "../mariadb" },
+    { "path": "../mssql" },
     { "path": "../mysql" },
     { "path": "../oracle" },
-    { "path": "../postgres" }
+    { "path": "../postgres" },
+    { "path": "../sqlite" },
+    { "path": "../sqljs" }
   ]
 }

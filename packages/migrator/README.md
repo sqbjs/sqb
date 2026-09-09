@@ -42,27 +42,42 @@ await migrator.execute({
 });
 ```
 
-PostgreSQL, Oracle, and MySQL are supported today, via the bundled `PgMigrationAdapter`,
-`OracleMigrationAdapter`, and `MysqlMigrationAdapter`. The Oracle and MySQL adapters have a few
-dialect-driven differences worth knowing:
+PostgreSQL, Oracle, MySQL, MariaDB, SQL Server, and SQLite (both the native `sqlite` driver and
+the WASM-based `sqljs` driver) are supported today, via the bundled `PgMigrationAdapter`,
+`OracleMigrationAdapter`, `MysqlMigrationAdapter`, `MariadbMigrationAdapter`,
+`MssqlMigrationAdapter`, `SqliteMigrationAdapter`, and `SqljsMigrationAdapter`. Each adapter has a
+few dialect-driven differences worth knowing:
 
-- **No schema auto-creation on Oracle.** An Oracle "schema" *is* a user, and provisioning one is a
-  DBA-level operation this adapter deliberately doesn't attempt. `infoSchema` (if given) is only
-  used as a table-name prefix for the bookkeeping tables — that schema/user must already exist.
-  MySQL has no such restriction — `CREATE SCHEMA IF NOT EXISTS` is just `CREATE DATABASE`, so the
-  MySQL adapter auto-creates `infoSchema` the same way the PostgreSQL adapter does.
-- **Multi-statement `.sql` scripts follow the standard SQL\*Plus convention on Oracle**: a PL/SQL
-  block (a trigger, procedure, function, package body, or a bare `BEGIN`/`DECLARE` block) is
-  terminated by a lone `/` on its own line; everything else is plain DDL/DML, `;`-separated — this
-  is required because `oracledb` runs exactly one statement per call, unlike `postgrejs`, which
-  runs a whole multi-statement script at once. MySQL scripts need no such splitting — the
-  connection is opened with `multipleStatements` enabled, and the server's own parser correctly
-  treats a trigger/procedure body's internal `;`s as part of one statement.
-- **Locking is best-effort on Oracle, native on MySQL.** Both Oracle and MySQL DDL always
-  implicitly commits, which would release a transaction-held lock the instant a migration's first
-  `CREATE`/`ALTER` ran. The Oracle adapter uses `DBMS_LOCK` instead (unaffected by that), and falls
-  back to running unprotected if it isn't grantable in your environment. The MySQL adapter uses
-  the native, session-scoped `GET_LOCK`/`RELEASE_LOCK` functions, which need no special grant.
+- **Schema auto-creation.** Postgres, MySQL, MariaDB, and SQL Server all auto-create `infoSchema`
+  (`CREATE SCHEMA IF NOT EXISTS`, which for MySQL/MariaDB is just `CREATE DATABASE`). Oracle is the
+  exception: a schema *is* a user there, and provisioning one is a DBA-level operation this adapter
+  deliberately doesn't attempt — `infoSchema` (if given) is only used as a table-name prefix, and
+  that schema/user must already exist. SQLite has no schema/catalog object at all (`sqlite` and
+  `sqljs` alike) - `infoSchema` is likewise just a table-name prefix there, and `$(schema)` resolves
+  to `main`, SQLite's always-present default database name.
+- **Multi-statement `.sql` scripts.** Postgres, MySQL, MariaDB, and SQLite (`sqlite`/`sqljs`) run a
+  whole multi-statement script - trigger/procedure bodies included - in one call. Oracle needs
+  script-splitting: it follows the standard SQL\*Plus convention where a PL/SQL block (a trigger,
+  procedure, function, package body, or a bare `BEGIN`/`DECLARE` block) is terminated by a lone `/`
+  on its own line, and everything else is plain DDL/DML, `;`-separated - required because
+  `oracledb` runs exactly one statement per call. SQL Server needs a different kind of splitting:
+  T-SQL requires `CREATE TRIGGER`/`PROCEDURE`/`FUNCTION`/`VIEW` to be the first statement in their
+  batch, so a script mixing e.g. a `CREATE TABLE` with a `CREATE TRIGGER` needs a `GO` on its own
+  line between them, same as sqlcmd/SSMS.
+- **Locking.** Postgres, MySQL, and MariaDB use their native session-scoped advisory-lock functions
+  (`pg_advisory_lock`, `GET_LOCK`/`RELEASE_LOCK`), unaffected by the implicit commit their own DDL
+  triggers. Oracle uses `DBMS_LOCK` for the same reason, falling back to running unprotected if it
+  isn't grantable in your environment. SQL Server DDL does *not* implicitly commit, so
+  `MssqlMigrationAdapter` uses a transaction-scoped `sp_getapplock` instead, released automatically
+  when that transaction commits. SQLite (`sqlite`/`sqljs`) is embedded and single-process with no
+  server to arbitrate a lock between clients, so locking is a no-op there.
+- **MariaDB's `GET_LOCK` rejects a negative timeout** (it warns and returns `NULL` instead of
+  waiting forever, unlike MySQL) - confirmed against a live server. `MariadbMigrationAdapter` uses
+  a very large positive timeout (2^30 seconds) to get the same effectively-infinite wait.
+- **`sqljs` never writes back to disk on its own** - sql.js loads a whole file into memory once at
+  connect time and only ever mutates that in-memory copy. `SqljsMigrationAdapter` exports and saves
+  the result back to the original file when the migration run finishes (skipped for a `:memory:`
+  database), otherwise every applied migration would be silently lost the moment the process exits.
 
 ## Main goals
 
