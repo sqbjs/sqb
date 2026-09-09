@@ -10,12 +10,14 @@
     "paths": {
       "@sqb/builder": ["../builder/src/index.js"],
       "@sqb/connect": ["../connect/src/index.js"],
+      "@sqb/oracle": ["../oracle/src/index.js"],
       "@sqb/postgres": ["../postgres/src/index.js"]
     }
   },
   "references": [
     { "path": "../builder" },
     { "path": "../connect" },
+    { "path": "../oracle" },
     { "path": "../postgres" }
   ]
 }

@@ -30,10 +30,13 @@
   "peerDependencies": {
     "@sqb/builder": "^6.0.7",
     "@sqb/connect": "^6.0.7",
+    "@sqb/oracle": "^6.0.7",
     "@sqb/postgres": "^6.0.7"
   },
   "devDependencies": {
+    "@types/oracledb": "^7.0.3",
     "expect": "^30.5.1",
+    "oracledb": "^7.0.0",
     "postgrejs": "^3.0.2"
   },
   "type": "module",

@@ -1,5 +1,6 @@
 import type { ClientConfiguration } from '@sqb/connect';
 import { AsyncEventEmitter } from 'strict-typed-events';
+import { OracleMigrationAdapter } from './adapters/oracle-migration-adapter.js';
 import { PgMigrationAdapter } from './adapters/pg-migration-adapter.js';
 import { MigrationAdapter } from './migration-adapter.js';
 import {
@@ -55,6 +56,13 @@ export class DbMigrator extends AsyncEventEmitter {
     switch (options.connection.dialect) {
       case 'postgres': {
         migrationAdapter = await PgMigrationAdapter.create({
+          ...options,
+          migrationPackage,
+        });
+        break;
+      }
+      case 'oracle': {
+        migrationAdapter = await OracleMigrationAdapter.create({
           ...options,
           migrationPackage,
         });

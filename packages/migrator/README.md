@@ -42,7 +42,21 @@ await migrator.execute({
 });
 ```
 
-Currently only PostgreSQL is supported, via the bundled `PgMigrationAdapter`.
+PostgreSQL and Oracle are supported today, via the bundled `PgMigrationAdapter` and
+`OracleMigrationAdapter`. The Oracle adapter has a few dialect-driven differences worth knowing:
+
+- **No schema auto-creation.** An Oracle "schema" *is* a user, and provisioning one is a DBA-level
+  operation this adapter deliberately doesn't attempt. `infoSchema` (if given) is only used as a
+  table-name prefix for the bookkeeping tables — that schema/user must already exist.
+- **Multi-statement `.sql` scripts follow the standard SQL\*Plus convention**: a PL/SQL block
+  (a trigger, procedure, function, package body, or a bare `BEGIN`/`DECLARE` block) is terminated
+  by a lone `/` on its own line; everything else is plain DDL/DML, `;`-separated — this is
+  required because `oracledb` runs exactly one statement per call, unlike `postgrejs`, which runs
+  a whole multi-statement script at once.
+- **Locking is best-effort.** Oracle DDL always implicitly commits, which would release a
+  transaction-held lock the instant a migration's first `CREATE`/`ALTER` ran, so the adapter uses
+  `DBMS_LOCK` instead (unaffected by that). If it isn't grantable in your environment, migrations
+  still run — just without protection against two runs racing concurrently.
 
 ## Main goals
 
