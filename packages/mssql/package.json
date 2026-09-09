@@ -1,7 +1,7 @@
 {
   "name": "@sqb/mssql",
   "description": "SQB adapter for the mssql (tedious) driver",
-  "version": "6.0.7",
+  "version": "6.0.8",
   "author": "Panates",
   "license": "Apache-2.0",
   "scripts": {
@@ -30,9 +30,9 @@
     "mssql": "^12.7.0"
   },
   "peerDependencies": {
-    "@sqb/builder": "^6.0.7",
-    "@sqb/connect": "^6.0.7",
-    "@sqb/mssql-dialect": "^6.0.7",
+    "@sqb/builder": "^6.0.8",
+    "@sqb/connect": "^6.0.8",
+    "@sqb/mssql-dialect": "^6.0.8",
     "mssql": "^11.0.0 || ^12.0.0"
   },
   "type": "module",
