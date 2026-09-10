@@ -3,7 +3,8 @@
   "description": "SQB adapter for Node.js and Bun's native SQLite drivers",
   "version": "6.0.8",
   "author": "Panates",
-  "license": "Apache-2.0",
+  "license": "BSD-3-Clause",
+  "homepage": "https://www.sqbjs.org",
   "scripts": {
     "compile": "tsc --noEmit",
     "prebuild": "npm run check && npm run lint && npm run clean",
@@ -12,7 +13,7 @@
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --max-warnings=0 --fix",
     "format": "prettier . --write --log-level=warn",
-    "check": "dpdm -T --no-warning --no-tree ./src/index.ts",
+    "check": "dpdm -T --no-warning --no-tree --skip-dynamic-imports circular --exit-code circular:1 ./src/index.ts",
     "test": "mocha",
     "clean": "npm run clean:src && npm run clean:test && npm run clean:build && npm run clean:cover",
     "clean:src": "ts-cleanup -s src --all",
