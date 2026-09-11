@@ -321,10 +321,15 @@ export class OracleSerializer implements SerializerExtension {
       ctx.rootQuery._type === SerializationType.DELETE_QUERY
     ) {
       const v = ctx.params?.[o.name];
+      /* Queries involving date data types run very slowly when Oracle's TO_TIMESTAMP is used.
+         To overcome this issue, TO_DATE should be used instead. Milliseconds can be disregarded. */
       if (v instanceof Date) {
         ctx.preparedParams = ctx.preparedParams || {};
-        ctx.preparedParams[o.name] = toDateString(v).replace('T', ' ');
-        return `TO_TIMESTAMP(:${o.name}, 'yyyy-mm-dd hh24:mi:ss.FF3')`;
+        ctx.preparedParams[o.name] = toDateString(v, { trim: 'sec' }).replace(
+          'T',
+          ' ',
+        );
+        return `TO_DATE(:${o.name}, 'yyyy-mm-dd hh24:mi:ss')`;
       }
       if (Array.isArray(v)) {
         delete ctx.params?.[o.name];
