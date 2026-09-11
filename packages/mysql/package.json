@@ -1,7 +1,7 @@
 {
   "name": "@sqb/mysql",
   "description": "SQB adapter for the mysql2 driver",
-  "version": "6.0.8",
+  "version": "6.0.9",
   "author": "Panates",
   "license": "BSD-3-Clause",
   "homepage": "https://www.sqbjs.org",
@@ -29,9 +29,9 @@
     "mysql2": "^3.24.4"
   },
   "peerDependencies": {
-    "@sqb/builder": "^6.0.8",
-    "@sqb/connect": "^6.0.8",
-    "@sqb/mysql-dialect": "^6.0.8",
+    "@sqb/builder": "^6.0.9",
+    "@sqb/connect": "^6.0.9",
+    "@sqb/mysql-dialect": "^6.0.9",
     "mysql2": "^3.24.4"
   },
   "type": "module",
